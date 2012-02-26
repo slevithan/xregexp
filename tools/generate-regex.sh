@@ -13,7 +13,7 @@ curl -# http://www.unicode.org/Public/6.1.0/ucd/UnicodeData.txt > UnicodeData-6.
 python parse.py UnicodeData-6.1.0.txt > output.txt
 
 # Quick hack to remove the last comma
-sed -i '' -e 's/,$//' output.txt
+sed -i '' -e '$s/,$//' output.txt
 
 # Display the result
 cat output.txt
