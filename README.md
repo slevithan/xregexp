@@ -30,14 +30,14 @@ Unicode plugin usage examples
 -----------------------------
 
 ```html
-    <script src="xregexp.js"></script>
-    <script src="xregexp-unicode-base.js"></script>
-    <script>
-        var word = XRegExp('\\p{L}+');
-        console.log(word.test('Русский'));
-        console.log(word.test('日本語'));
-        console.log(word.test('العربية'));
-    </script>
+<script src="xregexp.js"></script>
+<script src="xregexp-unicode-base.js"></script>
+<script>
+    var word = XRegExp('\\p{L}+');
+    console.log(word.test('Русский'));
+    console.log(word.test('日本語'));
+    console.log(word.test('العربية'));
+</script>
 ```
 
 More details [here](http://xregexp.com/plugins/).
