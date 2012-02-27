@@ -246,13 +246,13 @@ if (!XRegExp) {
     // first value in the arguments array. the context is ignored but is accepted for congruity
     // with `Function.prototype.apply`
     RegExp.prototype.apply = function (context, args) {
-        return this.exec(args[0]);
+        return this.test(args[0]);
     };
 
     // Accepts a context object and string; returns the result of calling `exec` with the provided
     // string. the context is ignored but is accepted for congruity with `Function.prototype.call`
     RegExp.prototype.call = function (context, str) {
-        return this.exec(str);
+        return this.test(str);
     };
 
 

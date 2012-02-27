@@ -267,15 +267,15 @@ test("XRegExp.matchChain", function () {
 test("RegExp.prototype.apply", function () {
 	var regex = /x/;
 
-	deepEqual(regex.apply(null, ["x"]), regex.exec("x"), "Apply with match same as exec");
-	deepEqual(regex.apply(null, ["y"]), regex.exec("y"), "Apply without match same as exec");
+	deepEqual(regex.apply(null, ["x"]), regex.test("x"), "Apply with match same as test");
+	deepEqual(regex.apply(null, ["y"]), regex.test("y"), "Apply without match same as test");
 });
 
 test("RegExp.prototype.call", function () {
 	var regex = /x/;
 
-	deepEqual(regex.call(null, "x"), regex.exec("x"), "Call with match same as exec");
-	deepEqual(regex.call(null, "y"), regex.exec("y"), "Call without match same as exec");
+	deepEqual(regex.call(null, "x"), regex.test("x"), "Call with match same as test");
+	deepEqual(regex.call(null, "y"), regex.test("y"), "Call without match same as test");
 });
 
 //-------------------------------------------------------------------
