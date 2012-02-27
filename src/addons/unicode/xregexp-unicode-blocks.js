@@ -1,5 +1,5 @@
 /*
-XRegExp Unicode plugin pack: Blocks 1.1
+XRegExp addon: Unicode blocks pack 1.1
 (c) 2010-2012 Steven Levithan
 MIT License
 <http://xregexp.com>
@@ -7,7 +7,7 @@ MIT License
 Uses the Unicode 6.1 character database:
 <http://unicode.org/Public/6.1.0/ucd/Blocks.txt>
 
-This package for the XRegExp Unicode plugin enables the 156 Unicode 6.1 blocks
+This package for the XRegExp Unicode addon enables the 156 Unicode 6.1 blocks
 in the Basic Multilingual Plane (U+0000-U+FFFF).
 
 Unicode blocks use the prefix "In". Example usage:
@@ -21,7 +21,7 @@ Letter case, spaces, hyphens, and underscores are ignored in block names.
 var XRegExp;
 
 if (!(XRegExp && XRegExp.addUnicodePackage)) {
-	throw ReferenceError("XRegExp's Unicode plugin must be loaded before adding blocks");
+	throw ReferenceError("XRegExp's Unicode addon must be loaded before adding blocks");
 }
 
 XRegExp.addUnicodePackage({
@@ -182,6 +182,4 @@ XRegExp.addUnicodePackage({
 	InHalfwidth_and_Fullwidth_Forms: "FF00-FFEF",
 	InSpecials: "FFF0-FFFF"
 });
-
-// Excludes 64 Unicode 6.1 blocks outside the BMP.
 

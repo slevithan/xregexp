@@ -4,8 +4,8 @@
 XRegExp provides augmented, extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regular expression utility belt with tools to simplify your client-side grepping while obviating cross-browser inconsistencies.
 
 
-Usage examples
---------------
+Sexy examples
+-------------
 
 ```html
 <script src="xregexp.js"></script>
@@ -26,12 +26,12 @@ Usage examples
 For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), and [browser fixes](http://xregexp.com/cross_browser/).
 
 
-Unicode plugin usage examples
------------------------------
+Unicode addon usage examples
+----------------------------
 
 ```html
 <script src="xregexp.js"></script>
-<script src="xregexp-unicode-base.js"></script>
+<script src="addons/unicode/xregexp-unicode-base.js"></script>
 <script>
     var word = XRegExp('\\p{L}+');
     console.log(word.test('Русский'));
@@ -40,7 +40,7 @@ Unicode plugin usage examples
 </script>
 ```
 
-More details [here](http://xregexp.com/plugins/).
+More details [here](http://xregexp.com/plugins/#unicode).
 
 
 Changelog

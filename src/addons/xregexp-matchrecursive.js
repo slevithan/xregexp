@@ -1,4 +1,4 @@
-// XRegExp Match Recursive plugin 0.1.1
+// XRegExp addon: Match Recursive 0.1.1
 // (c) 2009-2010 Steven Levithan
 // MIT License
 // <http://xregexp.com>
@@ -6,7 +6,7 @@
 var XRegExp;
 
 if (!XRegExp) {
-    throw ReferenceError("XRegExp must be loaded before the Match Recursive plugin");
+    throw ReferenceError("XRegExp must be loaded before the Match Recursive addon");
 }
 
 /* accepts a string to search, left and right delimiters as regex pattern strings, optional regex

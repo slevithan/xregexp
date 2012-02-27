@@ -1,5 +1,5 @@
 /*
-XRegExp Unicode plugin base 0.6
+XRegExp addon: Unicode base 0.6
 (c) 2008-2012 Steven Levithan
 MIT License
 <http://xregexp.com>
@@ -7,8 +7,8 @@ MIT License
 Uses the Unicode 6.1 character database:
 <http://unicode.org/Public/6.1.0/ucd/>
 
-The Unicode plugin base adds support for the \p{L} token only (Unicode category
-Letter). Plugin packages are available that add support for the remaining
+The Unicode addon base adds support for the \p{L} token only (Unicode category
+Letter). Addon packages are available that add support for the remaining
 Unicode categories, as well as Unicode scripts and blocks.
 
 All Unicode tokens can be inverted by using an uppercase P; e.g., \P{L} matches
@@ -22,7 +22,7 @@ Unicode token names.
 var XRegExp;
 
 if (!XRegExp) {
-    throw ReferenceError("XRegExp must be loaded before the Unicode plugin");
+    throw ReferenceError("XRegExp must be loaded before the Unicode addon");
 }
 
 (function () {
