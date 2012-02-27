@@ -46,4 +46,5 @@ More details [here](http://xregexp.com/plugins/#unicode).
 Changelog
 ---------
 
-Historical changes: [version history](http://xregexp.com/history/). Planned changes: [roadmap](https://github.com/slevithan/XRegExp/wiki/Roadmap).
+* Historical changes: [version history](http://xregexp.com/history/).
+* Planned changes: [roadmap](https://github.com/slevithan/XRegExp/wiki/Roadmap).
