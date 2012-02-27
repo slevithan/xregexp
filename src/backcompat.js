@@ -12,28 +12,36 @@ if (XRegExp) {
     XRegExp.matchWithinChain = XRegExp.matchChain;
 
     // Removed addFlags in 1.5.0
-    RegExp.prototype.addFlags = function (s) {
-        return clone(this, s);
+    RegExp.prototype.addFlags = function (flags) {
+        var x = this._xregexp;
+        var regex = XRegExp(this.source, /\/([a-z]*)$/.exec(this + "")[1] + (flags || ""));
+        if (x) {
+            regex._xregexp = {
+                source: x.source,
+                captureNames: x.captureNames ? x.captureNames.slice(0) : null
+            };
+        }
+        return regex;
     };
 
     // Removed forEachExec in 1.5.0
-    RegExp.prototype.forEachExec = function (s, f, c) {
-        return XRegExp.iterate(s, this, f, c);
+    RegExp.prototype.forEachExec = function (str, callback, context) {
+        return XRegExp.iterate(str, this, callback, context);
     };
 
     // Removed validate in 1.5.0
-    RegExp.prototype.validate = function (s) {
-        var r = RegExp("^(?:" + this.source + ")$(?!\\s)", /\/([a-z]*)$/.exec(this + "")[1]);
+    RegExp.prototype.validate = function (str) {
+        var regex = RegExp("^(?:" + this.source + ")$(?!\\s)", /\/([a-z]*)$/.exec(this + "")[1]);
         if (this.global)
             this.lastIndex = 0;
-        return s.search(r) === 0;
+        return str.search(regex) === 0;
     };
 
     // Removed execAll in 1.2.0
-    RegExp.prototype.execAll = function (s) {
-        var r = [];
-        XRegExp.iterate(s, this, function (m) {r.push(m);});
-        return r;
+    RegExp.prototype.execAll = function (str) {
+        var result = [];
+        XRegExp.iterate(str, this, function (match) {result.push(match);});
+        return result;
     };
 
 })();
