@@ -7,6 +7,7 @@ var XRegExp;
 
 if (XRegExp) {
 (function () {
+    "use strict";
 
     // Renamed matchWithinChain in 1.5.0
     XRegExp.matchWithinChain = XRegExp.matchChain;

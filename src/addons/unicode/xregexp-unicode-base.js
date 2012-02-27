@@ -1,5 +1,5 @@
 /*
-XRegExp addon: Unicode base 0.6
+XRegExp addon: Unicode Base 0.6
 (c) 2008-2012 Steven Levithan
 MIT License
 <http://xregexp.com>
@@ -7,7 +7,7 @@ MIT License
 Uses the Unicode 6.1 character database:
 <http://unicode.org/Public/6.1.0/ucd/>
 
-The Unicode addon base adds support for the \p{L} token only (Unicode category
+The Unicode Base addon adds support for the \p{L} token only (Unicode category
 Letter). Addon packages are available that add support for the remaining
 Unicode categories, as well as Unicode scripts and blocks.
 
@@ -22,10 +22,11 @@ Unicode token names.
 var XRegExp;
 
 if (!XRegExp) {
-    throw ReferenceError("XRegExp must be loaded before the Unicode addon");
+    throw ReferenceError("XRegExp must be loaded before Unicode Base");
 }
 
 (function () {
+    "use strict";
 
     var unicode = {}; // protected storage for package tokens
 

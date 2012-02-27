@@ -1,5 +1,5 @@
 /*
-XRegExp addon: Unicode scripts pack 1.1
+XRegExp addon: Unicode Scripts 1.1
 (c) 2010-2012 Steven Levithan
 MIT License
 <http://xregexp.com>
@@ -7,8 +7,8 @@ MIT License
 Uses the Unicode 6.1 character database:
 <http://unicode.org/Public/6.1.0/ucd/Scripts.txt>
 
-This package for the XRegExp Unicode addon enables the 71 Unicode 6.1 scripts
-in the Basic Multilingual Plane (U+0000-U+FFFF).
+This package for the XRegExp Unicode Base addon enables the 71 Unicode 6.1
+scripts in the Basic Multilingual Plane (U+0000-U+FFFF).
 
 Example usage:
 
@@ -21,7 +21,7 @@ Letter case, spaces, hyphens, and underscores are ignored in script names.
 var XRegExp;
 
 if (!(XRegExp && XRegExp.addUnicodePackage)) {
-	throw ReferenceError("XRegExp's Unicode addon must be loaded before adding scripts");
+	throw ReferenceError("XRegExp's Unicode Base must be loaded before Unicode Scripts");
 }
 
 XRegExp.addUnicodePackage({

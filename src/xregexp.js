@@ -11,6 +11,7 @@ var XRegExp;
 if (!XRegExp) {
 // Run within an anonymous function to protect variables and avoid new globals
 (function (undefined) {
+    "use strict";
 
     //---------------------------------
     //  Constructor
@@ -127,7 +128,7 @@ if (!XRegExp) {
     //---------------------------------
 
     // Lets you extend or change XRegExp syntax and create custom flags. This is used internally by
-    // the XRegExp library and can be used to create XRegExp plugins. This function is intended for
+    // the XRegExp library and can be used to create XRegExp addons. This function is intended for
     // users with advanced knowledge of JavaScript's regular expression syntax and behavior. It can
     // be disabled by `XRegExp.freezeTokens`
     XRegExp.addToken = function (regex, handler, scope, trigger) {
@@ -179,7 +180,7 @@ if (!XRegExp) {
     };
 
     // Breaks the unrestorable link to XRegExp's private list of tokens, thereby preventing
-    // syntax and flag changes. Should be run after XRegExp and any plugins are loaded
+    // syntax and flag changes. Should be run after XRegExp and any addons are loaded
     XRegExp.freezeTokens = function () {
         XRegExp.addToken = function () {
             throw Error("can't run addToken after freezeTokens");

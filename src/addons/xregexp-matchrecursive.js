@@ -1,12 +1,12 @@
 // XRegExp addon: Match Recursive 0.1.1
-// (c) 2009-2010 Steven Levithan
+// (c) 2009-2012 Steven Levithan
 // MIT License
 // <http://xregexp.com>
 
 var XRegExp;
 
 if (!XRegExp) {
-    throw ReferenceError("XRegExp must be loaded before the Match Recursive addon");
+    throw ReferenceError("XRegExp must be loaded before Match Recursive");
 }
 
 /* accepts a string to search, left and right delimiters as regex pattern strings, optional regex
@@ -30,6 +30,8 @@ unsupported features:
     flags, it introduces other limitations and is better not used. */
 
 XRegExp.matchRecursive = function (str, left, right, flags, options) {
+    "use strict";
+
     var options      = options || {},
         escapeChar   = options.escapeChar,
         vN           = options.valueNames,
