@@ -646,19 +646,5 @@ if (XRegExp) {
         function () {return this.hasFlag("s");}
     );
 
-
-    //---------------------------------
-    //  Backward compatibility
-    //---------------------------------
-
-    // Uncomment the following block for compatibility with XRegExp 1.0-1.2:
-    /*
-    XRegExp.matchWithinChain = XRegExp.matchChain;
-    RegExp.prototype.addFlags = function (s) {return clone(this, s);};
-    RegExp.prototype.execAll = function (s) {var r = []; XRegExp.iterate(s, this, function (m) {r.push(m);}); return r;};
-    RegExp.prototype.forEachExec = function (s, f, c) {return XRegExp.iterate(s, this, f, c);};
-    RegExp.prototype.validate = function (s) {var r = RegExp("^(?:" + this.source + ")$(?!\\s)", getNativeFlags(this)); if (this.global) this.lastIndex = 0; return s.search(r) === 0;};
-    */
-
 })();
 
