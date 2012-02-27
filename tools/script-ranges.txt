@@ -1,30 +1,3 @@
-/*
-XRegExp Unicode plugin pack: Scripts 1.1
-(c) 2010-2012 Steven Levithan
-MIT License
-<http://xregexp.com>
-
-Uses the Unicode 6.1 character database:
-<http://unicode.org/Public/6.1.0/ucd/Scripts.txt>
-
-This package for the XRegExp Unicode plugin enables the 71 Unicode 6.1 scripts
-in the Basic Multilingual Plane (U+0000-U+FFFF).
-
-Example usage:
-
-	\p{Latin}
-	\p{Canadian Aboriginal}
-
-Letter case, spaces, hyphens, and underscores are ignored in script names.
-*/
-
-var XRegExp;
-
-if (!(XRegExp && XRegExp.addUnicodePackage)) {
-	throw ReferenceError("XRegExp's Unicode plugin must be loaded before adding scripts");
-}
-
-XRegExp.addUnicodePackage({
 	Arabic: "0600-06040606-06080609-060A060B060D060E-060F0610-061A061E0620-063F0641-064A0656-065E066A-066D066E-066F0671-06D306D406D506D6-06DC06DE06DF-06E406E5-06E606E7-06E806E906EA-06ED06EE-06EF06F0-06F906FA-06FC06FD-06FE06FF0750-077F08A008A2-08AC08E4-08FEFB50-FBB1FBB2-FBC1FBD3-FD3DFD50-FD8FFD92-FDC7FDF0-FDFBFDFCFE70-FE74FE76-FEFC",
 	Armenian: "0531-05560559055A-055F0561-0587058A058FFB13-FB17",
 	Balinese: "1B00-1B031B041B05-1B331B341B351B36-1B3A1B3B1B3C1B3D-1B411B421B43-1B441B45-1B4B1B50-1B591B5A-1B601B61-1B6A1B6B-1B731B74-1B7C",
@@ -96,7 +69,3 @@ XRegExp.addUnicodePackage({
 	Tifinagh: "2D30-2D672D6F2D702D7F",
 	Vai: "A500-A60BA60CA60D-A60FA610-A61FA620-A629A62A-A62B",
 	Yi: "A000-A014A015A016-A48CA490-A4C6"
-});
-
-// Excludes 31 Unicode 6.1 scripts with no code points in the BMP.
-

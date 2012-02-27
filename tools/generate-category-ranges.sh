@@ -10,10 +10,10 @@ cd "$(dirname "$0")"
 curl -# http://www.unicode.org/Public/6.1.0/ucd/UnicodeData.txt > UnicodeData-6.1.0.txt
 
 # Generate the regular expressions
-python parse.py UnicodeData-6.1.0.txt > output.txt
+python parse-categories.py UnicodeData-6.1.0.txt > category-ranges.txt
 
 # Quick hack to remove the last comma
-sed -i '' -e '$s/,$//' output.txt
+sed -i '' -e '$s/,$//' category-ranges.txt
 
 # Display the result
-cat output.txt
+cat category-ranges.txt
