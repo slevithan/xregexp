@@ -1,7 +1,7 @@
 ﻿[XRegExp](http://xregexp.com/)
 ==============================
 
-XRegExp provides augmented, extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regular expression utility belt with tools to simplify your client-side grepping while obviating cross-browser inconsistencies.
+XRegExp provides augmented, extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regular expression utility belt with tools to make your client-side grepping both simpler and more powerful, while freeing you from worrying about pesky cross-browser inconsistencies.
 
 
 Usage examples
@@ -46,5 +46,5 @@ More details [here](http://xregexp.com/plugins/#unicode).
 Changelog
 ---------
 
-* Historical changes: [version history](http://xregexp.com/history/).
-* Planned changes: [roadmap](https://github.com/slevithan/XRegExp/wiki/Roadmap).
+* Historical changes: [Version history](http://xregexp.com/history/).
+* Planned changes: [Roadmap](https://github.com/slevithan/XRegExp/wiki/Roadmap).
