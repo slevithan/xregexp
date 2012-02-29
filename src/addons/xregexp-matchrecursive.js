@@ -17,77 +17,50 @@ data), allowing nested instances of left and right delimiters. use the g flag to
 matches, otherwise only the first is returned. if delimiters are unbalanced within the subject
 data, an error is thrown.
 
-this function admittedly pushes the boundaries of what can be accomplished sensibly without a
-"real" parser. however, by doing so it provides flexible and powerful recursive parsing
-capabilities with minimal code weight.
-
-warning: the `escapeChar` option is considered experimental and might be changed or removed in
-future versions.
-
-unsupported features:
-  - backreferences within delimiter patterns when using `escapeChar`.
-  - although providing delimiters as regex objects adds the minor feature of independent delimiter
-    flags, it introduces other limitations and is better not used. */
+known issues:
+- backreferences are not supported within delimiter patterns when using `escapeChar`. */
 
 XRegExp.matchRecursive = function (str, left, right, flags, options) {
     "use strict";
 
-    var options      = options || {},
-        escapeChar   = options.escapeChar,
-        vN           = options.valueNames,
-        flags        = flags || "",
-        global       = flags.indexOf("g") > -1,
-        ignoreCase   = flags.indexOf("i") > -1,
-        multiline    = flags.indexOf("m") > -1,
-        sticky       = flags.indexOf("y") > -1,
-        // sticky mode has its own handling in this function, which means you can use flag "y" even
-        // in browsers which don't support it natively
-        flags        = flags.replace(/y/g, ""),
-        left         = left  instanceof RegExp ? (left.global  ? left  : XRegExp.copyAsGlobal(left))  : XRegExp(left,  "g" + flags),
-        right        = right instanceof RegExp ? (right.global ? right : XRegExp.copyAsGlobal(right)) : XRegExp(right, "g" + flags),
-        output       = [],
-        openTokens   = 0,
-        delimStart   = 0,
-        delimEnd     = 0,
-        lastOuterEnd = 0,
+    var options = options || {},
+        escapeChar = options.escapeChar,
+        vN = options.valueNames,
+        flags = flags || "",
+        global = flags.indexOf("g") > -1,
+        sticky = flags.indexOf("y") > -1,
+        flags = flags.replace(/y/g, ""), // flag y handled internally; can be used even if not supported natively
+        left = XRegExp(left, flags),
+        right = XRegExp(right, flags),
+        output = [],
+        openTokens = 0, delimStart = 0, delimEnd = 0, lastOuterEnd = 0,
         outerStart, innerStart, leftMatch, rightMatch, escaped, esc;
 
     if (escapeChar) {
         if (escapeChar.length > 1)
             throw SyntaxError("can't supply more than one escape character");
-        if (multiline)
-            throw TypeError("can't supply escape character when using the multiline flag");
         escaped = XRegExp.escape(escapeChar);
-        // Escape pattern modifiers:
-        //   g - not needed here
-        //   i - included
-        //   m - **unsupported**, throws error
-        //   s - handled by XRegExp when delimiters are provided as strings
-        //   x - handled by XRegExp when delimiters are provided as strings
-        //   y - not needed here; supported by other handling in this function
         esc = RegExp(
-            "^(?:" + escaped + "[\\S\\s]|(?:(?!" + left.source + "|" + right.source + ")[^" + escaped + "])+)+",
-            ignoreCase ? "i" : ""
+            "(?:" + escaped + "[\\S\\s]|(?:(?!" + left.source + "|" + right.source + ")[^" + escaped + "])+)+",
+            flags.replace(/[^im]+/g, "") // flags g, y, s, and x aren't needed here (s and x are handled by XRegExp)
         );
     }
 
     while (true) {
-        // advance the starting search position to the end of the last delimiter match. a couple
-        // special cases are also covered:
-        //   - if using an escape character, advance to the next delimiter's starting position,
-        //     skipping any escaped characters
-        //   - first time through, reset lastIndex in case delimiters were provided as regexes
-        left.lastIndex = right.lastIndex = delimEnd +
-            (escapeChar ? (esc.exec(str.slice(delimEnd)) || [""])[0].length : 0);
+        // if using an escape character, advance to the next delimiter's starting position,
+        // skipping any escaped characters
+        if (escapeChar)
+            delimEnd += (XRegExp.exec(str, esc, delimEnd, /*anchored*/ true) || [""])[0].length;
 
-        leftMatch  = left.exec(str);
-        rightMatch = right.exec(str);
+        leftMatch = XRegExp.exec(str, left, delimEnd);
+        rightMatch = XRegExp.exec(str, right, delimEnd);
 
         // only keep the result which matched earlier in the string
         if (leftMatch && rightMatch) {
             if (leftMatch.index <= rightMatch.index)
-                 rightMatch = null;
-            else leftMatch  = null;
+                rightMatch = null;
+            else
+                leftMatch = null;
         }
 
         // paths*:
@@ -103,7 +76,7 @@ XRegExp.matchRecursive = function (str, left, right, flags, options) {
 
         if (leftMatch || rightMatch) {
             delimStart = (leftMatch || rightMatch).index;
-            delimEnd   = (leftMatch ? left : right).lastIndex;
+            delimEnd = delimStart + (leftMatch || rightMatch)[0].length;
         } else if (!openTokens) {
             break;
         }
@@ -132,8 +105,6 @@ XRegExp.matchRecursive = function (str, left, right, flags, options) {
                     break;
             }
         } else {
-            // reset lastIndex in case delimiters were provided as regexes
-            left.lastIndex = right.lastIndex = 0;
             throw Error("subject data contains unbalanced delimiters");
         }
 
@@ -144,9 +115,6 @@ XRegExp.matchRecursive = function (str, left, right, flags, options) {
 
     if (global && !sticky && vN && vN[0] && str.length > lastOuterEnd)
         output.push([vN[0], str.slice(lastOuterEnd), lastOuterEnd, str.length]);
-
-    // reset lastIndex in case delimiters were provided as regexes
-    left.lastIndex = right.lastIndex = 0;
 
     return output;
 };

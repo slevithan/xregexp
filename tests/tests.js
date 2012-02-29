@@ -8,12 +8,12 @@ test("Basic availability", function () {
 	ok(XRegExp.OUTSIDE_CLASS, "XRegExp.OUTSIDE_CLASS exists");
 	ok(XRegExp.addToken, "XRegExp.addToken exists");
 	ok(XRegExp.cache, "XRegExp.cache exists");
-	ok(XRegExp.copyAsGlobal, "XRegExp.copyAsGlobal exists");
 	ok(XRegExp.escape, "XRegExp.escape exists");
-	ok(XRegExp.execAt, "XRegExp.execAt exists");
+	ok(XRegExp.exec, "XRegExp.exec exists");
+	ok(XRegExp.forEach, "XRegExp.forEach exists");
 	ok(XRegExp.freezeTokens, "XRegExp.freezeTokens exists");
+	ok(XRegExp.globalize, "XRegExp.globalize exists");
 	ok(XRegExp.isRegExp, "XRegExp.isRegExp exists");
-	ok(XRegExp.iterate, "XRegExp.iterate exists");
 	ok(XRegExp.matchChain, "XRegExp.matchChain exists");
 	ok(XRegExp.version, "XRegExp.version exists");
 	ok(RegExp.prototype.apply, "RegExp.prototype.apply exists");
@@ -28,7 +28,9 @@ test("XRegExp", function () {
 	var regexCopy = XRegExp(regex);
 	var regexNamedCapture = XRegExp("(?<name>a)\\k<name>");
 
-	equal(XRegExp("(?:)").source, /(?:)/.source, "Empty regex source");
+	equal(XRegExp("").source, RegExp("").source, "Empty regex source (test 1)");
+	equal(XRegExp("(?:)").source, /(?:)/.source, "Empty regex source (test 2)");
+	equal(XRegExp().source, RegExp().source, "Undefined regex source");
 	ok(!XRegExp("(?:)").global, "Regex without flags");
 	ok(regexG.global, "Regex with global flag");
 	ok(regexGIM.global && regexGIM.ignoreCase && regexGIM.multiline, "Regex with multiple flags");
@@ -36,15 +38,18 @@ test("XRegExp", function () {
 	deepEqual(regex, XRegExp(regex), "Regex copy and original are alike");
 	ok(regex !== XRegExp(regex), "Regex copy is new instance");
 	ok(XRegExp(regexNamedCapture).exec("aa").name === "a", "Regex copy retains named capture properties");
-	ok(function () {try {XRegExp(regex, "g");} catch (err) {return err;}}() instanceof Error, "Regex copy with flag throws");
+	raises(function () {XRegExp(regex, "g");}, Error, "Regex copy with flag throws");
 	ok(XRegExp("(?:)") instanceof RegExp, "Result is instanceof RegExp");
 	ok(XRegExp("(?:)").constructor === RegExp, "Result's constructor is RegExp");
 
-	// Something like this might be a good test in the future, but for now,
-	// XRegExp doesn't throw on unsupported flags since it would add some
+	// Don't test this, since future XRegExp might throw like Firefox does with RegExp
+	//ok(XRegExp("(?:)", "gg").global, "Regex with duplicate flags");
+
+	// This might be a good test in the future, but for now, XRegExp
+	// doesn't throw on unsupported flags since it would add some
 	// complexity and overhead to keep track of any flags checked for in
 	// custom tokens.
-	//ok(function () {try {XRegExp("", "?");} catch (err) {return err;}}() instanceof Error, "Unsupported flag throws");
+	//raises(function () {XRegExp("", "?");}, Error, "Unsupported flag throws");
 });
 
 test("XRegExp.version", function () {
@@ -60,7 +65,7 @@ test("XRegExp.addToken", function () {
 	XRegExp.addToken(/\x02/, function () {return "2";}, XRegExp.INSIDE_CLASS);
 	XRegExp.addToken(/\x03/, function () {return "3";}, XRegExp.OUTSIDE_CLASS);
 	XRegExp.addToken(/\x04/, function () {return "4";}, XRegExp.INSIDE_CLASS | XRegExp.OUTSIDE_CLASS);
-	XRegExp.addToken(/\x05/, function () {return "5";}, XRegExp.OUTSIDE_CLASS, function(){return this.hasFlag("5");});
+	XRegExp.addToken(/\x05/, function () {return "5";}, XRegExp.OUTSIDE_CLASS, function () {return this.hasFlag("5");});
 	XRegExp.addToken(/\x06/, function () {this.setFlag("m"); return "6";});
 
 	ok(XRegExp("\x01").test("1"), "Default scope matches outside class");
@@ -86,10 +91,102 @@ test("XRegExp.cache", function () {
 	deepEqual(XRegExp.cache(". +\\1 1", "gimsx"), regexWithFlags, "Cached pattern plus flags");
 });
 
-test("XRegExp.copyAsGlobal", function () {
+test("XRegExp.escape", function () {
+	equal(XRegExp.escape("[()*+?.\\^$|"), "\\[\\(\\)\\*\\+\\?\\.\\\\\\^\\$\\|", "Metacharacters are escaped");
+	equal(XRegExp.escape("]{}-, #"), "\\]\\{\\}\\-\\,\\ \\#", "Occasional metacharacters are escaped");
+	equal(XRegExp.escape("abc_<123>!"), "abc_<123>!", "Nonmetacharacters are not escaped");
+});
+
+test("XRegExp.exec", function () {
+	var rX = /x/g;
+	var rA = /a/g;
+	var xregexp = XRegExp("(?<name>a)"); // tests expect this to be nonglobal and use named capture
+	var str = "abcxdef";
+	var match;
+
+	ok(XRegExp.exec(str, rX, 2), "Pos test 1");
+
+	ok(!XRegExp.exec(str, rX, 5), "Pos test 2");
+
+	rX.lastIndex = 5;
+	ok(XRegExp.exec(str, rX, 2), "Pos ignores lastIndex test 1");
+
+	rX.lastIndex = 0;
+	ok(!XRegExp.exec(str, rX, 5), "Pos ignores lastIndex test 2");
+
+	rA.lastIndex = 5;
+	ok(XRegExp.exec(str, rA), "Pos ignores lastIndex test 3 (pos defaults to 0)");
+
+	ok(XRegExp.exec(str, rX, 0, false), "Explicit !anchored allows matching after pos");
+
+	ok(!XRegExp.exec(str, rX, 0, true), "Anchored match fails if match possible after (but not at) pos");
+
+	ok(XRegExp.exec(str, rX, 3, true), "Anchored match succeeds if match at pos");
+
+	equal(XRegExp.exec(str, rX, 5), null, "Result of failure is null");
+
+	deepEqual(XRegExp.exec(str, xregexp), ["a", "a"], "Result of successful match is array with backreferences");
+
+	match = XRegExp.exec(str, xregexp);
+	equal(match.name, "a", "Match result includes named capture properties");
+
+	xregexp.lastIndex = 5;
+	XRegExp.exec(str, xregexp);
+	equal(xregexp.lastIndex, 5, "lastIndex of nonglobal regex left as is");
+
+	rX.lastIndex = 0;
+	XRegExp.exec(str, rX);
+	equal(rX.lastIndex, 4, "lastIndex of global regex updated to end of match");
+
+	rX.lastIndex = 5;
+	XRegExp.exec(str, rX, 2, true);
+	equal(rX.lastIndex, 0, "lastIndex of global regex updated to 0 after failure");
+
+	equal(XRegExp.exec("abc", /x/, 5), null, "pos greater than string length results in failure");
+});
+
+test("XRegExp.forEach", function () {
+	var str = "abc 123 def";
+	var regex = XRegExp("(?<first>\\w)\\w*");
+	var regexG = XRegExp("(?<first>\\w)\\w*", "g");
+
+	deepEqual(XRegExp.forEach(str, regex, function (m) {this.push(m[0]);}, []), ["abc", "123", "def"], "Match strings with nonglobal regex");
+	deepEqual(XRegExp.forEach(str, regexG, function (m) {this.push(m[0]);}, []), ["abc", "123", "def"], "Match strings with global regex");
+	deepEqual(XRegExp.forEach(str, regex, function (m) {this.push(m.first);}, []), ["a", "1", "d"], "Named backreferences");
+	deepEqual(XRegExp.forEach(str, regex, function (m) {this.push(m.index);}, []), [0, 4, 8], "Match indexes");
+	deepEqual(XRegExp.forEach(str, regex, function (m, i) {this.push(i);}, []), [0, 1, 2], "Match numbers");
+	deepEqual(XRegExp.forEach(str, regex, function (m, i, s) {this.push(s);}, []), [str, str, str], "Source strings");
+	deepEqual(XRegExp.forEach(str, regex, function (m, i, s, r) {this.push(r);}, []), [regex, regex, regex], "Source regexes");
+
+	var str2 = str;
+	deepEqual(XRegExp.forEach(str2, regex, function (m, i, s) {this.push(s); s += s; str2 += str2;}, []), [str, str, str], "Source string manipulation in callback doesn't affect iteration");
+
+	var regex2 = XRegExp(regex);
+	deepEqual(XRegExp.forEach(str, regex2, function (m, i, s, r) {this.push(i); r = /x/; regex2 = /x/;}, []), [0, 1, 2], "Source regex manipulation in callback doesn't affect iteration");
+
+	regexG.lastIndex = 4;
+	deepEqual(XRegExp.forEach(str, regexG, function (m) {this.push(m[0]);}, []), ["abc", "123", "def"], "Iteration starts at pos 0, ignoring lastIndex");
+
+	regex.lastIndex = 4;
+	XRegExp.forEach(str, regex, function () {});
+	equal(regex.lastIndex, 4, "lastIndex of nonglobal regex unmodified after iteration");
+
+	regexG.lastIndex = 4;
+	XRegExp.forEach(str, regexG, function () {});
+	equal(regexG.lastIndex, 0, "lastIndex of global regex reset to 0 after iteration");
+});
+
+test("XRegExp.freezeTokens", function () {
+	XRegExp.freezeTokens();
+
+	raises(function () {XRegExp.addToken(/>>>/, function () {return "Z";});}, Error, "addToken throws after freeze");
+	ok(!XRegExp(">>>").test("Z"), "Token not added");
+});
+
+test("XRegExp.globalize", function () {
 	var hasNativeY = typeof RegExp.prototype.sticky !== "undefined";
 	var regex = XRegExp("(?<name>a)\\k<name>", "im" + (hasNativeY ? "y" : ""));
-	var globalCopy = XRegExp.copyAsGlobal(regex);
+	var globalCopy = XRegExp.globalize(regex);
 	var globalOrig = XRegExp("(?:)", "g");
 
 	ok(regex !== globalCopy, "Copy is new instance");
@@ -97,68 +194,7 @@ test("XRegExp.copyAsGlobal", function () {
 	ok(regex.source === globalCopy.source, "Copy has same source");
 	ok(regex.ignoreCase === globalCopy.ignoreCase && regex.multiline === globalCopy.multiline && regex.sticky === globalCopy.sticky, "Copy has same ignoreCase, multiline, and sticky properties");
 	ok(globalCopy.exec("aa").name, "Copy retains named capture capabilities");
-	ok(XRegExp.copyAsGlobal(globalOrig).global, "Copy of global regex is global");
-});
-
-test("XRegExp.escape", function () {
-	equal(XRegExp.escape("[()*+?.\\^$|"), "\\[\\(\\)\\*\\+\\?\\.\\\\\\^\\$\\|", "Metacharacters are escaped");
-	equal(XRegExp.escape("]{}-, #"), "\\]\\{\\}\\-\\,\\ \\#", "Occasional metacharacters are escaped");
-	equal(XRegExp.escape("abc_<123>!"), "abc_<123>!", "Nonmetacharacters are not escaped");
-});
-
-test("XRegExp.execAt", function () {
-	var rX = /x/g;
-	var rA = /a/g;
-	var xregexp = XRegExp("(?<name>a)"); // tests expect this to be nonglobal and use named capture
-	var str = "abcxdef";
-	var match;
-
-	ok(XRegExp.execAt(str, rX, 2), "Pos test 1");
-
-	ok(!XRegExp.execAt(str, rX, 5), "Pos test 2");
-
-	rX.lastIndex = 5;
-	ok(XRegExp.execAt(str, rX, 2), "Pos ignores lastIndex test 1");
-
-	rX.lastIndex = 0;
-	ok(!XRegExp.execAt(str, rX, 5), "Pos ignores lastIndex test 2");
-
-	rA.lastIndex = 5;
-	ok(XRegExp.execAt(str, rA), "Pos ignores lastIndex test 3 (pos defaults to 0)");
-
-	ok(XRegExp.execAt(str, rX, 0, false), "Explicit !anchored allows matching after pos");
-
-	ok(!XRegExp.execAt(str, rX, 0, true), "Anchored match fails if match possible after (but not at) pos");
-
-	ok(XRegExp.execAt(str, rX, 3, true), "Anchored match succeeds if match at pos");
-
-	equal(XRegExp.execAt(str, rX, 5), null, "Result of failure is null");
-
-	deepEqual(XRegExp.execAt(str, xregexp), ["a", "a"], "Result of successful match is array with backreferences");
-
-	match = XRegExp.execAt(str, xregexp);
-	equal(match.name, "a", "Match result includes named capture properties");
-
-	xregexp.lastIndex = 5;
-	XRegExp.execAt(str, xregexp);
-	equal(xregexp.lastIndex, 5, "lastIndex of nonglobal regex left as is");
-
-	rX.lastIndex = 0;
-	XRegExp.execAt(str, rX);
-	equal(rX.lastIndex, 4, "lastIndex of global regex updated to end of match");
-
-	rX.lastIndex = 5;
-	XRegExp.execAt(str, rX, 2, true);
-	equal(rX.lastIndex, 0, "lastIndex of global regex updated to 0 after failure");
-
-	equal(XRegExp.execAt("abc", /x/, 5), null, "pos greater than string length results in failure");
-});
-
-test("XRegExp.freezeTokens", function () {
-	XRegExp.freezeTokens();
-
-	ok(function () {try {XRegExp.addToken(/>>>/, function () {return "Z";});} catch (err) {return err;}}() instanceof Error, "addToken throws after freeze");
-	ok(!XRegExp(">>>").test("Z"), "Token not added");
+	ok(XRegExp.globalize(globalOrig).global, "Copy of global regex is global");
 });
 
 test("XRegExp.isRegExp", function () {
@@ -192,64 +228,6 @@ test("XRegExp.isRegExp", function () {
 	iframe.parentNode.removeChild(iframe);
 });
 
-test("XRegExp.iterate", function () {
-	var str = "abc 123 def";
-	var regex = XRegExp("(?<first>\\w)\\w*");
-	var regexG = XRegExp("(?<first>\\w)\\w*", "g");
-	var result;
-
-	result = [];
-	XRegExp.iterate(str, regex, function (m) {result.push(m[0]);});
-	deepEqual(result, ["abc", "123", "def"], "Match strings with nonglobal regex");
-
-	result = [];
-	XRegExp.iterate(str, regexG, function (m) {result.push(m[0]);});
-	deepEqual(result, ["abc", "123", "def"], "Match strings with global regex");
-
-	result = [];
-	XRegExp.iterate(str, regex, function (m) {result.push(m.first);});
-	deepEqual(result, ["a", "1", "d"], "Named backreferences");
-
-	result = [];
-	XRegExp.iterate(str, regex, function (m) {result.push(m.index);});
-	deepEqual(result, [0, 4, 8], "Match indexes");
-
-	result = [];
-	XRegExp.iterate(str, regex, function (m, i) {result.push(i);});
-	deepEqual(result, [0, 1, 2], "Match numbers");
-
-	result = [];
-	XRegExp.iterate(str, regex, function (m, i, s) {result.push(s);});
-	deepEqual(result, [str, str, str], "Source strings");
-
-	result = [];
-	var str2 = str;
-	XRegExp.iterate(str2, regex, function (m, i, s) {result.push(s); s += s; str2 += str2;});
-	deepEqual(result, [str, str, str], "Source string manipulation in callback doesn't affect iteration");
-
-	result = [];
-	XRegExp.iterate(str, regex, function (m, i, s, r) {result.push(r);});
-	deepEqual(result, [regex, regex, regex], "Source regexes");
-
-	result = [];
-	var regex2 = XRegExp(regex);
-	XRegExp.iterate(str, regex2, function (m, i, s, r) {result.push(i); r = /x/; regex2 = /x/;});
-	deepEqual(result, [0, 1, 2], "Source regex manipulation in callback doesn't affect iteration");
-
-	result = [];
-	regexG.lastIndex = 4;
-	XRegExp.iterate(str, regexG, function (m) {result.push(m[0]);});
-	deepEqual(result, ["abc", "123", "def"], "Iteration starts at pos 0, ignoring lastIndex");
-
-	regex.lastIndex = 4;
-	XRegExp.iterate(str, regex, function () {});
-	equal(regex.lastIndex, 4, "lastIndex of nonglobal regex unmodified after iteration");
-
-	regexG.lastIndex = 4;
-	XRegExp.iterate(str, regexG, function () {});
-	equal(regexG.lastIndex, 0, "lastIndex of global regex reset to 0 after iteration");
-});
-
 test("XRegExp.matchChain", function () {
 	var html = '<html><img src="http://x.com/img.png"><script src="http://xregexp.com/path/file.ext"><img src="http://xregexp.com/path/to/img.jpg?x"><img src="http://xregexp.com/img2.gif"/></html>';
 	var xregexpImgFileNames = XRegExp.matchChain(html, [
@@ -261,7 +239,7 @@ test("XRegExp.matchChain", function () {
 
 	deepEqual(xregexpImgFileNames, ["img.jpg", "img2.gif"], "Four-level chain with plain regex and regex/backref objects (using named and numbered backrefs)");
 	deepEqual(XRegExp.matchChain("x", [/x/, /y/]), [], "Empty array returned if no matches");
-	ok(function () {try {XRegExp.matchChain(html, []);} catch (err) {return err;}}() instanceof Error, "Empty chain regex throws error");
+	raises(function () {XRegExp.matchChain(html, []);}, Error, "Empty chain regex throws error");
 });
 
 test("RegExp.prototype.apply", function () {
@@ -338,7 +316,7 @@ test("RegExp.prototype.exec", function () {
 
 	deepEqual(/NaN/.exec(NaN), ["NaN"], "NaN argument converted to string");
 
-	ok(function(){try {RegExp.prototype.exec.call("\\d", "1");} catch (err) {return err;}}() instanceof TypeError, "TypeError thrown when context is not type RegExp");
+	raises(function () {RegExp.prototype.exec.call("\\d", "1");}, TypeError, "TypeError thrown when context is not type RegExp");
 });
 
 test("RegExp.prototype.test", function () {
@@ -377,7 +355,7 @@ test("RegExp.prototype.test", function () {
 	deepEqual(regexG.test("123x567"), false, "lastIndex converted to integer (test 2)");
 
 	deepEqual(/1/.test(1), true, "Argument converted to string");
-	ok(function(){try {RegExp.prototype.test.call("\\d", "1");} catch (err) {return err;}}() instanceof TypeError, "TypeError thrown when context is not type RegExp");
+	raises(function () {RegExp.prototype.test.call("\\d", "1");}, TypeError, "TypeError thrown when context is not type RegExp");
 });
 
 test("String.prototype.match", function () {

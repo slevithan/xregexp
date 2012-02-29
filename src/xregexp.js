@@ -38,6 +38,8 @@ if (!XRegExp) {
             throw Error("can't call the XRegExp constructor within token definition functions");
 
         flags = flags || "";
+        pattern = pattern || ""; // Allows `XRegExp()`
+
         context = { // `this` object for custom tokens
             hasNamedCapture: false,
             captureNames: [],
@@ -151,8 +153,9 @@ if (!XRegExp) {
     // Accepts a `RegExp` instance; returns a copy with the `/g` flag set. The copy has a fresh
     // `lastIndex` (set to zero). If you want to copy a regex without forcing the `global`
     // property, use `XRegExp(regex)`. Do not use `RegExp(regex)` because it will not preserve
-    // special properties required for named capture
-    XRegExp.copyAsGlobal = function (regex) {
+    // special properties required for named capture.
+    // `XRegExp.copyAsGlobal` is a deprecated alias of `XRegExp.globalize`
+    XRegExp.globalize = XRegExp.copyAsGlobal = function (regex) {
         return clone(regex, "g");
     };
 
@@ -166,8 +169,9 @@ if (!XRegExp) {
     // Accepts a string to search, regex to search with, position to start the search within the
     // string (default: 0), and an optional Boolean indicating whether matches must start at-or-
     // after the position or at the specified position only. This function ignores the `lastIndex`
-    // of the provided regex in its own handling, but updates the property for compatibility
-    XRegExp.execAt = function (str, regex, pos, anchored) {
+    // of the provided regex in its own handling, but updates the property for compatibility.
+    // `XRegExp.execAt` is a deprecated alias of `XRegExp.exec`
+    XRegExp.exec = XRegExp.execAt = function (str, regex, pos, anchored) {
         var r2 = clone(regex, "g" + ((anchored && hasNativeY) ? "y" : "")),
             match;
         r2.lastIndex = pos = pos || 0;
@@ -195,11 +199,12 @@ if (!XRegExp) {
         return Object.prototype.toString.call(o) === "[object RegExp]";
     };
 
-    // Executes `callback` once per match within `str`. Provides a simpler and cleaner way to
-    // iterate over regex matches compared to the traditional approaches of subverting
-    // `String.prototype.replace` or repeatedly calling `exec` within a `while` loop
-    XRegExp.iterate = function (str, regex, callback, context) {
-        var r2 = clone(regex, "g"),
+    // Executes `callback` once per match within `str`; returns `context`. Provides a simpler and
+    // cleaner way to iterate over regex matches compared to the traditional approaches of
+    // subverting `String.prototype.replace` or repeatedly calling `exec` within a `while` loop.
+    // `XRegExp.iterate` is a deprecated alias of `XRegExp.forEach`
+    XRegExp.forEach = XRegExp.iterate = function (str, regex, callback, context) {
+        var r2 = XRegExp.globalize(regex),
             i = -1, match;
         while (match = r2.exec(str)) { // Run the altered `exec` (required for `lastIndex` fix, etc.)
             if (regex.global)
@@ -210,6 +215,7 @@ if (!XRegExp) {
         }
         if (regex.global)
             regex.lastIndex = 0;
+        return context;
     };
 
     // Accepts a string and an array of regexes; returns the result of using each successive regex
@@ -225,10 +231,10 @@ if (!XRegExp) {
     XRegExp.matchChain = function (str, chain) {
         return function recurseChain (values, level) {
             var item = chain[level].regex ? chain[level] : {regex: chain[level]},
-                regex = clone(item.regex, "g"),
+                regex = XRegExp.globalize(item.regex),
                 matches = [], i;
             for (i = 0; i < values.length; i++) {
-                XRegExp.iterate(values[i], regex, function (match) {
+                XRegExp.forEach(values[i], regex, function (match) {
                     matches.push(item.backref ? (match[item.backref] || "") : match[0]);
                 });
             }
@@ -456,7 +462,7 @@ if (!XRegExp) {
 
         // This is required if not `s.global`, and it avoids needing to set `s.lastIndex` to zero
         // and restore it to its original value when we're done using the regex
-        s = XRegExp.copyAsGlobal(s);
+        s = XRegExp.globalize(s);
 
         while (match = s.exec(str)) { // Run the altered `exec` (required for `lastIndex` fix, etc.)
             if (s.lastIndex > lastLastIndex) {
@@ -491,7 +497,7 @@ if (!XRegExp) {
     //  Private helper functions
     //---------------------------------
 
-    // Supporting function for `XRegExp`, `XRegExp.copyAsGlobal`, etc. Returns a copy of a `RegExp`
+    // Supporting function for `XRegExp`, `XRegExp.globalize`, etc. Returns a copy of a `RegExp`
     // instance with a fresh `lastIndex` (set to zero), preserving properties required for named
     // capture. Also allows adding new flags in the process of copying the regex
     function clone (regex, additionalFlags) {
@@ -509,6 +515,7 @@ if (!XRegExp) {
     }
 
     function getNativeFlags (regex) {
+        //return /\/([a-z]*)$/.exec(regex + "")[1];
         return (regex.global     ? "g" : "") +
                (regex.ignoreCase ? "i" : "") +
                (regex.multiline  ? "m" : "") +
