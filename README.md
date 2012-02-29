@@ -10,16 +10,30 @@ Usage examples
 ```html
 <script src="xregexp.js"></script>
 <script>
+    // named capture and x flag (free-spacing and comments)
     var date = XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
                         (?<month> [0-9]{2}) -?  # month \n\
                         (?<day>   [0-9]{2})     # day   ', 'x');
 
+    // named capture properties on match result
     var match = date.exec('2012-02-22');
-    console.log(match.day);
-    console.log('2012-02-22'.replace(date, '${month}/${day}/${year}'));
+    match.day; // -> '22'
 
-    console.log(XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>',
-                                   [/<b>.*?<\/b>/i, /\d+/]));
+    // named backreferences in replacement
+    '2012-02-22'.replace(date, '${month}/${day}/${year}'); // -> '02/22/2012'
+
+    // get array of numbers within <b> tags
+    XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [/<b>.*?<\/b>/i, /\d+/]);
+    // -> ['2', '4', '56']
+
+    var input = '<a href="http://xregexp.com/">XRegExp</a>\
+                 <a href="http://google.com/">Google</a>';
+
+    // get array of backreference-only arrays
+    XRegExp.forEach(input, /<a href="([^"]+)">(.*?)<\/a>/, function (match) {
+        this.push(match.slice(1));
+    }, []);
+    // -> [['http://xregexp.com/', 'XRegExp'], ['http://google.com/', 'Google']]
 </script>
 ```
 
