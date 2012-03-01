@@ -5,7 +5,7 @@
 // Provides an augmented, extensible, cross-browser implementation of regular expressions,
 // including support for additional syntax, flags, and methods
 
-var XRegExp;
+;var XRegExp;
 
 // Avoid running twice, since that would break references to native globals
 if (!XRegExp) {
@@ -29,13 +29,13 @@ if (!XRegExp) {
 
         if (XRegExp.isRegExp(pattern)) {
             if (flags !== undefined)
-                throw TypeError("can't supply flags when constructing one RegExp from another");
+                throw new TypeError("can't supply flags when constructing one RegExp from another");
             return clone(pattern);
         }
         // Tokens become part of the regex construction process, so protect against infinite
         // recursion when an XRegExp is constructed within a token handler or trigger
         if (isInsideConstructor)
-            throw Error("can't call the XRegExp constructor within token definition functions");
+            throw new Error("can't call the XRegExp constructor within token definition functions");
 
         flags = flags || "";
         pattern = pattern || ""; // Allows `XRegExp()`
@@ -73,7 +73,7 @@ if (!XRegExp) {
             }
         }
 
-        regex = RegExp(output.join(""), nativ.replace.call(flags, flagClip, ""));
+        regex = new RegExp(output.join(""), nativ.replace.call(flags, flagClip, ""));
         regex._xregexp = {
             source: pattern,
             captureNames: context.hasNamedCapture ? context.captureNames : null
@@ -187,7 +187,7 @@ if (!XRegExp) {
     // syntax and flag changes. Should be run after XRegExp and any addons are loaded
     XRegExp.freezeTokens = function () {
         XRegExp.addToken = function () {
-            throw Error("can't run addToken after freezeTokens");
+            throw new Error("can't run addToken after freezeTokens");
         };
     };
 
@@ -222,7 +222,7 @@ if (!XRegExp) {
     // to search within the matches of the previous regex. The array of regexes can also contain
     // objects with `regex` and `backref` properties, in which case the named or numbered back-
     // references specified are passed forward to the next regex or returned. E.g.:
-    // var domains = XRegExp.matchChain(str, [
+    // domains = XRegExp.matchChain(str, [
     //     {regex: /<a href="([^"]+)">/i, backref: 1},
     //     {regex: new XRegExp("(?i)^https?://(?<domain>[^/?#]+)"), backref: "domain"}
     // ]);
@@ -500,7 +500,7 @@ if (!XRegExp) {
     // capture. Also allows adding new flags in the process of copying the regex
     function clone (regex, additionalFlags) {
         if (!XRegExp.isRegExp(regex))
-            throw TypeError("type RegExp expected");
+            throw new TypeError("type RegExp expected");
         var x = regex._xregexp;
         regex = new XRegExp(regex.source, getNativeFlags(regex) + (additionalFlags || ""));
         if (x) {

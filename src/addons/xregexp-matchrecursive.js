@@ -3,10 +3,10 @@
 // MIT License
 // <http://xregexp.com>
 
-var XRegExp;
+;var XRegExp;
 
 if (!XRegExp) {
-    throw ReferenceError("XRegExp must be loaded before Match Recursive");
+    throw new ReferenceError("XRegExp must be loaded before Match Recursive");
 }
 
 /* accepts a string to search, left and right delimiters as regex pattern strings, optional regex
@@ -30,17 +30,17 @@ XRegExp.matchRecursive = function (str, left, right, flags, options) {
         global = flags.indexOf("g") > -1,
         sticky = flags.indexOf("y") > -1,
         flags = flags.replace(/y/g, ""), // flag y handled internally; can be used even if not supported natively
-        left = XRegExp(left, flags),
-        right = XRegExp(right, flags),
+        left = new XRegExp(left, flags),
+        right = new XRegExp(right, flags),
         output = [],
         openTokens = 0, delimStart = 0, delimEnd = 0, lastOuterEnd = 0,
         outerStart, innerStart, leftMatch, rightMatch, escaped, esc;
 
     if (escapeChar) {
         if (escapeChar.length > 1)
-            throw SyntaxError("can't supply more than one escape character");
+            throw new SyntaxError("can't supply more than one escape character");
         escaped = XRegExp.escape(escapeChar);
-        esc = RegExp(
+        esc = new RegExp(
             "(?:" + escaped + "[\\S\\s]|(?:(?!" + left.source + "|" + right.source + ")[^" + escaped + "])+)+",
             flags.replace(/[^im]+/g, "") // flags g, y, s, and x aren't needed here (s and x are handled by XRegExp)
         );
@@ -105,7 +105,7 @@ XRegExp.matchRecursive = function (str, left, right, flags, options) {
                     break;
             }
         } else {
-            throw Error("subject data contains unbalanced delimiters");
+            throw new Error("subject data contains unbalanced delimiters");
         }
 
         // if the delimiter matched an empty string, advance delimEnd to avoid an infinite loop

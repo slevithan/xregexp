@@ -1,9 +1,9 @@
-/*
-XRegExp addon: Unicode Base 0.6
-(c) 2008-2012 Steven Levithan
-MIT License
-<http://xregexp.com>
+// XRegExp addon: Unicode Base 0.6
+// (c) 2008-2012 Steven Levithan
+// MIT License
+// <http://xregexp.com>
 
+/*
 Uses the Unicode 6.1 character database:
 <http://unicode.org/Public/6.1.0/ucd/>
 
@@ -19,10 +19,10 @@ Letter case, spaces, hyphens, and underscores are ignored when comparing
 Unicode token names.
 */
 
-var XRegExp;
+;var XRegExp;
 
 if (!XRegExp) {
-    throw ReferenceError("XRegExp must be loaded before Unicode Base");
+    throw new ReferenceError("XRegExp must be loaded before Unicode Base");
 }
 
 (function () {
@@ -53,11 +53,11 @@ if (!XRegExp) {
 
             // \p{}, \P{}, and \p{^} are valid, but the double negative \P{^} isn't
             if (match[1] === "P" && match[2])
-                throw SyntaxError("erroneous characters: " + match[0]);
+                throw new SyntaxError("erroneous characters: " + match[0]);
             if (negated && scope === XRegExp.INSIDE_CLASS)
-                throw SyntaxError("not supported in character classes: \\" + match[1] + "{" + match[2] + "...}");
+                throw new SyntaxError("not supported in character classes: \\" + match[1] + "{" + match[2] + "...}");
             if (!unicode.hasOwnProperty(item))
-                throw SyntaxError("invalid or unsupported Unicode item: " + match[0]);
+                throw new SyntaxError("invalid or unsupported Unicode item: " + match[0]);
 
             return scope === XRegExp.OUTSIDE_CLASS ?
                 "[" + (negated ? "^" : "") + unicode[item] + "]" :

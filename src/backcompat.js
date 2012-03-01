@@ -1,9 +1,10 @@
-// Backward compatibility for XRegExp 1.0-1.2
-// (c) 2010-2012 Steven Levithan
+// XRegExp BackCompat 1.0
+// (c) 2012 Steven Levithan
 // MIT License
 // <http://xregexp.com>
+// Provides backward compatibility with XRegExp 1.x
 
-var XRegExp;
+;var XRegExp;
 
 if (XRegExp) {
 (function () {
@@ -15,7 +16,7 @@ if (XRegExp) {
     // Removed addFlags in 1.5.0
     RegExp.prototype.addFlags = function (flags) {
         var x = this._xregexp;
-        var regex = XRegExp(this.source, /\/([a-z]*)$/.exec(this + "")[1] + (flags || ""));
+        var regex = new XRegExp(this.source, /\/([a-z]*)$/.exec(this + "")[1] + (flags || ""));
         if (x) {
             regex._xregexp = {
                 source: x.source,
@@ -27,12 +28,12 @@ if (XRegExp) {
 
     // Removed forEachExec in 1.5.0
     RegExp.prototype.forEachExec = function (str, callback, context) {
-        return XRegExp.iterate(str, this, callback, context);
+        XRegExp.forEach(str, this, callback, context);
     };
 
     // Removed validate in 1.5.0
     RegExp.prototype.validate = function (str) {
-        var regex = RegExp("^(?:" + this.source + ")$(?!\\s)", /\/([a-z]*)$/.exec(this + "")[1]);
+        var regex = new RegExp("^(?:" + this.source + ")$(?!\\s)", /\/([a-z]*)$/.exec(this + "")[1]);
         if (this.global)
             this.lastIndex = 0;
         return str.search(regex) === 0;
@@ -40,9 +41,7 @@ if (XRegExp) {
 
     // Removed execAll in 1.2.0
     RegExp.prototype.execAll = function (str) {
-        var result = [];
-        XRegExp.iterate(str, this, function (match) {result.push(match);});
-        return result;
+        return XRegExp.forEach(str, this, function (match) {this.push(match);}, []);
     };
 
 })();
