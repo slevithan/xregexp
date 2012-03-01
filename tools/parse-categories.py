@@ -46,7 +46,6 @@ class RegExpGenerator(object):
 			buf.append('%04X%04X' % (start, end))
 		else:
 			buf.append('%04X-%04X' % (start, end))
-
 		return ''.join(buf)
 
 
