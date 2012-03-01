@@ -10,30 +10,61 @@ Usage examples
 ```html
 <script src="xregexp.js"></script>
 <script>
+    var date, match, str, pos = 0, result = [];
+
     // named capture and x flag (free-spacing and comments)
-    var date = XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
+    date = new XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
                         (?<month> [0-9]{2}) -?  # month \n\
                         (?<day>   [0-9]{2})     # day   ', 'x');
 
     // named capture properties on match result
-    var match = date.exec('2012-02-22');
+    match = date.exec('2012-02-22');
     match.day; // -> '22'
 
     // named backreferences in replacement
     '2012-02-22'.replace(date, '${month}/${day}/${year}'); // -> '02/22/2012'
 
-    // get array of numbers within <b> tags
+    str = '<a href="http://xregexp.com/api/">XRegExp</a>\
+           <a href="http://google.org/">Google</a>';
+
+    // get array of backreference-only arrays using XRegExp.forEach
+    XRegExp.forEach(str, new XRegExp('<a href="([^"]+)">(.*?)</a>', 'is'), function (match) {
+        this.push(match.slice(1));
+    }, []);
+    // -> [['http://xregexp.com/api/', 'XRegExp'], ['http://google.com/', 'Google']]
+
+    // get array of numbers within <b> tags using XRegExp.matchChain
     XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [/<b>.*?<\/b>/i, /\d+/]);
     // -> ['2', '4', '56']
 
-    var input = '<a href="http://xregexp.com/">XRegExp</a>\
-                 <a href="http://google.com/">Google</a>';
+    // XRegExp.matchChain can also pass forward and return specific backreferences
+    XRegExp.matchChain(str, [
+        {regex: /<a href="([^"]+)">/i, backref: 1},
+        {regex: new XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
+    ]);
+    // -> ['xregexp.com', 'google.org']
 
-    // get array of backreference-only arrays
-    XRegExp.forEach(input, /<a href="([^"]+)">(.*?)<\/a>/, function (match) {
-        this.push(match.slice(1));
-    }, []);
-    // -> [['http://xregexp.com/', 'XRegExp'], ['http://google.com/', 'Google']]
+    // regexes get call and apply methods
+    // first, some setup...
+    function validate (str, validators) {
+        for (var i = 0; i < validators.length; i++)
+            if (!validators[i].call(null, str)) return false;
+        return true;
+    }
+
+    // now we can pass both functions and regexes to our validator
+    validate("password!", [
+        function (str) {return str.length >= 8}, // 8+ total characters
+        /[\W_]/ // 1+ special character
+    ]); // -> true
+
+    // XRegExp.exec supports optional pos and sticky arguments
+    str = '123a5';
+    while (match = XRegExp.exec(str, XRegExp.cache('\d'), pos, true)) {
+        result.push(match[0]);
+        pos = regex.lastIndex;
+    }
+    // result -> ['1', '2', '3']
 </script>
 ```
 

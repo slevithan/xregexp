@@ -147,7 +147,7 @@ if (!XRegExp) {
     // created regex is cached
     XRegExp.cache = function (pattern, flags) {
         var key = pattern + "/" + (flags || "");
-        return XRegExp.cache[key] || (XRegExp.cache[key] = XRegExp(pattern, flags));
+        return XRegExp.cache[key] || (XRegExp.cache[key] = new XRegExp(pattern, flags));
     };
 
     // Accepts a `RegExp` instance; returns a copy with the `/g` flag set. The copy has a fresh
@@ -171,12 +171,12 @@ if (!XRegExp) {
     // after the position or at the specified position only. This function ignores the `lastIndex`
     // of the provided regex in its own handling, but updates the property for compatibility.
     // `XRegExp.execAt` is a deprecated alias of `XRegExp.exec`
-    XRegExp.exec = XRegExp.execAt = function (str, regex, pos, anchored) {
-        var r2 = clone(regex, "g" + ((anchored && hasNativeY) ? "y" : "")),
+    XRegExp.exec = XRegExp.execAt = function (str, regex, pos, sticky) {
+        var r2 = clone(regex, "g" + ((sticky && hasNativeY) ? "y" : "")),
             match;
         r2.lastIndex = pos = pos || 0;
         match = r2.exec(str); // Run the altered `exec` (required for `lastIndex` fix, etc.)
-        if (anchored && match && match.index !== pos)
+        if (sticky && match && match.index !== pos)
             match = null;
         if (regex.global)
             regex.lastIndex = match ? r2.lastIndex : 0;
@@ -222,11 +222,9 @@ if (!XRegExp) {
     // to search within the matches of the previous regex. The array of regexes can also contain
     // objects with `regex` and `backref` properties, in which case the named or numbered back-
     // references specified are passed forward to the next regex or returned. E.g.:
-    // var xregexpImgFileNames = XRegExp.matchChain(html, [
-    //     {regex: /<img\b([^>]+)>/i, backref: 1}, // <img> tag attributes
-    //     {regex: XRegExp('(?ix) \\s src=" (?<src> [^"]+ )'), backref: "src"}, // src attribute values
-    //     {regex: XRegExp("^http://xregexp\\.com(/[^#?]+)", "i"), backref: 1}, // xregexp.com paths
-    //     /[^\/]+$/ // filenames (strip directory paths)
+    // var domains = XRegExp.matchChain(str, [
+    //     {regex: /<a href="([^"]+)">/i, backref: 1},
+    //     {regex: new XRegExp("(?i)^https?://(?<domain>[^/?#]+)"), backref: "domain"}
     // ]);
     XRegExp.matchChain = function (str, chain) {
         return function recurseChain (values, level) {
@@ -504,7 +502,7 @@ if (!XRegExp) {
         if (!XRegExp.isRegExp(regex))
             throw TypeError("type RegExp expected");
         var x = regex._xregexp;
-        regex = XRegExp(regex.source, getNativeFlags(regex) + (additionalFlags || ""));
+        regex = new XRegExp(regex.source, getNativeFlags(regex) + (additionalFlags || ""));
         if (x) {
             regex._xregexp = {
                 source: x.source,
