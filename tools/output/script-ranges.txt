@@ -1,27 +1,3 @@
-// XRegExp addon: Unicode Scripts 1.1
-// (c) 2010-2012 Steven Levithan
-// MIT License
-// <http://xregexp.com>
-// Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/Scripts.txt>
-
-/*
-This package for the XRegExp Unicode Base addon enables all Unicode 6.1 scripts
-in the Basic Multilingual Plane (U+0000-U+FFFF).
-
-Example usage:
-    \p{Latin}
-    \p{Canadian Aboriginal}
-
-Letter case, spaces, hyphens, and underscores are ignored in script names.
-*/
-
-;var XRegExp;
-
-if (!(XRegExp && XRegExp.addUnicodePackage)) {
-	throw new ReferenceError("XRegExp's Unicode Base must be loaded before Unicode Scripts");
-}
-
-XRegExp.addUnicodePackage({
 	Arabic: "0600-06040606-060B060D-061A061E0620-063F0641-064A0656-065E066A-066F0671-06DC06DE-06FF0750-077F08A008A2-08AC08E4-08FEFB50-FBC1FBD3-FD3DFD50-FD8FFD92-FDC7FDF0-FDFCFE70-FE74FE76-FEFC",
 	Armenian: "0531-05560559-055F0561-0587058A058FFB13-FB17",
 	Balinese: "1B00-1B4B1B50-1B7C",
@@ -93,5 +69,3 @@ XRegExp.addUnicodePackage({
 	Tifinagh: "2D30-2D672D6F2D702D7F",
 	Vai: "A500-A62B",
 	Yi: "A000-A48CA490-A4C6"
-});
-
