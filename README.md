@@ -21,7 +21,7 @@ A few usage examples
     match = XRegExp.exec('2012-02-22', date);
     match.day; // -> '22'
 
-    // XRegExp.replace lets you use named backreferences in the replacement
+    // XRegExp.replace allows for named backreferences in replacements
     XRegExp.replace('2012-02-22', date, '${month}/${day}/${year}');
     // -> '02/22/2012'
 
@@ -65,7 +65,7 @@ A few usage examples
 </script>
 ```
 
-There's plenty more that isn't shown in these examples. You can even augment XRegExp's regular expression syntax with addons or write your own. For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), and [browser fixes](http://xregexp.com/cross_browser/).
+These examples don't show all of XRegExp's tricks. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), and [browser fixes](http://xregexp.com/cross_browser/).
 
 
 Unicode Base addon usage examples

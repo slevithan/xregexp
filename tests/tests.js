@@ -247,6 +247,10 @@ test("XRegExp.matchChain", function () {
 	raises(function () {XRegExp.matchChain(html, []);}, Error, "Empty chain regex throws error");
 });
 
+test("XRegExp.replace", function () {
+	// TODO: Add tests
+});
+
 test("RegExp.prototype.apply", function () {
 	var regex = /x/;
 

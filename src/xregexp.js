@@ -239,6 +239,21 @@ if (!XRegExp) {
         }([str], 0);
     };
 
+    // TODO: Add a description and handling for lastIndex
+    XRegExp.replace = function (str, search, replacement, replaceAll) {
+        if (XRegExp.isRegExp(search)) {
+            if (replaceAll === undefined)
+                replaceAll = search.global; // Follow flag /g when replaceAll isn't explicit
+            if (replaceAll && !search.global)
+                search = XRegExp.globalize(search);
+            else if (!replaceAll && search.global)
+                search = clone(search, "", "g"); // deglobalize
+        } else if (replaceAll) {
+            search = new RegExp(XRegExp.escape(search + ""), "g");
+        }
+        return str.replace(search, replacement); // Run the altered `replace` (required for extended replacement syntax, etc.)
+    };
+
 
     //---------------------------------
     //  New RegExp prototype methods
@@ -486,12 +501,14 @@ if (!XRegExp) {
     //---------------------------------
 
     // Returns a new copy of a `RegExp` object (with `lastIndex` zeroed), preserving properties
-    // required for named capture. Allows adding supplementary flags while copying the regex
-    function clone (regex, extraFlags) {
+    // required for named capture. Allows adding and removing flags while copying the regex
+    function clone (regex, addFlags, removeFlags) {
         if (!XRegExp.isRegExp(regex))
             throw new TypeError("type RegExp expected");
         var x = regex._xregexp,
-            flags = getNativeFlags(regex) + (extraFlags || "");
+            flags = getNativeFlags(regex) + (addFlags || "");
+        if (removeFlags)
+            flags = nativ.replace.call(flags, new RegExp("[" + removeFlags + "]+", "g"), "");
         if (x) {
             // Compiling regex.source rather than x.source preserves the effects of nonnative source flags
             regex = new XRegExp(regex.source, flags);
@@ -500,7 +517,7 @@ if (!XRegExp) {
                 captureNames: x.captureNames ? x.captureNames.slice(0) : null
             };
         } else {
-            flags = nativ.replace.call(flags, /([\s\S])(?=[\s\S]*\1)/g, ""); // Remove duplicate flags
+            flags = nativ.replace.call(flags, /([\s\S])(?=[\s\S]*\1)/g, ""); // Remove duplicate flags to avoid throwing
             regex = new RegExp(regex.source, flags);
         }
         return regex;
