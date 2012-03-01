@@ -49,13 +49,12 @@ test("XRegExp", function () {
 	equal(new XRegExp("(?:)").constructor, RegExp, "Result's constructor is RegExp");
 
 	// Don't test this, since future XRegExp might throw like modern browsers do with RegExp
-	//ok(XRegExp("(?:)", "gg").global, "Regex with duplicate flags");
+	//ok(new XRegExp("(?:)", "gg").global, "Regex with duplicate flags");
 
-	// This might be a good test in the future, but for now, XRegExp
-	// doesn't throw on unsupported flags since it would add some
-	// complexity and overhead to keep track of any flags checked for in
-	// custom tokens.
-	//raises(function () {XRegExp("", "?");}, Error, "Unsupported flag throws");
+	// This might be a good test in the future, but for now, XRegExp doesn't throw on
+	// unsupported flags since it would add some complexity and overhead to keep track of any
+	// flags checked for in custom tokens
+	//raises(function () {new XRegExp("", "?");}, Error, "Unsupported flag throws");
 });
 
 test("XRegExp.version", function () {

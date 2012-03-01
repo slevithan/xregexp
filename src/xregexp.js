@@ -262,11 +262,8 @@ if (!XRegExp) {
     //  Overriden native methods
     //---------------------------------
 
-    // Adds named capture support (with backreferences returned as `result.name`), and fixes two
-    // cross-browser issues per ES3:
-    // - Captured values for nonparticipating capturing groups should be returned as `undefined`,
-    //   rather than the empty string.
-    // - `lastIndex` should not be incremented after zero-length matches.
+    // Adds named capture support (with backreferences returned as `result.name`), and fixes
+    // browser bugs in the native method
     RegExp.prototype.exec = function (str) {
         var match, name, r2, origLastIndex;
         if (!this.global)
@@ -303,7 +300,7 @@ if (!XRegExp) {
         return match;
     };
 
-    // Fix browser bugs in native method
+    // Fixes browser bugs in the native method
     RegExp.prototype.test = function (str) {
         // Use the native `exec` to skip some processing overhead, even though the altered
         // `exec` would take care of the `lastIndex` fixes
@@ -319,7 +316,7 @@ if (!XRegExp) {
         return !!match;
     };
 
-    // Adds named capture support and fixes browser bugs in native method
+    // Adds named capture support and fixes browser bugs in the native method
     String.prototype.match = function (regex) {
         if (!XRegExp.isRegExp(regex))
             regex = RegExp(regex); // Native `RegExp`
@@ -333,18 +330,13 @@ if (!XRegExp) {
 
     // Adds support for `${n}` tokens for named and numbered backreferences in replacement text,
     // and provides named backreferences to replacement functions as `arguments[0].name`. Also
-    // fixes cross-browser differences in replacement text syntax when performing a replacement
-    // using a nonregex search value, and the value of replacement regexes' `lastIndex` property
-    // during replacement iterations. Note that this doesn't support SpiderMonkey's proprietary
-    // third (`flags`) parameter
+    // fixes browser bugs in replacement text syntax when performing a replacement using a nonregex
+    // search value, and the value of a replacement regex's `lastIndex` property during replacement
+    // iterations and upon completion. Note that this doesn't support SpiderMonkey's proprietary
+    // third (`flags`) argument
     String.prototype.replace = function (search, replacement) {
         var isRegex = XRegExp.isRegExp(search),
             captureNames, result, str, origLastIndex;
-
-        // There are too many combinations of search/replacement types/values and browser bugs that
-        // preclude passing to native `replace`, so don't try
-        //if (...)
-        //    return nativ.replace.apply(this, arguments);
 
         if (isRegex) {
             if (search._xregexp)
@@ -431,7 +423,7 @@ if (!XRegExp) {
         return result;
     };
 
-    // A consistent cross-browser, ES3 compliant `split`
+    // Fixes browser bugs in the native method
     String.prototype.split = function (s /* separator */, limit) {
         // If separator `s` is not a regex, use the native `split`
         if (!XRegExp.isRegExp(s))
@@ -493,7 +485,7 @@ if (!XRegExp) {
     //  Private helper functions
     //---------------------------------
 
-    // Returns a new copy of a `RegExp` object (with `lastIndex` reset to 0), preserving properties
+    // Returns a new copy of a `RegExp` object (with `lastIndex` zeroed), preserving properties
     // required for named capture. Allows adding supplementary flags while copying the regex
     function clone (regex, extraFlags) {
         if (!XRegExp.isRegExp(regex))
