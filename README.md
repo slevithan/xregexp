@@ -1,11 +1,11 @@
 ﻿[XRegExp](http://xregexp.com/)
 ==============================
 
-XRegExp provides augmented, extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regular expression utility belt with tools to make your client-side grepping both simpler and more powerful, while freeing you from worrying about pesky cross-browser inconsistencies.
+XRegExp provides augmented, extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regular expression utility belt with tools to make your client-side grepping simpler and more powerful, while freeing you from worrying about pesky cross-browser inconsistencies and the unreliable `lastIndex` property [(details)](http://blog.stevenlevithan.com/archives/fixing-javascript-regexp).
 
 
-Usage examples
---------------
+A few usage examples
+--------------------
 
 ```html
 <script src="xregexp.js"></script>
@@ -17,12 +17,12 @@ Usage examples
                         (?<month> [0-9]{2}) -?  # month \n\
                         (?<day>   [0-9]{2})     # day   ', 'x');
 
-    // named capture properties on the match result
-    match = date.exec('2012-02-22');
+    // XRegExp.exec gives you named capture properties on the match result
+    match = XRegExp.exec('2012-02-22', date);
     match.day; // -> '22'
 
-    // named backreferences in the replacement
-    '2012-02-22'.replace(date, '${month}/${day}/${year}');
+    // XRegExp.replace lets you use named backreferences in the replacement
+    XRegExp.replace('2012-02-22', date, '${month}/${day}/${year}');
     // -> '02/22/2012'
 
     // get an array of backreference-only arrays using XRegExp.forEach
@@ -52,7 +52,7 @@ Usage examples
         return res;
     }
     // now we can filter arrays using functions and regexes
-    filter(['a', 'ba', 'ab', 'b'], /^a/);
+    filter(['a', 'ba', 'ab', 'b'], new XRegExp('^a'));
     // -> ['a', 'ab']
 
     // XRegExp.exec supports optional pos and sticky arguments
@@ -65,7 +65,7 @@ Usage examples
 </script>
 ```
 
-For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), and [browser fixes](http://xregexp.com/cross_browser/).
+There's plenty more that isn't shown in these examples. You can even augment XRegExp's regular expression syntax with addons or write your own plugins. For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), and [browser fixes](http://xregexp.com/cross_browser/).
 
 
 Unicode Base addon usage examples
@@ -93,7 +93,7 @@ XRegExp uses the Unicode 6.1 character database (released 2012-01). More details
 
 
 Match Recursive addon usage examples
----------------------------------
+------------------------------------
 
 ```html
 <script src="xregexp.js"></script>
