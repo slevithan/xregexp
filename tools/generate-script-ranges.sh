@@ -7,7 +7,7 @@ cd "$(dirname "$0")"
 # http://unicode.org/Public/UNIDATA/Scripts.txt
 # Static, versioned copies have URLs similar to:
 # http://www.unicode.org/Public/6.1.0/ucd/Scripts.txt
-#curl -# http://www.unicode.org/Public/6.1.0/ucd/Scripts.txt > data/Scripts-6.1.0.txt
+curl -# http://www.unicode.org/Public/6.1.0/ucd/Scripts.txt > data/Scripts-6.1.0.txt
 
 # Generate the regular expressions
 python parse-scripts.py data/Scripts-6.1.0.txt > output/script-ranges.txt
