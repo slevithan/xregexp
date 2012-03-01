@@ -53,10 +53,11 @@ Usage examples
     }
 
     // now we can pass both functions and regexes to our validator
-    validate("password!", [
-        function (str) {return str.length >= 8}, // 8+ total characters
-        /[\W_]/ // 1+ special character
-    ]); // -> true
+    validate('password!', [
+        function (str) {return str.length >= 8}, // Eight or more characters
+        /[\W_]/ // At least one special character
+    ]);
+    // -> true
 
     // XRegExp.exec supports optional pos and sticky arguments
     str = '123a5';
