@@ -21,28 +21,34 @@ test("Basic availability", function () {
 });
 
 test("XRegExp", function () {
-	var regex = XRegExp("(?:)");
-	var regexG = XRegExp("(?:)", "g");
-	var regexGIM = XRegExp("(?:)", "gim");
-	var regexX = XRegExp("(?:)", "x");
-	var regexCopy = XRegExp(regex);
-	var regexNamedCapture = XRegExp("(?<name>a)\\k<name>");
+	var regex = new XRegExp("(?:)");
+	var regexG = new XRegExp("(?:)", "g");
+	var regexGIM = new XRegExp("(?:)", "gim");
+	var regexX = new XRegExp("(?:)", "x");
+	var regexCopy = new XRegExp(regex);
+	var regexNamedCapture = new XRegExp("(?<name>a)\\k<name>");
 
-	equal(XRegExp("").source, RegExp("").source, "Empty regex source (test 1)");
-	equal(XRegExp("(?:)").source, /(?:)/.source, "Empty regex source (test 2)");
-	equal(XRegExp().source, RegExp().source, "Undefined regex source");
-	ok(!XRegExp("(?:)").global, "Regex without flags");
+	equal(new XRegExp("").source, new RegExp("").source, "Empty regex source (test 1)");
+	equal(new XRegExp("(?:)").source, /(?:)/.source, "Empty regex source (test 2)");
+	equal(new XRegExp().source, new RegExp().source, "undefined regex source");
+	equal(new XRegExp(null).source, new RegExp(null).source, "null regex source");
+	equal(new XRegExp(NaN).source, new RegExp(NaN).source, "NaN regex source");
+	equal(new XRegExp(1).source, new RegExp(1).source, "numeric regex source");
+	equal(new XRegExp({}).source, new RegExp({}).source, "object regex source");
+	ok(!(new XRegExp("(?:)")).global, "Regex without flags");
 	ok(regexG.global, "Regex with global flag");
 	ok(regexGIM.global && regexGIM.ignoreCase && regexGIM.multiline, "Regex with multiple flags");
 	ok(!regexX.extended, "x flag stripped");
 	deepEqual(regex, XRegExp(regex), "Regex copy and original are alike");
-	ok(regex !== XRegExp(regex), "Regex copy is new instance");
-	ok(XRegExp(regexNamedCapture).exec("aa").name === "a", "Regex copy retains named capture properties");
+	notEqual(regex, XRegExp(regex), "Regex copy is new instance");
+	ok(XRegExp(new XRegExp(""))._xregexp, "Copied XRegExp preserves special properties");
+	ok(!XRegExp(new RegExp(""))._xregexp, "Copied RegExp is not assigned special properties");
+	equal(XRegExp(regexNamedCapture).exec("aa").name, "a", "Regex copy retains named capture properties");
 	raises(function () {XRegExp(regex, "g");}, Error, "Regex copy with flag throws");
-	ok(XRegExp("(?:)") instanceof RegExp, "Result is instanceof RegExp");
-	ok(XRegExp("(?:)").constructor === RegExp, "Result's constructor is RegExp");
+	ok(new XRegExp("(?:)") instanceof RegExp, "Result is instanceof RegExp");
+	equal(new XRegExp("(?:)").constructor, RegExp, "Result's constructor is RegExp");
 
-	// Don't test this, since future XRegExp might throw like Firefox does with RegExp
+	// Don't test this, since future XRegExp might throw like modern browsers do with RegExp
 	//ok(XRegExp("(?:)", "gg").global, "Regex with duplicate flags");
 
 	// This might be a good test in the future, but for now, XRegExp
@@ -55,8 +61,8 @@ test("XRegExp", function () {
 test("XRegExp.version", function () {
 	var parts = XRegExp.version.split(".");
 
-	ok(typeof XRegExp.version === "string", "Version is a string");
-	ok(parts.length === 3, "Version is three dot-delimited parts");
+	equal(typeof XRegExp.version, "string", "Version is a string");
+	equal(parts.length, 3, "Version is three dot-delimited parts");
 	ok(!(isNaN(+parts[0]) || isNaN(+parts[1]) || isNaN(+parts[2])), "Version parts are all numeric");
 });
 
@@ -87,7 +93,7 @@ test("XRegExp.cache", function () {
 	var regexWithFlags = XRegExp(". +\\1 1", "gimsx");
 
 	ok(cached1 instanceof RegExp, "Returns RegExp");
-	ok(cached1 === cached2, "References to separately cached patterns refer to same object");
+	strictEqual(cached1, cached2, "References to separately cached patterns refer to same object");
 	deepEqual(XRegExp.cache(". +\\1 1", "gimsx"), regexWithFlags, "Cached pattern plus flags");
 });
 
@@ -189,9 +195,9 @@ test("XRegExp.globalize", function () {
 	var globalCopy = XRegExp.globalize(regex);
 	var globalOrig = XRegExp("(?:)", "g");
 
-	ok(regex !== globalCopy, "Copy is new instance");
+	notEqual(regex, globalCopy, "Copy is new instance");
 	ok(globalCopy.global, "Copy is global");
-	ok(regex.source === globalCopy.source, "Copy has same source");
+	equal(regex.source, globalCopy.source, "Copy has same source");
 	ok(regex.ignoreCase === globalCopy.ignoreCase && regex.multiline === globalCopy.multiline && regex.sticky === globalCopy.sticky, "Copy has same ignoreCase, multiline, and sticky properties");
 	ok(globalCopy.exec("aa").name, "Copy retains named capture capabilities");
 	ok(XRegExp.globalize(globalOrig).global, "Copy of global regex is global");

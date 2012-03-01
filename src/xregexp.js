@@ -19,14 +19,8 @@ if (!XRegExp) {
 
     // Accepts a pattern and flags; returns a new, extended `RegExp` object. Differs from a native
     // regular expression in that additional syntax and flags are supported and cross-browser
-    // syntax inconsistencies are ameliorated. `XRegExp(/regex/)` clones an existing regex and
-    // converts to type XRegExp
+    // syntax inconsistencies are ameliorated. `XRegExp(/regex/)` clones an existing regex
     XRegExp = function (pattern, flags) {
-        var output = [],
-            currScope = XRegExp.OUTSIDE_CLASS,
-            pos = 0,
-            context, tokenResult, match, chr, regex;
-
         if (XRegExp.isRegExp(pattern)) {
             if (flags !== undefined)
                 throw new TypeError("can't supply flags when constructing one RegExp from another");
@@ -37,15 +31,19 @@ if (!XRegExp) {
         if (isInsideConstructor)
             throw new Error("can't call the XRegExp constructor within token definition functions");
 
-        flags = flags || "";
-        pattern = pattern || ""; // Allows `XRegExp()`
+        var output = [],
+            currScope = XRegExp.OUTSIDE_CLASS,
+            context = { // `this` object for custom tokens
+                hasNamedCapture: false,
+                captureNames: [],
+                hasFlag: function (flag) {return flags.indexOf(flag) > -1;},
+                setFlag: function (flag) {flags += flag;}
+            },
+            pos = 0,
+            tokenResult, match, chr, regex;
 
-        context = { // `this` object for custom tokens
-            hasNamedCapture: false,
-            captureNames: [],
-            hasFlag: function (flag) {return flags.indexOf(flag) > -1;},
-            setFlag: function (flag) {flags += flag;}
-        };
+        pattern = pattern === undefined ? "" : pattern + "";
+        flags = flags === undefined ? "" : flags + "";
 
         while (pos < pattern.length) {
             // Check for custom tokens at the current position
@@ -495,30 +493,34 @@ if (!XRegExp) {
     //  Private helper functions
     //---------------------------------
 
-    // Supporting function for `XRegExp`, `XRegExp.globalize`, etc. Returns a copy of a `RegExp`
-    // instance with a fresh `lastIndex` (set to zero), preserving properties required for named
-    // capture. Also allows adding new flags in the process of copying the regex
-    function clone (regex, additionalFlags) {
+    // Returns a new copy of a `RegExp` object (with `lastIndex` reset to 0), preserving properties
+    // required for named capture. Allows adding supplementary flags while copying the regex
+    function clone (regex, extraFlags) {
         if (!XRegExp.isRegExp(regex))
             throw new TypeError("type RegExp expected");
-        var x = regex._xregexp;
-        regex = new XRegExp(regex.source, getNativeFlags(regex) + (additionalFlags || ""));
+        var x = regex._xregexp,
+            flags = getNativeFlags(regex) + (extraFlags || "");
         if (x) {
+            // Compiling regex.source rather than x.source preserves the effects of nonnative source flags
+            regex = new XRegExp(regex.source, flags);
             regex._xregexp = {
                 source: x.source,
                 captureNames: x.captureNames ? x.captureNames.slice(0) : null
             };
+        } else {
+            flags = nativ.replace.call(flags, /([\s\S])(?=[\s\S]*\1)/g, ""); // Remove duplicate flags
+            regex = new RegExp(regex.source, flags);
         }
         return regex;
     }
 
     function getNativeFlags (regex) {
-        //return /\/([a-z]*)$/.exec(regex + "")[1];
+        //return /\/([a-z]*)$/i.exec(regex + "")[1];
         return (regex.global     ? "g" : "") +
                (regex.ignoreCase ? "i" : "") +
                (regex.multiline  ? "m" : "") +
                (regex.extended   ? "x" : "") + // Proposed for ES4; included in AS3
-               (regex.sticky     ? "y" : "");
+               (regex.sticky     ? "y" : ""); // Included in Firefox 3+
     }
 
     function runTokens (pattern, index, scope, context) {

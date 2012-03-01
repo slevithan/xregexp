@@ -16,7 +16,7 @@ if (XRegExp) {
     // Removed addFlags in 1.5.0
     RegExp.prototype.addFlags = function (flags) {
         var x = this._xregexp;
-        var regex = new XRegExp(this.source, /\/([a-z]*)$/.exec(this + "")[1] + (flags || ""));
+        var regex = new XRegExp(this.source, /\/([a-z]*)$/i.exec(this + "")[1] + (flags || ""));
         if (x) {
             regex._xregexp = {
                 source: x.source,
@@ -33,7 +33,7 @@ if (XRegExp) {
 
     // Removed validate in 1.5.0
     RegExp.prototype.validate = function (str) {
-        var regex = new RegExp("^(?:" + this.source + ")$(?!\\s)", /\/([a-z]*)$/.exec(this + "")[1]);
+        var regex = new RegExp("^(?:" + this.source + ")$(?!\\s)", /\/([a-z]*)$/i.exec(this + "")[1]);
         if (this.global)
             this.lastIndex = 0;
         return str.search(regex) === 0;
