@@ -2,13 +2,11 @@
 // (c) 2010-2012 Steven Levithan
 // MIT License
 // <http://xregexp.com>
+// Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/UnicodeData.txt>
 
 /*
-Uses the Unicode 6.1 character database:
-<http://unicode.org/Public/6.1.0/ucd/UnicodeData.txt>
-
-This package for the XRegExp Unicode Base addon enables the following 37
-Unicode categories (aka properties):
+This package for the XRegExp Unicode Base addon enables the following Unicode
+categories (aka properties):
 
 L - Letter (this top-level category is included in the Unicode Base addon)
     Ll - Lowercase letter

@@ -2,16 +2,13 @@
 // (c) 2010-2012 Steven Levithan
 // MIT License
 // <http://xregexp.com>
+// Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/Blocks.txt>
 
 /*
-Uses the Unicode 6.1 character database:
-<http://unicode.org/Public/6.1.0/ucd/Blocks.txt>
-
-This package for the XRegExp Unicode Base addon enables the 156 Unicode 6.1
-blocks in the Basic Multilingual Plane (U+0000-U+FFFF).
+This package for the XRegExp Unicode Base addon enables all Unicode 6.1 blocks
+in the Basic Multilingual Plane (U+0000-U+FFFF).
 
 Unicode blocks use the prefix "In". Example usage:
-
     \p{InMongolian}
     \p{InLatin Extended-A}
 

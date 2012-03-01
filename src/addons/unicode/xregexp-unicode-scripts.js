@@ -2,16 +2,13 @@
 // (c) 2010-2012 Steven Levithan
 // MIT License
 // <http://xregexp.com>
+// Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/Scripts.txt>
 
 /*
-Uses the Unicode 6.1 character database:
-<http://unicode.org/Public/6.1.0/ucd/Scripts.txt>
-
-This package for the XRegExp Unicode Base addon enables the 71 Unicode 6.1
-scripts in the Basic Multilingual Plane (U+0000-U+FFFF).
+This package for the XRegExp Unicode Base addon enables all Unicode 6.1 scripts
+in the Basic Multilingual Plane (U+0000-U+FFFF).
 
 Example usage:
-
     \p{Latin}
     \p{Canadian Aboriginal}
 

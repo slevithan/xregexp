@@ -2,11 +2,9 @@
 // (c) 2008-2012 Steven Levithan
 // MIT License
 // <http://xregexp.com>
+// Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/>
 
 /*
-Uses the Unicode 6.1 character database:
-<http://unicode.org/Public/6.1.0/ucd/>
-
 The Unicode Base addon adds support for the \p{L} token only (Unicode category
 Letter). Addon packages are available that add support for the remaining
 Unicode categories, as well as Unicode scripts and blocks.

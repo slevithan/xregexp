@@ -27,7 +27,7 @@ Usage examples
 
     // get an array of backreference-only arrays using XRegExp.forEach
     str = '<a href="http://xregexp.com/api/">XRegExp</a>\
-           <a href="http://google.org/">Google</a>';
+           <a href="http://google.com/">Google</a>';
     XRegExp.forEach(str, new XRegExp('<a href="([^"]+)">(.*?)</a>', 'is'), function (match) {
         this.push(match.slice(1));
     }, []);
@@ -42,7 +42,7 @@ Usage examples
         {regex: /<a href="([^"]+)">/i, backref: 1},
         {regex: new XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
     ]);
-    // -> ['xregexp.com', 'google.org']
+    // -> ['xregexp.com', 'google.com']
 
     // regexes get call and apply methods
     // first, the setup...
