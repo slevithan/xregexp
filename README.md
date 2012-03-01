@@ -22,12 +22,12 @@ Usage examples
     match.day; // -> '22'
 
     // named backreferences in the replacement
-    '2012-02-22'.replace(date, '${month}/${day}/${year}'); // -> '02/22/2012'
-
-    str = '<a href="http://xregexp.com/api/">XRegExp</a>\
-           <a href="http://google.org/">Google</a>';
+    '2012-02-22'.replace(date, '${month}/${day}/${year}');
+    // -> '02/22/2012'
 
     // get an array of backreference-only arrays using XRegExp.forEach
+    str = '<a href="http://xregexp.com/api/">XRegExp</a>\
+           <a href="http://google.org/">Google</a>';
     XRegExp.forEach(str, new XRegExp('<a href="([^"]+)">(.*?)</a>', 'is'), function (match) {
         this.push(match.slice(1));
     }, []);
@@ -51,8 +51,7 @@ Usage examples
             if (!validators[i].call(null, str)) return false;
         return true;
     }
-
-    // now we can pass both functions and regexes to our validator
+    // now we can use functions *and* regexes in our validation
     validate('password!', [
         function (str) {return str.length >= 8}, // eight or more characters
         new XRegExp('[\\W_]') // at least one special character
@@ -79,7 +78,7 @@ Unicode Base addon usage examples
 <script src="xregexp.js"></script>
 <script src="addons/unicode/xregexp-unicode-base.js"></script>
 <script>
-    var unicodeWord = XRegExp('^\\p{L}+$');
+    var unicodeWord = new XRegExp('^\\p{L}+$');
     unicodeWord.test('Русский'); // -> true
     unicodeWord.test('日本語'); // -> true
     unicodeWord.test('العربية'); // -> true
@@ -89,7 +88,7 @@ Unicode Base addon usage examples
 and blocks require addon packages -->
 <script src="addons/unicode/xregexp-unicode-scripts.js"></script>
 <script>
-    XRegExp('^\\p{Katakana}+$').test('カタカナ'); // -> true
+    new XRegExp('^\\p{Katakana}+$').test('カタカナ'); // -> true
 </script>
 ```
 
