@@ -1,7 +1,7 @@
 ﻿[XRegExp](http://xregexp.com/)
 ==============================
 
-XRegExp provides augmented, extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regular expression utility belt with tools to make your client-side grepping simpler and more powerful, while freeing you from worrying about pesky cross-browser inconsistencies and the unreliable `lastIndex` property [(details)](http://blog.stevenlevithan.com/archives/fixing-javascript-regexp).
+XRegExp provides augmented, extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regular expression utility belt with tools to make your client-side grepping simpler and more powerful, while freeing you from worrying about pesky cross-browser inconsistencies and the unreliable `lastIndex` property.
 
 
 A few usage examples
@@ -65,7 +65,7 @@ A few usage examples
 </script>
 ```
 
-There's plenty more that isn't shown in these examples. You can even augment XRegExp's regular expression syntax with addons or write your own plugins. For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), and [browser fixes](http://xregexp.com/cross_browser/).
+There's plenty more that isn't shown in these examples. You can even augment XRegExp's regular expression syntax with addons or write your own. For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), and [browser fixes](http://xregexp.com/cross_browser/).
 
 
 Unicode Base addon usage examples
