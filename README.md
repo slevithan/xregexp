@@ -103,18 +103,18 @@ Match Recursive addon usage examples
 <script src="xregexp.js"></script>
 <script src="addons/xregexp-matchrecursive.js"></script>
 <script>
-    var input = '(t((e))s)t()(ing)';
-    XRegExp.matchRecursive(input, '\\(', '\\)', 'g');
+    var str = '(t((e))s)t()(ing)';
+    XRegExp.matchRecursive(str, '\\(', '\\)', 'g');
     // -> ['t((e))s', '', 'ing']
 
     // ignoring escaped delimiters
-    input = 't\\{e\\\\{s{t\\{i}ng}';
-    XRegExp.matchRecursive(input, '{', '}', 'g', {escapeChar: '\\'});
+    str = 't\\{e\\\\{s{t\\{i}ng}';
+    XRegExp.matchRecursive(str, '{', '}', 'g', {escapeChar: '\\'});
     // -> ['s{t\\{i}ng']
 
     // extended information mode with valueNames
-    input = 'Here is <div>a <div>nested</div> tag.</div>';
-    XRegExp.matchRecursive(input, '<div\s*>', '</div>', 'i',
+    str = 'Here is <div>a <div>nested</div> tag.</div>';
+    XRegExp.matchRecursive(str, '<div\s*>', '</div>', 'i',
                            {valueNames: ['text', 'left', 'match', 'right']});
     // ->
     // [['text', 'Here is ', 0, 8],
@@ -123,8 +123,8 @@ Match Recursive addon usage examples
     //  ['right', '</div>', 37, 43]]
 
     // omitting unneeded parts with null valueNames
-    input = '...{1}..{function(x,y){return y+x;}}';
-    XRegExp.matchRecursive(input, '{', '}', 'g',
+    str = '...{1}..{function(x,y){return y+x;}}';
+    XRegExp.matchRecursive(str, '{', '}', 'g',
                            {valueNames: ['literal', null, 'value', null]});
     // ->
     // [['literal', '...', 0, 3],
@@ -132,12 +132,14 @@ Match Recursive addon usage examples
     //  ['literal', '..', 6, 8],
     //  ['value', 'function(x,y){return y+x;}', 9, 35]]
 
-    // sticky mode
-    input = '<1><2><3>4<5>';
-    XRegExp.matchRecursive(input, '<', '>', 'gy');
+    // sticky mode via the y flag
+    str = '<1><2><3>4<5>';
+    XRegExp.matchRecursive(str, '<', '>', 'gy');
     // -> ['1', '2', '3']
 </script>
 ```
+
+More details [here](http://xregexp.com/plugins/#matchRecursive).
 
 
 Changelog
