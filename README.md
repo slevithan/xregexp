@@ -44,19 +44,16 @@ Usage examples
     ]);
     // -> ['xregexp.com', 'google.com']
 
-    // regexes get call and apply methods
+    // regexes created by XRegExp get call and apply methods
     // first, the setup...
-    function validate (str, validators) {
-        for (var i = 0; i < validators.length; i++)
-            if (!validators[i].call(null, str)) return false;
-        return true;
+    function filter (array, fn) {
+        var res = [];
+        array.forEach(function (el) {if (fn.call(null, el)) res.push(el);});
+        return res;
     }
-    // now we can use functions *and* regexes in our validation
-    validate('password!', [
-        function (str) {return str.length >= 8}, // eight or more characters
-        new XRegExp('[\\W_]') // at least one special character
-    ]);
-    // -> true
+    // now we can filter arrays using functions and regexes
+    filter(['a', 'ba', 'ab', 'b'], /^a/);
+    // -> ['a', 'ab']
 
     // XRegExp.exec supports optional pos and sticky arguments
     str = '<1><2><3>4<5>';
@@ -106,35 +103,32 @@ Match Recursive addon usage examples
     XRegExp.matchRecursive(str, '\\(', '\\)', 'g');
     // -> ['t((e))s', '', 'ing']
 
-    // ignoring escaped delimiters
-    str = 't\\{e\\\\{s{t\\{i}ng}';
-    XRegExp.matchRecursive(str, '{', '}', 'g', {escapeChar: '\\'});
-    // -> ['s{t\\{i}ng']
-
     // extended information mode with valueNames
-    str = 'Here is <div>a <div>nested</div> tag.</div>';
-    XRegExp.matchRecursive(str, '<div\s*>', '</div>', 'i',
-                           {valueNames: ['text', 'left', 'match', 'right']});
-    // ->
-    // [['text', 'Here is ', 0, 8],
-    //  ['left', '<div>', 8, 13],
-    //  ['match', 'a <div>nested</div> tag.', 13, 37],
-    //  ['right', '</div>', 37, 43]]
+    str = 'Here is <div>a <div>nested</div> tag</div> example.';
+    XRegExp.matchRecursive(str, '<div\s*>', '</div>', 'gi', {
+        valueNames: ['between', 'left', 'match', 'right']
+    });
+    // -> [ ['between', 'Here is ', 0, 8],
+    // ['left', '<div>', 8, 13],
+    // ['match', 'a <div>nested</div> tag', 13, 37],
+    // ['right', '</div>', 36, 42],
+    // ['between', ' example.', 42, 51] ]
 
-    // omitting unneeded parts with null valueNames
-    str = '...{1}..{function(x,y){return y+x;}}';
-    XRegExp.matchRecursive(str, '{', '}', 'g',
-                           {valueNames: ['literal', null, 'value', null]});
-    // ->
-    // [['literal', '...', 0, 3],
-    //  ['value', '1', 4, 5],
-    //  ['literal', '..', 6, 8],
-    //  ['value', 'function(x,y){return y+x;}', 9, 35]]
+    // omitting unneeded parts with null valueNames, and using escapeChar
+    str = '...{1}\\{{function(x,y){return y+x;}}';
+    XRegExp.matchRecursive(str, '{', '}', 'g', {
+        valueNames: ['literal', null, 'value', null],
+        escapeChar: '\\'
+    });
+    // -> [ ['literal', '...', 0, 3],
+    // ['value', '1', 4, 5],
+    // ['literal', '\\{', 6, 8],
+    // ['value', 'function(x,y){return y+x;}', 9, 35] ]
 
     // sticky mode via the y flag
-    str = '<1><2><3>4<5>';
+    str = '<1><<<2>>><3>4<5>';
     XRegExp.matchRecursive(str, '<', '>', 'gy');
-    // -> ['1', '2', '3']
+    // -> ['1', '<<2>>', '3']
 </script>
 ```
 
