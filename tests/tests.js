@@ -4,8 +4,6 @@ module("API");
 
 test("Basic availability", function () {
 	ok(XRegExp, "XRegExp exists");
-	ok(XRegExp.INSIDE_CLASS, "XRegExp.INSIDE_CLASS exists");
-	ok(XRegExp.OUTSIDE_CLASS, "XRegExp.OUTSIDE_CLASS exists");
 	ok(XRegExp.addToken, "XRegExp.addToken exists");
 	ok(XRegExp.cache, "XRegExp.cache exists");
 	ok(XRegExp.escape, "XRegExp.escape exists");
@@ -13,9 +11,13 @@ test("Basic availability", function () {
 	ok(XRegExp.forEach, "XRegExp.forEach exists");
 	ok(XRegExp.freezeTokens, "XRegExp.freezeTokens exists");
 	ok(XRegExp.globalize, "XRegExp.globalize exists");
+	ok(XRegExp.install, "XRegExp.install exists");
 	ok(XRegExp.isRegExp, "XRegExp.isRegExp exists");
 	ok(XRegExp.matchChain, "XRegExp.matchChain exists");
+	ok(XRegExp.replace, "XRegExp.replace exists");
 	ok(XRegExp.version, "XRegExp.version exists");
+	ok(XRegExp.INSIDE_CLASS, "XRegExp.INSIDE_CLASS exists");
+	ok(XRegExp.OUTSIDE_CLASS, "XRegExp.OUTSIDE_CLASS exists");
 	ok(RegExp.prototype.apply, "RegExp.prototype.apply exists");
 	ok(RegExp.prototype.call, "RegExp.prototype.call exists");
 });
@@ -200,6 +202,11 @@ test("XRegExp.globalize", function () {
 	ok(regex.ignoreCase === globalCopy.ignoreCase && regex.multiline === globalCopy.multiline && regex.sticky === globalCopy.sticky, "Copy has same ignoreCase, multiline, and sticky properties");
 	ok(globalCopy.exec("aa").name, "Copy retains named capture capabilities");
 	ok(XRegExp.globalize(globalOrig).global, "Copy of global regex is global");
+});
+
+test("XRegExp.install", function () {
+	strictEqual(XRegExp.install(), undefined, "No-op");
+	// No tests needed; currently a no-op, in preparation for XRegExp 2
 });
 
 test("XRegExp.isRegExp", function () {

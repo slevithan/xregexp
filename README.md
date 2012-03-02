@@ -10,7 +10,7 @@ A few usage examples
 ```html
 <script src="xregexp.js"></script>
 <script>
-    var date, match, str, pos = 0, result = [];
+    var date, dateStr, match, str, pos = 0, result = [];
 
     // Using named capture and the x flag (free-spacing and comments)
     date = new XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
@@ -18,7 +18,8 @@ A few usage examples
                         (?<day>   [0-9]{2})     # day   ', 'x');
 
     // XRegExp.exec gives you named backreferences on the match result
-    match = XRegExp.exec('2012-02-22', date);
+    dateStr = '2012-02-22';
+    match = XRegExp.exec(dateStr, date);
     match.day; // -> '22'
 
     // It also supports optional pos and sticky arguments
@@ -30,10 +31,23 @@ A few usage examples
     // result -> ['1', '2', '3']
 
     // XRegExp.replace allows named backreferences in replacements
-    XRegExp.replace('2012-02-22', date, '${month}/${day}/${year}');
-    // -> '02/22/2012'
+    XRegExp.replace(dateStr, date, '${month}/${day}/${year}'); // -> '02/22/2012'
 
-    // Using XRegExp.forEach to get an array of backreference-only arrays
+    // In fact, all XRegExps are RegExps and work perfectly with native methods
+    date.test(dateStr); // -> true
+
+    // The only caveat is that named captures must be referred to using numbered backreferences
+    dateStr.replace(date, '$2/$3/$1'); // -> '02/22/2012'
+
+    // If you want, you can extend native methods so you don't have to worry about this
+    XRegExp.install('natives');
+    dateStr.replace(date, '${month}/${day}/${year}'); // -> '02/22/2012'
+    dateStr.replace(date, function (match) {
+        return match.month + '/' + match.day + '/' +match.year;
+    }); // -> '02/22/2012'
+    date.exec(dateStr).day; // -> 22
+
+    // Get an array of backreference-only arrays using XRegExp.forEach
     str = '<a href="http://xregexp.com/api/">XRegExp</a>\
            <a href="http://www.google.com/">Google</a>';
     XRegExp.forEach(str, new XRegExp('<a href="([^"]+)">(.*?)</a>', 'is'), function (match) {
@@ -41,7 +55,7 @@ A few usage examples
     }, []);
     // -> [['http://xregexp.com/api/', 'XRegExp'], ['http://www.google.com/', 'Google']]
 
-    // Using XRegExp.matchChain to get an array of numbers within <b> tags
+    // Get an array of numbers within <b> tags using XRegExp.matchChain
     XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [/<b>.*?<\/b>/i, /\d+/]);
     // -> ['2', '4', '56']
 
@@ -125,7 +139,7 @@ Match Recursive addon usage examples
     // ['literal', '\\{', 6, 8],
     // ['value', 'function(x,y){return y+x;}', 9, 35]]
 
-    // Sticky mode via the y flag
+    // Sticky mode via the y flag (works everywhere, not just where /y is natively supported)
     str = '<1><<<2>>><3>4<5>';
     XRegExp.matchRecursive(str, '<', '>', 'gy');
     // -> ['1', '<<2>>', '3']

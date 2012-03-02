@@ -148,15 +148,6 @@ if (!XRegExp) {
         return XRegExp.cache[key] || (XRegExp.cache[key] = new XRegExp(pattern, flags));
     };
 
-    // Accepts a `RegExp` instance; returns a copy with the `/g` flag set. The copy has a fresh
-    // `lastIndex` (set to zero). If you want to copy a regex without forcing the `global`
-    // property, use `XRegExp(regex)`. Do not use `RegExp(regex)` because it will not preserve
-    // special properties required for named capture.
-    // `XRegExp.copyAsGlobal` is a deprecated alias of `XRegExp.globalize`
-    XRegExp.globalize = XRegExp.copyAsGlobal = function (regex) {
-        return clone(regex, "g");
-    };
-
     // Accepts a string; returns the string with regex metacharacters escaped. The returned string
     // can safely be used at any point within a regex to match the provided literal string. Escaped
     // characters are [ ] { } ( ) * + ? - . , \ ^ $ | # and whitespace
@@ -181,22 +172,6 @@ if (!XRegExp) {
         return match;
     };
 
-    // Breaks the unrestorable link to XRegExp's private list of tokens, thereby preventing
-    // syntax and flag changes. Should be run after XRegExp and any addons are loaded
-    XRegExp.freezeTokens = function () {
-        XRegExp.addToken = function () {
-            throw new Error("can't run addToken after freezeTokens");
-        };
-    };
-
-    // Accepts any value; returns a Boolean indicating whether the argument is a `RegExp` object.
-    // Note that this is also `true` for regex literals and regexes created by the `XRegExp`
-    // constructor. This works correctly for variables created in another frame, when `instanceof`
-    // and `constructor` checks would fail to work as intended
-    XRegExp.isRegExp = function (o) {
-        return Object.prototype.toString.call(o) === "[object RegExp]";
-    };
-
     // Executes `callback` once per match within `str`; returns `context`. Provides a simpler and
     // cleaner way to iterate over regex matches compared to the traditional approaches of
     // subverting `String.prototype.replace` or repeatedly calling `exec` within a `while` loop.
@@ -214,6 +189,39 @@ if (!XRegExp) {
         if (regex.global)
             regex.lastIndex = 0;
         return context;
+    };
+
+    // Breaks the unrestorable link to XRegExp's private list of tokens, thereby preventing
+    // syntax and flag changes. Should be run after XRegExp and any addons are loaded
+    XRegExp.freezeTokens = function () {
+        XRegExp.addToken = function () {
+            throw new Error("can't run addToken after freezeTokens");
+        };
+    };
+
+    // Accepts a `RegExp` instance; returns a copy with the `/g` flag set. The copy has a fresh
+    // `lastIndex` (set to zero). If you want to copy a regex without forcing the `global`
+    // property, use `XRegExp(regex)`. Do not use `RegExp(regex)` because it will not preserve
+    // special properties required for named capture.
+    // `XRegExp.copyAsGlobal` is a deprecated alias of `XRegExp.globalize`
+    XRegExp.globalize = XRegExp.copyAsGlobal = function (regex) {
+        return clone(regex, "g");
+    };
+
+    // Accepts a space-delimited string of nondefault features to install. This is a placeholder
+    // for planned XRegExp 2 changes. It does nothing (the relevant features are currently
+    // installed automatically), but allows writing future-proof code (see the XRegExp roadmap at
+    // <http://bit.ly/xregexp-roadmap>)
+    XRegExp.install = function (features) {
+        // No-op
+    };
+
+    // Accepts any value; returns a Boolean indicating whether the argument is a `RegExp` object.
+    // Note that this is also `true` for regex literals and regexes created by the `XRegExp`
+    // constructor. This works correctly for variables created in another frame, when `instanceof`
+    // and `constructor` checks would fail to work as intended
+    XRegExp.isRegExp = function (o) {
+        return Object.prototype.toString.call(o) === "[object RegExp]";
     };
 
     // Accepts a string and an array of regexes; returns the result of using each successive regex
