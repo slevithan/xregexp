@@ -239,19 +239,27 @@ if (!XRegExp) {
         }([str], 0);
     };
 
-    // TODO: Add a description and handling for lastIndex
+    // Returns a new string with one or all matches of a pattern replaced by a replacement. The
+    // pattern can be a string or a regex, and the replacement can be a string or a function to be
+    // called for each match. An optional Boolean argument specifies whether to replace the first
+    // match only or all matches (overrides flag `/g`). Replacement strings can use `${n}` for
+    // named and numbered backreferences. Replacement functions can use named backreferences via
+    // `arguments[0].name`
     XRegExp.replace = function (str, search, replacement, replaceAll) {
-        if (XRegExp.isRegExp(search)) {
+        var isRegex = XRegExp.isRegExp(search),
+            r2, result;
+        if (isRegex) {
             if (replaceAll === undefined)
-                replaceAll = search.global; // Follow flag /g when replaceAll isn't explicit
-            if (replaceAll && !search.global)
-                search = XRegExp.globalize(search);
-            else if (!replaceAll && search.global)
-                search = clone(search, "", "g"); // deglobalize
+                replaceAll = search.global; // Follow flag `/g` when `replaceAll` isn't explicit
+            // Note that since a copy is used, `search`'s `lastIndex` isn't updated *during* replacement iterations
+            r2 = clone(search, replaceAll ? "g" : "", replaceAll ? "" : "g");
         } else if (replaceAll) {
-            search = new RegExp(XRegExp.escape(search + ""), "g");
+            r2 = new RegExp(XRegExp.escape(search + ""), "g");
         }
-        return str.replace(search, replacement); // Run the altered `replace` (required for extended replacement syntax, etc.)
+        result = (str + "").replace(r2, replacement); // Run the altered `replace` (required for extended replacement syntax, etc.)
+        if (isRegex && search.global)
+            search.lastIndex = 0; // Fixes IE, Safari bug (last tested IE 9, Safari 5.1)
+        return result;
     };
 
 
@@ -311,7 +319,7 @@ if (!XRegExp) {
                 this.lastIndex--;
         }
         if (!this.global)
-            this.lastIndex = origLastIndex; // Fix IE, Opera bug (last tested IE 9.0.5, Opera 11.61 on Windows)
+            this.lastIndex = origLastIndex; // Fixes IE, Opera bug (last tested IE 9, Opera 11.6)
         return match;
     };
 
@@ -327,7 +335,7 @@ if (!XRegExp) {
         if (match && !compliantLastIndexIncrement && this.global && !match[0].length && (this.lastIndex > match.index))
             this.lastIndex--;
         if (!this.global)
-            this.lastIndex = origLastIndex; // Fix IE, Opera bug (last tested IE 9.0.5, Opera 11.61 on Windows)
+            this.lastIndex = origLastIndex; // Fixes IE, Opera bug (last tested IE 9, Opera 11.6)
         return !!match;
     };
 
@@ -337,7 +345,7 @@ if (!XRegExp) {
             regex = RegExp(regex); // Native `RegExp`
         if (regex.global) {
             var result = nativ.match.apply(this, arguments);
-            regex.lastIndex = 0; // Fix IE bug
+            regex.lastIndex = 0; // Fixes IE bug
             return result;
         }
         return regex.exec(this); // Run the altered `exec`
@@ -373,7 +381,8 @@ if (!XRegExp) {
                             arguments[0][captureNames[i]] = arguments[i + 1];
                     }
                 }
-                // Update `lastIndex` before calling `replacement` (fix browsers)
+                // Update `lastIndex` before calling `replacement`.
+                // Fixes IE, Chrome, Firefox, Safari bug (last tested IE 9, Chrome 17, Firefox 10, Safari 5.1)
                 if (isRegex && search.global)
                     search.lastIndex = arguments[arguments.length - 2] + arguments[0].length;
                 return replacement.apply(null, arguments);
@@ -430,9 +439,9 @@ if (!XRegExp) {
 
         if (isRegex) {
             if (search.global)
-                search.lastIndex = 0; // Fix IE, Safari bug (last tested IE 9.0.5, Safari 5.1.2 on Windows)
+                search.lastIndex = 0; // Fixes IE, Safari bug (last tested IE 9, Safari 5.1)
             else
-                search.lastIndex = origLastIndex; // Fix IE, Opera bug (last tested IE 9.0.5, Opera 11.61 on Windows)
+                search.lastIndex = origLastIndex; // Fixes IE, Opera bug (last tested IE 9, Opera 11.6)
         }
 
         return result;

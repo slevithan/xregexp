@@ -12,28 +12,36 @@ A few usage examples
 <script>
     var date, match, str, pos = 0, result = [];
 
-    // named capture and the x flag (free-spacing and comments)
+    // Using named capture and the x flag (free-spacing and comments)
     date = new XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
                         (?<month> [0-9]{2}) -?  # month \n\
                         (?<day>   [0-9]{2})     # day   ', 'x');
 
-    // XRegExp.exec gives you named capture properties on the match result
+    // XRegExp.exec gives you named backreferences on the match result
     match = XRegExp.exec('2012-02-22', date);
     match.day; // -> '22'
 
-    // XRegExp.replace allows for named backreferences in replacements
+    // It also supports optional pos and sticky arguments
+    str = '<1><2><3>4<5>';
+    while (match = XRegExp.exec(str, XRegExp.cache('<(\\d+)>'), pos, true)) {
+        result.push(match[1]);
+        pos = match.index + match[0].length;
+    }
+    // result -> ['1', '2', '3']
+
+    // XRegExp.replace allows named backreferences in replacements
     XRegExp.replace('2012-02-22', date, '${month}/${day}/${year}');
     // -> '02/22/2012'
 
-    // get an array of backreference-only arrays using XRegExp.forEach
+    // Using XRegExp.forEach to get an array of backreference-only arrays
     str = '<a href="http://xregexp.com/api/">XRegExp</a>\
-           <a href="http://google.com/">Google</a>';
+           <a href="http://www.google.com/">Google</a>';
     XRegExp.forEach(str, new XRegExp('<a href="([^"]+)">(.*?)</a>', 'is'), function (match) {
         this.push(match.slice(1));
     }, []);
-    // -> [['http://xregexp.com/api/', 'XRegExp'], ['http://google.com/', 'Google']]
+    // -> [['http://xregexp.com/api/', 'XRegExp'], ['http://www.google.com/', 'Google']]
 
-    // get an array of numbers within <b> tags using XRegExp.matchChain
+    // Using XRegExp.matchChain to get an array of numbers within <b> tags
     XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [/<b>.*?<\/b>/i, /\d+/]);
     // -> ['2', '4', '56']
 
@@ -42,30 +50,22 @@ A few usage examples
         {regex: /<a href="([^"]+)">/i, backref: 1},
         {regex: new XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
     ]);
-    // -> ['xregexp.com', 'google.com']
+    // -> ['xregexp.com', 'www.google.com']
 
-    // regexes created by XRegExp get call and apply methods
-    // first, the setup...
+    // XRegExp regexes get call and apply methods
+    // To demonstrate, let's first create the function we'll be calling...
     function filter (array, fn) {
         var res = [];
         array.forEach(function (el) {if (fn.call(null, el)) res.push(el);});
         return res;
     }
-    // now we can filter arrays using functions and regexes
+    // Now we can filter arrays using functions and regexes
     filter(['a', 'ba', 'ab', 'b'], new XRegExp('^a'));
     // -> ['a', 'ab']
-
-    // XRegExp.exec supports optional pos and sticky arguments
-    str = '<1><2><3>4<5>';
-    while (match = XRegExp.exec(str, XRegExp.cache('<(\\d+)>'), pos, true)) {
-        result.push(match[1]);
-        pos = match.index + match[0].length;
-    }
-    // result -> ['1', '2', '3']
 </script>
 ```
 
-These examples don't show all of XRegExp's tricks. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), and [browser fixes](http://xregexp.com/cross_browser/).
+These examples should give you an idea of what's possible, but they don't show all of XRegExp's tricks. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), and [browser fixes](http://xregexp.com/cross_browser/).
 
 
 Unicode Base addon usage examples
@@ -85,7 +85,7 @@ Unicode Base addon usage examples
 and blocks require addon packages -->
 <script src="addons/unicode/xregexp-unicode-scripts.js"></script>
 <script>
-    new XRegExp('^\\p{Katakana}+$').test('カタカナ'); // -> true
+    new XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
 </script>
 ```
 
@@ -103,29 +103,29 @@ Match Recursive addon usage examples
     XRegExp.matchRecursive(str, '\\(', '\\)', 'g');
     // -> ['t((e))s', '', 'ing']
 
-    // extended information mode with valueNames
+    // Extended information mode with valueNames
     str = 'Here is <div>a <div>nested</div> tag</div> example.';
     XRegExp.matchRecursive(str, '<div\s*>', '</div>', 'gi', {
         valueNames: ['between', 'left', 'match', 'right']
     });
-    // -> [ ['between', 'Here is ', 0, 8],
+    // -> [['between', 'Here is ', 0, 8],
     // ['left', '<div>', 8, 13],
     // ['match', 'a <div>nested</div> tag', 13, 37],
     // ['right', '</div>', 36, 42],
-    // ['between', ' example.', 42, 51] ]
+    // ['between', ' example.', 42, 51]]
 
-    // omitting unneeded parts with null valueNames, and using escapeChar
+    // Omitting unneeded parts with null valueNames, and using escapeChar
     str = '...{1}\\{{function(x,y){return y+x;}}';
     XRegExp.matchRecursive(str, '{', '}', 'g', {
         valueNames: ['literal', null, 'value', null],
         escapeChar: '\\'
     });
-    // -> [ ['literal', '...', 0, 3],
+    // -> [['literal', '...', 0, 3],
     // ['value', '1', 4, 5],
     // ['literal', '\\{', 6, 8],
-    // ['value', 'function(x,y){return y+x;}', 9, 35] ]
+    // ['value', 'function(x,y){return y+x;}', 9, 35]]
 
-    // sticky mode via the y flag
+    // Sticky mode via the y flag
     str = '<1><<<2>>><3>4<5>';
     XRegExp.matchRecursive(str, '<', '>', 'gy');
     // -> ['1', '<<2>>', '3']

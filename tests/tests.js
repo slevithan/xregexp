@@ -466,6 +466,8 @@ test("String.prototype.replace", function () {
 	// in `try..catch` since this throws an error in XRegExp 1.5.0 (fixed in 1.5.1)
 	equal(function () {try {return "xaaa".replace(/a/);} catch (err) {return err;}}(), "xundefinedaa", 'Replacement string is "undefined", when not provided');
 
+	equal("x".replace(/x/, /x/), "/x/", "Regex search with RegExp replacement");
+
 	equal("xaaa".replace(), "xaaa", "Source returned when no replacement provided");
 
 	var regex = /x/;
@@ -490,9 +492,12 @@ test("String.prototype.replace", function () {
 	"123x567".replace(regexG, "_");
 	equal(regexG.lastIndex, 0, "Global regex lastIndex reset to 0");
 
-	equal("x".replace(/x/, /x/), "/x/", "Regex search with RegExp replacement");
-
-	// TODO: Add test(s) of lastIndex from within replacement functions
+	var regex2 = /x/g;
+	var interimLastIndex = 0;
+	"1x2".replace(regex2, function () {
+		interimLastIndex = regex2.lastIndex;
+	});
+	equal(interimLastIndex, 2, "Global regex lastIndex updated during replacement iterations");
 });
 
 test("String.prototype.split", function () {
