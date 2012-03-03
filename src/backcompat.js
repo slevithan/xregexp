@@ -1,5 +1,5 @@
 /*!
- * XRegExp BackCompat v1.0.0-beta
+ * XRegExp BackCompat v1.0.0-alpha
  * Copyright 2012 Steven Levithan <http://xregexp.com>
  * Available under the MIT License
  * Provides backward compatibility with XRegExp 1.x
@@ -16,8 +16,8 @@ if (XRegExp) {
 
     // removed in XRegExp v1.5.0
     RegExp.prototype.addFlags = function (flags) {
-        var x = this._xregexp;
-        var regex = new XRegExp(this.source, /\/([a-z]*)$/i.exec(this + "")[1] + (flags || ""));
+        var regex = new XRegExp(this.source, /\/([a-z]*)$/i.exec(this + "")[1] + (flags || "")),
+            x = this._xregexp;
         if (x) {
             regex._xregexp = {
                 source: x.source,
