@@ -1,61 +1,18 @@
-// XRegExp addon: Unicode Categories 1.1
-// (c) 2010-2012 Steven Levithan
-// MIT License
-// <http://xregexp.com>
-// Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/UnicodeData.txt>
-
-/*
-This package for the XRegExp Unicode Base addon enables the following Unicode
-categories (aka properties):
-
-L - Letter (this top-level category is included in the Unicode Base addon)
-    Ll - Lowercase letter
-    Lu - Uppercase letter
-    Lt - Titlecase letter
-    Lm - Modifier letter
-    Lo - Letter without case
-M - Mark
-    Mn - Non-spacing mark
-    Mc - Spacing combining mark
-    Me - Enclosing mark
-N - Number
-    Nd - Decimal digit
-    Nl - Letter number
-    No -  Other number
-P - Punctuation
-    Pd - Dash punctuation
-    Ps - Open punctuation
-    Pe - Close punctuation
-    Pi - Initial punctuation
-    Pf - Final punctuation
-    Pc - Connector punctuation
-    Po - Other punctuation
-S - Symbol
-    Sm - Math symbol
-    Sc - Currency symbol
-    Sk - Modifier symbol
-    So - Other symbol
-Z - Separator
-    Zs - Space separator
-    Zl - Line separator
-    Zp - Paragraph separator
-C - Other
-    Cc - Control
-    Cf - Format
-    Co - Private use
-    Cs - Surrogate
-    Cn - Unassigned
-
-Example usage:
-
-    \p{N}
-    \p{Cn}
+/*!
+ * XRegExp addon: Unicode Categories v1.2.0-beta
+ * (c) 2010-2012 Steven Levithan <http://xregexp.com>
+ * Available under the MIT License
+ * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/UnicodeData.txt>
+ *
+ * Adds support for all Unicode categories (aka properties) E.g., \p{Lu} or
+ * \p{UppercaseLetter}. Token names are case insensitive, and any spaces,
+ * hyphens, and underscores are ignored.
 */
 
 ;var XRegExp;
 
 if (!(XRegExp && XRegExp.addUnicodePackage)) {
-    throw new ReferenceError("XRegExp's Unicode Base must be loaded before Unicode Categories");
+    throw new ReferenceError("XRegExp Unicode Base must be loaded before Unicode Categories");
 }
 
 XRegExp.addUnicodePackage({
@@ -96,5 +53,44 @@ XRegExp.addUnicodePackage({
     Co: "E000-F8FF",
     Cs: "D800-DFFF",
     Cn: "03780379037F-0383038B038D03A20528-05300557055805600588058B-058E059005C8-05CF05EB-05EF05F5-05FF0605061C061D070E074B074C07B2-07BF07FB-07FF082E082F083F085C085D085F-089F08A108AD-08E308FF097809800984098D098E0991099209A909B109B3-09B509BA09BB09C509C609C909CA09CF-09D609D8-09DB09DE09E409E509FC-0A000A040A0B-0A0E0A110A120A290A310A340A370A3A0A3B0A3D0A43-0A460A490A4A0A4E-0A500A52-0A580A5D0A5F-0A650A76-0A800A840A8E0A920AA90AB10AB40ABA0ABB0AC60ACA0ACE0ACF0AD1-0ADF0AE40AE50AF2-0B000B040B0D0B0E0B110B120B290B310B340B3A0B3B0B450B460B490B4A0B4E-0B550B58-0B5B0B5E0B640B650B78-0B810B840B8B-0B8D0B910B96-0B980B9B0B9D0BA0-0BA20BA5-0BA70BAB-0BAD0BBA-0BBD0BC3-0BC50BC90BCE0BCF0BD1-0BD60BD8-0BE50BFB-0C000C040C0D0C110C290C340C3A-0C3C0C450C490C4E-0C540C570C5A-0C5F0C640C650C70-0C770C800C810C840C8D0C910CA90CB40CBA0CBB0CC50CC90CCE-0CD40CD7-0CDD0CDF0CE40CE50CF00CF3-0D010D040D0D0D110D3B0D3C0D450D490D4F-0D560D58-0D5F0D640D650D76-0D780D800D810D840D97-0D990DB20DBC0DBE0DBF0DC7-0DC90DCB-0DCE0DD50DD70DE0-0DF10DF5-0E000E3B-0E3E0E5C-0E800E830E850E860E890E8B0E8C0E8E-0E930E980EA00EA40EA60EA80EA90EAC0EBA0EBE0EBF0EC50EC70ECE0ECF0EDA0EDB0EE0-0EFF0F480F6D-0F700F980FBD0FCD0FDB-0FFF10C610C8-10CC10CE10CF1249124E124F12571259125E125F1289128E128F12B112B612B712BF12C112C612C712D7131113161317135B135C137D-137F139A-139F13F5-13FF169D-169F16F1-16FF170D1715-171F1737-173F1754-175F176D17711774-177F17DE17DF17EA-17EF17FA-17FF180F181A-181F1878-187F18AB-18AF18F6-18FF191D-191F192C-192F193C-193F1941-1943196E196F1975-197F19AC-19AF19CA-19CF19DB-19DD1A1C1A1D1A5F1A7D1A7E1A8A-1A8F1A9A-1A9F1AAE-1AFF1B4C-1B4F1B7D-1B7F1BF4-1BFB1C38-1C3A1C4A-1C4C1C80-1CBF1CC8-1CCF1CF7-1CFF1DE7-1DFB1F161F171F1E1F1F1F461F471F4E1F4F1F581F5A1F5C1F5E1F7E1F7F1FB51FC51FD41FD51FDC1FF01FF11FF51FFF2065-206920722073208F209D-209F20BA-20CF20F1-20FF218A-218F23F4-23FF2427-243F244B-245F27002B4D-2B4F2B5A-2BFF2C2F2C5F2CF4-2CF82D262D28-2D2C2D2E2D2F2D68-2D6E2D71-2D7E2D97-2D9F2DA72DAF2DB72DBF2DC72DCF2DD72DDF2E3C-2E7F2E9A2EF4-2EFF2FD6-2FEF2FFC-2FFF3040309730983100-3104312E-3130318F31BB-31BF31E4-31EF321F32FF4DB6-4DBF9FCD-9FFFA48D-A48FA4C7-A4CFA62C-A63FA698-A69EA6F8-A6FFA78FA794-A79FA7AB-A7F7A82C-A82FA83A-A83FA878-A87FA8C5-A8CDA8DA-A8DFA8FC-A8FFA954-A95EA97D-A97FA9CEA9DA-A9DDA9E0-A9FFAA37-AA3FAA4EAA4FAA5AAA5BAA7C-AA7FAAC3-AADAAAF7-AB00AB07AB08AB0FAB10AB17-AB1FAB27AB2F-ABBFABEEABEFABFA-ABFFD7A4-D7AFD7C7-D7CAD7FC-D7FFFA6EFA6FFADA-FAFFFB07-FB12FB18-FB1CFB37FB3DFB3FFB42FB45FBC2-FBD2FD40-FD4FFD90FD91FDC8-FDEFFDFEFDFFFE1A-FE1FFE27-FE2FFE53FE67FE6C-FE6FFE75FEFDFEFEFF00FFBF-FFC1FFC8FFC9FFD0FFD1FFD8FFD9FFDD-FFDFFFE7FFEF-FFF8FFFEFFFF"
+},
+{
+    //L: "Letter", // included in the Unicode Base addon
+    Ll: "Lowercase_Letter",
+    Lu: "Uppercase_Letter",
+    Lt: "Titlecase_Letter",
+    Lm: "Modifier_Letter",
+    Lo: "Other_Letter",
+    M: "Mark",
+    Mn: "Non_Spacing_Mark",
+    Mc: "Spacing_Combining_Mark",
+    Me: "Enclosing_Mark",
+    Z: "Separator",
+    Zs: "Space_Separator",
+    Zl: "Line_Separator",
+    Zp: "Paragraph_Separator",
+    S: "Symbol",
+    Sm: "Math_Symbol",
+    Sc: "Currency_Symbol",
+    Sk: "Modifier_Symbol",
+    So: "Other_Symbol",
+    N: "Number",
+    Nd: "Decimal_Digit_Number",
+    Nl: "Letter_Number",
+    No: "Other_Number",
+    P: "Punctuation",
+    Pd: "Dash_Punctuation",
+    Ps: "Open_Punctuation",
+    Pe: "Close_Punctuation",
+    Pi: "Initial_Punctuation",
+    Pf: "Final_Punctuation",
+    Pc: "Connector_Punctuation",
+    Po: "Other_Punctuation",
+    C: "Other",
+    Cc: "Control",
+    Cf: "Format",
+    Co: "Private_Use",
+    Cs: "Surrogate",
+    Cn: "Unassigned"
 });
 

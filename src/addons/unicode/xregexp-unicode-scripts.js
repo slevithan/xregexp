@@ -1,24 +1,18 @@
-// XRegExp addon: Unicode Scripts 1.1
-// (c) 2010-2012 Steven Levithan
-// MIT License
-// <http://xregexp.com>
-// Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/Scripts.txt>
-
-/*
-This package for the XRegExp Unicode Base addon enables all Unicode 6.1 scripts
-in the Basic Multilingual Plane (U+0000-U+FFFF).
-
-Example usage:
-    \p{Latin}
-    \p{Canadian Aboriginal}
-
-Letter case, spaces, hyphens, and underscores are ignored in script names.
+/*!
+ * XRegExp addon: Unicode Scripts v1.1.1-beta
+ * (c) 2010-2012 Steven Levithan <http://xregexp.com>
+ * Available under the MIT License
+ * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/Scripts.txt>
+ *
+ * Adds support for all Unicode scripts in the Basic Multilingual Plane
+ * (U+0000-U+FFFF). E.g., \p{Latin}. Token names are case insensitive, and any
+ * spaces, hyphens, and underscores are ignored.
 */
 
 ;var XRegExp;
 
 if (!(XRegExp && XRegExp.addUnicodePackage)) {
-    throw new ReferenceError("XRegExp's Unicode Base must be loaded before Unicode Scripts");
+    throw new ReferenceError("XRegExp Unicode Base must be loaded before Unicode Scripts");
 }
 
 XRegExp.addUnicodePackage({
