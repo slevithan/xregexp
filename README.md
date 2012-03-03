@@ -1,8 +1,10 @@
-﻿# [XRegExp](http://xregexp.com/) <sup>v1.6.0-alpha</sup>
+﻿[XRegExp](http://xregexp.com/) <sup>v1.6.0-alpha</sup>
+======================================================
 
 XRegExp provides augmented, extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regular expression utility belt with tools to make your client-side grepping simpler and more powerful, while freeing you from worrying about pesky cross-browser inconsistencies and the unreliable `lastIndex` property.
 
-## A few usage examples
+
+## A few examples
 
 ~~~ js
 var date, dateStr, match, str, pos = 0, result = [];
@@ -75,7 +77,8 @@ filter(['a', 'ba', 'ab', 'b'], new XRegExp('^a'));
 
 These examples should give you an idea of what's possible, but they don't show all of XRegExp's tricks. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), [browser fixes](http://xregexp.com/cross_browser/), and [roadmap](https://github.com/slevithan/XRegExp/wiki/Roadmap).
 
-## Unicode addon usage examples
+
+## XRegExp Unicode Base <sup>v1.0.0-alpha</sup> examples
 
 First include the Unicode Base script:
 
@@ -93,16 +96,17 @@ unicodeWord.test('日本語'); // -> true
 unicodeWord.test('العربية'); // -> true
 ~~~
 
-The base script adds `\p{L}` (or you can use its alias, `\p{Letter}`), but other Unicode categories, scripts, and blocks require addon packages. Try these after additionally including `xregexp-unicode-scripts.js`:
+The base script adds `\p{L}` (and its alias, `\p{Letter}`), but other Unicode categories, scripts, and blocks require addon packages. Try these next examples after additionally including `xregexp-unicode-scripts.js`:
 
 ~~~ js
 new XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
-new XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Ümlaut Café'); // -> true
+new XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
 ~~~
 
-XRegExp uses the Unicode 6.1 character database (released 2012-01). More details [here](http://xregexp.com/plugins/#unicode).
+XRegExp uses the Unicode 6.1 character database (released January 2012). More details [here](http://xregexp.com/plugins/#unicode).
 
-## Match Recursive addon usage examples
+
+## XRegExp Match Recursive <sup>v0.2.0-beta</sup> examples
 
 First include the Match Recursive script:
 
@@ -111,7 +115,7 @@ First include the Match Recursive script:
 <script src="addons/xregexp-matchrecursive.js"></script>
 ~~~
 
-Then get recursive:
+You can then match recursive constructs using left and right XRegExp pattern delimiters:
 
 ~~~ js
 var str = '(t((e))s)t()(ing)';
@@ -120,7 +124,7 @@ XRegExp.matchRecursive(str, '\\(', '\\)', 'g');
 
 // Extended information mode with valueNames
 str = 'Here is <div>a <div>nested</div> tag</div> example.';
-XRegExp.matchRecursive(str, '<div\s*>', '</div>', 'gi', {
+XRegExp.matchRecursive(str, '<div\\s*>', '</div>', 'gi', {
     valueNames: ['between', 'left', 'match', 'right']
 });
 // -> [['between', 'Here is ', 0, 8],
@@ -147,6 +151,7 @@ XRegExp.matchRecursive(str, '<', '>', 'gy');
 ~~~
 
 More details [here](http://xregexp.com/plugins/#matchRecursive).
+
 
 ## Changelog
 

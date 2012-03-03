@@ -1,6 +1,6 @@
 /*!
- * XRegExp addon: Unicode Base v1.0.0-alpha
- * (c) 2008-2012 Steven Levithan <http://xregexp.com>
+ * XRegExp Unicode Base v1.0.0-alpha
+ * Copyright 2008-2012 Steven Levithan <http://xregexp.com>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/>
  *

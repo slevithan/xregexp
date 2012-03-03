@@ -1,7 +1,8 @@
-// XRegExp addon: Match Recursive 0.1.1
-// (c) 2009-2012 Steven Levithan
-// MIT License
-// <http://xregexp.com>
+/*!
+ * XRegExp Match Recursive v0.2.0-beta
+ * Copyright 2009-2012 Steven Levithan <http://xregexp.com>
+ * Available under the MIT License
+*/
 
 ;var XRegExp;
 
@@ -9,17 +10,29 @@ if (!XRegExp) {
     throw new ReferenceError("XRegExp must be loaded before Match Recursive");
 }
 
-/* accepts a string to search, left and right delimiters as regex pattern strings, optional regex
-flags (may include non-native s, x, and y flags), and an options object which allows setting an
-escape character and changing the return format from an array of matches to a two-dimensional array
-of string parts with extended position data. returns an array of matches (optionally with extended
-data), allowing nested instances of left and right delimiters. use the g flag to return all
-matches, otherwise only the first is returned. if delimiters are unbalanced within the subject
-data, an error is thrown.
-
-known issues:
-- backreferences are not supported within delimiter patterns when using `escapeChar`. */
-
+/**
+ * Returns strings found between provided left and right delimiters (allowing
+ * nested delimiters) or arrays of match parts and position data. An error is
+ * thrown if delimiters are unbalanced within the data.
+ * Known issue: Backrefs not supported in right delimiter when using escapeChar
+ * @param {String} str The string to search.
+ * @param {String} left Left delimiter as an XRegExp pattern.
+ * @param {String} right Right delimiter as an XRegExp pattern.
+ * @param {String} flags Flags for left and right delimiters. Use: g,i,m,s,x,y.
+ * @param {Object} options Lets you specify valueNames and escapeChar options.
+ * @returns {Array} The list of matches.
+ * @example
+ *
+ * // basic usage
+ * XRegExp.matchRecursive('(t((e))s)t()(ing)', '\\(', '\\)', 'g');
+ *
+ * // with valueNames and escapeChar
+ * var str = '...{1}\\{{function(x,y){return y+x;}}';
+ * XRegExp.matchRecursive(str, '{', '}', 'gi', {
+ *     valueNames: ['between', 'left', 'match', 'right'],
+ *     escapeChar: '\\'
+ * });
+ */
 XRegExp.matchRecursive = function (str, left, right, flags, options) {
     "use strict";
 
@@ -29,7 +42,7 @@ XRegExp.matchRecursive = function (str, left, right, flags, options) {
         flags = flags || "",
         global = flags.indexOf("g") > -1,
         sticky = flags.indexOf("y") > -1,
-        flags = flags.replace(/y/g, ""), // flag y handled internally; can be used even if not supported natively
+        flags = flags.replace(/y/g, ""), // flag y handled internally; usable when not natively supported
         left = new XRegExp(left, flags),
         right = new XRegExp(right, flags),
         output = [],
@@ -42,20 +55,20 @@ XRegExp.matchRecursive = function (str, left, right, flags, options) {
         escaped = XRegExp.escape(escapeChar);
         esc = new RegExp(
             "(?:" + escaped + "[\\S\\s]|(?:(?!" + left.source + "|" + right.source + ")[^" + escaped + "])+)+",
-            flags.replace(/[^im]+/g, "") // flags g, y, s, and x aren't needed here (s and x are handled by XRegExp)
+            flags.replace(/[^im]+/g, "") // flags g,y,s,x aren't needed here (s,x handled by XRegExp)
         );
     }
 
     while (true) {
-        // if using an escape character, advance to the next delimiter's starting position,
-        // skipping any escaped characters
+        // if using an escape character, advance to the next delimiter's
+        // starting position, skipping any escaped characters
         if (escapeChar)
             delimEnd += (XRegExp.exec(str, esc, delimEnd, /*anchored*/ true) || [""])[0].length;
 
         leftMatch = XRegExp.exec(str, left, delimEnd);
         rightMatch = XRegExp.exec(str, right, delimEnd);
 
-        // only keep the result which matched earlier in the string
+        // keep only the result that matched earlier in the string
         if (leftMatch && rightMatch) {
             if (leftMatch.index <= rightMatch.index)
                 rightMatch = null;
@@ -105,10 +118,10 @@ XRegExp.matchRecursive = function (str, left, right, flags, options) {
                     break;
             }
         } else {
-            throw new Error("subject data contains unbalanced delimiters");
+            throw new Error("string contains unbalanced delimiters");
         }
 
-        // if the delimiter matched an empty string, advance delimEnd to avoid an infinite loop
+        // if the delimiter matched an empty string, avoid an infinite loop
         if (delimStart === delimEnd)
             delimEnd++;
     }

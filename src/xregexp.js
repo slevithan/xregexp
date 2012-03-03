@@ -1,9 +1,9 @@
-// XRegExp 1.5.1
-// (c) 2007-2012 Steven Levithan
-// MIT License
-// <http://xregexp.com>
-// Provides an augmented, extensible, cross-browser implementation of regular expressions,
-// including support for additional syntax, flags, and methods
+/*!
+ * XRegExp v1.6.0-alpha
+ * Copyright 2007-2012 Steven Levithan <http://xregexp.com>
+ * Available under the MIT License
+ * Augmented, extensible, cross-browser regular expressions
+ */
 
 ;var XRegExp;
 

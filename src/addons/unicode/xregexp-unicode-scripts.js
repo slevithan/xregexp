@@ -1,6 +1,6 @@
 /*!
- * XRegExp addon: Unicode Scripts v1.1.1-beta
- * (c) 2010-2012 Steven Levithan <http://xregexp.com>
+ * XRegExp Unicode Scripts v1.1.1-beta
+ * Copyright 2010-2012 Steven Levithan <http://xregexp.com>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/Scripts.txt>
  *

@@ -1,6 +1,6 @@
 /*!
- * XRegExp addon: Unicode Categories v1.2.0-beta
- * (c) 2010-2012 Steven Levithan <http://xregexp.com>
+ * XRegExp Unicode Categories v1.2.0-beta
+ * Copyright 2010-2012 Steven Levithan <http://xregexp.com>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/UnicodeData.txt>
  *
