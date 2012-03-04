@@ -1,13 +1,13 @@
 ﻿[XRegExp](http://xregexp.com/) (v1.6.0-alpha)
 =============================================
 
-XRegExp provides augmented, extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regular expression utility belt with tools to make your client-side grepping simpler and more powerful, while freeing you from worrying about pesky cross-browser inconsistencies and the unreliable `lastIndex` property.
+XRegExp provides augmented, extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regular expression utility belt with tools to make your client-side grepping simpler and more powerful, while freeing you from worrying about pesky cross-browser inconsistencies and the dubious `lastIndex` property.
 
 
 ## A few examples
 
 ~~~ js
-var date, dateStr, match, str, pos = 0, result = [];
+var date, dateStr, match, str, pos, result = [];
 
 // Using named capture and the x flag (free-spacing and comments)
 date = new XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
@@ -20,12 +20,13 @@ match = XRegExp.exec(dateStr, date);
 match.day; // -> '22'
 
 // It also supports optional pos and sticky arguments
-str = '<1><2><3>4<5>';
+str = '<1><2><3><4>5<6>';
+pos = 2;
 while (match = XRegExp.exec(str, XRegExp.cache('<(\\d+)>'), pos, true)) {
     result.push(match[1]);
     pos = match.index + match[0].length;
 }
-// result -> ['1', '2', '3']
+// result -> ['2', '3', '4']
 
 // XRegExp.replace allows named backreferences in replacements
 XRegExp.replace(dateStr, date, '${month}/${day}/${year}'); // -> '02/22/2012'
@@ -159,9 +160,11 @@ More details [here](http://xregexp.com/plugins/#matchRecursive).
 * Planned changes: [Roadmap](https://github.com/slevithan/XRegExp/wiki/Roadmap).
 
 
-## Author
+## Authors
 
-Steven Levithan ([blog](http://blog.stevenlevithan.com/), [github](http://github.com/slevithan/), [twitter](http://twitter.com/slevithan))
+Steven Levithan ([blog](http://blog.stevenlevithan.com/), [github](http://github.com/slevithan/), [twitter](http://twitter.com/slevithan)).
+
+Tools: Unicode category and script range generators by [Mathias Bynens](http://mathiasbynens.be/).
 
 Feel free to fork if you see possible improvements!
 
