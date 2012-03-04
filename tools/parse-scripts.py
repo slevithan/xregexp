@@ -57,8 +57,8 @@ def analyze(source):
 
 def main(source):
 	dictionary = analyze(source)
-	for script in ['Arabic', 'Armenian', 'Balinese', 'Bamum', 'Batak', 'Bengali', 'Bopomofo', 'Braille', 'Buginese', 'Buhid', 'Canadian_Aboriginal', 'Cham', 'Cherokee', 'Common', 'Coptic', 'Cyrillic', 'Devanagari', 'Ethiopic', 'Georgian', 'Glagolitic', 'Greek', 'Gujarati', 'Gurmukhi', 'Han', 'Hangul', 'Hanunoo', 'Hebrew', 'Hiragana', 'Inherited', 'Javanese', 'Kannada', 'Katakana', 'Kayah_Li', 'Khmer', 'Lao', 'Latin', 'Lepcha', 'Limbu', 'Lisu', 'Malayalam', 'Mandaic', 'Meetei_Mayek', 'Mongolian', 'Myanmar', 'New_Tai_Lue', 'Nko', 'Ogham', 'Ol_Chiki', 'Oriya', 'Phags_Pa', 'Rejang', 'Runic', 'Samaritan', 'Saurashtra', 'Sinhala', 'Sundanese', 'Syloti_Nagri', 'Syriac', 'Tagalog', 'Tagbanwa', 'Tai_Le', 'Tai_Tham', 'Tai_Viet', 'Tamil', 'Telugu', 'Thaana', 'Thai', 'Tibetan', 'Tifinagh', 'Vai', 'Yi']:
-		print '    ' + script + ': "' + dictionary[script] + '",'
+	for item in sorted(dictionary.items()):
+		print '    ' + item[0] + ': "' + item[1] + '",'
 
 if __name__ == '__main__':
 	main(sys.argv[1])
