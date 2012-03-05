@@ -164,9 +164,9 @@ More details: [Addons: Match Recursive](http://xregexp.com/plugins/#matchRecursi
 
 ## Authors
 
-Steven Levithan ([blog](http://blog.stevenlevithan.com/), [github](http://github.com/slevithan/), [twitter](http://twitter.com/slevithan)).
+XRegExp by [Steven Levithan](http://stevenlevithan.com/).
 
-Tools: Unicode category and script range generators by [Mathias Bynens](http://mathiasbynens.be/).
+Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/).
 
 Fork me to show support, fix, and extend.
 

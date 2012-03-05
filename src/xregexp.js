@@ -6,7 +6,7 @@
  */
 
 // Avoid running twice; that could break references to native globals
-if (typeof XRegExp === "undefined") {
+;if (typeof XRegExp === "undefined") {
 (function (root, undefined) {
     "use strict";
 
@@ -97,6 +97,7 @@ if (typeof XRegExp === "undefined") {
         match: String.prototype.match,
         replace: String.prototype.replace,
         split: String.prototype.split,
+        // Hold these so they can be given back if they were added before XRegExp ran
         apply: RegExp.prototype.apply,
         call: RegExp.prototype.call
     };
@@ -651,15 +652,14 @@ if (typeof XRegExp === "undefined") {
     }
 
     function setMethods (on) {
-        // Restore methods if they existed before XRegExp ran; otherwise delete
-        if (nativ.apply)
-            RegExp.prototype.apply = on ? XRegExp.prototype.apply : nativ.apply;
-        else if (!on)
-            delete RegExp.prototype.apply;
-        if (nativ.call)
-            RegExp.prototype.call = on ? XRegExp.prototype.call : nativ.call;
-        else if (!on)
-            delete RegExp.prototype.call;
+        if (on) {
+            RegExp.prototype.apply = XRegExp.prototype.apply;
+            RegExp.prototype.call = XRegExp.prototype.call;
+        } else {
+            // Restore methods if they existed before XRegExp ran; otherwise delete
+            nativ.apply ? RegExp.prototype.apply = nativ.apply : delete RegExp.prototype.apply;
+            nativ.call ? RegExp.prototype.call = nativ.call : delete RegExp.prototype.call;
+        }
         features.methods = on;
     }
 
