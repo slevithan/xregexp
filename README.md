@@ -1,4 +1,4 @@
-﻿[XRegExp](http://xregexp.com/) (v1.6.0-alpha)
+﻿[XRegExp](http://xregexp.com/) (v1.6.0-dev)
 =============================================
 
 XRegExp provides augmented, extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regular expression utility belt with tools to make your client-side grepping simpler and more powerful, while freeing you from worrying about pesky cross-browser inconsistencies and the dubious `lastIndex` property.
@@ -79,7 +79,7 @@ filter(['a', 'ba', 'ab', 'b'], XRegExp('^a'));
 These examples should give you an idea of what's possible, but they don't show all of XRegExp's tricks. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), [browser fixes](http://xregexp.com/cross_browser/), and [roadmap](https://github.com/slevithan/XRegExp/wiki/Roadmap).
 
 
-## XRegExp Unicode Base (v1.0.0-alpha)
+## XRegExp Unicode Base (v1.0.0-dev)
 
 First include the Unicode Base script:
 
@@ -109,7 +109,7 @@ XRegExp uses the Unicode 6.1 character database (released January 2012).
 More details: [Addons: Unicode](http://xregexp.com/plugins/#unicode).
 
 
-## XRegExp Match Recursive (v0.2.0-beta)
+## XRegExp Match Recursive (v0.2.0-dev)
 
 First include the Match Recursive script:
 
@@ -168,5 +168,5 @@ Steven Levithan ([blog](http://blog.stevenlevithan.com/), [github](http://github
 
 Tools: Unicode category and script range generators by [Mathias Bynens](http://mathiasbynens.be/).
 
-Feel free to fork if you see possible improvements!
+Fork me to show support, fix, and extend.
 

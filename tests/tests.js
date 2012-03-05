@@ -9,12 +9,14 @@ test("Basic availability", function () {
 	ok(XRegExp.escape, "XRegExp.escape exists");
 	ok(XRegExp.exec, "XRegExp.exec exists");
 	ok(XRegExp.forEach, "XRegExp.forEach exists");
-	ok(XRegExp.freezeTokens, "XRegExp.freezeTokens exists");
+	//ok(XRegExp.freezeTokens, "XRegExp.freezeTokens exists"); // Deprecated in v1.6.0
 	ok(XRegExp.globalize, "XRegExp.globalize exists");
 	ok(XRegExp.install, "XRegExp.install exists");
+	ok(XRegExp.isInstalled, "XRegExp.isInstalled exists");
 	ok(XRegExp.isRegExp, "XRegExp.isRegExp exists");
 	ok(XRegExp.matchChain, "XRegExp.matchChain exists");
 	ok(XRegExp.replace, "XRegExp.replace exists");
+	ok(XRegExp.uninstall, "XRegExp.uninstall exists");
 	ok(XRegExp.version, "XRegExp.version exists");
 	ok(XRegExp.INSIDE_CLASS, "XRegExp.INSIDE_CLASS exists");
 	ok(XRegExp.OUTSIDE_CLASS, "XRegExp.OUTSIDE_CLASS exists");
@@ -57,14 +59,6 @@ test("XRegExp", function () {
 	// unsupported flags since it would add some complexity and overhead to keep track of any
 	// flags checked for in custom tokens
 	//raises(function () {XRegExp("", "?");}, Error, "Unsupported flag throws");
-});
-
-test("XRegExp.version", function () {
-	var parts = XRegExp.version.split(".");
-
-	equal(typeof XRegExp.version, "string", "Version is a string");
-	equal(parts.length, 3, "Version is three dot-delimited parts");
-	ok(!(isNaN(+parts[0]) || isNaN(+parts[1]) || isNaN(+parts[2])), "Version parts are all numeric");
 });
 
 test("XRegExp.addToken", function () {
@@ -183,12 +177,13 @@ test("XRegExp.forEach", function () {
 	equal(regexG.lastIndex, 0, "lastIndex of global regex reset to 0 after iteration");
 });
 
-test("XRegExp.freezeTokens", function () {
+// Deprecated in v1.6.0
+/*test("XRegExp.freezeTokens", function () {
 	XRegExp.freezeTokens();
 
 	raises(function () {XRegExp.addToken(/>>>/, function () {return "Z";});}, Error, "addToken throws after freeze");
 	ok(!XRegExp(">>>").test("Z"), "Token not added");
-});
+});*/
 
 test("XRegExp.globalize", function () {
 	var hasNativeY = typeof RegExp.prototype.sticky !== "undefined";
@@ -205,8 +200,11 @@ test("XRegExp.globalize", function () {
 });
 
 test("XRegExp.install", function () {
-	strictEqual(XRegExp.install(), undefined, "No-op");
-	// No tests needed; currently a no-op, in preparation for XRegExp 2
+	// TODO: Add tests
+});
+
+test("XRegExp.isInstalled", function () {
+	// TODO: Add tests
 });
 
 test("XRegExp.isRegExp", function () {
@@ -256,6 +254,18 @@ test("XRegExp.matchChain", function () {
 
 test("XRegExp.replace", function () {
 	// TODO: Add tests
+});
+
+test("XRegExp.uninstall", function () {
+	// TODO: Add tests
+});
+
+test("XRegExp.version", function () {
+	var parts = XRegExp.version.split(".");
+
+	equal(typeof XRegExp.version, "string", "Version is a string");
+	equal(parts.length, 3, "Version is three dot-delimited parts");
+	ok(!(isNaN(+parts[0]) || isNaN(+parts[1])), "Major and minor version parts are numeric");
 });
 
 test("XRegExp.prototype.apply", function () {

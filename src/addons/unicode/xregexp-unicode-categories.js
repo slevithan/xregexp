@@ -1,5 +1,5 @@
 /*!
- * XRegExp Unicode Categories v1.2.0-beta
+ * XRegExp Unicode Categories v1.2.0-dev
  * Copyright 2010-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/UnicodeData.txt>
@@ -9,14 +9,12 @@
  * hyphens, and underscores are ignored.
 */
 
-;var XRegExp;
-
-if (!(XRegExp && XRegExp.addUnicodePackage)) {
-    throw new ReferenceError("XRegExp Unicode Base must be loaded before Unicode Categories");
-}
-
-(function () {
+;(function () {
     "use strict";
+
+    if (typeof XRegExp === "undefined" || typeof XRegExp.addUnicodePackage === "undefined") {
+        throw new ReferenceError("XRegExp Unicode Base must be loaded before Unicode Categories");
+    }
 
     var extensible = XRegExp.isInstalled("extensibility");
 
@@ -105,5 +103,5 @@ if (!(XRegExp && XRegExp.addUnicodePackage)) {
     if (!extensible)
         XRegExp.uninstall("extensibility"); // revert to previous state
 
-})();
+}());
 

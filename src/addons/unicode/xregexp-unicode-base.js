@@ -1,5 +1,5 @@
 /*!
- * XRegExp Unicode Base v1.0.0-alpha
+ * XRegExp Unicode Base v1.0.0-dev
  * Copyright 2008-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/>
@@ -10,13 +10,7 @@
  * case insensitive, and any spaces, hyphens, and underscores are ignored.
 */
 
-;var XRegExp;
-
-if (!XRegExp) {
-    throw new ReferenceError("XRegExp must be loaded before Unicode Base");
-}
-
-(function () {
+;(function () {
     "use strict";
 
     var unicode = {}, // storage for package tokens
@@ -29,25 +23,15 @@ if (!XRegExp) {
         var p, name, alias;
         if (!XRegExp.isInstalled("extensibility"))
             throw new Error("can't add Unicode package unless extensibility is installed");
-        for (p in pack) {
-            if (pack.hasOwnProperty(p)) {
-                name = rename(p);
-                if (!unicode.hasOwnProperty(name)) // disallow replacing added tokens
-                    unicode[name] = pack[p].replace(/\w{4}/g, "\\u$&");
-            }
-        }
+        for (p in pack)
+            pack.hasOwnProperty(p) && (unicode[slug(p)] = pack[p].replace(/\w{4}/g, "\\u$&"));
         if (aliases) {
-            for (p in aliases) {
-                if (aliases.hasOwnProperty(p)) {
-                    alias = rename(aliases[p]);
-                    if (!unicode.hasOwnProperty(alias)) // disallow replacing added tokens
-                        unicode[alias] = unicode[rename(p)];
-                }
-            }
+            for (p in aliases)
+                aliases.hasOwnProperty(p) && (unicode[slug(aliases[p])] = unicode[slug(p)]);
         }
     };
 
-    function rename (name) {
+    function slug (name) {
         return name.replace(/[- _]+/g, "").toLowerCase();
     }
 
@@ -80,5 +64,5 @@ if (!XRegExp) {
     if (!extensible)
         XRegExp.uninstall("extensibility"); // revert to previous state
 
-})();
+}());
 

@@ -1,15 +1,16 @@
 /*!
- * XRegExp BackCompat v1.0.0-alpha
+ * XRegExp BackCompat v1.0.0-dev
  * Copyright 2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Provides backward compatibility with XRegExp 1.x
  */
 
-;var XRegExp;
-
-if (XRegExp) {
-(function () {
+;(function () {
     "use strict";
+
+    // overriding natives, adding RegExp.prototype methods, and allowing syntax extensions became
+    // optional features in XRegExp v1.6.0
+    XRegExp.install("natives methods extensibility");
 
     // renamed in XRegExp v1.5.0
     XRegExp.matchWithinChain = XRegExp.matchChain;
@@ -45,6 +46,5 @@ if (XRegExp) {
         return XRegExp.forEach(str, this, function (match) {this.push(match);}, []);
     };
 
-})();
-}
+}());
 

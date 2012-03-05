@@ -1,14 +1,8 @@
 /*!
- * XRegExp Match Recursive v0.2.0-beta
+ * XRegExp Match Recursive v0.2.0-dev
  * Copyright 2009-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
 */
-
-;var XRegExp;
-
-if (!XRegExp) {
-    throw new ReferenceError("XRegExp must be loaded before Match Recursive");
-}
 
 /**
  * Returns strings found between provided left and right delimiters (allowing
@@ -33,7 +27,7 @@ if (!XRegExp) {
  *     escapeChar: '\\'
  * });
  */
-XRegExp.matchRecursive = function (str, left, right, flags, options) {
+;XRegExp.matchRecursive = function (str, left, right, flags, options) {
     "use strict";
 
     var options = options || {},
