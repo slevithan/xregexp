@@ -27,47 +27,42 @@
         // recursion when an XRegExp is constructed within a token handler or trigger
         if (isInsideConstructor)
             throw new Error("can't call the XRegExp constructor within token definition functions");
-
         var output = [],
-            currScope = XRegExp.OUTSIDE_CLASS,
+            scope = defaultScope,
+            pos = 0,
             context = { // `this` object for custom tokens
                 hasNamedCapture: false,
                 captureNames: [],
                 hasFlag: function (flag) {return flags.indexOf(flag) > -1;},
                 setFlag: function (flag) {flags += flag;}
             },
-            pos = 0,
             tokenResult, match, chr;
-
         pattern = pattern === undefined ? "" : pattern + "";
         flags = flags === undefined ? "" : flags + "";
-
         while (pos < pattern.length) {
             // Check for custom tokens at the current position
-            tokenResult = runTokens(pattern, pos, currScope, context);
-
+            tokenResult = runTokens(pattern, pos, scope, context);
             if (tokenResult) {
                 output.push(tokenResult.output);
                 pos += (tokenResult.match[0].length || 1);
             } else {
                 // Check for native multicharacter metasequences (excluding character classes) at
                 // the current position
-                if (match = nativ.exec.call(nativeTokens[currScope], pattern.slice(pos))) {
+                if (match = nativ.exec.call(nativeTokens[scope], pattern.slice(pos))) {
                     output.push(match[0]);
                     pos += match[0].length;
                 } else {
                     chr = pattern.charAt(pos);
                     if (chr === "[")
-                        currScope = XRegExp.INSIDE_CLASS;
+                        scope = classScope;
                     else if (chr === "]")
-                        currScope = XRegExp.OUTSIDE_CLASS;
+                        scope = defaultScope;
                     // Advance position one character
                     output.push(chr);
                     pos++;
                 }
             }
         }
-
         return augment(RegExp(output.join(""), nativ.replace.call(flags, flagClip, "")), context);
     }
 
@@ -79,8 +74,9 @@
     XRegExp.version = "1.6.0-dev";
 
     // Token scope bitflags
-    XRegExp.INSIDE_CLASS = 1;
-    XRegExp.OUTSIDE_CLASS = 2;
+    // Create private copies to protect core operations
+    var classScope = XRegExp.INSIDE_CLASS = 1;
+    var defaultScope = XRegExp.OUTSIDE_CLASS = 2;
 
 
     //---------------------------------
@@ -127,8 +123,8 @@
     // All native RegExp multicharacter metasequences (including deprecated octals, excluding
     // character classes)
     var nativeTokens = {};
-    nativeTokens[XRegExp.INSIDE_CLASS] = /^(?:\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S]))/;
-    nativeTokens[XRegExp.OUTSIDE_CLASS] = /^(?:\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S])|\(\?[:=!]|[?*+]\?|{\d+(?:,\d*)?}\??)/;
+    nativeTokens[classScope] = /^(?:\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S]))/;
+    nativeTokens[defaultScope] = /^(?:\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S])|\(\?[:=!]|[?*+]\?|{\d+(?:,\d*)?}\??)/;
 
     // Check for correct `exec` handling of nonparticipating capturing groups
     var compliantExecNpcg = nativ.exec.call(/()??/, "")[1] === undefined;
@@ -152,7 +148,7 @@
         tokens.push({
             pattern: copy(regex, "g" + (hasNativeY ? "y" : "")),
             handler: handler,
-            scope: scope || XRegExp.OUTSIDE_CLASS,
+            scope: scope || defaultScope,
             trigger: trigger || null
         });
     }
