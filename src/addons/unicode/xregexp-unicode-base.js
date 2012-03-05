@@ -1,6 +1,6 @@
 /*!
  * XRegExp Unicode Base v1.0.0-alpha
- * Copyright 2008-2012 Steven Levithan <http://xregexp.com>
+ * Copyright 2008-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/>
  *
@@ -19,14 +19,16 @@ if (!XRegExp) {
 (function () {
     "use strict";
 
-    var unicode = {}; // protected storage for package tokens
+    var unicode = {}, // storage for package tokens
+        extensible = XRegExp.isInstalled("extensibility");
 
-    function rename (name) {
-        return name.replace(/[- _]+/g, "").toLowerCase();
-    }
+    if (!extensible)
+        XRegExp.install("extensibility"); // temporarily install
 
     XRegExp.addUnicodePackage = function (pack, aliases) {
         var p, name, alias;
+        if (!XRegExp.isInstalled("extensibility"))
+            throw new Error("can't add Unicode package unless extensibility is installed");
         for (p in pack) {
             if (pack.hasOwnProperty(p)) {
                 name = rename(p);
@@ -45,12 +47,15 @@ if (!XRegExp) {
         }
     };
 
+    function rename (name) {
+        return name.replace(/[- _]+/g, "").toLowerCase();
+    }
+
     XRegExp.addToken(
         /\\([pP]){(\^?)([^}]*)}/,
         function (match, scope) {
             var negated = (match[1] === "P" || match[2]),
                 item = match[3].replace(/[- _]+/g, "").toLowerCase();
-
             // \p{..}, \P{..}, and \p{^..} are valid, but the double negative \P{^..} isn't
             if (match[1] === "P" && match[2])
                 throw new SyntaxError("erroneous characters: " + match[0]);
@@ -58,7 +63,6 @@ if (!XRegExp) {
                 throw new SyntaxError("not supported in character classes: \\" + match[1] + "{" + match[2] + "...}");
             if (!unicode.hasOwnProperty(item))
                 throw new SyntaxError("invalid or unsupported Unicode item: " + match[0]);
-
             return scope === XRegExp.OUTSIDE_CLASS ?
                 "[" + (negated ? "^" : "") + unicode[item] + "]" :
                 unicode[item];
@@ -72,6 +76,9 @@ if (!XRegExp) {
     {
         L: "Letter"
     });
+
+    if (!extensible)
+        XRegExp.uninstall("extensibility"); // revert to previous state
 
 })();
 

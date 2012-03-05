@@ -10,9 +10,9 @@ XRegExp provides augmented, extensible JavaScript regular expressions. You get n
 var date, dateStr, match, str, pos, result = [];
 
 // Using named capture and the x flag (free-spacing and comments)
-date = new XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
-                    (?<month> [0-9]{2}) -?  # month \n\
-                    (?<day>   [0-9]{2})     # day   ', 'x');
+date = XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
+                (?<month> [0-9]{2}) -?  # month \n\
+                (?<day>   [0-9]{2})     # day   ', 'x');
 
 // XRegExp.exec gives you named backreferences on the match result
 dateStr = '2012-02-22';
@@ -48,7 +48,7 @@ date.exec(dateStr).day; // -> 22
 // Get an array of backreference-only arrays using XRegExp.forEach
 str = '<a href="http://xregexp.com/api/">XRegExp</a>\
        <a href="http://www.google.com/">Google</a>';
-XRegExp.forEach(str, new XRegExp('<a href="([^"]+)">(.*?)</a>', 'is'), function (match) {
+XRegExp.forEach(str, XRegExp('<a href="([^"]+)">(.*?)</a>', 'is'), function (match) {
     this.push(match.slice(1));
 }, []);
 // -> [['http://xregexp.com/api/', 'XRegExp'], ['http://www.google.com/', 'Google']]
@@ -57,10 +57,10 @@ XRegExp.forEach(str, new XRegExp('<a href="([^"]+)">(.*?)</a>', 'is'), function 
 XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [/<b>.*?<\/b>/i, /\d+/]);
 // -> ['2', '4', '56']
 
-// XRegExp.matchChain can also pass forward and return specific backreferences
+// You can also pass forward and return specific backreferences
 XRegExp.matchChain(str, [
     {regex: /<a href="([^"]+)">/i, backref: 1},
-    {regex: new XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
+    {regex: XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
 ]);
 // -> ['xregexp.com', 'www.google.com']
 
@@ -72,7 +72,7 @@ function filter (array, fn) {
     return res;
 }
 // Now we can filter arrays using functions and regexes
-filter(['a', 'ba', 'ab', 'b'], new XRegExp('^a'));
+filter(['a', 'ba', 'ab', 'b'], XRegExp('^a'));
 // -> ['a', 'ab']
 ~~~
 
@@ -91,7 +91,7 @@ First include the Unicode Base script:
 Then you can do this:
 
 ~~~ js
-var unicodeWord = new XRegExp('^\\p{L}+$');
+var unicodeWord = XRegExp('^\\p{L}+$');
 unicodeWord.test('Русский'); // -> true
 unicodeWord.test('日本語'); // -> true
 unicodeWord.test('العربية'); // -> true
@@ -100,11 +100,13 @@ unicodeWord.test('العربية'); // -> true
 The base script adds `\p{L}` (and its alias, `\p{Letter}`), but other Unicode categories, scripts, and blocks require addon packages. Try these next examples after additionally including `xregexp-unicode-scripts.js`:
 
 ~~~ js
-new XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
-new XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
+XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
+XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
 ~~~
 
-XRegExp uses the Unicode 6.1 character database (released January 2012). More details [here](http://xregexp.com/plugins/#unicode).
+XRegExp uses the Unicode 6.1 character database (released January 2012).
+
+More details: [Addons: Unicode](http://xregexp.com/plugins/#unicode).
 
 
 ## XRegExp Match Recursive (v0.2.0-beta)
@@ -116,7 +118,7 @@ First include the Match Recursive script:
 <script src="addons/xregexp-matchrecursive.js"></script>
 ~~~
 
-You can then match recursive constructs using left and right XRegExp pattern delimiters:
+You can then match recursive constructs using XRegExp patterns as left and right delimiters:
 
 ~~~ js
 var str = '(t((e))s)t()(ing)';
@@ -151,7 +153,7 @@ XRegExp.matchRecursive(str, '<', '>', 'gy');
 // -> ['1', '<<2>>', '3']
 ~~~
 
-More details [here](http://xregexp.com/plugins/#matchRecursive).
+More details: [Addons: Match Recursive](http://xregexp.com/plugins/#matchRecursive).
 
 
 ## Changelog

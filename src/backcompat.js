@@ -1,6 +1,6 @@
 /*!
  * XRegExp BackCompat v1.0.0-alpha
- * Copyright 2012 Steven Levithan <http://xregexp.com>
+ * Copyright 2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Provides backward compatibility with XRegExp 1.x
  */

@@ -18,45 +18,45 @@ test("Basic availability", function () {
 	ok(XRegExp.version, "XRegExp.version exists");
 	ok(XRegExp.INSIDE_CLASS, "XRegExp.INSIDE_CLASS exists");
 	ok(XRegExp.OUTSIDE_CLASS, "XRegExp.OUTSIDE_CLASS exists");
-	ok(RegExp.prototype.apply, "RegExp.prototype.apply exists");
-	ok(RegExp.prototype.call, "RegExp.prototype.call exists");
+	ok(XRegExp.prototype.apply, "XRegExp.prototype.apply exists");
+	ok(XRegExp.prototype.call, "XRegExp.prototype.call exists");
 });
 
 test("XRegExp", function () {
-	var regex = new XRegExp("(?:)");
-	var regexG = new XRegExp("(?:)", "g");
-	var regexGIM = new XRegExp("(?:)", "gim");
-	var regexX = new XRegExp("(?:)", "x");
-	var regexCopy = new XRegExp(regex);
-	var regexNamedCapture = new XRegExp("(?<name>a)\\k<name>");
+	var regex = XRegExp("(?:)");
+	var regexG = XRegExp("(?:)", "g");
+	var regexGIM = XRegExp("(?:)", "gim");
+	var regexX = XRegExp("(?:)", "x");
+	var regexCopy = XRegExp(regex);
+	var regexNamedCapture = XRegExp("(?<name>a)\\k<name>");
 
-	equal(new XRegExp("").source, new RegExp("").source, "Empty regex source (test 1)");
-	equal(new XRegExp("(?:)").source, /(?:)/.source, "Empty regex source (test 2)");
-	equal(new XRegExp().source, new RegExp().source, "undefined regex source");
-	equal(new XRegExp(null).source, new RegExp(null).source, "null regex source");
-	equal(new XRegExp(NaN).source, new RegExp(NaN).source, "NaN regex source");
-	equal(new XRegExp(1).source, new RegExp(1).source, "numeric regex source");
-	equal(new XRegExp({}).source, new RegExp({}).source, "object regex source");
-	ok(!(new XRegExp("(?:)")).global, "Regex without flags");
+	equal(XRegExp("").source, RegExp("").source, "Empty regex source (test 1)");
+	equal(XRegExp("(?:)").source, /(?:)/.source, "Empty regex source (test 2)");
+	equal(XRegExp().source, RegExp().source, "undefined regex source");
+	equal(XRegExp(null).source, RegExp(null).source, "null regex source");
+	equal(XRegExp(NaN).source, RegExp(NaN).source, "NaN regex source");
+	equal(XRegExp(1).source, RegExp(1).source, "numeric regex source");
+	equal(XRegExp({}).source, RegExp({}).source, "object regex source");
+	ok(!(XRegExp("(?:)")).global, "Regex without flags");
 	ok(regexG.global, "Regex with global flag");
 	ok(regexGIM.global && regexGIM.ignoreCase && regexGIM.multiline, "Regex with multiple flags");
 	ok(!regexX.extended, "x flag stripped");
 	deepEqual(regex, XRegExp(regex), "Regex copy and original are alike");
 	notEqual(regex, XRegExp(regex), "Regex copy is new instance");
-	ok(XRegExp(new XRegExp(""))._xregexp, "Copied XRegExp preserves special properties");
-	ok(!XRegExp(new RegExp(""))._xregexp, "Copied RegExp is not assigned special properties");
+	ok(XRegExp(XRegExp(""))._xregexp, "Copied XRegExp preserves special properties");
+	ok(!XRegExp(RegExp(""))._xregexp, "Copied RegExp is not assigned special properties");
 	equal(XRegExp(regexNamedCapture).exec("aa").name, "a", "Regex copy retains named capture properties");
 	raises(function () {XRegExp(regex, "g");}, Error, "Regex copy with flag throws");
-	ok(new XRegExp("(?:)") instanceof RegExp, "Result is instanceof RegExp");
-	equal(new XRegExp("(?:)").constructor, RegExp, "Result's constructor is RegExp");
+	ok(XRegExp("(?:)") instanceof RegExp, "Result is instanceof RegExp");
+	equal(XRegExp("(?:)").constructor, RegExp, "Result's constructor is RegExp");
 
 	// Don't test this, since future XRegExp might throw like modern browsers do with RegExp
-	//ok(new XRegExp("(?:)", "gg").global, "Regex with duplicate flags");
+	//ok(XRegExp("(?:)", "gg").global, "Regex with duplicate flags");
 
 	// This might be a good test in the future, but for now, XRegExp doesn't throw on
 	// unsupported flags since it would add some complexity and overhead to keep track of any
 	// flags checked for in custom tokens
-	//raises(function () {new XRegExp("", "?");}, Error, "Unsupported flag throws");
+	//raises(function () {XRegExp("", "?");}, Error, "Unsupported flag throws");
 });
 
 test("XRegExp.version", function () {
@@ -258,15 +258,15 @@ test("XRegExp.replace", function () {
 	// TODO: Add tests
 });
 
-test("RegExp.prototype.apply", function () {
-	var regex = /x/;
+test("XRegExp.prototype.apply", function () {
+	var regex = XRegExp("x");
 
 	deepEqual(regex.apply(null, ["x"]), regex.test("x"), "Apply with match same as test");
 	deepEqual(regex.apply(null, ["y"]), regex.test("y"), "Apply without match same as test");
 });
 
-test("RegExp.prototype.call", function () {
-	var regex = /x/;
+test("XRegExp.prototype.call", function () {
+	var regex = XRegExp("x");
 
 	deepEqual(regex.call(null, "x"), regex.test("x"), "Call with match same as test");
 	deepEqual(regex.call(null, "y"), regex.test("y"), "Call without match same as test");

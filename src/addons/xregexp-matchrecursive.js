@@ -1,6 +1,6 @@
 /*!
  * XRegExp Match Recursive v0.2.0-beta
- * Copyright 2009-2012 Steven Levithan <http://xregexp.com>
+ * Copyright 2009-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
 */
 
@@ -43,8 +43,8 @@ XRegExp.matchRecursive = function (str, left, right, flags, options) {
         global = flags.indexOf("g") > -1,
         sticky = flags.indexOf("y") > -1,
         flags = flags.replace(/y/g, ""), // flag y handled internally; usable when not natively supported
-        left = new XRegExp(left, flags),
-        right = new XRegExp(right, flags),
+        left = XRegExp(left, flags),
+        right = XRegExp(right, flags),
         output = [],
         openTokens = 0, delimStart = 0, delimEnd = 0, lastOuterEnd = 0,
         outerStart, innerStart, leftMatch, rightMatch, escaped, esc;
@@ -53,7 +53,7 @@ XRegExp.matchRecursive = function (str, left, right, flags, options) {
         if (escapeChar.length > 1)
             throw new SyntaxError("can't supply more than one escape character");
         escaped = XRegExp.escape(escapeChar);
-        esc = new RegExp(
+        esc = RegExp(
             "(?:" + escaped + "[\\S\\s]|(?:(?!" + left.source + "|" + right.source + ")[^" + escaped + "])+)+",
             flags.replace(/[^im]+/g, "") // flags g,y,s,x aren't needed here (s,x handled by XRegExp)
         );
