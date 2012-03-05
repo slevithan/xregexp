@@ -774,12 +774,10 @@
     // Automatically install optional features
     XRegExp.install("all");
 
-    // If module.exports exists, assume we're in CommonJS
-    if (typeof module === "object" && typeof module.exports === "object") {
-        module.exports = XRegExp;
-    } else {
-        root.XRegExp = XRegExp;
-    }
+    if (typeof exports === "undefined")
+        root.XRegExp = XRegExp; // Create global varable
+    else // For CommonJS enviroments
+        exports.XRegExp = XRegExp;
 
 }(this));
 }

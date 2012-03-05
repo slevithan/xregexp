@@ -164,7 +164,7 @@ More details: [Addons: Match Recursive](http://xregexp.com/plugins/#matchRecursi
 
 ## Authors
 
-XRegExp by [Steven Levithan](http://stevenlevithan.com/).
+XRegExp and addons by [Steven Levithan](http://stevenlevithan.com/).
 
 Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/).
 
