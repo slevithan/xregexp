@@ -20,36 +20,30 @@
         XRegExp.install("extensibility"); // temporarily install
 
     XRegExp.addUnicodePackage = function (pack, aliases) {
-        var p, name, alias;
+        var p;
         if (!XRegExp.isInstalled("extensibility"))
             throw new Error("can't add Unicode package unless extensibility is installed");
         for (p in pack)
-            pack.hasOwnProperty(p) && (unicode[slug(p)] = pack[p].replace(/\w{4}/g, "\\u$&"));
+            pack.hasOwnProperty(p) && (unicode[slug(p)] = expand(pack[p]));
         if (aliases) {
             for (p in aliases)
                 aliases.hasOwnProperty(p) && (unicode[slug(aliases[p])] = unicode[slug(p)]);
         }
     };
 
-    function slug (name) {
-        return name.replace(/[- _]+/g, "").toLowerCase();
-    }
-
     XRegExp.addToken(
         /\\([pP]){(\^?)([^}]*)}/,
         function (match, scope) {
-            var negated = (match[1] === "P" || match[2]),
-                item = match[3].replace(/[- _]+/g, "").toLowerCase();
+            var inv = (match[1] === "P" || match[2]) ? "^" : "",
+                item = slug(match[3]);
             // \p{..}, \P{..}, and \p{^..} are valid, but the double negative \P{^..} isn't
             if (match[1] === "P" && match[2])
                 throw new SyntaxError("erroneous characters: " + match[0]);
-            if (negated && scope === XRegExp.INSIDE_CLASS)
-                throw new SyntaxError("not supported in character classes: \\" + match[1] + "{" + match[2] + "...}");
             if (!unicode.hasOwnProperty(item))
                 throw new SyntaxError("invalid or unsupported Unicode item: " + match[0]);
-            return scope === XRegExp.OUTSIDE_CLASS ?
-                "[" + (negated ? "^" : "") + unicode[item] + "]" :
-                unicode[item];
+            return scope === XRegExp.INSIDE_CLASS ?
+                (inv ? cacheInversion(item) : unicode[item]) :
+                "[" + inv + unicode[item] + "]";
         },
         XRegExp.INSIDE_CLASS | XRegExp.OUTSIDE_CLASS
     );
@@ -63,6 +57,44 @@
 
     if (!extensible)
         XRegExp.uninstall("extensibility"); // revert to previous state
+
+    // Generates a standardized token name (lowercase, with hyphens, spaces, and underscores removed)
+    function slug (name) {return name.replace(/[- _]+/g, "").toLowerCase();}
+
+    // Expands an abbreviated list of Unicode code points to be used in a regex character class
+    function expand (str) {return str.replace(/\w{4}/g, "\\u$&");}
+
+    // Converts a hexadecimal number to decimal
+    function dec (hex) {return parseInt(hex, 16);}
+
+    // Converts a decimal number to hexadecimal
+    function hex (dec) {return pad(parseInt(dec, 10).toString(16));}
+
+    // Adds leading zeros if shorter than four characters
+    function pad (str) {while (str.length < 4) str = "0" + str; return str;}
+
+    // Returns a cached inverted range; generates and caches the range if not previously done
+    function cacheInversion (item) {return unicode["^" + item] || (unicode["^" + item] = invert(unicode[item]));}
+
+    // Inverts a list of Unicode code points and ranges
+    function invert (range) {
+        var output = [],
+            lastEnd = -1,
+            start;
+        XRegExp.forEach(range, /\\u(\w{4})(?:-\\u(\w{4}))?/, function (m) {
+            start = dec(m[1]);
+            if (start > (lastEnd + 1)) {
+                output.push("\\u" + pad(hex(lastEnd + 1)));
+                (start > (lastEnd + 2)) && output.push("-\\u" + pad(hex(start - 1)));
+            }
+            lastEnd = dec(m[2] || m[1]);
+        });
+        if (lastEnd < 65535) {
+            output.push("\\u" + pad(hex(lastEnd + 1)));
+            (lastEnd < 65534) && output.push("-\\uFFFF");
+        }
+        return output.join("");
+    }
 
 }());
 

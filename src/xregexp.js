@@ -144,23 +144,25 @@
     //  Public methods
     //---------------------------------
 
-    function activeAddToken (regex, handler, scope, trigger) {
-        tokens.push({
-            pattern: copy(regex, "g" + (hasNativeY ? "y" : "")),
-            handler: handler,
-            scope: scope || defaultScope,
-            trigger: trigger || null
-        });
-    }
-    function inactiveAddToken () {
-        throw new Error("extensibility must be installed before running addToken");
-    }
+    var addToken = {
+        on: function (regex, handler, scope, trigger) {
+            tokens.push({
+                pattern: copy(regex, "g" + (hasNativeY ? "y" : "")),
+                handler: handler,
+                scope: scope || defaultScope,
+                trigger: trigger || null
+            });
+        },
+        off: function () {
+            throw new Error("extensibility must be installed before running addToken");
+        }
+    };
     // Lets you extend or change XRegExp syntax and create custom flags. This is used internally by
     // the XRegExp library and can be used to create XRegExp addons. This function is intended for
     // users with advanced knowledge of JavaScript's regular expression syntax and behavior. To use
-    // it, you must first run `XRegExp.install('extensibility'). It can be disabled by
-    // `XRegExp.uninstall('extensibility')`
-    XRegExp.addToken = inactiveAddToken;
+    // it, you must first run `XRegExp.install("extensibility"). It can be disabled by
+    // `XRegExp.uninstall("extensibility")`
+    XRegExp.addToken = addToken.off;
 
     // Accepts a pattern and flags; returns an extended `RegExp` object. If the pattern and flag
     // combination has previously been cached, the cached copy is returned; otherwise the newly
@@ -643,7 +645,7 @@
     }
 
     function setExtensibility (on) {
-        XRegExp.addToken = on ? activeAddToken : inactiveAddToken;
+        XRegExp.addToken = addToken[on ? "on" : "off"];
         features.extensibility = on;
     }
 
@@ -660,11 +662,11 @@
     }
 
     function setNatives (on) {
-        RegExp.prototype.exec = on ? fixed.exec : nativ.exec;
-        RegExp.prototype.test = on ? fixed.test : nativ.test;
-        String.prototype.match = on ? fixed.match : nativ.match;
-        String.prototype.replace = on ? fixed.replace : nativ.replace;
-        String.prototype.split = on ? fixed.split : nativ.split;
+        RegExp.prototype.exec = (on ? fixed : nativ).exec;
+        RegExp.prototype.test = (on ? fixed : nativ).test;
+        String.prototype.match = (on ? fixed : nativ).match;
+        String.prototype.replace = (on ? fixed : nativ).replace;
+        String.prototype.split = (on ? fixed : nativ).split;
         features.natives = on;
     }
 
