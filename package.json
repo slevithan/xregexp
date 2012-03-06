@@ -10,5 +10,5 @@
     }],
     "description": "Extended regular expressions",
     "keywords": ["regex", "regexp", "xregexp"],
-    "main": "src/xregexp.js"
+    "main": "xregexp-all.js"
 }
