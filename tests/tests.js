@@ -48,7 +48,7 @@ test("XRegExp", function () {
 	notEqual(regex, XRegExp(regex), "Regex copy is new instance");
 	ok(XRegExp(XRegExp(""))._xregexp, "Copied XRegExp preserves special properties");
 	ok(!XRegExp(RegExp(""))._xregexp, "Copied RegExp is not assigned special properties");
-	equal(XRegExp(regexNamedCapture).exec("aa").name, "a", "Regex copy retains named capture properties");
+	equal(XRegExp.exec("aa", XRegExp(regexNamedCapture)).name, "a", "Regex copy retains named capture properties");
 	raises(function () {XRegExp(regex, "g");}, Error, "Regex copy with flag throws");
 	ok(XRegExp("(?:)") instanceof RegExp, "Result is instanceof RegExp");
 	equal(XRegExp("(?:)").constructor, RegExp, "Result's constructor is RegExp");
@@ -63,12 +63,14 @@ test("XRegExp", function () {
 });
 
 test("XRegExp.addToken", function () {
+	XRegExp.install("extensibility");
 	XRegExp.addToken(/\x01/, function () {return "1";});
 	XRegExp.addToken(/\x02/, function () {return "2";}, XRegExp.INSIDE_CLASS);
 	XRegExp.addToken(/\x03/, function () {return "3";}, XRegExp.OUTSIDE_CLASS);
 	XRegExp.addToken(/\x04/, function () {return "4";}, XRegExp.INSIDE_CLASS | XRegExp.OUTSIDE_CLASS);
 	XRegExp.addToken(/\x05/, function () {return "5";}, XRegExp.OUTSIDE_CLASS, function () {return this.hasFlag("5");});
 	XRegExp.addToken(/\x06/, function () {this.setFlag("m"); return "6";});
+	XRegExp.uninstall("extensibility");
 
 	ok(XRegExp("\x01").test("1"), "Default scope matches outside class");
 	ok(!XRegExp("[\x01]").test("1"), "Default scope doesn't match inside class");
@@ -196,7 +198,7 @@ test("XRegExp.globalize", function () {
 	ok(globalCopy.global, "Copy is global");
 	equal(regex.source, globalCopy.source, "Copy has same source");
 	ok(regex.ignoreCase === globalCopy.ignoreCase && regex.multiline === globalCopy.multiline && regex.sticky === globalCopy.sticky, "Copy has same ignoreCase, multiline, and sticky properties");
-	ok(globalCopy.exec("aa").name, "Copy retains named capture capabilities");
+	ok(XRegExp.exec("aa", globalCopy).name, "Copy retains named capture capabilities");
 	ok(XRegExp.globalize(globalOrig).global, "Copy of global regex is global");
 });
 
@@ -292,6 +294,8 @@ module("Overriden natives");
 //-------------------------------------------------------------------
 
 test("RegExp.prototype.exec", function () {
+	XRegExp.install("natives");
+
 	deepEqual(/x/.exec("a"), null, "Nonmatch returns null");
 
 	deepEqual(/a/.exec("a"), ["a"], "Match returns array");
@@ -348,9 +352,13 @@ test("RegExp.prototype.exec", function () {
 	deepEqual(/NaN/.exec(NaN), ["NaN"], "NaN argument converted to string");
 
 	raises(function () {RegExp.prototype.exec.call("\\d", "1");}, TypeError, "TypeError thrown when context is not type RegExp");
+
+	XRegExp.uninstall("natives");
 });
 
 test("RegExp.prototype.test", function () {
+	XRegExp.install("natives");
+
 	deepEqual(/x/.test("a"), false, "Nonmatch returns false");
 
 	deepEqual(/a/.test("a"), true, "Match returns true");
@@ -387,9 +395,13 @@ test("RegExp.prototype.test", function () {
 
 	deepEqual(/1/.test(1), true, "Argument converted to string");
 	raises(function () {RegExp.prototype.test.call("\\d", "1");}, TypeError, "TypeError thrown when context is not type RegExp");
+
+	XRegExp.uninstall("natives");
 });
 
 test("String.prototype.match", function () {
+	XRegExp.install("natives");
+
 	deepEqual("a".match(/x/), null, "Nonglobal regex: Nonmatch returns null");
 
 	deepEqual("a".match(/a/), ["a"], "Nonglobal regex: Match returns array");
@@ -427,9 +439,13 @@ test("String.prototype.match", function () {
 	deepEqual("1".match("^(1)"), ["1", "1"], "Argument converted to RegExp");
 
 	deepEqual(String.prototype.match.call(1, /1/), ["1"], "Nonstring context is converted to string");
+
+	XRegExp.uninstall("natives");
 });
 
 test("String.prototype.replace", function () {
+	XRegExp.install("natives");
+
 	equal("xaaa".replace(/a/, "b"), "xbaa", "Basic nonglobal regex search");
 	equal("xaaa".replace(/a/g, "b"), "xbbb", "Basic global regex search");
 	equal("xaaa".replace("a", "b"), "xbaa", "Basic string search");
@@ -520,11 +536,17 @@ test("String.prototype.replace", function () {
 		interimLastIndex = regex2.lastIndex;
 	});
 	equal(interimLastIndex, 2, "Global regex lastIndex updated during replacement iterations");
+
+	XRegExp.uninstall("natives");
 });
 
 test("String.prototype.split", function () {
+	XRegExp.install("natives");
+
 	// TODO: Add tests (basic functionality tests, not the long list from
 	// the cross-browser fixes module)
+
+	XRegExp.uninstall("natives");
 });
 
 //-------------------------------------------------------------------
@@ -532,18 +554,30 @@ module("Overriden natives extensions");
 //-------------------------------------------------------------------
 
 test("RegExp.prototype.exec", function () {
+	XRegExp.install("natives");
+
 	equal(XRegExp("(?<name>a)").exec("a").name, "a", "Match array has named capture properties");
+
+	XRegExp.uninstall("natives");
 });
 
 // RegExp.prototype.test is overridden but not extended by XRegExp
 //test("RegExp.prototype.test", function () {});
 
 test("String.prototype.match", function () {
+	XRegExp.install("natives");
+
 	equal("a".match(XRegExp("(?<name>a)")).name, "a", "Match array has named capture properties");
+
+	XRegExp.uninstall("natives");
 });
 
 test("String.prototype.replace", function () {
+	XRegExp.install("natives");
+
 	// TODO: Add tests
+
+	XRegExp.uninstall("natives");
 });
 
 // String.prototype.split is overridden but not extended by XRegExp

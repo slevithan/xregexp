@@ -48,7 +48,7 @@
             } else {
                 // Check for native multicharacter metasequences (excluding character classes) at
                 // the current position
-                if (match = nativ.exec.call(nativeTokens[scope], pattern.slice(pos))) {
+                if ((match = nativ.exec.call(nativeTokens[scope], pattern.slice(pos)))) {
                     output.push(match[0]);
                     pos += match[0].length;
                 } else {
@@ -176,7 +176,7 @@
     // can safely be used at any point within a regex to match the provided literal string. Escaped
     // characters are [ ] { } ( ) * + ? - . , \ ^ $ | # and whitespace
     XRegExp.escape = function (str) {
-        return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+        return nativ.replace.call(str, /[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
     };
 
     // Accepts a string to search, regex to search with, position to start the search within the
@@ -187,7 +187,7 @@
         var r2 = copy(regex, "g" + ((sticky && hasNativeY) ? "y" : "")),
             match;
         r2.lastIndex = pos = pos || 0;
-        match = r2.exec(str); // Run the altered `exec` (required for `lastIndex` fix, etc.)
+        match = fixed.exec.call(r2, str); // Fixed `exec` required for `lastIndex` fix, etc.
         if (sticky && match && match.index !== pos)
             match = null;
         if (regex.global)
@@ -201,7 +201,7 @@
     XRegExp.forEach = function (str, regex, callback, context) {
         var r2 = XRegExp.globalize(regex),
             i = -1, match;
-        while ((match = r2.exec(str))) { // Run the altered `exec` (required for `lastIndex` fix, etc.)
+        while ((match = fixed.exec.call(r2, str))) { // Fixed `exec` required for `lastIndex` fix, etc.
             if (regex.global)
                 regex.lastIndex = r2.lastIndex; // Doing this to follow expectations if `lastIndex` is checked within `callback`
             callback.call(context, match, ++i, str, regex);
@@ -285,7 +285,7 @@
         } else if (replaceAll) {
             r2 = RegExp(XRegExp.escape(search + ""), "g");
         }
-        result = (str + "").replace(r2, replacement); // Run the altered `replace` (required for extended replacement syntax, etc.)
+        result = fixed.replace.call(str + "", r2, replacement); // Fixed `replace` required for named backreferences, etc.
         if (isRegex && search.global)
             search.lastIndex = 0; // Fixes IE, Safari bug (last tested IE 9, Safari 5.1)
         return result;
@@ -299,9 +299,8 @@
     // Accepts an object or space-delimited string specifying optional features to uninstall
     XRegExp.uninstall = function (options) {
         options = prepareOptions(options);
-        // TODO: Cannot yet uninstall natives. XRegExp needs updates to work correctly when natives are uninstalled
-        //if (features.natives && options.natives)
-        //    setNatives(false);
+        if (features.natives && options.natives)
+            setNatives(false);
         if (features.methods && options.methods)
             setMethods(false);
         if (features.extensibility && options.extensibility)
@@ -317,13 +316,13 @@
     // first value in the arguments array. the context is ignored but is accepted for congruity
     // with `Function.prototype.apply`
     XRegExp.prototype.apply = function (context, args) {
-        return this.test(args[0]);
+        return this.test(args[0]); // Intentionally not specifying fixed or native version of `test`
     };
 
     // Accepts a context object and string; returns the result of calling `exec` with the provided
     // string. the context is ignored but is accepted for congruity with `Function.prototype.call`
     XRegExp.prototype.call = function (context, str) {
-        return this.test(str);
+        return this.test(str); // Intentionally not specifying fixed or native version of `test`
     };
 
 
@@ -371,30 +370,19 @@
 
     // Fixes browser bugs in the native `RegExp.prototype.test`
     fixed.test = function (str) {
-        // Use the native `exec` to skip some processing overhead, even though the altered
-        // `exec` would take care of the `lastIndex` fixes
-        var match, origLastIndex;
-        if (!this.global)
-            origLastIndex = this.lastIndex;
-        match = nativ.exec.call(this, str);
-        // Fix browsers that increment `lastIndex` after zero-length matches
-        if (match && !compliantLastIndexIncrement && this.global && !match[0].length && (this.lastIndex > match.index))
-            this.lastIndex--;
-        if (!this.global)
-            this.lastIndex = origLastIndex; // Fixes IE, Opera bug (last tested IE 9, Opera 11.6)
-        return !!match;
+        return !!fixed.exec.call(this, str);
     };
 
     // Adds named capture support and fixes browser bugs in the native `String.prototype.match`
     fixed.match = function (regex) {
         if (!XRegExp.isRegExp(regex))
-            regex = RegExp(regex); // Native `RegExp`
+            regex = RegExp(regex); // Use native `RegExp`
         if (regex.global) {
             var result = nativ.match.apply(this, arguments);
             regex.lastIndex = 0; // Fixes IE bug
             return result;
         }
-        return regex.exec(this); // Run the altered `exec`
+        return fixed.exec.call(regex, this);
     };
 
     // Adds support for `${n}` tokens for named and numbered backreferences in replacement text,
@@ -512,7 +500,7 @@
         // This is required if not `s.global`, and it avoids needing to set `s.lastIndex` to zero
         // and restore it to its original value when we're done using the regex
         s = XRegExp.globalize(s);
-        while ((match = s.exec(str))) { // Run the altered `exec` (required for `lastIndex` fix, etc.)
+        while ((match = fixed.exec.call(s, str))) { // Fixed `exec` required for `lastIndex` fix, etc.
             if (s.lastIndex > lastLastIndex) {
                 output.push(str.slice(lastLastIndex, match.index));
                 if (match.length > 1 && match.index < str.length)
@@ -575,7 +563,7 @@
     }
 
     function getNativeFlags (regex) {
-        //return /\/([a-z]*)$/i.exec(regex + "")[1];
+        //return nativ.exec.call(/\/([a-z]*)$/i, regex + "")[1];
         return (regex.global     ? "g" : "") +
                (regex.ignoreCase ? "i" : "") +
                (regex.multiline  ? "m" : "") +
@@ -622,7 +610,7 @@
                 t = tokens[i];
                 if ((scope & t.scope) && (!t.trigger || t.trigger.call(context))) {
                     t.pattern.lastIndex = index;
-                    match = t.pattern.exec(pattern); // Running the altered `exec` here allows use of named backreferences, etc.
+                    match = fixed.exec.call(t.pattern, pattern); // Fixed `exec` here allows use of named backreferences, etc.
                     if (match && match.index === index) {
                         result = {
                             output: t.handler.call(context, match, scope),
@@ -674,8 +662,7 @@
     // Augment XRegExp's regular expression syntax and flags. Note that when adding tokens, the
     // third (`scope`) argument defaults to `XRegExp.OUTSIDE_CLASS`
 
-    // Needed for XRegExp.addToken to work
-    XRegExp.install("extensibility");
+    XRegExp.install("extensibility"); // Temporarily install; needed for XRegExp.addToken
 
     // Comment pattern: (?# )
     XRegExp.addToken(
@@ -758,7 +745,7 @@
         function () {return this.hasFlag("s");}
     );
 
-    XRegExp.uninstall("extensibility");
+    XRegExp.uninstall("extensibility"); // Revert to default state
 
 
     //---------------------------------
