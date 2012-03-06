@@ -1,5 +1,5 @@
 /*!
- * XRegExp v1.6.0-dev
+ * XRegExp v2.0.0-dev
  * Copyright 2007-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Augmented, extensible, cross-browser regular expressions
@@ -71,7 +71,7 @@
     //  Public properties
     //---------------------------------
 
-    XRegExp.version = "1.6.0-dev";
+    XRegExp.version = "2.0.0-dev";
 
     // Token scope bitflags
     // Create private copies to protect core operations
@@ -182,9 +182,8 @@
     // Accepts a string to search, regex to search with, position to start the search within the
     // string (default: 0), and an optional Boolean indicating whether matches must start at-or-
     // after the position or at the specified position only. This function ignores the `lastIndex`
-    // of the provided regex in its own handling, but updates the property for compatibility.
-    // The alias `XRegExp.execAt` was deprecated in v1.6.0
-    XRegExp.exec = XRegExp.execAt = function (str, regex, pos, sticky) {
+    // of the provided regex in its own handling, but updates the property for compatibility
+    XRegExp.exec = function (str, regex, pos, sticky) {
         var r2 = copy(regex, "g" + ((sticky && hasNativeY) ? "y" : "")),
             match;
         r2.lastIndex = pos = pos || 0;
@@ -198,9 +197,8 @@
 
     // Executes `callback` once per match within `str`; returns `context`. Provides a simpler and
     // cleaner way to iterate over regex matches compared to the traditional approaches of
-    // subverting `String.prototype.replace` or repeatedly calling `exec` within a `while` loop.
-    // The alias `XRegExp.iterate` was deprecated in v1.6.0
-    XRegExp.forEach = XRegExp.iterate = function (str, regex, callback, context) {
+    // subverting `String.prototype.replace` or repeatedly calling `exec` within a `while` loop
+    XRegExp.forEach = function (str, regex, callback, context) {
         var r2 = XRegExp.globalize(regex),
             i = -1, match;
         while ((match = r2.exec(str))) { // Run the altered `exec` (required for `lastIndex` fix, etc.)
@@ -215,18 +213,11 @@
         return context;
     };
 
-    // Deprecated in v1.6.0. If you want this functionality to be permanent,
-    // `delete XRegExp.install` afterward
-    XRegExp.freezeTokens = function () {
-        XRegExp.uninstall("extensibility");
-    };
-
     // Accepts a `RegExp` instance; returns a copy with the `/g` flag set. The copy has a fresh
     // `lastIndex` (set to zero). If you want to copy a regex without forcing the `global`
     // property, use `XRegExp(regex)`. Do not use `RegExp(regex)` because it will not preserve
-    // special properties required for named capture.
-    // The alias `XRegExp.copyAsGlobal` was deprecated in v1.6.0
-    XRegExp.globalize = XRegExp.copyAsGlobal = function (regex) {
+    // special properties required for named capture
+    XRegExp.globalize = function (regex) {
         return copy(regex, "g");
     };
 
@@ -298,6 +289,11 @@
         if (isRegex && search.global)
             search.lastIndex = 0; // Fixes IE, Safari bug (last tested IE 9, Safari 5.1)
         return result;
+    };
+
+    // Fixes browser bugs in the native `String.prototype.split`
+    XRegExp.split = function (str, separator, limit) {
+        return fixed.split.call(str, separator, limit);
     };
 
     // Accepts an object or space-delimited string specifying optional features to uninstall
@@ -762,15 +758,12 @@
         function () {return this.hasFlag("s");}
     );
 
-    //XRegExp.uninstall("extensibility");
+    XRegExp.uninstall("extensibility");
 
 
     //---------------------------------
     //  Expose XRegExp
     //---------------------------------
-
-    // Automatically install optional features
-    XRegExp.install("all");
 
     if (typeof exports === "undefined")
         root.XRegExp = XRegExp; // Create global varable

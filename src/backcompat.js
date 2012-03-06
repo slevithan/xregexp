@@ -8,9 +8,24 @@
 ;(function () {
     "use strict";
 
-    // overriding natives, adding RegExp.prototype methods, and allowing syntax extensions became
-    // optional features in XRegExp v1.6.0
+    // XRegExp v2.0.0 no longer automatically overrides natives, extends
+    // RegExp.prototype, or allows syntax extensions
     XRegExp.install("natives methods extensibility");
+
+    // renamed in XRegExp v2.0.0
+    XRegExp.copyAsGlobal = XRegExp.globalize;
+
+    // renamed in XRegExp v2.0.0
+    XRegExp.execAt = XRegExp.exec;
+
+    // renamed in XRegExp v2.0.0
+    XRegExp.iterate = XRegExp.forEach;
+
+    // removed in XRegExp v2.0.0. If you want this functionality to be
+    // permanent, `delete XRegExp.install` afterward
+    XRegExp.freezeTokens = function () {
+        XRegExp.uninstall("extensibility");
+    };
 
     // renamed in XRegExp v1.5.0
     XRegExp.matchWithinChain = XRegExp.matchChain;

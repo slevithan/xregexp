@@ -9,13 +9,14 @@ test("Basic availability", function () {
 	ok(XRegExp.escape, "XRegExp.escape exists");
 	ok(XRegExp.exec, "XRegExp.exec exists");
 	ok(XRegExp.forEach, "XRegExp.forEach exists");
-	//ok(XRegExp.freezeTokens, "XRegExp.freezeTokens exists"); // Deprecated in v1.6.0
+	//ok(XRegExp.freezeTokens, "XRegExp.freezeTokens exists"); // Deprecated in v2.0.0
 	ok(XRegExp.globalize, "XRegExp.globalize exists");
 	ok(XRegExp.install, "XRegExp.install exists");
 	ok(XRegExp.isInstalled, "XRegExp.isInstalled exists");
 	ok(XRegExp.isRegExp, "XRegExp.isRegExp exists");
 	ok(XRegExp.matchChain, "XRegExp.matchChain exists");
 	ok(XRegExp.replace, "XRegExp.replace exists");
+	ok(XRegExp.split, "XRegExp.split exists");
 	ok(XRegExp.uninstall, "XRegExp.uninstall exists");
 	ok(XRegExp.version, "XRegExp.version exists");
 	ok(XRegExp.INSIDE_CLASS, "XRegExp.INSIDE_CLASS exists");
@@ -177,7 +178,7 @@ test("XRegExp.forEach", function () {
 	equal(regexG.lastIndex, 0, "lastIndex of global regex reset to 0 after iteration");
 });
 
-// Deprecated in v1.6.0
+// Deprecated in v2.0.0
 /*test("XRegExp.freezeTokens", function () {
 	XRegExp.freezeTokens();
 
@@ -253,6 +254,10 @@ test("XRegExp.matchChain", function () {
 });
 
 test("XRegExp.replace", function () {
+	// TODO: Add tests
+});
+
+test("XRegExp.split", function () {
 	// TODO: Add tests
 });
 
