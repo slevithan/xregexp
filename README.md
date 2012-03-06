@@ -168,5 +168,7 @@ XRegExp and addons by [Steven Levithan](http://stevenlevithan.com/).
 
 Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/). Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
 
+All code released under the [MIT License](http://opensource.org/licenses/mit-license.php).
+
 Fork me to show support, fix, and extend.
 

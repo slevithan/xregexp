@@ -1,7 +1,7 @@
 {
     "name": "xregexp",
     "version": "2.0.0-dev",
-    "url": "http://xregexp.com/",
+    "homepage": "http://xregexp.com/",
     "author": "Steven Levithan <steves_list@hotmail.com>",
     "license": "MIT",
     "repository" : [{
