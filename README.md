@@ -162,11 +162,14 @@ More details: [Addons: Match Recursive](http://xregexp.com/plugins/#matchRecursi
 * Planned changes: [Roadmap](https://github.com/slevithan/XRegExp/wiki/Roadmap).
 
 
-## Authors
+## About
 
-XRegExp and addons by [Steven Levithan](http://stevenlevithan.com/).
+XRegExp and addons copyright 2007-2012 by [Steven Levithan](http://stevenlevithan.com/).
 
-Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/). Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
+Tools:
+
+* Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/).
+* Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
 
 All code released under the [MIT License](http://opensource.org/licenses/mit-license.php).
 
