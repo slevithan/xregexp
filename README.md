@@ -166,7 +166,7 @@ More details: [Addons: Match Recursive](http://xregexp.com/plugins/#matchRecursi
 
 XRegExp and addons by [Steven Levithan](http://stevenlevithan.com/).
 
-Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/).
+Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/). Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
 
 Fork me to show support, fix, and extend.
 

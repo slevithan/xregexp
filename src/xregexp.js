@@ -316,13 +316,13 @@
     // first value in the arguments array. the context is ignored but is accepted for congruity
     // with `Function.prototype.apply`
     XRegExp.prototype.apply = function (context, args) {
-        return this.test(args[0]); // Intentionally not specifying fixed or native version of `test`
+        return this.test(args[0]); // Intentionally doesn't specify fixed/native `test`
     };
 
     // Accepts a context object and string; returns the result of calling `exec` with the provided
     // string. the context is ignored but is accepted for congruity with `Function.prototype.call`
     XRegExp.prototype.call = function (context, str) {
-        return this.test(str); // Intentionally not specifying fixed or native version of `test`
+        return this.test(str); // Intentionally doesn't specify fixed/native `test`
     };
 
 
@@ -476,7 +476,7 @@
     };
 
     // Fixes browser bugs in the native `String.prototype.split`
-    fixed.split = function (s /* separator */, limit) {
+    fixed.split = function (s /*separator*/, limit) {
         // If separator `s` is not a regex, use the native `split`
         if (!XRegExp.isRegExp(s))
             return nativ.split.apply(this, arguments);
@@ -662,7 +662,7 @@
     // Augment XRegExp's regular expression syntax and flags. Note that when adding tokens, the
     // third (`scope`) argument defaults to `XRegExp.OUTSIDE_CLASS`
 
-    XRegExp.install("extensibility"); // Temporarily install; needed for XRegExp.addToken
+    XRegExp.install("extensibility"); // Temporarily install
 
     // Comment pattern: (?# )
     XRegExp.addToken(

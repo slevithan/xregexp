@@ -345,8 +345,8 @@ test("RegExp.prototype.exec", function () {
 
 	deepEqual(/null/.exec(null), ["null"], "null argument converted to string");
 
-	// This is broken in old Firefox (tested v2.0; it works in v10), but not for any fault of XRegExp.
-	// Uncomment this test if future XRegExp fixes it.
+	// This is broken in old Firefox (tested v2.0; it works in v8+), but not for any fault of XRegExp.
+	// Uncomment this test if future XRegExp fixes it for old Firefox.
 	//deepEqual(/undefined/.exec(), ["undefined"], "undefined argument converted to string");
 
 	deepEqual(/NaN/.exec(NaN), ["NaN"], "NaN argument converted to string");
@@ -482,7 +482,7 @@ test("String.prototype.replace", function () {
 	equal("xaaa".replace("a", function ($0) {return $0;}), "xaaa", "String search with function replacement, using match");
 
 	// This is broken in Safari (tested v5.1.2/7534.52.7), but not for any fault of XRegExp.
-	// Uncomment this test if future XRegExp fixes it.
+	// Uncomment this test if future XRegExp fixes it for Safari.
 	//equal("xaaa".replace("a", function () {return "$&";}), "x$&aa", "String search with function replacement, using $& in return string");
 
 	equal("xaaa".replace("a", function ($0, pos) {return "" + pos;}), "x1aa", "String search with function replacement, using pos in return string");
