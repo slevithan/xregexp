@@ -3,11 +3,15 @@
 # Allow running this script from another directory
 cd "$(dirname "$0")"
 
-# List of all source files excluding backcompat.js
+# Ordered list of all source files excluding backcompat.js
 source_files="
     ../src/xregexp.js
     ./concatenate-source-files-fix.js
-    $(find ../src/addons -name '*.js' -print)
+    ../src/addons/unicode/xregexp-unicode-base.js
+    ../src/addons/unicode/xregexp-unicode-blocks.js
+    ../src/addons/unicode/xregexp-unicode-categories.js
+    ../src/addons/unicode/xregexp-unicode-scripts.js
+    ../src/addons/xregexp-matchrecursive.js
 "
 
 # Filename of concatenated package

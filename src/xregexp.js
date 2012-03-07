@@ -544,7 +544,7 @@
         var x = regex._xregexp,
             flags = getNativeFlags(regex) + (addFlags || "");
         if (removeFlags)
-            flags = nativ.replace.call(flags, new RegExp("[" + removeFlags + "]+", "g"), ""); // Don't need to escape `removeFlags` since this is private
+            flags = nativ.replace.call(flags, new RegExp("[" + removeFlags + "]+", "g"), ""); // Would need to escape `removeFlags` if this wasn't private
         if (x) {
             // Compiling the current (rather than precompilation) source preserves the effects of nonnative source flags
             regex = XRegExp(regex.source, flags);

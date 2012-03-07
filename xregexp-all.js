@@ -66,7 +66,7 @@
                 }
             }
         }
-        return augment(RegExp(output.join(""), nativ.replace.call(flags, flagClip, "")), context);
+        return augment(new RegExp(output.join(""), nativ.replace.call(flags, flagClip, "")), context);
     }
 
 
@@ -286,7 +286,7 @@
             // Note that since a copy is used, `search`'s `lastIndex` isn't updated *during* replacement iterations
             r2 = copy(search, replaceAll ? "g" : "", replaceAll ? "" : "g");
         } else if (replaceAll) {
-            r2 = RegExp(XRegExp.escape(search + ""), "g");
+            r2 = new RegExp(XRegExp.escape(search + ""), "g");
         }
         result = fixed.replace.call(str + "", r2, replacement); // Fixed `replace` required for named backreferences, etc.
         if (isRegex && search.global)
@@ -319,13 +319,13 @@
     // first value in the arguments array. the context is ignored but is accepted for congruity
     // with `Function.prototype.apply`
     XRegExp.prototype.apply = function (context, args) {
-        return this.test(args[0]); // Intentionally not specifying fixed or native version of `test`
+        return this.test(args[0]); // Intentionally doesn't specify fixed/native `test`
     };
 
     // Accepts a context object and string; returns the result of calling `exec` with the provided
     // string. the context is ignored but is accepted for congruity with `Function.prototype.call`
     XRegExp.prototype.call = function (context, str) {
-        return this.test(str); // Intentionally not specifying fixed or native version of `test`
+        return this.test(str); // Intentionally doesn't specify fixed/native `test`
     };
 
 
@@ -344,7 +344,7 @@
             // Fix browsers whose `exec` methods don't consistently return `undefined` for
             // nonparticipating capturing groups
             if (!compliantExecNpcg && match.length > 1 && indexOf(match, "") > -1) {
-                r2 = RegExp(this.source, nativ.replace.call(getNativeFlags(this), "g", ""));
+                r2 = new RegExp(this.source, nativ.replace.call(getNativeFlags(this), "g", ""));
                 // Using `str.slice(match.index)` rather than `match[0]` in case lookahead allowed
                 // matching due to characters outside the match
                 nativ.replace.call((str + "").slice(match.index), r2, function () {
@@ -379,7 +379,7 @@
     // Adds named capture support and fixes browser bugs in the native `String.prototype.match`
     fixed.match = function (regex) {
         if (!XRegExp.isRegExp(regex))
-            regex = RegExp(regex); // Use native `RegExp`
+            regex = new RegExp(regex); // Use native `RegExp`
         if (regex.global) {
             var result = nativ.match.apply(this, arguments);
             regex.lastIndex = 0; // Fixes IE bug
@@ -399,11 +399,11 @@
             captureNames, result, str, origLastIndex;
         if (isRegex) {
             if (search._xregexp)
-                captureNames = search._xregexp.captureNames; // Array or `null`
+                captureNames = search._xregexp.captureNames;
             if (!search.global)
                 origLastIndex = search.lastIndex;
         } else {
-            search = search + ""; // Type conversion
+            search += "";
         }
         if (Object.prototype.toString.call(replacement) === "[object Function]") {
             result = nativ.replace.call(this + "", search, function () {
@@ -423,7 +423,7 @@
                 return replacement.apply(null, arguments);
             });
         } else {
-            str = this + ""; // Type conversion, so `args[args.length - 1]` will be a string (given nonstring `this`)
+            str = this + ""; // Ensure `args[args.length - 1]` will be a string when given nonstring `this`
             result = nativ.replace.call(str, search, function () {
                 var args = arguments; // Keep this function's `arguments` available through closure
                 return nativ.replace.call(replacement + "", replacementToken, function ($0, $1, $2) {
@@ -479,11 +479,11 @@
     };
 
     // Fixes browser bugs in the native `String.prototype.split`
-    fixed.split = function (s /* separator */, limit) {
+    fixed.split = function (s /*separator*/, limit) {
         // If separator `s` is not a regex, use the native `split`
         if (!XRegExp.isRegExp(s))
             return nativ.split.apply(this, arguments);
-        var str = this + "", // Type conversion
+        var str = this + "",
             output = [],
             lastLastIndex = 0,
             match, lastLength;
@@ -531,9 +531,7 @@
     //---------------------------------
 
     function augment (regex, context) {
-        regex._xregexp = {
-            captureNames: context.hasNamedCapture ? context.captureNames : null
-        };
+        regex._xregexp = {captureNames: context.hasNamedCapture ? context.captureNames : null};
         // Can't automatically inherit these methods since the XRegExp constructor returns a
         // nonprimitive value
         regex.apply = XRegExp.prototype.apply;
@@ -549,18 +547,16 @@
         var x = regex._xregexp,
             flags = getNativeFlags(regex) + (addFlags || "");
         if (removeFlags)
-            flags = nativ.replace.call(flags, RegExp("[" + removeFlags + "]+", "g"), "");
+            flags = nativ.replace.call(flags, new RegExp("[" + removeFlags + "]+", "g"), ""); // Would need to escape `removeFlags` if this wasn't private
         if (x) {
             // Compiling the current (rather than precompilation) source preserves the effects of nonnative source flags
             regex = XRegExp(regex.source, flags);
-            regex._xregexp = {
-                captureNames: x.captureNames ? x.captureNames.slice(0) : null
-            };
+            regex._xregexp = {captureNames: x.captureNames ? x.captureNames.slice(0) : null};
         } else {
             // Remove duplicate flags to avoid throwing
             flags = nativ.replace.call(flags, /([\s\S])(?=[\s\S]*\1)/g, "");
             // Don't use `XRegExp`; avoid searching for special tokens and adding special properties
-            regex = RegExp(regex.source, flags);
+            regex = new RegExp(regex.source, flags);
         }
         return regex;
     }
@@ -665,7 +661,7 @@
     // Augment XRegExp's regular expression syntax and flags. Note that when adding tokens, the
     // third (`scope`) argument defaults to `XRegExp.OUTSIDE_CLASS`
 
-    XRegExp.install("extensibility"); // Temporarily install; needed for XRegExp.addToken
+    XRegExp.install("extensibility"); // Temporarily install
 
     // Comment pattern: (?# )
     XRegExp.addToken(
@@ -1292,11 +1288,10 @@ var XRegExp = exports.XRegExp;
  * Returns strings found between provided left and right delimiters (allowing
  * nested delimiters) or arrays of match parts and position data. An error is
  * thrown if delimiters are unbalanced within the data.
- * Known issue: Backrefs not supported in right delimiter when using escapeChar
  * @param {String} str The string to search.
  * @param {String} left Left delimiter as an XRegExp pattern.
  * @param {String} right Right delimiter as an XRegExp pattern.
- * @param {String} flags Flags for left and right delimiters. Use: g,i,m,s,x,y.
+ * @param {String} flags Flags for the left and right delimiters. Use: gimsxy.
  * @param {Object} options Lets you specify valueNames and escapeChar options.
  * @returns {Array} The list of matches.
  * @example
@@ -1314,26 +1309,28 @@ var XRegExp = exports.XRegExp;
 ;XRegExp.matchRecursive = function (str, left, right, flags, options) {
     "use strict";
 
-    var options = options || {},
+    flags = flags || "";
+    options = options || {};
+    var global = flags.indexOf("g") > -1,
+        sticky = flags.indexOf("y") > -1;
+    flags = flags.replace(/y/g, ""); // flag y handled internally
+    var left = XRegExp(left, flags),
+        right = XRegExp(right, flags),
         escapeChar = options.escapeChar,
         vN = options.valueNames,
-        flags = flags || "",
-        global = flags.indexOf("g") > -1,
-        sticky = flags.indexOf("y") > -1,
-        flags = flags.replace(/y/g, ""), // flag y handled internally; usable when not natively supported
-        left = XRegExp(left, flags),
-        right = XRegExp(right, flags),
         output = [],
         openTokens = 0, delimStart = 0, delimEnd = 0, lastOuterEnd = 0,
         outerStart, innerStart, leftMatch, rightMatch, escaped, esc;
 
     if (escapeChar) {
         if (escapeChar.length > 1)
-            throw new SyntaxError("can't supply more than one escape character");
+            throw new SyntaxError("can't use more than one escape character");
+        if (/\\[1-9]/.test(right.source.replace(/\\[0\D]|\[(?:[^\\\]]|\\[\s\S])*]/g, "")))
+            throw new SyntaxError("can't use escape character if backreference in delimiter");
         escaped = XRegExp.escape(escapeChar);
-        esc = RegExp(
+        esc = new RegExp(
             "(?:" + escaped + "[\\S\\s]|(?:(?!" + left.source + "|" + right.source + ")[^" + escaped + "])+)+",
-            flags.replace(/[^im]+/g, "") // flags g,y,s,x aren't needed here (s,x handled by XRegExp)
+            flags.replace(/[^im]+/g, "") // flags gsxy aren't needed here (sx handled by XRegExp)
         );
     }
 
@@ -1341,40 +1338,32 @@ var XRegExp = exports.XRegExp;
         // if using an escape character, advance to the next delimiter's
         // starting position, skipping any escaped characters
         if (escapeChar)
-            delimEnd += (XRegExp.exec(str, esc, delimEnd, /*anchored*/ true) || [""])[0].length;
-
+            delimEnd += (XRegExp.exec(str, esc, delimEnd, /*sticky*/ true) || [""])[0].length;
         leftMatch = XRegExp.exec(str, left, delimEnd);
         rightMatch = XRegExp.exec(str, right, delimEnd);
-
-        // keep only the result that matched earlier in the string
+        // keep only the leftmost result
         if (leftMatch && rightMatch) {
-            if (leftMatch.index <= rightMatch.index)
-                rightMatch = null;
-            else
-                leftMatch = null;
+            if (leftMatch.index <= rightMatch.index) rightMatch = null;
+            else leftMatch = null;
         }
-
-        // paths*:
-        // leftMatch | rightMatch | openTokens | result
-        // 1         | 0          | 1          | ...
-        // 1         | 0          | 0          | ...
-        // 0         | 1          | 1          | ...
-        // 0         | 1          | 0          | throw
-        // 0         | 0          | 1          | throw
-        // 0         | 0          | 0          | break
-        // * - does not include the sticky mode special case
-        //   - the loop ends after the first completed match if not in global mode
-
+        /* paths (leftMatch, rightMatch, openTokens):
+        LM | RM | OT | Result
+        1  | 0  | 1  | loop
+        1  | 0  | 0  | loop
+        0  | 1  | 1  | loop
+        0  | 1  | 0  | throw
+        0  | 0  | 1  | throw
+        0  | 0  | 0  | break
+        * doesn't include the sticky mode special case
+        * loop ends after first completed match if !global */
         if (leftMatch || rightMatch) {
             delimStart = (leftMatch || rightMatch).index;
             delimEnd = delimStart + (leftMatch || rightMatch)[0].length;
         } else if (!openTokens) {
             break;
         }
-
         if (sticky && !openTokens && delimStart > lastOuterEnd)
             break;
-
         if (leftMatch) {
             if (!openTokens++) {
                 outerStart = delimStart;
@@ -1392,16 +1381,13 @@ var XRegExp = exports.XRegExp;
                     output.push(str.slice(innerStart, delimStart));
                 }
                 lastOuterEnd = delimEnd;
-                if (!global)
-                    break;
+                if (!global) break;
             }
         } else {
             throw new Error("string contains unbalanced delimiters");
         }
-
         // if the delimiter matched an empty string, avoid an infinite loop
-        if (delimStart === delimEnd)
-            delimEnd++;
+        if (delimStart === delimEnd) delimEnd++;
     }
 
     if (global && !sticky && vN && vN[0] && str.length > lastOuterEnd)
