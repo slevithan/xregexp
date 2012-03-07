@@ -21,7 +21,7 @@
     // renamed in XRegExp v2.0.0
     XRegExp.iterate = XRegExp.forEach;
 
-    // removed in XRegExp v2.0.0. If you want this functionality to be
+    // removed in XRegExp v2.0.0. if you want this functionality to be
     // permanent, `delete XRegExp.install` afterward
     XRegExp.freezeTokens = function () {
         XRegExp.uninstall("extensibility");
@@ -32,14 +32,9 @@
 
     // removed in XRegExp v1.5.0
     RegExp.prototype.addFlags = function (flags) {
-        var regex = new XRegExp(this.source, /\/([a-z]*)$/i.exec(this + "")[1] + (flags || "")),
+        var regex = XRegExp(this.source, /\/([a-z]*)$/i.exec(this + "")[1] + (flags || "")),
             x = this._xregexp;
-        if (x) {
-            regex._xregexp = {
-                source: x.source,
-                captureNames: x.captureNames ? x.captureNames.slice(0) : null
-            };
-        }
+        if (x) regex._xregexp = {captureNames: x.captureNames ? x.captureNames.slice(0) : null};
         return regex;
     };
 
@@ -51,8 +46,7 @@
     // removed in XRegExp v1.5.0
     RegExp.prototype.validate = function (str) {
         var regex = new RegExp("^(?:" + this.source + ")$(?!\\s)", /\/([a-z]*)$/i.exec(this + "")[1]);
-        if (this.global)
-            this.lastIndex = 0;
+        if (this.global) this.lastIndex = 0;
         return str.search(regex) === 0;
     };
 

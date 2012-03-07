@@ -8,11 +8,10 @@
  * Returns strings found between provided left and right delimiters (allowing
  * nested delimiters) or arrays of match parts and position data. An error is
  * thrown if delimiters are unbalanced within the data.
- * Known issue: Backrefs not supported in right delimiter when using escapeChar
  * @param {String} str The string to search.
  * @param {String} left Left delimiter as an XRegExp pattern.
  * @param {String} right Right delimiter as an XRegExp pattern.
- * @param {String} flags Flags for left and right delimiters. Use: g,i,m,s,x,y.
+ * @param {String} flags Flags for the left and right delimiters. Use: gimsxy.
  * @param {Object} options Lets you specify valueNames and escapeChar options.
  * @returns {Array} The list of matches.
  * @example
@@ -30,26 +29,28 @@
 ;XRegExp.matchRecursive = function (str, left, right, flags, options) {
     "use strict";
 
-    var options = options || {},
+    flags = flags || "";
+    options = options || {};
+    var global = flags.indexOf("g") > -1,
+        sticky = flags.indexOf("y") > -1;
+    flags = flags.replace(/y/g, ""); // flag y handled internally
+    var left = XRegExp(left, flags),
+        right = XRegExp(right, flags),
         escapeChar = options.escapeChar,
         vN = options.valueNames,
-        flags = flags || "",
-        global = flags.indexOf("g") > -1,
-        sticky = flags.indexOf("y") > -1,
-        flags = flags.replace(/y/g, ""), // flag y handled internally; usable when not natively supported
-        left = XRegExp(left, flags),
-        right = XRegExp(right, flags),
         output = [],
         openTokens = 0, delimStart = 0, delimEnd = 0, lastOuterEnd = 0,
         outerStart, innerStart, leftMatch, rightMatch, escaped, esc;
 
     if (escapeChar) {
         if (escapeChar.length > 1)
-            throw new SyntaxError("can't supply more than one escape character");
+            throw new SyntaxError("can't use more than one escape character");
+        if (/\\[1-9]/.test(right.source.replace(/\\[0\D]|\[(?:[^\\\]]|\\[\s\S])*]/g, "")))
+            throw new SyntaxError("can't use escape character if backreference in delimiter");
         escaped = XRegExp.escape(escapeChar);
-        esc = RegExp(
+        esc = new RegExp(
             "(?:" + escaped + "[\\S\\s]|(?:(?!" + left.source + "|" + right.source + ")[^" + escaped + "])+)+",
-            flags.replace(/[^im]+/g, "") // flags g,y,s,x aren't needed here (s,x handled by XRegExp)
+            flags.replace(/[^im]+/g, "") // flags gsxy aren't needed here (sx handled by XRegExp)
         );
     }
 
@@ -58,39 +59,31 @@
         // starting position, skipping any escaped characters
         if (escapeChar)
             delimEnd += (XRegExp.exec(str, esc, delimEnd, /*sticky*/ true) || [""])[0].length;
-
         leftMatch = XRegExp.exec(str, left, delimEnd);
         rightMatch = XRegExp.exec(str, right, delimEnd);
-
-        // keep only the result that matched earlier in the string
+        // keep only the leftmost result
         if (leftMatch && rightMatch) {
-            if (leftMatch.index <= rightMatch.index)
-                rightMatch = null;
-            else
-                leftMatch = null;
+            if (leftMatch.index <= rightMatch.index) rightMatch = null;
+            else leftMatch = null;
         }
-
-        // paths*:
-        // leftMatch | rightMatch | openTokens | result
-        // 1         | 0          | 1          | ...
-        // 1         | 0          | 0          | ...
-        // 0         | 1          | 1          | ...
-        // 0         | 1          | 0          | throw
-        // 0         | 0          | 1          | throw
-        // 0         | 0          | 0          | break
-        // * - does not include the sticky mode special case
-        //   - the loop ends after the first completed match if not in global mode
-
+        /* paths (leftMatch, rightMatch, openTokens):
+        LM | RM | OT | Result
+        1  | 0  | 1  | loop
+        1  | 0  | 0  | loop
+        0  | 1  | 1  | loop
+        0  | 1  | 0  | throw
+        0  | 0  | 1  | throw
+        0  | 0  | 0  | break
+        * doesn't include the sticky mode special case
+        * loop ends after first completed match if !global */
         if (leftMatch || rightMatch) {
             delimStart = (leftMatch || rightMatch).index;
             delimEnd = delimStart + (leftMatch || rightMatch)[0].length;
         } else if (!openTokens) {
             break;
         }
-
         if (sticky && !openTokens && delimStart > lastOuterEnd)
             break;
-
         if (leftMatch) {
             if (!openTokens++) {
                 outerStart = delimStart;
@@ -108,16 +101,13 @@
                     output.push(str.slice(innerStart, delimStart));
                 }
                 lastOuterEnd = delimEnd;
-                if (!global)
-                    break;
+                if (!global) break;
             }
         } else {
             throw new Error("string contains unbalanced delimiters");
         }
-
         // if the delimiter matched an empty string, avoid an infinite loop
-        if (delimStart === delimEnd)
-            delimEnd++;
+        if (delimStart === delimEnd) delimEnd++;
     }
 
     if (global && !sticky && vN && vN[0] && str.length > lastOuterEnd)

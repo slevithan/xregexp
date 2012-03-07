@@ -63,7 +63,7 @@
                 }
             }
         }
-        return augment(RegExp(output.join(""), nativ.replace.call(flags, flagClip, "")), context);
+        return augment(new RegExp(output.join(""), nativ.replace.call(flags, flagClip, "")), context);
     }
 
 
@@ -283,7 +283,7 @@
             // Note that since a copy is used, `search`'s `lastIndex` isn't updated *during* replacement iterations
             r2 = copy(search, replaceAll ? "g" : "", replaceAll ? "" : "g");
         } else if (replaceAll) {
-            r2 = RegExp(XRegExp.escape(search + ""), "g");
+            r2 = new RegExp(XRegExp.escape(search + ""), "g");
         }
         result = fixed.replace.call(str + "", r2, replacement); // Fixed `replace` required for named backreferences, etc.
         if (isRegex && search.global)
@@ -341,7 +341,7 @@
             // Fix browsers whose `exec` methods don't consistently return `undefined` for
             // nonparticipating capturing groups
             if (!compliantExecNpcg && match.length > 1 && indexOf(match, "") > -1) {
-                r2 = RegExp(this.source, nativ.replace.call(getNativeFlags(this), "g", ""));
+                r2 = new RegExp(this.source, nativ.replace.call(getNativeFlags(this), "g", ""));
                 // Using `str.slice(match.index)` rather than `match[0]` in case lookahead allowed
                 // matching due to characters outside the match
                 nativ.replace.call((str + "").slice(match.index), r2, function () {
@@ -376,7 +376,7 @@
     // Adds named capture support and fixes browser bugs in the native `String.prototype.match`
     fixed.match = function (regex) {
         if (!XRegExp.isRegExp(regex))
-            regex = RegExp(regex); // Use native `RegExp`
+            regex = new RegExp(regex); // Use native `RegExp`
         if (regex.global) {
             var result = nativ.match.apply(this, arguments);
             regex.lastIndex = 0; // Fixes IE bug
@@ -396,11 +396,11 @@
             captureNames, result, str, origLastIndex;
         if (isRegex) {
             if (search._xregexp)
-                captureNames = search._xregexp.captureNames; // Array or `null`
+                captureNames = search._xregexp.captureNames;
             if (!search.global)
                 origLastIndex = search.lastIndex;
         } else {
-            search = search + ""; // Type conversion
+            search += "";
         }
         if (Object.prototype.toString.call(replacement) === "[object Function]") {
             result = nativ.replace.call(this + "", search, function () {
@@ -420,7 +420,7 @@
                 return replacement.apply(null, arguments);
             });
         } else {
-            str = this + ""; // Type conversion, so `args[args.length - 1]` will be a string (given nonstring `this`)
+            str = this + ""; // Ensure `args[args.length - 1]` will be a string when given nonstring `this`
             result = nativ.replace.call(str, search, function () {
                 var args = arguments; // Keep this function's `arguments` available through closure
                 return nativ.replace.call(replacement + "", replacementToken, function ($0, $1, $2) {
@@ -480,7 +480,7 @@
         // If separator `s` is not a regex, use the native `split`
         if (!XRegExp.isRegExp(s))
             return nativ.split.apply(this, arguments);
-        var str = this + "", // Type conversion
+        var str = this + "",
             output = [],
             lastLastIndex = 0,
             match, lastLength;
@@ -528,9 +528,7 @@
     //---------------------------------
 
     function augment (regex, context) {
-        regex._xregexp = {
-            captureNames: context.hasNamedCapture ? context.captureNames : null
-        };
+        regex._xregexp = {captureNames: context.hasNamedCapture ? context.captureNames : null};
         // Can't automatically inherit these methods since the XRegExp constructor returns a
         // nonprimitive value
         regex.apply = XRegExp.prototype.apply;
@@ -546,18 +544,16 @@
         var x = regex._xregexp,
             flags = getNativeFlags(regex) + (addFlags || "");
         if (removeFlags)
-            flags = nativ.replace.call(flags, RegExp("[" + removeFlags + "]+", "g"), "");
+            flags = nativ.replace.call(flags, new RegExp("[" + removeFlags + "]+", "g"), ""); // Don't need to escape `removeFlags` since this is private
         if (x) {
             // Compiling the current (rather than precompilation) source preserves the effects of nonnative source flags
             regex = XRegExp(regex.source, flags);
-            regex._xregexp = {
-                captureNames: x.captureNames ? x.captureNames.slice(0) : null
-            };
+            regex._xregexp = {captureNames: x.captureNames ? x.captureNames.slice(0) : null};
         } else {
             // Remove duplicate flags to avoid throwing
             flags = nativ.replace.call(flags, /([\s\S])(?=[\s\S]*\1)/g, "");
             // Don't use `XRegExp`; avoid searching for special tokens and adding special properties
-            regex = RegExp(regex.source, flags);
+            regex = new RegExp(regex.source, flags);
         }
         return regex;
     }
