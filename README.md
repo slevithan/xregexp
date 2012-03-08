@@ -6,7 +6,7 @@ XRegExp provides augmented, extensible JavaScript regular expressions. You get n
 
 ## Usage examples
 
-Note that these examples take advantage of new features in XRegExp v2.0.0-dev.
+Note that these examples take advantage of new features in XRegExp v2.0.0-beta.
 
 ~~~ js
 var date, dateStr, match, str, pos, result = [];

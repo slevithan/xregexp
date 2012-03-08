@@ -2,7 +2,7 @@
 /***** xregexp.js *****/
 
 /*!
- * XRegExp v2.0.0-dev
+ * XRegExp v2.0.0-beta
  * Copyright 2007-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Augmented, extensible, cross-browser regular expressions
@@ -71,7 +71,7 @@
     //  Public properties
     //---------------------------------
 
-    XRegExp.version = "2.0.0-dev";
+    XRegExp.version = "2.0.0-beta";
 
     // Token scope bitflags (create private copies to protect core operations)
     var classScope = XRegExp.INSIDE_CLASS = 0x1;
@@ -272,16 +272,17 @@
     // `arguments[0].name`
     XRegExp.replace = function (str, search, replacement, replaceAll) {
         var isRegex = XRegExp.isRegExp(search),
-            r2, result;
+            search2 = search,
+            result;
         if (isRegex) {
             if (replaceAll === undefined)
                 replaceAll = search.global; // Follow flag `/g` when `replaceAll` isn't explicit
             // Note that since a copy is used, `search`'s `lastIndex` isn't updated *during* replacement iterations
-            r2 = copy(search, replaceAll ? "g" : "", replaceAll ? "" : "g");
+            search2 = copy(search, replaceAll ? "g" : "", replaceAll ? "" : "g");
         } else if (replaceAll) {
-            r2 = new RegExp(XRegExp.escape(search + ""), "g");
+            search2 = new RegExp(XRegExp.escape(search + ""), "g");
         }
-        result = fixed.replace.call(str + "", r2, replacement); // Fixed `replace` required for named backreferences, etc.
+        result = fixed.replace.call(str + "", search2, replacement); // Fixed `replace` required for named backreferences, etc.
         if (isRegex && search.global)
             search.lastIndex = 0; // Fixes IE, Safari bug (last tested IE 9, Safari 5.1)
         return result;
@@ -748,13 +749,15 @@
 
 // Ensure that XRegExp is defined in the module scope, so included modules are
 // able to access it.
-var XRegExp = exports.XRegExp;
+if (typeof exports !== "undefined") {
+    var XRegExp = exports.XRegExp;
+}
 
 
 /***** xregexp-unicode-base.js *****/
 
 /*!
- * XRegExp Unicode Base v1.0.0-dev
+ * XRegExp Unicode Base v1.0.0-beta
  * Copyright 2008-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/>
@@ -857,7 +860,7 @@ var XRegExp = exports.XRegExp;
 /***** xregexp-unicode-blocks.js *****/
 
 /*!
- * XRegExp Unicode Blocks v1.2.0-dev
+ * XRegExp Unicode Blocks v1.2.0-beta
  * Copyright 2010-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/Blocks.txt>
@@ -1048,7 +1051,7 @@ var XRegExp = exports.XRegExp;
 /***** xregexp-unicode-categories.js *****/
 
 /*!
- * XRegExp Unicode Categories v1.2.0-dev
+ * XRegExp Unicode Categories v1.2.0-beta
  * Copyright 2010-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/UnicodeData.txt>
@@ -1158,7 +1161,7 @@ var XRegExp = exports.XRegExp;
 /***** xregexp-unicode-scripts.js *****/
 
 /*!
- * XRegExp Unicode Scripts v1.2.0-dev
+ * XRegExp Unicode Scripts v1.2.0-beta
  * Copyright 2010-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/Scripts.txt>
@@ -1263,7 +1266,7 @@ var XRegExp = exports.XRegExp;
 /***** xregexp-matchrecursive.js *****/
 
 /*!
- * XRegExp Match Recursive v0.2.0-dev
+ * XRegExp Match Recursive v0.2.0-beta
  * Copyright 2009-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
 */

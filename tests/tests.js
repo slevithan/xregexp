@@ -9,7 +9,6 @@ test("Basic availability", function () {
 	ok(XRegExp.escape, "XRegExp.escape exists");
 	ok(XRegExp.exec, "XRegExp.exec exists");
 	ok(XRegExp.forEach, "XRegExp.forEach exists");
-	//ok(XRegExp.freezeTokens, "XRegExp.freezeTokens exists"); // Deprecated in v2.0.0
 	ok(XRegExp.globalize, "XRegExp.globalize exists");
 	ok(XRegExp.install, "XRegExp.install exists");
 	ok(XRegExp.isInstalled, "XRegExp.isInstalled exists");
@@ -180,14 +179,6 @@ test("XRegExp.forEach", function () {
 	equal(regexG.lastIndex, 0, "lastIndex of global regex reset to 0 after iteration");
 });
 
-// Deprecated in v2.0.0
-/*test("XRegExp.freezeTokens", function () {
-	XRegExp.freezeTokens();
-
-	raises(function () {XRegExp.addToken(/>>>/, function () {return "Z";});}, Error, "addToken throws after freeze");
-	ok(!XRegExp(">>>").test("Z"), "Token not added");
-});*/
-
 test("XRegExp.globalize", function () {
 	var hasNativeY = typeof RegExp.prototype.sticky !== "undefined";
 	var regex = XRegExp("(?<name>a)\\k<name>", "im" + (hasNativeY ? "y" : ""));
@@ -256,7 +247,17 @@ test("XRegExp.matchChain", function () {
 });
 
 test("XRegExp.replace", function () {
-	// TODO: Add tests
+	equal(XRegExp.replace("test", "t", "x", true), "xesx", "string search with replaceAll true");
+	equal(XRegExp.replace("test", "t", "x", false), "xest", "string search with replaceAll false");
+	equal(XRegExp.replace("test", "t", "x"), "xest", "string search without replaceAll");
+	equal(XRegExp.replace("test", /t/, "x", true), "xesx", "regex search with replaceAll true");
+	equal(XRegExp.replace("test", /t/, "x", false), "xest", "regex search with replaceAll false");
+	equal(XRegExp.replace("test", /t/, "x"), "xest", "regex search without replaceAll");
+	equal(XRegExp.replace("test", /t/g, "x", true), "xesx", "global regex search with replaceAll true");
+	equal(XRegExp.replace("test", /t/g, "x", false), "xest", "global regex search with replaceAll false");
+	equal(XRegExp.replace("test", /t/g, "x"), "xesx", "global regex search without replaceAll");
+
+	// TODO: Add tests (above tests cover replaceAll functionality only)
 });
 
 test("XRegExp.split", function () {

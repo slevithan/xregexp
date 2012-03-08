@@ -1,5 +1,5 @@
 /*!
- * XRegExp v2.0.0-dev
+ * XRegExp v2.0.0-beta
  * Copyright 2007-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Augmented, extensible, cross-browser regular expressions
@@ -68,7 +68,7 @@
     //  Public properties
     //---------------------------------
 
-    XRegExp.version = "2.0.0-dev";
+    XRegExp.version = "2.0.0-beta";
 
     // Token scope bitflags (create private copies to protect core operations)
     var classScope = XRegExp.INSIDE_CLASS = 0x1;
@@ -269,16 +269,17 @@
     // `arguments[0].name`
     XRegExp.replace = function (str, search, replacement, replaceAll) {
         var isRegex = XRegExp.isRegExp(search),
-            r2, result;
+            search2 = search,
+            result;
         if (isRegex) {
             if (replaceAll === undefined)
                 replaceAll = search.global; // Follow flag `/g` when `replaceAll` isn't explicit
             // Note that since a copy is used, `search`'s `lastIndex` isn't updated *during* replacement iterations
-            r2 = copy(search, replaceAll ? "g" : "", replaceAll ? "" : "g");
+            search2 = copy(search, replaceAll ? "g" : "", replaceAll ? "" : "g");
         } else if (replaceAll) {
-            r2 = new RegExp(XRegExp.escape(search + ""), "g");
+            search2 = new RegExp(XRegExp.escape(search + ""), "g");
         }
-        result = fixed.replace.call(str + "", r2, replacement); // Fixed `replace` required for named backreferences, etc.
+        result = fixed.replace.call(str + "", search2, replacement); // Fixed `replace` required for named backreferences, etc.
         if (isRegex && search.global)
             search.lastIndex = 0; // Fixes IE, Safari bug (last tested IE 9, Safari 5.1)
         return result;
