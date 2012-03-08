@@ -135,7 +135,7 @@
         return !x.lastIndex;
     }();
 
-    // Check for "y" flag support
+    // Check for y-flag support (Firefox 3+)
     var hasNativeY = RegExp.prototype.sticky !== undefined;
 
 
@@ -477,8 +477,8 @@
         - Negative number: 4294967296 - Math.floor(Math.abs(limit))
         - Other: Type-convert, then use the above rules */
         limit = limit === undefined ?
-            -1 >>> 0 : /* Math.pow(2, 32) - 1 */
-            limit >>> 0; /* ToUint32(limit) */
+            -1 >>> 0 : // Math.pow(2, 32) - 1
+            limit >>> 0; // ToUint32(limit)
 
         // This is required if not `s.global`, and it avoids needing to set `s.lastIndex` to zero
         // and restore it to its original value when we're done using the regex
