@@ -673,12 +673,17 @@
     );
 
     // Capturing group (match the opening parenthesis only).
-    // Required for support of named capturing groups
+    // Required for support of named capturing groups.
+    // Also adds explicit capture mode
     XRegExp.addToken(
         /\((?!\?)/,
         function () {
-            this.captureNames.push(null);
-            return "(";
+            if (this.hasFlag("n")) {
+                return "(?:";
+            } else {
+                this.captureNames.push(null);
+                return "(";
+            }
         }
     );
 
@@ -715,10 +720,10 @@
         }
     );
 
-    // Mode modifier at the start of the pattern only, with any combination of flags imsx: (?imsx)
-    // Does not support x(?i), (?-i), (?i-m), (?i: ), (?i)(?m), etc.
+    // Mode modifier at the start of the pattern only, with any combination of flags imnsx: (?imnsx)
+    // Does not support ..(?i), (?-i), (?i-m), (?i: ), (?i)(?m), etc.
     XRegExp.addToken(
-        /^\(\?([imsx]+)\)/,
+        /^\(\?([imnsx]+)\)/,
         function (match) {
             this.setFlag(match[1]);
             return "";
@@ -1291,7 +1296,7 @@ var XRegExp = exports.XRegExp;
  * @param {String} str The string to search.
  * @param {String} left Left delimiter as an XRegExp pattern.
  * @param {String} right Right delimiter as an XRegExp pattern.
- * @param {String} flags Flags for the left and right delimiters. Use: gimsxy.
+ * @param {String} flags Flags for the left and right delimiters. Use: gimnsxy.
  * @param {Object} options Lets you specify valueNames and escapeChar options.
  * @returns {Array} The list of matches.
  * @example
@@ -1330,7 +1335,7 @@ var XRegExp = exports.XRegExp;
         escaped = XRegExp.escape(escapeChar);
         esc = new RegExp(
             "(?:" + escaped + "[\\S\\s]|(?:(?!" + left.source + "|" + right.source + ")[^" + escaped + "])+)+",
-            flags.replace(/[^im]+/g, "") // flags gsxy aren't needed here (sx handled by XRegExp)
+            flags.replace(/[^im]+/g, "") // flags gnsxy aren't needed here (nsx handled by XRegExp)
         );
     }
 

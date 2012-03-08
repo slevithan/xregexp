@@ -1,10 +1,12 @@
-﻿[XRegExp](http://xregexp.com/) (v2.0.0-dev)
-=============================================
+﻿[XRegExp](http://xregexp.com/)
+==============================
 
 XRegExp provides augmented, extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regular expression utility belt with tools to make your client-side grepping simpler and more powerful, while freeing you from worrying about pesky cross-browser inconsistencies and the dubious `lastIndex` property.
 
 
-## A few examples
+## Usage examples
+
+Note that these examples take advantage of new features in XRegExp v2.0.0-dev.
 
 ~~~ js
 var date, dateStr, match, str, pos, result = [];
@@ -54,8 +56,11 @@ XRegExp.forEach(str, XRegExp('<a href="([^"]+)">(.*?)</a>', 'is'), function (mat
 // -> [['http://xregexp.com/api/', 'XRegExp'], ['http://www.google.com/', 'Google']]
 
 // Get an array of numbers within <b> tags using XRegExp.matchChain
-XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [/<b>.*?<\/b>/i, /\d+/]);
-// -> ['2', '4', '56']
+XRegExp.matchChain('1 <b>2</b> 3 <b>4 a56.1</b>', [
+    XRegExp('(?is)<b>.*?<\\/b>'),
+    /\d+(?:\.\d+)?/
+]);
+// -> ['2', '4', '56.1']
 
 // You can also pass forward and return specific backreferences
 XRegExp.matchChain(str, [
@@ -79,7 +84,7 @@ filter(['a', 'ba', 'ab', 'b'], XRegExp('^a'));
 These examples should give you an idea of what's possible, but they don't show all of XRegExp's tricks. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), [browser fixes](http://xregexp.com/cross_browser/), and [roadmap](https://github.com/slevithan/XRegExp/wiki/Roadmap).
 
 
-## XRegExp Unicode Base (v1.0.0-dev)
+## XRegExp Unicode Base
 
 First include the Unicode Base script:
 
@@ -109,7 +114,7 @@ XRegExp uses the Unicode 6.1 character database (released January 2012).
 More details: [Addons: Unicode](http://xregexp.com/plugins/#unicode).
 
 
-## XRegExp Match Recursive (v0.2.0-dev)
+## XRegExp Match Recursive
 
 First include the Match Recursive script:
 

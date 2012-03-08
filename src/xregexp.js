@@ -670,12 +670,17 @@
     );
 
     // Capturing group (match the opening parenthesis only).
-    // Required for support of named capturing groups
+    // Required for support of named capturing groups.
+    // Also adds explicit capture mode
     XRegExp.addToken(
         /\((?!\?)/,
         function () {
-            this.captureNames.push(null);
-            return "(";
+            if (this.hasFlag("n")) {
+                return "(?:";
+            } else {
+                this.captureNames.push(null);
+                return "(";
+            }
         }
     );
 
@@ -712,10 +717,10 @@
         }
     );
 
-    // Mode modifier at the start of the pattern only, with any combination of flags imsx: (?imsx)
-    // Does not support x(?i), (?-i), (?i-m), (?i: ), (?i)(?m), etc.
+    // Mode modifier at the start of the pattern only, with any combination of flags imnsx: (?imnsx)
+    // Does not support ..(?i), (?-i), (?i-m), (?i: ), (?i)(?m), etc.
     XRegExp.addToken(
-        /^\(\?([imsx]+)\)/,
+        /^\(\?([imnsx]+)\)/,
         function (match) {
             this.setFlag(match[1]);
             return "";
