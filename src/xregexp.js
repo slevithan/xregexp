@@ -29,41 +29,38 @@
             throw new Error("can't call the XRegExp constructor within token definition functions");
         var output = [],
             scope = defaultScope,
-            pos = 0,
-            context = { // `this` object for custom tokens
+            tokenContext = {
                 hasNamedCapture: false,
                 captureNames: [],
                 hasFlag: function (flag) {return flags.indexOf(flag) > -1;},
                 setFlag: function (flag) {flags += flag;}
             },
+            pos = 0,
             tokenResult, match, chr;
         pattern = pattern === undefined ? "" : pattern + "";
         flags = flags === undefined ? "" : flags + "";
         while (pos < pattern.length) {
             // Check for custom tokens at the current position
-            tokenResult = runTokens(pattern, pos, scope, context);
+            tokenResult = runTokens(pattern, pos, scope, tokenContext);
             if (tokenResult) {
                 output.push(tokenResult.output);
                 pos += (tokenResult.match[0].length || 1);
             } else {
-                // Check for native multicharacter metasequences (excluding character classes) at
-                // the current position
+                // Check for native multichar tokens (except char classes) at the current position
                 if ((match = nativ.exec.call(nativeTokens[scope], pattern.slice(pos)))) {
                     output.push(match[0]);
                     pos += match[0].length;
                 } else {
                     chr = pattern.charAt(pos);
-                    if (chr === "[")
-                        scope = classScope;
-                    else if (chr === "]")
-                        scope = defaultScope;
+                    if (chr === "[") scope = classScope;
+                    else if (chr === "]") scope = defaultScope;
                     // Advance position one character
                     output.push(chr);
                     pos++;
                 }
             }
         }
-        return augment(new RegExp(output.join(""), nativ.replace.call(flags, flagClip, "")), context);
+        return augment(new RegExp(output.join(""), nativ.replace.call(flags, flagClip, "")), tokenContext);
     }
 
 
@@ -73,10 +70,9 @@
 
     XRegExp.version = "2.0.0-dev";
 
-    // Token scope bitflags
-    // Create private copies to protect core operations
-    var classScope = XRegExp.INSIDE_CLASS = 1;
-    var defaultScope = XRegExp.OUTSIDE_CLASS = 2;
+    // Token scope bitflags (create private copies to protect core operations)
+    var classScope = XRegExp.INSIDE_CLASS = 0x1;
+    var defaultScope = XRegExp.OUTSIDE_CLASS = 0x2;
 
 
     //---------------------------------
@@ -224,12 +220,9 @@
     // Accepts an object or space-delimited string specifying optional features to install
     XRegExp.install = function (options) {
         options = prepareOptions(options);
-        if (!features.natives && options.natives)
-            setNatives(true);
-        if (!features.methods && options.methods)
-            setMethods(true);
-        if (!features.extensibility && options.extensibility)
-            setExtensibility(true);
+        if (!features.natives && options.natives) setNatives(true);
+        if (!features.methods && options.methods) setMethods(true);
+        if (!features.extensibility && options.extensibility) setExtensibility(true);
     };
 
     // Accepts any value; returns a Boolean indicating whether the argument is a `RegExp` object.
@@ -299,12 +292,9 @@
     // Accepts an object or space-delimited string specifying optional features to uninstall
     XRegExp.uninstall = function (options) {
         options = prepareOptions(options);
-        if (features.natives && options.natives)
-            setNatives(false);
-        if (features.methods && options.methods)
-            setMethods(false);
-        if (features.extensibility && options.extensibility)
-            setExtensibility(false);
+        if (features.natives && options.natives) setNatives(false);
+        if (features.methods && options.methods) setMethods(false);
+        if (features.extensibility && options.extensibility) setExtensibility(false);
     };
 
 
@@ -395,10 +385,8 @@
         var isRegex = XRegExp.isRegExp(search),
             captureNames, result, str, origLastIndex;
         if (isRegex) {
-            if (search._xregexp)
-                captureNames = search._xregexp.captureNames;
-            if (!search.global)
-                origLastIndex = search.lastIndex;
+            if (search._xregexp) captureNames = search._xregexp.captureNames;
+            if (!search.global) origLastIndex = search.lastIndex;
         } else {
             search += "";
         }
@@ -426,40 +414,35 @@
                 return nativ.replace.call(replacement + "", replacementToken, function ($0, $1, $2) {
                     // Numbered backreference (without delimiters) or special variable
                     if ($1) {
-                        switch ($1) {
-                            case "$": return "$";
-                            case "&": return args[0];
-                            case "`": return args[args.length - 1].slice(0, args[args.length - 2]);
-                            case "'": return args[args.length - 1].slice(args[args.length - 2] + args[0].length);
-                            // Numbered backreference
-                            default:
-                                // What does "$10" mean?
-                                // - Backreference 10, if 10 or more capturing groups exist
-                                // - Backreference 1 followed by "0", if 1-9 capturing groups exist
-                                // - Otherwise, it's the string "$10"
-                                // Also note:
-                                // - Backreferences cannot be more than two digits (enforced by `replacementToken`)
-                                // - "$01" is equivalent to "$1" if a capturing group exists, otherwise it's the string "$01"
-                                // - There is no "$0" token ("$&" is the entire match)
-                                var literalNumbers = "";
-                                $1 = +$1; // Type conversion; drop leading zero
-                                if (!$1) // `$1` was "0" or "00"
-                                    return $0;
-                                while ($1 > args.length - 3) {
-                                    literalNumbers = String.prototype.slice.call($1, -1) + literalNumbers;
-                                    $1 = Math.floor($1 / 10); // Drop the last digit
-                                }
-                                return ($1 ? args[$1] || "" : "$") + literalNumbers;
+                        if ($1 === "$") return "$";
+                        if ($1 === "&") return args[0];
+                        if ($1 === "`") return args[args.length - 1].slice(0, args[args.length - 2]);
+                        if ($1 === "'") return args[args.length - 1].slice(args[args.length - 2] + args[0].length);
+                        // Else, numbered backreference
+                        /* Assert: `$10` in replacement is one of:
+                        - Backreference 10, if 10 or more capturing groups exist
+                        - Backreference 1 followed by `0`, if 1-9 capturing groups exist
+                        - Otherwise, it's the literal string `$10`
+                        Also note:
+                        - Backreferences cannot be more than two digits (enforced by `replacementToken`)
+                        - `$01` is equivalent to `$1` if a capturing group exists, otherwise it's the string `$01`
+                        - There is no `$0` token (`$&` is the entire match) */
+                        var literalNumbers = "";
+                        $1 = +$1; // Type-convert; drop leading zero
+                        if (!$1) // `$1` was `0` or `00`
+                            return $0;
+                        while ($1 > args.length - 3) {
+                            literalNumbers = String.prototype.slice.call($1, -1) + literalNumbers;
+                            $1 = Math.floor($1 / 10); // Drop the last digit
                         }
+                        return ($1 ? args[$1] || "" : "$") + literalNumbers;
                     // Named backreference or delimited numbered backreference
                     } else {
-                        // What does "${n}" mean?
-                        // - Backreference to numbered capture n. Two differences from "$n":
-                        //   - n can be more than two digits
-                        //   - Backreference 0 is allowed, and is the entire match
-                        // - Backreference to named capture n, if it exists and is not a number overridden by numbered capture
-                        // - Otherwise, it's the string "${n}"
-                        var n = +$2; // Type conversion; drop leading zeros
+                        /* Assert: `${n}` in replacement is one of:
+                        - Backreference to numbered capture `n`. Differences from `$n`: n can be more than two digits; backreference 0 is allowed, and is the entire match.
+                        - Backreference to named capture `n`, if it exists and is not a number overridden by numbered capture.
+                        - Otherwise, it's the literal string `${n}` */
+                        var n = +$2; // Type-convert; drop leading zeros
                         if (n <= args.length - 3)
                             return args[n];
                         n = captureNames ? indexOf(captureNames, $2) : -1;
@@ -484,19 +467,16 @@
             output = [],
             lastLastIndex = 0,
             match, lastLength;
-        // Behavior for `limit`: if it's...
-        // - `undefined`: No limit
-        // - `NaN` or zero: Return an empty array
-        // - A positive number: Use `Math.floor(limit)`
-        // - A negative number: No limit
-        // - Other: Type-convert, then use the above rules
-        if (limit === undefined || +limit < 0) {
-            limit = Infinity;
-        } else {
-            limit = Math.floor(+limit);
-            if (!limit)
-                return [];
-        }
+        /* `limit` value conversions:
+        - undefined: 4294967295 // Math.pow(2, 32) - 1
+        - 0, Infinity, NaN: 0
+        - Positive number: limit = Math.floor(limit); if (limit > 4294967295) limit -= 4294967296;
+        - Negative number: 4294967296 - Math.floor(Math.abs(limit))
+        - Other: Type-convert, then use the above rules */
+        limit = limit === undefined ?
+            -1 >>> 0 : /* Math.pow(2, 32) - 1 */
+            limit >>> 0; /* ToUint32(limit) */
+
         // This is required if not `s.global`, and it avoids needing to set `s.lastIndex` to zero
         // and restore it to its original value when we're done using the regex
         s = XRegExp.globalize(s);
@@ -527,8 +507,8 @@
     //  Private helper functions
     //---------------------------------
 
-    function augment (regex, context) {
-        regex._xregexp = {captureNames: context.hasNamedCapture ? context.captureNames : null};
+    function augment (regex, details) {
+        regex._xregexp = {captureNames: details.hasNamedCapture ? details.captureNames : null};
         // Can't automatically inherit these methods since the XRegExp constructor returns a
         // nonprimitive value
         regex.apply = XRegExp.prototype.apply;
@@ -585,13 +565,10 @@
      */
     function prepareOptions (value) {
         value = value || {};
-        if (value === "all" || value.all) {
+        if (value === "all" || value.all)
             value = {natives: true, methods: true, extensibility: true};
-        } else if (typeof value === "string") {
-            value = XRegExp.forEach(value, /[^\s,]+/, function (match) {
-                this[match] = true;
-            }, {});
-        }
+        else if (typeof value === "string")
+            value = XRegExp.forEach(value, /[^\s,]+/, function (m) {this[m] = true;}, {});
         return value;
     }
 
@@ -688,8 +665,8 @@
     XRegExp.addToken(
         /\(\?<([$\w]+)>/,
         function (match) {
-            if (!isNaN(match[1]))
-                throw new SyntaxError("cannot use integer as capture name"); // Avoid incorrect lookups since named backrefs are added to match arrays
+            if (!isNaN(match[1])) // Avoid incorrect lookups since named backreferences are added to match arrays
+                throw new SyntaxError("cannot use an integer as capture name");
             this.captureNames.push(match[1]);
             this.hasNamedCapture = true;
             return "(";

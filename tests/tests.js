@@ -624,6 +624,8 @@ test("RegExp.prototype.lastIndex", function () {
 });
 
 test("String.prototype.split with regex separator", function () {
+	XRegExp.install("natives");
+
 	// Some of these tests are not known to fail in any browser, but many
 	// fail in at least one version of one browser
 
@@ -684,7 +686,11 @@ test("String.prototype.split with regex separator", function () {
 	deepEqual("test".split(/(t)(e)(s)(t)/), ["", "t", "e", "s", "t", ""]);
 	deepEqual(".".split(/(((.((.??)))))/), ["", ".", ".", ".", "", "", ""]);
 	deepEqual(".".split(/(((((.??)))))/), ["."]);
-	deepEqual("a b c d".split(" ", -(Math.pow(2, 32) - 1)), ["a"]); // very large negative number test by Brian O
+	deepEqual("a b c d".split(/ /, -(Math.pow(2, 32) - 1)), ["a"]); // very large negative number test by Brian O
+	deepEqual("a b c d".split(/ /, Math.pow(2, 32) + 1), ["a"]);
+	deepEqual("a b c d".split(/ /, Infinity), []);
+
+	XRegExp.uninstall("natives");
 });
 
 test("Regular expression syntax", function () {
