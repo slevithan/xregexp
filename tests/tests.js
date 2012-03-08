@@ -599,6 +599,10 @@ test("Leading mode modifier", function () {
 	// TODO: Add tests
 });
 
+test("n flag (explicit capture mode)", function () {
+	// TODO: Add tests
+});
+
 test("s flag (dotall mode)", function () {
 	// TODO: Add tests
 });

@@ -688,6 +688,8 @@
     XRegExp.addToken(
         /\(\?<([$\w]+)>/,
         function (match) {
+            if (!isNaN(match[1]))
+                throw new SyntaxError("cannot use integer as capture name"); // Avoid incorrect lookups since named backrefs are added to match arrays
             this.captureNames.push(match[1]);
             this.hasNamedCapture = true;
             return "(";
