@@ -55,6 +55,12 @@ XRegExp.forEach(str, XRegExp('<a href="([^"]+)">(.*?)</a>', 'is'), function (mat
 }, []);
 // -> [['http://xregexp.com/api/', 'XRegExp'], ['http://www.google.com/', 'Google']]
 
+// Extract every other digit from a string
+XRegExp.forEach("1a2345", /\d/, function (match, i) {
+    if (i % 2) this.push(+match[0]);
+}, []);
+// -> [2, 4]
+
 // Get an array of numbers within <b> tags using XRegExp.matchChain
 XRegExp.matchChain('1 <b>2</b> 3 <b>4 a56.1</b>', [
     XRegExp('(?is)<b>.*?<\\/b>'),
