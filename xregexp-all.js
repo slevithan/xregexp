@@ -71,7 +71,10 @@
     //  Private variables
     //---------------------------------
 
-    var features = { // Optional features, can be installed and uninstalled
+    var isInsideConstructor = false, // Used during XRegExp construction
+
+        // Optional features, can be installed and uninstalled
+        features = {
             natives: false,
             methods: false,
             extensibility: false
@@ -95,6 +98,19 @@
         // Storage for addon tokens
         tokens = [],
 
+        // Check for correct `exec` handling of nonparticipating capturing groups
+        compliantExecNpcg = nativ.exec.call(/()??/, "")[1] === undefined,
+
+        // Check for correct handling of `lastIndex` after zero-length matches
+        compliantLastIndexIncrement = function () {
+            var x = /^/g;
+            nativ.test.call(x, "");
+            return !x.lastIndex;
+        }(),
+
+        // Check for flag y support (Firefox 3+)
+        hasNativeY = RegExp.prototype.sticky !== undefined,
+
         // Token scope bitflags
         classScope = 0x1,
         defaultScope = 0x2,
@@ -112,7 +128,24 @@
             off: function () {
                 throw new Error("extensibility must be installed before running addToken");
             }
-        };
+        },
+
+        // Any backreference in replacement strings
+        replacementToken = /\$(?:(\d\d?|[$&`'])|{([$\w]+)})/g,
+
+        // Nonnative and duplicate flags
+        flagClip = /[^gimy]+|([\s\S])(?=[\s\S]*\1)/g,
+
+        // Any regex quantifier
+        quantifier = /^(?:[?*+]|{\d+(?:,\d*)?})\??/,
+
+        // Storage for regexes that match native regex syntax
+        nativeTokens = {};
+
+    // Any native regex multicharacter token in character class scope (includes octals)
+    nativeTokens[classScope] = /^(?:\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S]))/;
+    // Any native regex multicharacter token in default scope (includes octals, excludes character classes)
+    nativeTokens[defaultScope] = /^(?:\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S])|\(\?[:=!]|[?*+]\?|{\d+(?:,\d*)?}\??)/;
 
 
     //---------------------------------
@@ -567,43 +600,6 @@
             function () {return this.hasFlag("s");}
         ]
     ]);
-
-
-    //---------------------------------
-    //  Private variables, part 2
-    //---------------------------------
-
-    var isInsideConstructor = false, // Used during XRegExp construction
-
-        // Any backreference in replacement strings
-        replacementToken = /\$(?:(\d\d?|[$&`'])|{([$\w]+)})/g,
-
-        // Nonnative and duplicate flags
-        flagClip = /[^gimy]+|([\s\S])(?=[\s\S]*\1)/g,
-
-        // Any regex quantifier
-        quantifier = /^(?:[?*+]|{\d+(?:,\d*)?})\??/,
-
-        // Check for correct `exec` handling of nonparticipating capturing groups
-        compliantExecNpcg = nativ.exec.call(/()??/, "")[1] === undefined,
-
-        // Check for correct handling of `lastIndex` after zero-length matches
-        compliantLastIndexIncrement = function () {
-            var x = /^/g;
-            nativ.test.call(x, "");
-            return !x.lastIndex;
-        }(),
-
-        // Check for flag y support (Firefox 3+)
-        hasNativeY = RegExp.prototype.sticky !== undefined,
-
-        // Storage for regexes that match native regex syntax
-        nativeTokens = {};
-
-    // Any native regex multicharacter token in character class scope (includes octals)
-    nativeTokens[classScope] = /^(?:\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S]))/;
-    // Any native regex multicharacter token in default scope (includes octals, excludes character classes)
-    nativeTokens[defaultScope] = /^(?:\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S])|\(\?[:=!]|[?*+]\?|{\d+(?:,\d*)?}\??)/;
 
 
     //---------------------------------
