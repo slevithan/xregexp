@@ -8,29 +8,27 @@
 ;(function () {
     "use strict";
 
-    // XRegExp v2.0.0 no longer automatically overrides natives, extends
-    // RegExp.prototype, or allows syntax extensions
+    // XRegExp v2.0.0 doesn't touch global objects/methods or allow syntax extensions by default
     XRegExp.install("natives methods extensibility");
 
-    // renamed in XRegExp v2.0.0
+    // Renamed in XRegExp v2.0.0
     XRegExp.copyAsGlobal = XRegExp.globalize;
 
-    // renamed in XRegExp v2.0.0
+    // Renamed in XRegExp v2.0.0
     XRegExp.execAt = XRegExp.exec;
 
-    // renamed in XRegExp v2.0.0
+    // Renamed in XRegExp v2.0.0
     XRegExp.iterate = XRegExp.forEach;
 
-    // removed in XRegExp v2.0.0. if you want this functionality to be
-    // permanent, `delete XRegExp.install` afterward
+    // Removed in XRegExp v2.0.0. To make this permanent, `delete XRegExp.install` afterward
     XRegExp.freezeTokens = function () {
         XRegExp.uninstall("extensibility");
     };
 
-    // renamed in XRegExp v1.5.0
+    // Renamed in XRegExp v1.5.0
     XRegExp.matchWithinChain = XRegExp.matchChain;
 
-    // removed in XRegExp v1.5.0
+    // Removed in XRegExp v1.5.0
     RegExp.prototype.addFlags = function (flags) {
         var regex = XRegExp(this.source, /\/([a-z]*)$/i.exec(this + "")[1] + (flags || "")),
             x = this._xregexp;
@@ -38,19 +36,19 @@
         return regex;
     };
 
-    // removed in XRegExp v1.5.0
+    // Removed in XRegExp v1.5.0
     RegExp.prototype.forEachExec = function (str, callback, context) {
         XRegExp.forEach(str, this, callback, context);
     };
 
-    // removed in XRegExp v1.5.0
+    // Removed in XRegExp v1.5.0
     RegExp.prototype.validate = function (str) {
         var regex = new RegExp("^(?:" + this.source + ")$(?!\\s)", /\/([a-z]*)$/i.exec(this + "")[1]);
         if (this.global) this.lastIndex = 0;
         return str.search(regex) === 0;
     };
 
-    // removed in XRegExp v1.2.0
+    // Removed in XRegExp v1.2.0
     RegExp.prototype.execAll = function (str) {
         return XRegExp.forEach(str, this, function (match) {this.push(match);}, []);
     };

@@ -5,14 +5,13 @@
 */
 
 /**
- * Returns strings found between provided left and right delimiters (allowing
- * nested delimiters) or arrays of match parts and position data. An error is
- * thrown if delimiters are unbalanced within the data.
+ * Returns matches between outermost left and right delimiters, or arrays of match parts and
+ * position data. An error is thrown if delimiters are unbalanced within the data.
  * @param {String} str The string to search.
- * @param {String} left Left delimiter as an XRegExp pattern.
- * @param {String} right Right delimiter as an XRegExp pattern.
- * @param {String} flags Flags for the left and right delimiters. Use: gimnsxy.
- * @param {Object} options Lets you specify valueNames and escapeChar options.
+ * @param {String} left Left delimiter as an XRegExp pattern string.
+ * @param {String} right Right delimiter as an XRegExp pattern string.
+ * @param {String} flags Flags for the left and right delimiters. Use any of: `gimnsxy`.
+ * @param {Object} options Lets you specify `valueNames` and `escapeChar` options.
  * @returns {Array} The list of matches.
  * @example
  *
@@ -33,7 +32,7 @@
     options = options || {};
     var global = flags.indexOf("g") > -1,
         sticky = flags.indexOf("y") > -1;
-    flags = flags.replace(/y/g, ""); // flag y handled internally
+    flags = flags.replace(/y/g, ""); // Flag y handled internally
     var left = XRegExp(left, flags),
         right = XRegExp(right, flags),
         escapeChar = options.escapeChar,
@@ -50,23 +49,23 @@
         escaped = XRegExp.escape(escapeChar);
         esc = new RegExp(
             "(?:" + escaped + "[\\S\\s]|(?:(?!" + left.source + "|" + right.source + ")[^" + escaped + "])+)+",
-            flags.replace(/[^im]+/g, "") // flags gnsxy aren't needed here (nsx handled by XRegExp)
+            flags.replace(/[^im]+/g, "") // Flags gy not needed here; flags nsx handled by XRegExp
         );
     }
 
     while (true) {
-        // if using an escape character, advance to the next delimiter's
-        // starting position, skipping any escaped characters
+        // If using an escape character, advance to the delimiter's next starting position,
+        // skipping any escaped characters in between
         if (escapeChar)
             delimEnd += (XRegExp.exec(str, esc, delimEnd, /*sticky*/ true) || [""])[0].length;
         leftMatch = XRegExp.exec(str, left, delimEnd);
         rightMatch = XRegExp.exec(str, right, delimEnd);
-        // keep only the leftmost result
+        // Keep only the leftmost result
         if (leftMatch && rightMatch) {
             if (leftMatch.index <= rightMatch.index) rightMatch = null;
             else leftMatch = null;
         }
-        /* paths (leftMatch, rightMatch, openTokens):
+        /* Paths (LM:leftMatch, RM:rightMatch, OT:openTokens):
         LM | RM | OT | Result
         1  | 0  | 1  | loop
         1  | 0  | 0  | loop
@@ -74,8 +73,8 @@
         0  | 1  | 0  | throw
         0  | 0  | 1  | throw
         0  | 0  | 0  | break
-        * doesn't include the sticky mode special case
-        * loop ends after first completed match if !global */
+        * Doesn't include the sticky mode special case
+        * Loop ends after the first completed match if `!global` */
         if (leftMatch || rightMatch) {
             delimStart = (leftMatch || rightMatch).index;
             delimEnd = delimStart + (leftMatch || rightMatch)[0].length;
@@ -106,7 +105,7 @@
         } else {
             throw new Error("string contains unbalanced delimiters");
         }
-        // if the delimiter matched an empty string, avoid an infinite loop
+        // If the delimiter matched an empty string, avoid an infinite loop
         if (delimStart === delimEnd) delimEnd++;
     }
 

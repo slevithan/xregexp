@@ -4,9 +4,9 @@
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/Scripts.txt>
  *
- * Adds support for all Unicode scripts in the Basic Multilingual Plane
- * (U+0000-U+FFFF). E.g., \p{Latin}. Token names are case insensitive, and any
- * spaces, hyphens, and underscores are ignored.
+ * Adds support for all Unicode scripts in the Basic Multilingual Plane (U+0000-U+FFFF).
+ * E.g., `\p{Latin}`. Token names are case insensitive, and any spaces, hyphens, and underscores
+ * are ignored.
 */
 
 ;(function () {
@@ -19,7 +19,7 @@
     var extensible = XRegExp.isInstalled("extensibility");
 
     if (!extensible)
-        XRegExp.install("extensibility"); // temporarily install
+        XRegExp.install("extensibility"); // Temporarily install
 
     XRegExp.addUnicodePackage({
         Arabic: "0600-06040606-060B060D-061A061E0620-063F0641-064A0656-065E066A-066F0671-06DC06DE-06FF0750-077F08A008A2-08AC08E4-08FEFB50-FBC1FBD3-FD3DFD50-FD8FFD92-FDC7FDF0-FDFCFE70-FE74FE76-FEFC",
@@ -96,7 +96,7 @@
     });
 
     if (!extensible)
-        XRegExp.uninstall("extensibility"); // revert to previous state
+        XRegExp.uninstall("extensibility"); // Revert to previous state
 
 }());
 

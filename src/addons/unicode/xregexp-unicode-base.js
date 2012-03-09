@@ -4,20 +4,20 @@
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/>
  *
- * Adds support for the \p{L} or \p{Letter} Unicode category. Addon packages
- * for the remaining Unicode categories, scripts, and blocks are available.
- * All Unicode tokens can be inverted using \P{..} or \p{^..}. Token names are
- * case insensitive, and any spaces, hyphens, and underscores are ignored.
+ * Adds support for the `\p{L}` or `\p{Letter}` Unicode category. Addon packages for the remaining
+ * Unicode categories, scripts, and blocks are available separately. All Unicode tokens can be
+ * inverted using `\P{..}` or `\p{^..}`. Token names are case insensitive, and any spaces, hyphens,
+ * and underscores are ignored.
 */
 
 ;(function () {
     "use strict";
 
-    var unicode = {}, // storage for package tokens
+    var unicode = {}, // Storage for package tokens
         extensible = XRegExp.isInstalled("extensibility");
 
     if (!extensible)
-        XRegExp.install("extensibility"); // temporarily install
+        XRegExp.install("extensibility"); // Temporarily install
 
     XRegExp.addUnicodePackage = function (pack, aliases) {
         var p;
@@ -56,12 +56,12 @@
     });
 
     if (!extensible)
-        XRegExp.uninstall("extensibility"); // revert to previous state
+        XRegExp.uninstall("extensibility"); // Revert to previous state
 
     // Generates a standardized token name (lowercase, with hyphens, spaces, and underscores removed)
     function slug (name) {return name.replace(/[- _]+/g, "").toLowerCase();}
 
-    // Expands an abbreviated list of Unicode code points to be used in a regex character class
+    // Expands a list of Unicode code points and ranges to be usable in a regex character class
     function expand (str) {return str.replace(/\w{4}/g, "\\u$&");}
 
     // Converts a hexadecimal number to decimal
@@ -73,7 +73,7 @@
     // Adds leading zeros if shorter than four characters
     function pad (str) {while (str.length < 4) str = "0" + str; return str;}
 
-    // Returns a cached inverted range; generates and caches the range if not previously done
+    // Gets a cached inversion of the specified token; generates the inverted token on first use
     function cacheInversion (item) {return unicode["^" + item] || (unicode["^" + item] = invert(unicode[item]));}
 
     // Inverts a list of Unicode code points and ranges

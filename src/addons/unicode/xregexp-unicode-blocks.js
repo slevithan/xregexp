@@ -4,10 +4,9 @@
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/Blocks.txt>
  *
- * Adds support for all Unicode blocks in the Basic Multilingual Plane
- * (U+0000-U+FFFF). Unicode blocks use the prefix "In". E.g., \p{InBasicLatin}.
- * Token names are case insensitive, and any spaces, hyphens, and underscores
- * are ignored.
+ * Adds support for all Unicode blocks in the Basic Multilingual Plane (U+0000-U+FFFF). Unicode
+ * blocks use the prefix "In". E.g., `\p{InBasicLatin}`. Token names are case insensitive, and any
+ * spaces, hyphens, and underscores are ignored.
 */
 
 ;(function () {
@@ -20,7 +19,7 @@
     var extensible = XRegExp.isInstalled("extensibility");
 
     if (!extensible)
-        XRegExp.install("extensibility"); // temporarily install
+        XRegExp.install("extensibility"); // Temporarily install
 
     XRegExp.addUnicodePackage({
         InBasic_Latin: "0000-007F",
@@ -182,7 +181,7 @@
     });
 
     if (!extensible)
-        XRegExp.uninstall("extensibility"); // revert to previous state
+        XRegExp.uninstall("extensibility"); // Revert to previous state
 
 }());
 
