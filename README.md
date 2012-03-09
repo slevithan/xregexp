@@ -47,28 +47,22 @@ dateStr.replace(date, function (match) {
 }); // -> '02/22/2012'
 date.exec(dateStr).day; // -> 22
 
-// Get an array of backreference-only arrays using XRegExp.forEach
-str = '<a href="http://xregexp.com/api/">XRegExp</a>\
-       <a href="http://www.google.com/">Google</a>';
-XRegExp.forEach(str, XRegExp('<a href="([^"]+)">(.*?)</a>', 'is'), function (match) {
-    this.push(match.slice(1));
-}, []);
-// -> [['http://xregexp.com/api/', 'XRegExp'], ['http://www.google.com/', 'Google']]
-
-// Extract every other digit from a string
+// Extract every other digit from a string using XRegExp.forEach
 XRegExp.forEach("1a2345", /\d/, function (match, i) {
     if (i % 2) this.push(+match[0]);
 }, []);
 // -> [2, 4]
 
 // Get an array of numbers within <b> tags using XRegExp.matchChain
-XRegExp.matchChain('1 <b>2</b> 3 <b>4 a56.1</b>', [
+XRegExp.matchChain('1 <b>2</b> 3 <b>4 a56.7</b>', [
     XRegExp('(?is)<b>.*?<\\/b>'),
     /\d+(?:\.\d+)?/
 ]);
-// -> ['2', '4', '56.1']
+// -> ['2', '4', '56.7']
 
 // You can also pass forward and return specific backreferences
+str = '<a href="http://xregexp.com/">XRegExp</a>\
+       <a href="http://www.google.com/">Google</a>';
 XRegExp.matchChain(str, [
     {regex: /<a href="([^"]+)">/i, backref: 1},
     {regex: XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
