@@ -2,7 +2,7 @@
  * XRegExp Match Recursive v0.2.0-beta
  * Copyright 2009-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
-*/
+ */
 
 /**
  * Returns matches between outermost left and right delimiters, or arrays of match parts and

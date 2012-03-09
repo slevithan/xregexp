@@ -3,12 +3,13 @@
  * Copyright 2010-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/UnicodeData.txt>
- *
+ */
+
+/**
  * Adds support for all Unicode categories (aka properties) E.g., `\p{Lu}` or
  * `\p{Uppercase Letter}`. Token names are case insensitive, and any spaces, hyphens,
  * and underscores are ignored.
-*/
-
+ */
 ;(function () {
     "use strict";
 

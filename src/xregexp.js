@@ -2,7 +2,7 @@
  * XRegExp v2.0.0-beta
  * Copyright 2007-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
- * Augmented, extensible, cross-browser regular expressions
+ * Extended regular expressions
  */
 
 // Avoid running twice; that could break references to native globals

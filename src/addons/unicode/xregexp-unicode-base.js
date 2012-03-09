@@ -3,13 +3,14 @@
  * Copyright 2008-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/>
- *
+ */
+
+/**
  * Adds support for the `\p{L}` or `\p{Letter}` Unicode category. Addon packages for the remaining
  * Unicode categories, scripts, and blocks are available separately. All Unicode tokens can be
  * inverted using `\P{..}` or `\p{^..}`. Token names are case insensitive, and any spaces, hyphens,
  * and underscores are ignored.
-*/
-
+ */
 ;(function () {
     "use strict";
 

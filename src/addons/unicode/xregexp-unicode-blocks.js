@@ -3,12 +3,13 @@
  * Copyright 2010-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/Blocks.txt>
- *
+ */
+
+/**
  * Adds support for all Unicode blocks in the Basic Multilingual Plane (U+0000-U+FFFF). Unicode
  * blocks use the prefix "In". E.g., `\p{InBasicLatin}`. Token names are case insensitive, and any
  * spaces, hyphens, and underscores are ignored.
-*/
-
+ */
 ;(function () {
     "use strict";
 

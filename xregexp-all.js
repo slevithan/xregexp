@@ -5,7 +5,7 @@
  * XRegExp v2.0.0-beta
  * Copyright 2007-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
- * Augmented, extensible, cross-browser regular expressions
+ * Extended regular expressions
  */
 
 // Avoid running twice; that could break references to native globals
@@ -783,13 +783,14 @@ if (typeof exports !== "undefined") {
  * Copyright 2008-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/>
- *
+ */
+
+/**
  * Adds support for the `\p{L}` or `\p{Letter}` Unicode category. Addon packages for the remaining
  * Unicode categories, scripts, and blocks are available separately. All Unicode tokens can be
  * inverted using `\P{..}` or `\p{^..}`. Token names are case insensitive, and any spaces, hyphens,
  * and underscores are ignored.
-*/
-
+ */
 ;(function () {
     "use strict";
 
@@ -886,12 +887,13 @@ if (typeof exports !== "undefined") {
  * Copyright 2010-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/Blocks.txt>
- *
+ */
+
+/**
  * Adds support for all Unicode blocks in the Basic Multilingual Plane (U+0000-U+FFFF). Unicode
  * blocks use the prefix "In". E.g., `\p{InBasicLatin}`. Token names are case insensitive, and any
  * spaces, hyphens, and underscores are ignored.
-*/
-
+ */
 ;(function () {
     "use strict";
 
@@ -1076,12 +1078,13 @@ if (typeof exports !== "undefined") {
  * Copyright 2010-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/UnicodeData.txt>
- *
+ */
+
+/**
  * Adds support for all Unicode categories (aka properties) E.g., `\p{Lu}` or
  * `\p{Uppercase Letter}`. Token names are case insensitive, and any spaces, hyphens,
  * and underscores are ignored.
-*/
-
+ */
 ;(function () {
     "use strict";
 
@@ -1186,12 +1189,13 @@ if (typeof exports !== "undefined") {
  * Copyright 2010-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/Scripts.txt>
- *
+ */
+
+/**
  * Adds support for all Unicode scripts in the Basic Multilingual Plane (U+0000-U+FFFF).
  * E.g., `\p{Latin}`. Token names are case insensitive, and any spaces, hyphens, and underscores
  * are ignored.
-*/
-
+ */
 ;(function () {
     "use strict";
 
@@ -1290,7 +1294,7 @@ if (typeof exports !== "undefined") {
  * XRegExp Match Recursive v0.2.0-beta
  * Copyright 2009-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
-*/
+ */
 
 /**
  * Returns matches between outermost left and right delimiters, or arrays of match parts and
