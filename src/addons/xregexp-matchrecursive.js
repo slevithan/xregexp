@@ -10,8 +10,8 @@
  * @param {String} str The string to search.
  * @param {String} left Left delimiter as an XRegExp pattern string.
  * @param {String} right Right delimiter as an XRegExp pattern string.
- * @param {String} flags Flags for the left and right delimiters. Use any of: `gimnsxy`.
- * @param {Object} options Lets you specify `valueNames` and `escapeChar` options.
+ * @param {String} [flags] Flags for the left and right delimiters. Use any of: `gimnsxy`.
+ * @param {Object} [options] Lets you specify `valueNames` and `escapeChar` options.
  * @returns {Array} The list of matches.
  * @example
  *

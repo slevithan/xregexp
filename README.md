@@ -54,11 +54,11 @@ XRegExp.forEach("1a2345", /\d/, function (match, i) {
 // -> [2, 4]
 
 // Get numbers within <b> tags using XRegExp.matchChain
-XRegExp.matchChain('1 <b>2</b> 3 <b>4 a56.7</b>', [
+XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [
     XRegExp('(?is)<b>.*?<\\/b>'),
-    /\d+(?:\.\d+)?/
+    /\d+/
 ]);
-// -> ['2', '4', '56.7']
+// -> ['2', '4', '56']
 
 // You can also pass forward and return specific backreferences
 str = '<a href="http://xregexp.com/">XRegExp</a>\

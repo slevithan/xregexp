@@ -2,7 +2,6 @@
  * XRegExp v2.0.0-beta
  * Copyright 2007-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
- * Extended regular expressions
  */
 
 /**
@@ -178,6 +177,12 @@ var addToken = {
  *  Public properties/methods
  *-------------------------------*/
 
+/**
+ * The semantic version number.
+ * @static
+ * @memberOf XRegExp
+ * @type String
+ */
 X.version = "2.0.0-beta";
 
 // Token scope bitflags
@@ -251,20 +256,17 @@ X.globalize = function (regex) {
 /**
  * Installs optional features according to the specified options.
  * @memberOf XRegExp
- * @param {Object} [options={}] Options object.
- * @returns {undefined} Does not return a value.
+ * @param {String|Object} options Options object.
+ * @returns {undefined} No value returned.
  * @example
  *
  * // With an options object
  * XRegExp.install({
- *
  *   // Overrides native regex methods with fixed/extended versions that support named
- *   // backreferences and fix a variety of cross-browser bugs
+ *   // backreferences and fix numerous cross-browser bugs
  *   natives: true,
- *
  *   // Copies the XRegExp.prototype.apply/call methods to RegExp.prototype
  *   methods: true,
- *
  *   // Enables XRegExp syntax and flag extensibility (used by addons)
  *   extensibility: true,
  * });
@@ -295,14 +297,29 @@ X.isInstalled = function (feature) {
     return !!(features[feature]);
 };
 
-// Accepts a string and an array of regexes; returns the result of using each successive regex
-// to search within the matches of the previous regex. The array of regexes can also contain
-// objects with `regex` and `backref` properties, in which case the named or numbered back-
-// references specified are passed forward to the next regex or returned. E.g.:
-// domains = XRegExp.matchChain(str, [
-//     {regex: /<a href="([^"]+)">/i, backref: 1},
-//     {regex: XRegExp("(?i)^https?://(?<domain>[^/?#]+)"), backref: "domain"}
-// ]);
+/**
+ * Retrieves the matches from searching a string using a chain of regexes that successively search
+ * within the previous matches. The chain array can contain regexes and objects with `regex` and
+ * `backref` properties. When a backreference is specified, matches of the named or numbered
+ * backreference are passed forward to the next regex or returned.
+ * @memberOf XRegExp
+ * @param {String} str The string to search.
+ * @param {Array} chain Regexes that successively search for matches within previous results.
+ * @returns {Array} Matches found by the last regex in the chain.
+ * @example
+ *
+ * // Basic usage; gets numbers within <b> tags
+ * XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [
+ *   XRegExp('(?is)<b>.*?<\\/b>'),
+ *   /\d+/
+ * ]);
+ *
+ * // Passing forward and returning specific backreferences
+ * XRegExp.matchChain(str, [
+ *   {regex: /<a href="([^"]+)">/i, backref: 1},
+ *   {regex: XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
+ * ]);
+ */
 X.matchChain = function (str, chain) {
     return function recurseChain (values, level) {
         var item = chain[level].regex ? chain[level] : {regex: chain[level]},
@@ -350,19 +367,16 @@ X.split = function (str, separator, limit) {
 /**
  * Uninstalls optional features according to the specified options.
  * @memberOf XRegExp
- * @param {Object} [options={}] Options object.
- * @returns {undefined} Does not return a value.
+ * @param {String|Object} options Options object.
+ * @returns {undefined} No value returned.
  * @example
  *
  * // With an options object
  * XRegExp.uninstall({
- *
  *   // Restores native regex methods
  *   natives: true,
- *
  *   // Removes added RegExp.prototype methods, or restores to their original values
  *   methods: true,
- *
  *   // Disables additional syntax and flag extensions
  *   extensibility: true,
  * });
@@ -781,7 +795,7 @@ function indexOf (array, item, from) {
 /**
  * Prepares an options object from the given value.
  * @private
- * @param {Mixed} value The value to convert to an options object.
+ * @param {String|Object} value The value to convert to an options object.
  * @returns {Object} The options object.
  */
 function prepareOptions (value) {
