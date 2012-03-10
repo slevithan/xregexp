@@ -517,9 +517,27 @@
     //  Built-in tokens
     //---------------------------------
 
-    // Augment XRegExp's syntax and flags. Default scope is `XRegExp.OUTSIDE_CLASS`
+    // Augment XRegExp's syntax and flags. Default scope is `XRegExp.OUTSIDE_CLASS`.
+    // The most frequently used tokens are added last
 
     addTokens([
+        // Unicode token placeholder: \p{..}, \P{..}, \p{^..}
+        [
+            /\\[pP]{\^?[^}]*}/,
+            function () {
+                throw new ReferenceError("Unicode tokens require XRegExp Unicode Base");
+            },
+            XRegExp.INSIDE_CLASS | XRegExp.OUTSIDE_CLASS
+        ],
+        // Empty character class: [] or [^]
+        [
+            /\[\^?]/,
+            function (match) {
+                // For cross-browser compatibility with ES3, convert [] to \b\B and [^] to [\s\S].
+                // (?!) should work like \b\B, but is unreliable in Firefox
+                return match[0] === "[]" ? "\\b\\B" : "[\\s\\S]";
+            }
+        ],
         // Comment pattern: (?# )
         [
             /\(\?#[^)]*\)/,
@@ -528,28 +546,13 @@
                 return nativ.test.call(quantifier, match.input.slice(match.index + match[0].length)) ? "" : "(?:)";
             }
         ],
-        // Capturing group; match the opening parenthesis only: (
-        // Required for support of named capturing groups. Also adds explicit capture mode (flag n)
+        // Leading mode modifier, with any combination of flags imnsx: (?imnsx)
+        // Does not support: ..(?i), (?-i), (?i-m), (?i: ), (?i)(?m), etc.
         [
-            /\((?!\?)/,
-            function () {
-                if (this.hasFlag("n")) {
-                    return "(?:";
-                } else {
-                    this.captureNames.push(null);
-                    return "(";
-                }
-            }
-        ],
-        // Named capturing group; match the opening delimiter only: (?<name>
-        [
-            /\(\?<([$\w]+)>/,
+            /^\(\?([imnsx]+)\)/,
             function (match) {
-                if (!isNaN(match[1])) // Avoid incorrect lookups since named backreferences are added to match arrays
-                    throw new SyntaxError("cannot use an integer as capture name");
-                this.captureNames.push(match[1]);
-                this.hasNamedCapture = true;
-                return "(";
+                this.setFlag(match[1]);
+                return "";
             }
         ],
         // Named backreference: \k<name>
@@ -562,24 +565,6 @@
                 return index > -1 ?
                     "\\" + (index + 1) + (isNaN(match.input.charAt(match.index + match[0].length)) ? "" : "(?:)") :
                     match[0];
-            }
-        ],
-        // Empty character class: [] or [^]
-        [
-            /\[\^?]/,
-            function (match) {
-                // For cross-browser compatibility with ES3, convert [] to \b\B and [^] to [\s\S].
-                // (?!) should work like \b\B, but is unreliable in Firefox
-                return match[0] === "[]" ? "\\b\\B" : "[\\s\\S]";
-            }
-        ],
-        // Leading mode modifier, with any combination of flags imnsx: (?imnsx)
-        // Does not support: ..(?i), (?-i), (?i-m), (?i: ), (?i)(?m), etc.
-        [
-            /^\(\?([imnsx]+)\)/,
-            function (match) {
-                this.setFlag(match[1]);
-                return "";
             }
         ],
         // Whitespace and comments, in free-spacing mode (aka extended mode, flag x) only
@@ -598,6 +583,30 @@
             function () {return "[\\s\\S]";},
             XRegExp.OUTSIDE_CLASS,
             function () {return this.hasFlag("s");}
+        ],
+        // Named capturing group; match the opening delimiter only: (?<name>
+        [
+            /\(\?<([$\w]+)>/,
+            function (match) {
+                if (!isNaN(match[1])) // Avoid incorrect lookups since named backreferences are added to match arrays
+                    throw new SyntaxError("cannot use an integer as capture name");
+                this.captureNames.push(match[1]);
+                this.hasNamedCapture = true;
+                return "(";
+            }
+        ],
+        // Capturing group; match the opening parenthesis only: (
+        // Required for support of named capturing groups. Also adds explicit capture mode (flag n)
+        [
+            /\((?!\?)/,
+            function () {
+                if (this.hasFlag("n")) {
+                    return "(?:";
+                } else {
+                    this.captureNames.push(null);
+                    return "(";
+                }
+            }
         ]
     ]);
 
