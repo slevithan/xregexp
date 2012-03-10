@@ -15,10 +15,10 @@
  * @returns {Array} The list of matches.
  * @example
  *
- * // basic usage
+ * // Basic usage
  * XRegExp.matchRecursive('(t((e))s)t()(ing)', '\\(', '\\)', 'g');
  *
- * // with valueNames and escapeChar
+ * // With valueNames and escapeChar
  * var str = '...{1}\\{{function(x,y){return y+x;}}';
  * XRegExp.matchRecursive(str, '{', '}', 'gi', {
  *     valueNames: ['between', 'left', 'match', 'right'],
