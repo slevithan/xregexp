@@ -17,14 +17,14 @@
  * @requires N/A
  */
 
-// Avoid running twice; that could break references to native globals
+// Avoid running twice; that would duplicate tokens and could break references to native globals
 ;typeof XRegExp === "undefined" &&
 function (root, undefined) {
 "use strict";
 
-/*---------------------------------
+/*--------------------------------------
  *  Constructor
- *-------------------------------*/
+ *------------------------------------*/
 
 /**
  * Creates an extended regular expression object. Differs from a native regular expression in that
@@ -38,8 +38,8 @@ function (root, undefined) {
  *   <li>`i` - ignore case
  *   <li>`m` - multiline anchors
  *   <li>`n` - explicit capture
- *   <li>`s` - dot matches all (singleline)
- *   <li>`x` - free-spacing and comments (extended)
+ *   <li>`s` - dot matches all (aka singleline)
+ *   <li>`x` - free-spacing and line comments (aka extended)
  *   <li>`y` - sticky (Firefox 3+ only)
  * @returns {RegExp} The extended regular expression object.
  */
@@ -90,9 +90,9 @@ function XRegExp (pattern, flags) {
 }
 
 
-/*---------------------------------
+/*--------------------------------------
  *  Private variables
- *-------------------------------*/
+ *------------------------------------*/
 
 // Shortcuts
 var X = XRegExp,
@@ -176,9 +176,9 @@ var addToken = {
 };
 
 
-/*---------------------------------
+/*--------------------------------------
  *  Public properties/methods
- *-------------------------------*/
+ *------------------------------------*/
 
 /**
  * The semantic version number.
@@ -188,15 +188,49 @@ var addToken = {
  */
 X.version = "2.0.0-beta";
 
-// Token scope bitflags
+/**
+ * Bitflag for regex character class scope; used by addons.
+ * @final
+ * @memberOf XRegExp
+ * @type Number
+ */
 X.INSIDE_CLASS = classScope;
+
+/**
+ * Bitflag for regex default scope; used by addons.
+ * @final
+ * @memberOf XRegExp
+ * @type Number
+ */
 X.OUTSIDE_CLASS = defaultScope;
 
-// Lets you extend or change XRegExp syntax and create custom flags. This is used internally by
-// the XRegExp library and can be used to create XRegExp addons. This function is intended for
-// users with advanced knowledge of JavaScript's regular expression syntax and behavior. To use
-// it, you must first run `XRegExp.install("extensibility"). It can be disabled by
-// `XRegExp.uninstall("extensibility")`
+/**
+ * Extends or changes XRegExp syntax and allows custom flags. This is used internally by XRegExp
+ * and can be used to create XRegExp addons. `XRegExp.install('extensibility')` must be run before
+ * calling this function, or an error is thrown. If more than one token can match the same string,
+ * the last added wins.
+ * @memberOf XRegExp
+ * @param {RegExp} regex A regex object that matches the token being added.
+ * @param {Function} handler A function that returns a new pattern string (using native regex
+ *   syntax) to replace the matched pattern within all future XRegExp regexes. Invoked with two
+ *   arguments: The match object, and the regex scope where the match was found. Has access to
+ *   persistent properties of the regex being built through `this`.
+ * @param {Number} [scope=XRegExp.OUTSIDE_CLASS] The regex scope where the token applies. Use
+ *   bitwise OR to include multiple scopes.
+ * @param {Function} [trigger] A function that returns `true` if the token should be applied; e.g.,
+ *   if a flag is set. If `false` is returned, the matched pattern segment can be matched by other
+ *   tokens. Has access to persistent properties of the regex being built through `this`, including
+ *   function `this.hasFlag`.
+ * @returns {undefined} N/A
+ * @example
+ *
+ * // Add support for escape sequences: \Q..\E and \Q..
+ * XRegExp.addToken(
+ *   /\\Q([\s\S]*?)(?:\\E|$)/,
+ *   function (match) {return XRegExp.escape(match[1])},
+ *   XRegExp.INSIDE_CLASS | XRegExp.OUTSIDE_CLASS
+ * );
+ */
 X.addToken = addToken.off;
 
 // Accepts a pattern and flags; returns an extended `RegExp` object. If the pattern and flag
@@ -260,7 +294,7 @@ X.globalize = function (regex) {
  * Installs optional features according to the specified options.
  * @memberOf XRegExp
  * @param {String|Object} options Options object.
- * @returns {undefined} No value returned.
+ * @returns {undefined} N/A
  * @example
  *
  * // With an options object
@@ -371,7 +405,7 @@ X.split = function (str, separator, limit) {
  * Uninstalls optional features according to the specified options.
  * @memberOf XRegExp
  * @param {String|Object} options Options object.
- * @returns {undefined} No value returned.
+ * @returns {undefined} N/A
  * @example
  *
  * // With an options object
@@ -398,9 +432,9 @@ X.uninstall = function (options) {
 };
 
 
-/*---------------------------------
+/*--------------------------------------
  *  XRegExp.prototype methods
- *-------------------------------*/
+ *------------------------------------*/
 
 // Accepts a context object and arguments array; returns the result of calling `exec` with the
 // first value in the arguments array. the context is ignored but is accepted for congruity
@@ -416,9 +450,9 @@ X.prototype.call = function (context, str) {
 };
 
 
-/*---------------------------------
+/*--------------------------------------
  *  Fixed/extended native methods
- *-------------------------------*/
+ *------------------------------------*/
 
 // Adds named capture support (with backreferences returned as `result.name`), and fixes
 // browser bugs in the native `RegExp.prototype.exec`
@@ -521,13 +555,14 @@ fixed.replace = function (search, replacement) {
                     if ($1 === "'") return args[args.length - 1].slice(args[args.length - 2] + args[0].length);
                     // Else, numbered backreference
                     /* Assert: `$10` in replacement is one of:
-                    - Backreference 10, if 10 or more capturing groups exist
-                    - Backreference 1 followed by `0`, if 1-9 capturing groups exist
-                    - Otherwise, it's the literal string `$10`
-                    Also note:
-                    - Backreferences cannot be more than two digits (enforced by `replacementToken`)
-                    - `$01` is equivalent to `$1` if a capturing group exists, otherwise it's the string `$01`
-                    - There is no `$0` token (`$&` is the entire match) */
+                     *   1. Backreference 10, if 10 or more capturing groups exist.
+                     *   2. Backreference 1 followed by `0`, if 1-9 capturing groups exist.
+                     *   3. Otherwise, it's the literal string `$10`.
+                     * Details:
+                     *   - Backreferences cannot be more than two digits (enforced by `replacementToken`).
+                     *   - `$01` is equivalent to `$1` if a capturing group exists, otherwise it's the string `$01`.
+                     *   - There is no `$0` token (`$&` is the entire match).
+                     */
                     var literalNumbers = "";
                     $1 = +$1; // Type-convert; drop leading zero
                     if (!$1) // `$1` was `0` or `00`
@@ -540,9 +575,12 @@ fixed.replace = function (search, replacement) {
                 // Named backreference or delimited numbered backreference
                 } else {
                     /* Assert: `${n}` in replacement is one of:
-                    - Backreference to numbered capture `n`. Differences from `$n`: n can be more than two digits; backreference 0 is allowed, and is the entire match.
-                    - Backreference to named capture `n`, if it exists and is not a number overridden by numbered capture.
-                    - Otherwise, it's the literal string `${n}` */
+                     *   1. Backreference to numbered capture `n`. Differences from `$n`:
+                     *     a. `n` can be more than two digits.
+                     *     b. Backreference 0 is allowed, and is the entire match.
+                     *   2. Backreference to named capture `n`, if it exists and is not a number overridden by numbered capture.
+                     *   3. Otherwise, it's the literal string `${n}`.
+                     */
                     var n = +$2; // Type-convert; drop leading zeros
                     if (n <= args.length - 3)
                         return args[n];
@@ -568,12 +606,13 @@ fixed.split = function (s /*separator*/, limit) {
         output = [],
         lastLastIndex = 0,
         match, lastLength;
-    /* `limit` value conversions:
-    - undefined: 4294967295 // Math.pow(2, 32) - 1
-    - 0, Infinity, NaN: 0
-    - Positive number: limit = Math.floor(limit); if (limit > 4294967295) limit -= 4294967296;
-    - Negative number: 4294967296 - Math.floor(Math.abs(limit))
-    - Other: Type-convert, then use the above rules */
+    /* Values for `limit`, per the spec:
+     * If undefined: 4294967295 // Math.pow(2, 32) - 1
+     * If 0, Infinity, or NaN: 0
+     * If a positive number: limit = Math.floor(limit); if (limit > 4294967295) limit -= 4294967296;
+     * If a negative number: 4294967296 - Math.floor(Math.abs(limit))
+     * If other: Type-convert, then use the above rules
+     */
     limit = limit === undefined ?
         -1 >>> 0 : // Math.pow(2, 32) - 1
         limit >>> 0; // ToUint32(limit)
@@ -601,11 +640,12 @@ fixed.split = function (s /*separator*/, limit) {
 };
 
 
-/*---------------------------------
+/*--------------------------------------
  *  Built-in tokens
- *-------------------------------*/
+ *------------------------------------*/
 
-// Default scope is `XRegExp.OUTSIDE_CLASS`. The most frequently used tokens are added last
+// Default scope is `XRegExp.OUTSIDE_CLASS`.
+// The most frequently used tokens are added last
 
 // Temporarily install
 X.install("extensibility");
@@ -613,7 +653,7 @@ X.install("extensibility");
 // Shortcut
 var XAdd = X.addToken;
 
-/* Unicode token: \p{..}, \P{..}, \p{^..}
+/* Unicode token: \p{..}, \P{..}, or \p{^..}
  * This is merely a placeholder that reserves Unicode token syntax. It is overriden by the XRegExp
  * Unicode Base addon
  */
@@ -626,7 +666,7 @@ XAdd(/\\[pP]{\^?[^}]*}/,
 
 /* Empty character class: [] or [^]
  * Fixes a critical cross-browser syntax inconsistency. Unless this is standardized (per the spec),
- * regex syntax cannot be accurately parsed because character class ends cannot be determined
+ * regex syntax cannot be accurately parsed because character class endings cannot be determined
  */
 XAdd(/\[\^?]/,
     function (match) {
@@ -702,7 +742,7 @@ XAdd(/\(\?<([$\w]+)>/,
     }
 );
 
-/* Capturing group; match the opening parenthesis only: (
+/* Capturing group; match the opening parenthesis only.
  * Required for support of named capturing groups. Also adds explicit capture mode (flag n)
  */
 XAdd(/\((?!\?)/,
@@ -720,9 +760,9 @@ XAdd(/\((?!\?)/,
 X.uninstall("extensibility");
 
 
-/*---------------------------------
+/*--------------------------------------
  *  Private helper functions
- *-------------------------------*/
+ *------------------------------------*/
 
 function augment (regex, details) {
     return extend(regex, {
@@ -866,9 +906,9 @@ function setNatives (on) {
 }
 
 
-/*---------------------------------
+/*--------------------------------------
  *  Expose XRegExp
- *-------------------------------*/
+ *------------------------------------*/
 
 if (typeof exports === "undefined")
     root.XRegExp = X; // Create global varable
