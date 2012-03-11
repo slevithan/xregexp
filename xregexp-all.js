@@ -9,10 +9,10 @@
 
 /**
  * XRegExp provides augmented, extensible JavaScript regular expressions. You get new syntax,
- * flags, and methods beyond what browsers support natively. XRegExp is also a regular expression
- * utility belt with tools to make your client-side grepping simpler and more powerful, while
- * freeing you from worrying about pesky cross-browser inconsistencies and the dubious lastIndex
- * property. See XRegExp's documentation (http://xregexp.com/) for more details.
+ * flags, and methods beyond what browsers support natively. XRegExp is also a regex utility belt
+ * with tools to make your client-side grepping simpler and more powerful, while freeing you from
+ * worrying about pesky cross-browser inconsistencies and the dubious `lastIndex` property. See
+ * XRegExp's documentation (http://xregexp.com/) for more details.
  * @module xregexp
  * @requires N/A
  */
@@ -27,9 +27,9 @@ function (root, undefined) {
  *------------------------------------*/
 
 /**
- * Creates an extended regular expression object. Differs from a native regular expression in that
- * additional syntax and flags are supported. The returned object is in fact a native `RegExp` and
- * works with all native methods. Use `XRegExp(/regexp/)` without flags to clone a regex object.
+ * Creates an extended regular expression object for matching text with a pattern. Differs from a
+ * native regular expression in that additional syntax and flags are supported. The returned object
+ * is in fact a native `RegExp` and works with all native methods.
  * @class XRegExp
  * @constructor
  * @param {String} pattern The text of the regular expression.
@@ -42,6 +42,15 @@ function (root, undefined) {
  *   <li>`x` - free-spacing and line comments (aka extended)
  *   <li>`y` - sticky (Firefox 3+ only)
  * @returns {RegExp} The extended regular expression object.
+ * @example
+ *
+ * // With named capture and flag x
+ * date = XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
+ *                 (?<month> [0-9]{2}) -?  # month \n\
+ *                 (?<day>   [0-9]{2})     # day   ', 'x');
+ *
+ * // Clones the regex, preserving special named capture properties
+ * XRegExp(date);
  */
 function XRegExp (pattern, flags) {
     if (X.isRegExp(pattern)) {
@@ -49,8 +58,8 @@ function XRegExp (pattern, flags) {
             throw new TypeError("can't supply flags when constructing one RegExp from another");
         return copy(pattern);
     }
-    // Tokens become part of the regex construction process, so protect against infinite
-    // recursion when an XRegExp is constructed within a token handler function
+    // Tokens become part of the regex construction process, so protect against infinite recursion
+    // when an XRegExp is constructed within a token handler function
     if (isInsideConstructor)
         throw new Error("can't call the XRegExp constructor within token definition functions");
     var output = [],
@@ -72,7 +81,7 @@ function XRegExp (pattern, flags) {
             output.push(tokenResult.output);
             pos += (tokenResult.match[0].length || 1);
         } else {
-            // Check for native multicharacter tokens (except character classes) at the current position
+            // Check for native tokens (except character classes) at the current position
             if ((match = nativ.exec.call(nativeTokens[scope], pattern.slice(pos)))) {
                 output.push(match[0]);
                 pos += match[0].length;
@@ -99,21 +108,21 @@ var X = XRegExp,
     R = RegExp,
     S = String;
 
-// Optional features, can be installed and uninstalled
+// Optional features; can be installed and uninstalled
 var features = {
     natives: false,
     methods: false,
     extensibility: false
 };
 
-// Store native globals to use and restore ("native" is an ES3 reserved keyword)
+// Store native methods to use and restore ("native" is an ES3 reserved keyword)
 var nativ = {
     exec: R.prototype.exec,
     test: R.prototype.test,
     match: S.prototype.match,
     replace: S.prototype.replace,
     split: S.prototype.split,
-    // Hold these so they can be given back if present before XRegExp ran
+    // Hold these so they can be given back if present before XRegExp runs
     apply: R.prototype.apply,
     call: R.prototype.call
 };
@@ -141,7 +150,7 @@ var replacementToken = /\$(?:(\d\d?|[$&`'])|{([$\w]+)})/g;
 // Nonnative and duplicate flags
 var flagClip = /[^gimy]+|([\s\S])(?=[\s\S]*\1)/g;
 
-// Any greedy/lazy regex quantifier
+// Any greedy/lazy quantifier
 var quantifier = /^(?:[?*+]|{\d+(?:,\d*)?})\??/;
 
 // Check for correct `exec` handling of nonparticipating capturing groups
@@ -157,7 +166,7 @@ var compliantLastIndexIncrement = function () {
 // Check for flag y support (Firefox 3+)
 var hasNativeY = R.prototype.sticky !== undefined;
 
-// Used to kill recursion during XRegExp construction
+// Used to kill infinite recursion during XRegExp construction
 var isInsideConstructor = false;
 
 // Installed and uninstalled states for `XRegExp.addToken`
@@ -224,26 +233,43 @@ X.OUTSIDE_CLASS = defaultScope;
  * @returns {undefined} N/A
  * @example
  *
- * // Add support for escape sequences: \Q..\E and \Q..
+ * // Adds support for escape sequences: \Q..\E and \Q..
  * XRegExp.addToken(
  *   /\\Q([\s\S]*?)(?:\\E|$)/,
- *   function (match) {return XRegExp.escape(match[1])},
+ *   function (match) {return XRegExp.escape(match[1]);},
  *   XRegExp.INSIDE_CLASS | XRegExp.OUTSIDE_CLASS
  * );
  */
 X.addToken = addToken.off;
 
-// Accepts a pattern and flags; returns an extended `RegExp` object. If the pattern and flag
-// combination has previously been cached, the cached copy is returned; otherwise the newly
-// created regex is cached
+/**
+ * Caches and returns the result of calling `XRegExp(pattern, flags)`. On any subsequent call with
+ * the same pattern and flag combination, the cached copy is returned.
+ * @memberOf XRegExp
+ * @param {String} pattern The text of the regular expression.
+ * @param {String} [flags] Can have any combination of native and custom flags.
+ * @returns {RegExp} The cached XRegExp object.
+ * @example
+ *
+ * while (match = XRegExp.cache('.', 'gs').exec(str)) {
+ *   // The regex is compiled once only
+ * }
+ */
 X.cache = function (pattern, flags) {
     var key = pattern + "/" + (flags || "");
     return X.cache[key] || (X.cache[key] = X(pattern, flags));
 };
 
-// Accepts a string; returns the string with regex metacharacters escaped. The returned string
-// can safely be used at any point within a regex to match the provided literal string. Escaped
-// characters are [ ] { } ( ) * + ? - . , \ ^ $ | # and whitespace
+/**
+ * Escapes any regular expression metacharacters, for use when matching literal strings. The result
+ * can safely be used at any point within a regex that uses any flags.
+ * @memberOf XRegExp
+ * @param {String} str The string to escape.
+ * @returns {String} The escaped string.
+ * @example
+ *
+ * XRegExp.escape('Escaped? [x]');
+ */
 X.escape = function (str) {
     return nativ.replace.call(str, /[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 };
@@ -305,7 +331,7 @@ X.globalize = function (regex) {
  *   // Copies the XRegExp.prototype.apply/call methods to RegExp.prototype
  *   methods: true,
  *   // Enables XRegExp syntax and flag extensibility (used by addons)
- *   extensibility: true,
+ *   extensibility: true
  * });
  *
  * // With an options string
@@ -336,13 +362,13 @@ X.isInstalled = function (feature) {
 
 /**
  * Retrieves the matches from searching a string using a chain of regexes that successively search
- * within the previous matches. The chain array can contain regexes and objects with `regex` and
- * `backref` properties. When a backreference is specified, matches of the named or numbered
- * backreference are passed forward to the next regex or returned.
+ * within previous matches. The provided `chain` array can contain regexes and objects with `regex`
+ * and `backref` properties. When a backreference is specified, the named or numbered backreference
+ * is passed forward to the next regex or returned.
  * @memberOf XRegExp
  * @param {String} str The string to search.
- * @param {Array} chain Regexes that successively search for matches within previous results.
- * @returns {Array} Matches found by the last regex in the chain.
+ * @param {Array} chain Array of regexes that each search for matches within previous results.
+ * @returns {Array} Strings matched by the last regex in the chain. Empty array if no matches.
  * @example
  *
  * // Basic usage; gets numbers within <b> tags
@@ -415,7 +441,7 @@ X.split = function (str, separator, limit) {
  *   // Removes added RegExp.prototype methods, or restores to their original values
  *   methods: true,
  *   // Disables additional syntax and flag extensions
- *   extensibility: true,
+ *   extensibility: true
  * });
  *
  * // With an options string
