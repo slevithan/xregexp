@@ -46,7 +46,7 @@ function (root, undefined) {
  *                 (?<month> [0-9]{2}) -?  # month \n\
  *                 (?<day>   [0-9]{2})     # day   ', 'x');
  *
- * // Clones the regex, preserving special named capture properties
+ * // Clones the regex, preserving special properties for named capture
  * XRegExp(date);
  */
 function XRegExp (pattern, flags) {
@@ -265,16 +265,39 @@ X.cache = function (pattern, flags) {
  * @returns {String} The escaped string.
  * @example
  *
- * XRegExp.escape('Escaped? [x]');
+ * XRegExp.escape('Escaped? <.>');
+ * // -> 'Escaped\?\ <\.>'
  */
 X.escape = function (str) {
     return nativ.replace.call(str, /[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 };
 
-// Accepts a string to search, regex to search with, position to start the search within the
-// string (default: 0), and an optional Boolean indicating whether matches must start at-or-
-// after the position or at the specified position only. This function ignores the `lastIndex`
-// of the provided regex in its own handling, but updates the property for compatibility
+/**
+ * Executes a regex search in a specified string. Returns a result array or `null`. If the provided
+ * regex uses named capture, named backreference properties are included on the result array.
+ * Optional `pos` and `sticky` arguments specify the search start position, and whether the match
+ * must start at the specified position only. The `lastIndex` property of the provided regex is not
+ * used, but is updated for compatibility.
+ * @memberOf XRegExp
+ * @param {String} str The string to search.
+ * @param {RegExp} regex The regular expression to use for the search.
+ * @param {Number} [pos=0] The zero-indexed position to start the search within the string.
+ * @param {Boolean} [sticky=false] Whether the match must start at the specified position only.
+ * @returns {Array} A result array with named backreference properties, or null.
+ * @example
+ *
+ * // Basic use, with named backreference
+ * var match = XRegExp.exec('U+2620', XRegExp('U\\+(?<hex>[0-9A-F]{4})'));
+ * match.hex; // -> '2620'
+ *
+ * // With pos and sticky, in a loop
+ * var pos = 2, result;
+ * while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d)>/, pos, true)) {
+ *   result.push(match[1]);
+ *   pos = match.index + match[0].length;
+ * }
+ * // result -> ['2', '3', '4']
+ */
 X.exec = function (str, regex, pos, sticky) {
     var r2 = copy(regex, "g" + ((sticky && hasNativeY) ? "y" : "")),
         match;
@@ -368,14 +391,15 @@ X.isInstalled = function (feature) {
  * @returns {Array} Strings matched by the last regex in the chain. Empty array if no matches.
  * @example
  *
- * // Basic usage; gets numbers within <b> tags
+ * // Basic usage; matches numbers within <b> tags
  * XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [
  *   XRegExp('(?is)<b>.*?<\\/b>'),
  *   /\d+/
  * ]);
+ * // -> ['2', '4', '56']
  *
  * // Passing forward and returning specific backreferences
- * XRegExp.matchChain(str, [
+ * XRegExp.matchChain(html, [
  *   {regex: /<a href="([^"]+)">/i, backref: 1},
  *   {regex: XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
  * ]);
@@ -677,8 +701,7 @@ X.install("extensibility");
 var XAdd = X.addToken;
 
 /* Unicode token: \p{..}, \P{..}, or \p{^..}
- * This is merely a placeholder that reserves Unicode token syntax. It is overriden by the XRegExp
- * Unicode Base addon
+ * A placeholder that reserves Unicode token syntax; superseded by addon XRegExp Unicode Base
  */
 XAdd(/\\[pP]{\^?[^}]*}/,
     function () {

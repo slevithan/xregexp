@@ -6,46 +6,42 @@ XRegExp provides augmented, extensible JavaScript regular expressions. You get n
 
 ## Usage examples
 
-Note that these examples take advantage of new features in XRegExp v2.0.0-beta.
+Note that these examples take advantage of new features in XRegExp v2.0.0-beta ([details](https://github.com/slevithan/XRegExp/wiki/Roadmap)).
 
 ~~~ js
-var date, dateStr, match, str, pos, result = [];
-
 // Using named capture and the x flag (free-spacing and comments)
-date = XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
-                (?<month> [0-9]{2}) -?  # month \n\
-                (?<day>   [0-9]{2})     # day   ', 'x');
+var date = XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
+                    (?<month> [0-9]{2}) -?  # month \n\
+                    (?<day>   [0-9]{2})     # day   ', 'x');
 
 // XRegExp.exec gives you named backreferences on the match result
-dateStr = '2012-02-22';
-match = XRegExp.exec(dateStr, date);
+var match = XRegExp.exec('2012-02-22', date);
 match.day; // -> '22'
 
 // It also supports optional pos and sticky arguments
-str = '<1><2><3><4>5<6>';
-pos = 2;
-while (match = XRegExp.exec(str, XRegExp.cache('<(\\d+)>'), pos, true)) {
+var pos = 2, result = [];
+while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d+)>/, pos, true)) {
     result.push(match[1]);
     pos = match.index + match[0].length;
 }
 // result -> ['2', '3', '4']
 
 // XRegExp.replace allows named backreferences in replacements
-XRegExp.replace(dateStr, date, '${month}/${day}/${year}'); // -> '02/22/2012'
+XRegExp.replace('2012-02-22', date, '${month}/${day}/${year}'); // -> '02/22/2012'
 
 // In fact, all XRegExps are RegExps and work perfectly with native methods
-date.test(dateStr); // -> true
+date.test('2012-02-22'); // -> true
 
 // The only caveat is that named captures must be referred to using numbered backreferences
-dateStr.replace(date, '$2/$3/$1'); // -> '02/22/2012'
+'2012-02-22'.replace(date, '$2/$3/$1'); // -> '02/22/2012'
 
 // If you want, you can extend native methods so you don't have to worry about this
 XRegExp.install('natives');
-dateStr.replace(date, '${month}/${day}/${year}'); // -> '02/22/2012'
-dateStr.replace(date, function (match) {
+'2012-02-22'.replace(date, '${month}/${day}/${year}'); // -> '02/22/2012'
+'2012-02-22'.replace(date, function (match) {
     return match.month + '/' + match.day + '/' +match.year;
 }); // -> '02/22/2012'
-date.exec(dateStr).day; // -> 22
+date.exec('2012-02-22').day; // -> 22
 
 // Extract every other digit from a string using XRegExp.forEach
 XRegExp.forEach("1a2345", /\d/, function (match, i) {
@@ -61,9 +57,9 @@ XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [
 // -> ['2', '4', '56']
 
 // You can also pass forward and return specific backreferences
-str = '<a href="http://xregexp.com/">XRegExp</a>\
-       <a href="http://www.google.com/">Google</a>';
-XRegExp.matchChain(str, [
+var urlStr = '<a href="http://xregexp.com/">XRegExp</a>\
+              <a href="http://www.google.com/">Google</a>';
+XRegExp.matchChain(urlStr, [
     {regex: /<a href="([^"]+)">/i, backref: 1},
     {regex: XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
 ]);
@@ -81,7 +77,7 @@ filter(['a', 'ba', 'ab', 'b'], XRegExp('^a'));
 // -> ['a', 'ab']
 ~~~
 
-These examples should give you an idea of what's possible, but they don't show all of XRegExp's tricks. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), [browser fixes](http://xregexp.com/cross_browser/), and [roadmap](https://github.com/slevithan/XRegExp/wiki/Roadmap).
+These examples should give you an idea of what's possible, but XRegExp has plenty more tricks that aren't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), [browser fixes](http://xregexp.com/cross_browser/).
 
 
 ## XRegExp Unicode Base
