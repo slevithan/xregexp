@@ -891,7 +891,7 @@ add(/\(\?#[^)]*\)/,
  */
 add(/^\(\?([a-z]+)\)/i,
     function (match) {
-        if (nativ.test.call(match[1], /[gy]/))
+        if (nativ.test.call(/[gy]/, match[1]))
             throw new SyntaxError("can't use flag g or y in mode modifier");
         this.setFlag(match[1]);
         return "";
