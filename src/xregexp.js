@@ -1,5 +1,5 @@
 /*!
- * XRegExp v2.0.0-beta
+ * XRegExp v2.0.0-beta2
  * Copyright 2007-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  */
@@ -192,7 +192,7 @@ var addToken = {
  * @memberOf XRegExp
  * @type String
  */
-X.version = "2.0.0-beta";
+X.version = "2.0.0-beta2";
 
 /**
  * Bitflag for regex character class scope; used by addons.

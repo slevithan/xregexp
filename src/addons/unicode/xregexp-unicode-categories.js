@@ -7,8 +7,8 @@
 
 /**
  * Adds support for all Unicode categories (aka properties) E.g., `\p{Lu}` or
- * `\p{Uppercase Letter}`. Token names are case insensitive, and any spaces, hyphens,
- * and underscores are ignored.
+ * `\p{Uppercase Letter}`. Token names are case insensitive, and any spaces, hyphens, and
+ * underscores are ignored.
  */
 ;(function () {
 "use strict";
