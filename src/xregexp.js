@@ -851,11 +851,8 @@ fixed.split = function (s /*separator*/, limit) {
  *  Built-in tokens
  *------------------------------------*/
 
-// Temporarily install
-X.install("extensibility");
-
 // Shortcut
-var add = X.addToken;
+var add = addToken.on;
 
 /* Unicode token: \p{..} or \P{..}
  * Reserves syntax; superseded by the XRegExp Unicode Base addon.
@@ -951,9 +948,6 @@ add(/\((?!\?)/,
             return "(";
         }
     });
-
-// Revert to default state
-X.uninstall("extensibility");
 
 
 /*--------------------------------------
