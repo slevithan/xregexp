@@ -98,7 +98,6 @@ function XRegExp (pattern, flags) {
     return augment(new R(output.join(""), nativ.replace.call(flags, flagClip, "")), tokenContext);
 }
 
-
 /*--------------------------------------
  *  Private variables
  *------------------------------------*/
@@ -183,7 +182,6 @@ var addToken = {
         throw new Error("extensibility must be installed before running addToken");
     }
 };
-
 
 /*--------------------------------------
  *  Public properties/methods
@@ -592,7 +590,6 @@ X.uninstall = function (options) {
     if (features.extensibility && options.extensibility) setExtensibility(false);
 };
 
-
 /*--------------------------------------
  *  XRegExp.prototype methods
  *------------------------------------*/
@@ -624,7 +621,6 @@ X.prototype.apply = function (context, args) {
 X.prototype.call = function (context, str) {
     return this.test(str); // Intentionally doesn't specify fixed/native `test`
 };
-
 
 /*--------------------------------------
  *  Fixed/extended native methods
@@ -849,7 +845,6 @@ fixed.split = function (s /*separator*/, limit) {
     return output.length > limit ? output.slice(0, limit) : output;
 };
 
-
 /*--------------------------------------
  *  Built-in tokens
  *------------------------------------*/
@@ -951,7 +946,6 @@ add(/\((?!\?)/,
             return "(";
         }
     });
-
 
 /*--------------------------------------
  *  Private helper functions
@@ -1147,7 +1141,6 @@ function setNatives (on) {
     S.prototype.split = (on ? fixed : nativ).split;
     features.natives = on;
 }
-
 
 /*--------------------------------------
  *  Expose XRegExp
