@@ -57,9 +57,9 @@ XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [
 // -> ['2', '4', '56']
 
 // You can also pass forward and return specific backreferences
-var urlStr = '<a href="http://xregexp.com/">XRegExp</a>\
-              <a href="http://www.google.com/">Google</a>';
-XRegExp.matchChain(urlStr, [
+var html = '<a href="http://xregexp.com/">XRegExp</a>\
+            <a href="http://www.google.com/">Google</a>';
+XRegExp.matchChain(html, [
     {regex: /<a href="([^"]+)">/i, backref: 1},
     {regex: XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
 ]);
