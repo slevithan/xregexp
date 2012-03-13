@@ -20,7 +20,7 @@ match.day; // -> '22'
 
 // It also includes optional pos and sticky arguments
 var pos = 2, result = [];
-while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d+)>/, pos, true)) {
+while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d+)>/, pos, 'sticky')) {
     result.push(match[1]);
     pos = match.index + match[0].length;
 }
