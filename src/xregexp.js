@@ -984,7 +984,10 @@ function copy (regex, addFlags, removeFlags) {
         flags = nativ.replace.call(flags, new R("[" + removeFlags + "]+", "g"), ""); // Would need to escape `removeFlags` if this was public
     if (x) {
         // Compiling the current (rather than precompilation) source preserves the effects of nonnative source flags
-        regex = augment(X(regex.source, flags), x.captureNames);
+        regex = augment(
+            X(regex.source, flags),
+            x.captureNames ? x.captureNames.slice(0) : null
+        );
     } else {
         // Remove duplicate flags to avoid throwing
         flags = nativ.replace.call(flags, /([\s\S])(?=[\s\S]*\1)/g, "");
