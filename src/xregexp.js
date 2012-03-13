@@ -92,7 +92,10 @@ function XRegExp (pattern, flags) {
             }
         }
     }
-    return augment(new R(output.join(""), nativ.replace.call(flags, flagClip, "")), tokenContext);
+    return augment(
+        new R(output.join(""), nativ.replace.call(flags, flagClip, "")),
+        tokenContext.hasNamedCapture ? tokenContext.captureNames : null
+    );
 }
 
 /*--------------------------------------
@@ -952,17 +955,15 @@ add(/\((?!\?)/,
  * Attaches methods and special properties for named capture to an `XRegExp` object.
  * @private
  * @param {RegExp} regex Regex to augment.
- * @param {Object} details Object with `hasNamedCapture` and `captureNames` properties.
+ * @param {Array} captureNames Array with capture names, or null.
  * @returns {RegExp} Augmented regex.
  */
-function augment (regex, details) {
-    return extend(regex, {
-        _xregexp: {captureNames: details.hasNamedCapture ? details.captureNames : null},
-        // Can't automatically inherit these methods since the XRegExp constructor returns a
-        // nonprimitive value
-        apply: X.prototype.apply,
-        call: X.prototype.call
-    });
+function augment (regex, captureNames) {
+    regex._xregexp = {captureNames: captureNames};
+    // Can't automatically inherit these since the XRegExp constructor returns a nonprimitive value
+    regex.apply = X.prototype.apply;
+    regex.call = X.prototype.call;
+    return regex;
 }
 
 /**
@@ -983,8 +984,7 @@ function copy (regex, addFlags, removeFlags) {
         flags = nativ.replace.call(flags, new R("[" + removeFlags + "]+", "g"), ""); // Would need to escape `removeFlags` if this was public
     if (x) {
         // Compiling the current (rather than precompilation) source preserves the effects of nonnative source flags
-        regex = X(regex.source, flags);
-        regex._xregexp = {captureNames: x.captureNames ? x.captureNames.slice(0) : null};
+        regex = augment(X(regex.source, flags), x.captureNames);
     } else {
         // Remove duplicate flags to avoid throwing
         flags = nativ.replace.call(flags, /([\s\S])(?=[\s\S]*\1)/g, "");
@@ -992,19 +992,6 @@ function copy (regex, addFlags, removeFlags) {
         regex = new R(regex.source, flags); // Use native `RegExp`
     }
     return regex;
-}
-
-/**
- * Copy properties of `b` to `a`.
- * @private
- * @param {Object} a Object that will receive new properties.
- * @param {Object} b Object whose properties will be copied.
- * @returns {Object} Augmented `a` object.
- */
-function extend (a, b) {
-    for (var p in b)
-        b.hasOwnProperty(p) && (a[p] = b[p]);
-    return a;
 }
 
 /**
@@ -1018,8 +1005,8 @@ function getNativeFlags (regex) {
     return (regex.global     ? "g" : "") +
            (regex.ignoreCase ? "i" : "") +
            (regex.multiline  ? "m" : "") +
-           (regex.extended   ? "x" : "") + // Proposed for ES4; included in AS3
-           (regex.sticky     ? "y" : ""); // Included in Firefox 3+
+           (regex.extended   ? "x" : "") + // Proposed for ES6; included in AS3
+           (regex.sticky     ? "y" : ""); // Firefox 3+
 }
 
 /*
