@@ -57,7 +57,7 @@
         // If using an escape character, advance to the delimiter's next starting position,
         // skipping any escaped characters in between
         if (escapeChar)
-            delimEnd += (XRegExp.exec(str, esc, delimEnd, "sticky") || [""])[0].length;
+            delimEnd += (XRegExp.exec(str, esc, delimEnd, /*sticky*/ true) || [""])[0].length;
         leftMatch = XRegExp.exec(str, left, delimEnd);
         rightMatch = XRegExp.exec(str, right, delimEnd);
         // Keep only the leftmost result

@@ -286,7 +286,7 @@ X.escape = function (str) {
  * @param {String} str String to search.
  * @param {RegExp} regex Regular expression to search with.
  * @param {Number} [pos=0] Zero-based index at which to start the search.
- * @param {String} [sticky] If value is 'sticky', match must start at the specified position only.
+ * @param {Boolean} [sticky=false] Whether the match must start at the specified position only.
  * @returns {Array} Match array with named backreference properties, or null.
  * @example
  *
@@ -296,14 +296,13 @@ X.escape = function (str) {
  *
  * // With pos and sticky, in a loop
  * var pos = 2, result = [];
- * while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d)>/, pos, 'sticky')) {
+ * while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d)>/, pos, true)) {
  *   result.push(match[1]);
  *   pos = match.index + match[0].length;
  * }
  * // result -> ['2', '3', '4']
  */
 X.exec = function (str, regex, pos, sticky) {
-    // Allows any truthy `sticky` value for backward compatibility with v1.5.x
     var r2 = copy(regex, "g" + ((sticky && hasNativeY) ? "y" : "")),
         match;
     r2.lastIndex = pos = pos || 0;

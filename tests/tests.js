@@ -121,11 +121,9 @@ test("XRegExp.exec", function () {
 	ok(XRegExp.exec(str, rA), "Pos ignores lastIndex test 3 (pos defaults to 0)");
 
 	ok(XRegExp.exec(str, rX, 0), "Undefined sticky allows matching after pos");
-	ok(XRegExp.exec(str, rX, 0, ""), "Explicit sticky='' allows matching after pos");
-	ok(XRegExp.exec(str, rX, 0, false), "Explicit sticky=false allows matching after pos"); // backcompat with v1.5.x
-	ok(!XRegExp.exec(str, rX, 0, "sticky"), "Sticky match fails if match possible after (but not at) pos");
-	ok(!XRegExp.exec(str, rX, 0, true), "Sticky match with sticky=true fails if match possible after (but not at) pos"); // backcompat with v1.5.x
-	ok(XRegExp.exec(str, rX, 3, "sticky"), "Sticky match succeeds if match at pos");
+	ok(XRegExp.exec(str, rX, 0, false), "Explicit sticky=false allows matching after pos");
+	ok(!XRegExp.exec(str, rX, 0, true), "Sticky match fails if match possible after (but not at) pos");
+	ok(XRegExp.exec(str, rX, 3, true), "Sticky match succeeds if match at pos");
 	equal(XRegExp.exec(str, rX, 5), null, "Result of failure is null");
 	deepEqual(XRegExp.exec(str, xregexp), ["a", "a"], "Result of successful match is array with backreferences");
 
