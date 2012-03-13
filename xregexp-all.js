@@ -97,7 +97,8 @@ function XRegExp (pattern, flags) {
     }
     return augment(
         new R(output.join(""), nativ.replace.call(flags, flagClip, "")),
-        tokenContext.hasNamedCapture ? tokenContext.captureNames : null
+        tokenContext.hasNamedCapture ? tokenContext.captureNames : null,
+        "XRegExp"
     );
 }
 
@@ -288,7 +289,7 @@ X.escape = function (str) {
  * @param {String} str String to search.
  * @param {RegExp} regex Regular expression to search with.
  * @param {Number} [pos=0] Zero-based index at which to start the search.
- * @param {Boolean} [sticky=false] Whether the match must start at the specified position only.
+ * @param {String} [sticky] If value is 'sticky', match must start at the specified position only.
  * @returns {Array} Match array with named backreference properties, or null.
  * @example
  *
@@ -298,13 +299,14 @@ X.escape = function (str) {
  *
  * // With pos and sticky, in a loop
  * var pos = 2, result = [];
- * while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d)>/, pos, true)) {
+ * while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d)>/, pos, 'sticky')) {
  *   result.push(match[1]);
  *   pos = match.index + match[0].length;
  * }
  * // result -> ['2', '3', '4']
  */
 X.exec = function (str, regex, pos, sticky) {
+    // Allows any truthy `sticky` value for backward compatibility with v1.5.x
     var r2 = copy(regex, "g" + ((sticky && hasNativeY) ? "y" : "")),
         match;
     r2.lastIndex = pos = pos || 0;
@@ -471,7 +473,7 @@ X.matchChain = function (str, chain) {
 /**
  * Returns a new string with one or all matches of a pattern replaced. The pattern can be a string
  * or regex, and the replacement can be a string or a function to be called for each match. To
- * perform a global search and replace, use the optional `replaceAll` argument or include flag g if
+ * perform a global search and replace, use the optional `scope` argument or include flag g if
  * using a regex. Replacement strings can use `${n}` for named and numbered backreferences.
  * Replacement functions can use named backreferences via `arguments[0].name`. Also fixes browser
  * bugs compared to the native `String.prototype.replace` and can be used reliably cross-browser.
@@ -494,8 +496,8 @@ X.matchChain = function (str, chain) {
  *     <li>0..n arguments, one for each backreference (corresponding to $1, $2, etc. above).
  *     <li>The zero-based index of the match within the total search string.
  *     <li>The total string being searched.
- * @param {Boolean} [replaceAll=false] Whether to replace all matches or the first match only. If
- *   not explicitly specified as `false` and using a regex with flag g, `replaceAll` is `true`.
+ * @param {String} [scope='one'] Use 'one' to replace the first match only, or 'all'. If not
+ *   explicitly specified and using a regex with flag g, `scope` is 'all'.
  * @returns {String} New string with one or all matches replaced.
  * @example
  *
@@ -511,19 +513,19 @@ X.matchChain = function (str, chain) {
  * // -> 'Smith, John'
  *
  * // Global string search/replacement
- * XRegExp.replace('RegExp builds RegExps', 'RegExp', 'XRegExp', true);
+ * XRegExp.replace('RegExp builds RegExps', 'RegExp', 'XRegExp', 'all');
  * // -> 'XRegExp builds XRegExps'
  */
-X.replace = function (str, search, replacement, replaceAll) {
+X.replace = function (str, search, replacement, scope) {
     var isRegex = X.isRegExp(search),
         search2 = search,
         result;
     if (isRegex) {
-        if (replaceAll === undefined)
-            replaceAll = search.global; // Follow flag g when `replaceAll` isn't explicit
+        if (scope === undefined && search.global)
+            scope = "all"; // Follow flag g when `scope` isn't explicit
         // Note that since a copy is used, `search`'s `lastIndex` isn't updated *during* replacement iterations
-        search2 = copy(search, replaceAll ? "g" : "", replaceAll ? "" : "g");
-    } else if (replaceAll) {
+        search2 = copy(search, scope === "all" ? "g" : "", scope === "all" ? "" : "g");
+    } else if (scope === "all") {
         search2 = new R(X.escape(search + ""), "g");
     }
     result = fixed.replace.call(str + "", search2, replacement); // Fixed `replace` required for named backreferences, etc.
@@ -818,8 +820,8 @@ fixed.split = function (s /*separator*/, limit) {
     /* Values for `limit`, per the spec:
      * If undefined: 4294967295 // Math.pow(2, 32) - 1
      * If 0, Infinity, or NaN: 0
-     * If a positive number: limit = Math.floor(limit); if (limit > 4294967295) limit -= 4294967296;
-     * If a negative number: 4294967296 - Math.floor(Math.abs(limit))
+     * If positive number: limit = Math.floor(limit); if (limit > 4294967295) limit -= 4294967296;
+     * If negative number: 4294967296 - Math.floor(Math.abs(limit))
      * If other: Type-convert, then use the above rules
      */
     limit = limit === undefined ?
@@ -955,14 +957,15 @@ add(/\((?!\?)/,
  *------------------------------------*/
 
 /**
- * Attaches methods and special properties for named capture to an `XRegExp` object.
+ * Attaches methods and special properties for named capture to a regex object.
  * @private
  * @param {RegExp} regex Regex to augment.
  * @param {Array} captureNames Array with capture names, or null.
+ * @param {String} creator 'RegExp' or 'XRegExp'.
  * @returns {RegExp} Augmented regex.
  */
-function augment (regex, captureNames) {
-    regex._xregexp = {captureNames: captureNames};
+function augment (regex, captureNames, creator) {
+    regex._xregexp = {captureNames: captureNames, creator: creator};
     // Can't automatically inherit these since the XRegExp constructor returns a nonprimitive value
     regex.apply = X.prototype.apply;
     regex.call = X.prototype.call;
@@ -970,8 +973,9 @@ function augment (regex, captureNames) {
 }
 
 /**
- * Copies a regex object, preserving special properties for named capture. The copy has a fresh
- * `lastIndex` property (set to zero). Allows adding and removing flags while copying the regex.
+ * Copies a regex object while preserving special properties for named capture and augmenting with
+ * `XRegExp.prototype` methods. The copy has a fresh `lastIndex` property (set to zero). Allows
+ * adding and removing flags while copying the regex.
  * @private
  * @param {RegExp} regex Regex to copy.
  * @param {String} [addFlags] Flags to be added while copying the regex.
@@ -981,21 +985,26 @@ function augment (regex, captureNames) {
 function copy (regex, addFlags, removeFlags) {
     if (!X.isRegExp(regex))
         throw new TypeError("type RegExp expected");
-    var x = regex._xregexp,
+    var _x = regex._xregexp,
         flags = getNativeFlags(regex) + (addFlags || "");
     if (removeFlags)
         flags = nativ.replace.call(flags, new R("[" + removeFlags + "]+", "g"), ""); // Would need to escape `removeFlags` if this was public
-    if (x) {
+    if (_x && _x.creator !== "RegExp") {
         // Compiling the current (rather than precompilation) source preserves the effects of nonnative source flags
         regex = augment(
             X(regex.source, flags),
-            x.captureNames ? x.captureNames.slice(0) : null
+            _x.captureNames ? _x.captureNames.slice(0) : null,
+            "XRegExp"
         );
     } else {
         // Remove duplicate flags to avoid throwing
         flags = nativ.replace.call(flags, /([\s\S])(?=[\s\S]*\1)/g, "");
-        // Don't use `XRegExp`; avoid searching for special tokens and adding special properties
-        regex = new R(regex.source, flags); // Use native `RegExp`
+        // Augment with `XRegExp.prototype` methods
+        regex = augment(
+            new R(regex.source, flags), // Use native `RegExp`; avoid searching for special tokens
+            null,
+            "RegExp"
+        );
     }
     return regex;
 }
@@ -1725,7 +1734,7 @@ if (!extensible)
         // If using an escape character, advance to the delimiter's next starting position,
         // skipping any escaped characters in between
         if (escapeChar)
-            delimEnd += (XRegExp.exec(str, esc, delimEnd, /*sticky*/ true) || [""])[0].length;
+            delimEnd += (XRegExp.exec(str, esc, delimEnd, "sticky") || [""])[0].length;
         leftMatch = XRegExp.exec(str, left, delimEnd);
         rightMatch = XRegExp.exec(str, right, delimEnd);
         // Keep only the leftmost result

@@ -45,8 +45,8 @@ test("XRegExp", function () {
 	ok(!regexX.extended, "x flag stripped");
 	deepEqual(regex, XRegExp(regex), "Regex copy and original are alike");
 	notEqual(regex, XRegExp(regex), "Regex copy is new instance");
-	ok(XRegExp(XRegExp(""))._xregexp, "Copied XRegExp preserves special properties");
-	ok(!XRegExp(RegExp(""))._xregexp, "Copied RegExp is not assigned special properties");
+	equal(XRegExp(XRegExp(""))._xregexp.creator, "XRegExp", "Copied XRegExp has creator XRegExp");
+	equal(XRegExp(RegExp(""))._xregexp.creator, "RegExp", "Copied RegExp has creator RegExp");
 	equal(XRegExp.exec("aa", XRegExp(regexNamedCapture)).name, "a", "Regex copy retains named capture properties");
 	raises(function () {XRegExp(regex, "g");}, Error, "Regex copy with flag throws");
 	ok(XRegExp("(?:)") instanceof RegExp, "Result is instanceof RegExp");
@@ -120,14 +120,13 @@ test("XRegExp.exec", function () {
 	rA.lastIndex = 5;
 	ok(XRegExp.exec(str, rA), "Pos ignores lastIndex test 3 (pos defaults to 0)");
 
-	ok(XRegExp.exec(str, rX, 0, false), "Explicit !anchored allows matching after pos");
-
-	ok(!XRegExp.exec(str, rX, 0, true), "Anchored match fails if match possible after (but not at) pos");
-
-	ok(XRegExp.exec(str, rX, 3, true), "Anchored match succeeds if match at pos");
-
+	ok(XRegExp.exec(str, rX, 0), "Undefined sticky allows matching after pos");
+	ok(XRegExp.exec(str, rX, 0, ""), "Explicit sticky='' allows matching after pos");
+	ok(XRegExp.exec(str, rX, 0, false), "Explicit sticky=false allows matching after pos"); // backcompat with v1.5.x
+	ok(!XRegExp.exec(str, rX, 0, "sticky"), "Sticky match fails if match possible after (but not at) pos");
+	ok(!XRegExp.exec(str, rX, 0, true), "Sticky match with sticky=true fails if match possible after (but not at) pos"); // backcompat with v1.5.x
+	ok(XRegExp.exec(str, rX, 3, "sticky"), "Sticky match succeeds if match at pos");
 	equal(XRegExp.exec(str, rX, 5), null, "Result of failure is null");
-
 	deepEqual(XRegExp.exec(str, xregexp), ["a", "a"], "Result of successful match is array with backreferences");
 
 	match = XRegExp.exec(str, xregexp);
@@ -247,17 +246,17 @@ test("XRegExp.matchChain", function () {
 });
 
 test("XRegExp.replace", function () {
-	equal(XRegExp.replace("test", "t", "x", true), "xesx", "string search with replaceAll true");
-	equal(XRegExp.replace("test", "t", "x", false), "xest", "string search with replaceAll false");
-	equal(XRegExp.replace("test", "t", "x"), "xest", "string search without replaceAll");
-	equal(XRegExp.replace("test", /t/, "x", true), "xesx", "regex search with replaceAll true");
-	equal(XRegExp.replace("test", /t/, "x", false), "xest", "regex search with replaceAll false");
-	equal(XRegExp.replace("test", /t/, "x"), "xest", "regex search without replaceAll");
-	equal(XRegExp.replace("test", /t/g, "x", true), "xesx", "global regex search with replaceAll true");
-	equal(XRegExp.replace("test", /t/g, "x", false), "xest", "global regex search with replaceAll false");
-	equal(XRegExp.replace("test", /t/g, "x"), "xesx", "global regex search without replaceAll");
+	equal(XRegExp.replace("test", "t", "x", "all"), "xesx", "string search with scope='all'");
+	equal(XRegExp.replace("test", "t", "x", "one"), "xest", "string search with scope='one'");
+	equal(XRegExp.replace("test", "t", "x"), "xest", "string search without scope");
+	equal(XRegExp.replace("test", /t/, "x", "all"), "xesx", "regex search with scope='all'");
+	equal(XRegExp.replace("test", /t/, "x", "one"), "xest", "regex search with scope='one'");
+	equal(XRegExp.replace("test", /t/, "x"), "xest", "regex search without scope");
+	equal(XRegExp.replace("test", /t/g, "x", "all"), "xesx", "global regex search with scope='all'");
+	equal(XRegExp.replace("test", /t/g, "x", "one"), "xest", "global regex search with scope='one'");
+	equal(XRegExp.replace("test", /t/g, "x"), "xesx", "global regex search without scope");
 
-	// TODO: Add tests (above tests cover replaceAll functionality only)
+	// TODO: Add tests (above tests cover scope functionality only)
 });
 
 test("XRegExp.split", function () {

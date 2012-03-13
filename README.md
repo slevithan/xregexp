@@ -9,7 +9,7 @@ XRegExp provides augmented, extensible JavaScript regular expressions. You get n
 Note that these examples take advantage of new features in XRegExp v2.0.0-beta ([details](https://github.com/slevithan/XRegExp/wiki/Roadmap)).
 
 ~~~ js
-// Using named capture and the x flag (free-spacing and comments)
+// Using named capture and flag x (free-spacing and line comments)
 var date = XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
                     (?<month> [0-9]{2}) -?  # month \n\
                     (?<day>   [0-9]{2})     # day   ', 'x');
@@ -18,9 +18,9 @@ var date = XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
 var match = XRegExp.exec('2012-02-22', date);
 match.day; // -> '22'
 
-// It also supports optional pos and sticky arguments
+// It also includes optional pos and sticky arguments
 var pos = 2, result = [];
-while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d+)>/, pos, true)) {
+while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d+)>/, pos, 'sticky')) {
     result.push(match[1]);
     pos = match.index + match[0].length;
 }
@@ -148,7 +148,7 @@ XRegExp.matchRecursive(str, '{', '}', 'g', {
 // ['literal', '\\{', 6, 8],
 // ['value', 'function(x,y){return y+x;}', 9, 35]]
 
-// Sticky mode via the y flag (works everywhere, not just where /y is natively supported)
+// Sticky mode via flag y
 str = '<1><<<2>>><3>4<5>';
 XRegExp.matchRecursive(str, '<', '>', 'gy');
 // -> ['1', '<<2>>', '3']
