@@ -23,19 +23,22 @@ var pos = 2, result = [];
 while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d+)>/, pos, 'sticky')) {
     result.push(match[1]);
     pos = match.index + match[0].length;
-}
-// result -> ['2', '3', '4']
+} // result -> ['2', '3', '4']
 
 // XRegExp.replace allows named backreferences in replacements
 XRegExp.replace('2012-02-22', date, '${month}/${day}/${year}'); // -> '02/22/2012'
+XRegExp.replace('2012-02-22', date, function (match) {
+    return match.month + '/' + match.day + '/' +match.year;
+}); // -> '02/22/2012'
 
 // In fact, all XRegExps are RegExps and work perfectly with native methods
 date.test('2012-02-22'); // -> true
 
-// The only caveat is that named captures must be referred to using numbered backreferences
+// The *only* caveat is that named captures must be referred to using numbered backreferences
 '2012-02-22'.replace(date, '$2/$3/$1'); // -> '02/22/2012'
 
 // If you want, you can extend native methods so you don't have to worry about this
+// Doing so also fixes numerous browser bugs in the native methods
 XRegExp.install('natives');
 '2012-02-22'.replace(date, '${month}/${day}/${year}'); // -> '02/22/2012'
 '2012-02-22'.replace(date, function (match) {
@@ -46,15 +49,13 @@ date.exec('2012-02-22').day; // -> 22
 // Extract every other digit from a string using XRegExp.forEach
 XRegExp.forEach("1a2345", /\d/, function (match, i) {
     if (i % 2) this.push(+match[0]);
-}, []);
-// -> [2, 4]
+}, []); // -> [2, 4]
 
 // Get numbers within <b> tags using XRegExp.matchChain
 XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [
     XRegExp('(?is)<b>.*?<\\/b>'),
     /\d+/
-]);
-// -> ['2', '4', '56']
+]); // -> ['2', '4', '56']
 
 // You can also pass forward and return specific backreferences
 var html = '<a href="http://xregexp.com/">XRegExp</a>\
@@ -62,8 +63,7 @@ var html = '<a href="http://xregexp.com/">XRegExp</a>\
 XRegExp.matchChain(html, [
     {regex: /<a href="([^"]+)">/i, backref: 1},
     {regex: XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
-]);
-// -> ['xregexp.com', 'www.google.com']
+]); // -> ['xregexp.com', 'www.google.com']
 
 // XRegExp regexes get call and apply methods
 // To demonstrate, let's first create the function we'll be using...
@@ -73,11 +73,10 @@ function filter (array, fn) {
     return res;
 }
 // Now we can filter arrays using functions and regexes
-filter(['a', 'ba', 'ab', 'b'], XRegExp('^a'));
-// -> ['a', 'ab']
+filter(['a', 'ba', 'ab', 'b'], XRegExp('^a')); // -> ['a', 'ab']
 ~~~
 
-These examples should give you an idea of what's possible, but XRegExp has plenty more tricks that aren't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), [browser fixes](http://xregexp.com/cross_browser/).
+These examples should give you an idea of what's possible, but XRegExp has a lot more tricks that aren't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), and [browser fixes](http://xregexp.com/cross_browser/).
 
 
 ## XRegExp Unicode Base
@@ -167,10 +166,7 @@ More details: [Addons: Match Recursive](http://xregexp.com/plugins/#matchRecursi
 
 XRegExp and addons copyright 2007-2012 by [Steven Levithan](http://stevenlevithan.com/).
 
-Tools:
-
-* Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/).
-* Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
+Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/). Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
 
 All code released under the [MIT License](http://opensource.org/licenses/mit-license.php).
 
