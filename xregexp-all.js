@@ -328,8 +328,8 @@ X.exec = function (str, regex, pos, sticky) {
  *   <li>The zero-based match index.
  *   <li>The string being traversed.
  *   <li>The regex object being used to traverse the string.
- * @param {Object|Array} [context] Object to use as `this` when executing `callback`.
- * @returns {Object|Array} Provided `context` object.
+ * @param {*} [context] Object to use as `this` when executing `callback`.
+ * @returns {*} Provided `context` object.
  * @example
  *
  * // Extracts every other digit from a string
@@ -602,12 +602,15 @@ X.uninstall = function (options) {
 /**
  * Calls an XRegExp object's `test` method with the first value in the provided arguments array.
  * @memberOf XRegExp.prototype
- * @param {Object} context Ignored. Accepted only for congruity with `Function.prototype.apply`.
+ * @param {*} context Ignored. Accepted only for congruity with `Function.prototype.apply`.
  * @param {Array} args Array with the string to search as its first value.
  * @returns {Boolean} Whether the regex matched the provided value.
  * @example
  *
- * XRegExp('\\d').apply(null, ['123']); // -> true
+ * XRegExp('.').apply(null, ['abc']); // -> true
+ *
+ * // Regexes copied by XRegExp also get the apply method
+ * XRegExp(/./).apply(null, ['abc']); // -> true
  */
 X.prototype.apply = function (context, args) {
     return this.test(args[0]); // Intentionally doesn't specify fixed/native `test`
@@ -616,12 +619,15 @@ X.prototype.apply = function (context, args) {
 /**
  * Calls an XRegExp object's `test` method with the provided string.
  * @memberOf XRegExp.prototype
- * @param {Object} context Ignored. Accepted only for congruity with `Function.prototype.call`.
+ * @param {*} context Ignored. Accepted only for congruity with `Function.prototype.call`.
  * @param {String} str String to search.
  * @returns {Boolean} Whether the regex matched the provided value.
  * @example
  *
- * XRegExp('\\d').call(null, '123'); // -> true
+ * XRegExp('.').call(null, 'abc'); // -> true
+ *
+ * // Regexes copied by XRegExp also get the call method
+ * XRegExp(/./).call(null, 'abc'); // -> true
  */
 X.prototype.call = function (context, str) {
     return this.test(str); // Intentionally doesn't specify fixed/native `test`
