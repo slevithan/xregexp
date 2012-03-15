@@ -1214,13 +1214,16 @@ XRegExp = XRegExp || (function (undef) {
             return "(";
         });
 
+/*--------------------------------------
+ *  Expose XRegExp
+ *------------------------------------*/
+
+// For CommonJS enviroments
+    if (typeof exports !== "undefined") {
+        exports.XRegExp = self;
+    }
 
     return self;
 
 }());
-
-// For CommonJS enviroments
-if (typeof exports !== "undefined") {
-    exports.XRegExp = XRegExp;
-}
 

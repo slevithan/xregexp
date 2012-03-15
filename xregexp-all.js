@@ -1217,15 +1217,18 @@ XRegExp = XRegExp || (function (undef) {
             return "(";
         });
 
+/*--------------------------------------
+ *  Expose XRegExp
+ *------------------------------------*/
+
+// For CommonJS enviroments
+    if (typeof exports !== "undefined") {
+        exports.XRegExp = self;
+    }
 
     return self;
 
 }());
-
-// For CommonJS enviroments
-if (typeof exports !== "undefined") {
-    exports.XRegExp = XRegExp;
-}
 
 
 /***** concatenate-source-files-fix.js *****/
@@ -1250,7 +1253,7 @@ if (typeof exports !== "undefined") {
  * Unicode categories, scripts, and blocks are available separately. All Unicode tokens can be
  * inverted using `\P{..}` or `\p{^..}`. Token names are case insensitive, and any spaces, hyphens,
  * and underscores are ignored.
- * @requires xregexp
+ * @requires XRegExp
  */
 (function (XRegExp) {
     "use strict";
@@ -1407,6 +1410,7 @@ if (typeof exports !== "undefined") {
  * Adds support for all Unicode blocks in the Basic Multilingual Plane (U+0000-U+FFFF). Unicode
  * blocks use the prefix "In". E.g., `\p{InBasicLatin}`. Token names are case insensitive, and any
  * spaces, hyphens, and underscores are ignored.
+ * @requires XRegExp, XRegExp Unicode Base
  */
 (function (XRegExp) {
     "use strict";
@@ -1600,6 +1604,7 @@ if (typeof exports !== "undefined") {
  * Adds support for all Unicode categories (aka properties) E.g., `\p{Lu}` or
  * `\p{Uppercase Letter}`. Token names are case insensitive, and any spaces, hyphens, and
  * underscores are ignored.
+ * @requires XRegExp, XRegExp Unicode Base
  */
 (function (XRegExp) {
     "use strict";
@@ -1712,6 +1717,7 @@ if (typeof exports !== "undefined") {
  * Adds support for all Unicode scripts in the Basic Multilingual Plane (U+0000-U+FFFF).
  * E.g., `\p{Latin}`. Token names are case insensitive, and any spaces, hyphens, and underscores
  * are ignored.
+ * @requires XRegExp, XRegExp Unicode Base
  */
 (function (XRegExp) {
     "use strict";
@@ -1821,6 +1827,7 @@ if (typeof exports !== "undefined") {
 /**
  * Returns matches between outermost left and right delimiters, or arrays of match parts and
  * position data. An error is thrown if delimiters are unbalanced within the data.
+ * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {String} left Left delimiter as an XRegExp pattern string.
  * @param {String} right Right delimiter as an XRegExp pattern string.

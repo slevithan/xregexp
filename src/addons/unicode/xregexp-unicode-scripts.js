@@ -9,6 +9,7 @@
  * Adds support for all Unicode scripts in the Basic Multilingual Plane (U+0000-U+FFFF).
  * E.g., `\p{Latin}`. Token names are case insensitive, and any spaces, hyphens, and underscores
  * are ignored.
+ * @requires XRegExp, XRegExp Unicode Base
  */
 (function (XRegExp) {
     "use strict";

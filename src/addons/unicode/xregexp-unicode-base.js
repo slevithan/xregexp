@@ -10,7 +10,7 @@
  * Unicode categories, scripts, and blocks are available separately. All Unicode tokens can be
  * inverted using `\P{..}` or `\p{^..}`. Token names are case insensitive, and any spaces, hyphens,
  * and underscores are ignored.
- * @requires xregexp
+ * @requires XRegExp
  */
 (function (XRegExp) {
     "use strict";

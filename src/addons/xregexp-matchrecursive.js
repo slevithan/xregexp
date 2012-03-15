@@ -10,6 +10,7 @@
 /**
  * Returns matches between outermost left and right delimiters, or arrays of match parts and
  * position data. An error is thrown if delimiters are unbalanced within the data.
+ * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {String} left Left delimiter as an XRegExp pattern string.
  * @param {String} right Right delimiter as an XRegExp pattern string.
