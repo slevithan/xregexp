@@ -18,8 +18,6 @@ test("Basic availability", function () {
 	ok(XRegExp.split, "XRegExp.split exists");
 	ok(XRegExp.uninstall, "XRegExp.uninstall exists");
 	ok(XRegExp.version, "XRegExp.version exists");
-	ok(XRegExp.INSIDE_CLASS, "XRegExp.INSIDE_CLASS exists");
-	ok(XRegExp.OUTSIDE_CLASS, "XRegExp.OUTSIDE_CLASS exists");
 	ok(XRegExp.prototype.apply, "XRegExp.prototype.apply exists");
 	ok(XRegExp.prototype.call, "XRegExp.prototype.call exists");
 });
@@ -45,8 +43,8 @@ test("XRegExp", function () {
 	ok(!regexX.extended, "x flag stripped");
 	deepEqual(regex, XRegExp(regex), "Regex copy and original are alike");
 	notEqual(regex, XRegExp(regex), "Regex copy is new instance");
-	equal(XRegExp(XRegExp(""))._xregexp.creator, "XRegExp", "Copied XRegExp has creator XRegExp");
-	equal(XRegExp(RegExp(""))._xregexp.creator, "RegExp", "Copied RegExp has creator RegExp");
+	equal(XRegExp(XRegExp("")).xregexp.isNative, false, "Copied XRegExp !isNative");
+	equal(XRegExp(RegExp("")).xregexp.isNative, true, "Copied RegExp isNative");
 	equal(XRegExp.exec("aa", XRegExp(regexNamedCapture)).name, "a", "Regex copy retains named capture properties");
 	raises(function () {XRegExp(regex, "g");}, Error, "Regex copy with flag throws");
 	ok(XRegExp("(?:)") instanceof RegExp, "Result is instanceof RegExp");
@@ -64,21 +62,21 @@ test("XRegExp", function () {
 test("XRegExp.addToken", function () {
 	XRegExp.install("extensibility");
 	XRegExp.addToken(/\x01/, function () {return "1";});
-	XRegExp.addToken(/\x02/, function () {return "2";}, XRegExp.INSIDE_CLASS);
-	XRegExp.addToken(/\x03/, function () {return "3";}, XRegExp.OUTSIDE_CLASS);
-	XRegExp.addToken(/\x04/, function () {return "4";}, XRegExp.INSIDE_CLASS | XRegExp.OUTSIDE_CLASS);
-	XRegExp.addToken(/\x05/, function () {return "5";}, XRegExp.OUTSIDE_CLASS, function () {return this.hasFlag("5");});
+	XRegExp.addToken(/\x02/, function () {return "2";}, {scope: "class"});
+	XRegExp.addToken(/\x03/, function () {return "3";}, {scope: "default"});
+	XRegExp.addToken(/\x04/, function () {return "4";}, {scope: "all"});
+	XRegExp.addToken(/\x05/, function () {return "5";}, {scope: "default", trigger: function () {return this.hasFlag("5");}});
 	XRegExp.addToken(/\x06/, function () {this.setFlag("m"); return "6";});
 	XRegExp.uninstall("extensibility");
 
 	ok(XRegExp("\x01").test("1"), "Default scope matches outside class");
 	ok(!XRegExp("[\x01]").test("1"), "Default scope doesn't match inside class");
-	ok(!XRegExp("\x02").test("2"), "Explicit INSIDE_CLASS scope doesn't match outside class");
-	ok(XRegExp("[\x02]").test("2"), "Explicit INSIDE_CLASS scope matches inside class");
-	ok(XRegExp("\x03").test("3"), "Explicit OUTSIDE_CLASS scope matches outside class");
-	ok(!XRegExp("[\x03]").test("3"), "Explicit OUTSIDE_CLASS scope doesn't match inside class");
-	ok(XRegExp("\x04").test("4"), "Explicit INSIDE_CLASS|OUTSIDE_CLASS scope matches outside class");
-	ok(XRegExp("[\x04]").test("4"), "Explicit INSIDE_CLASS|OUTSIDE_CLASS scope matches inside class");
+	ok(!XRegExp("\x02").test("2"), "Explicit class scope doesn't match outside class");
+	ok(XRegExp("[\x02]").test("2"), "Explicit class scope matches inside class");
+	ok(XRegExp("\x03").test("3"), "Explicit default scope matches outside class");
+	ok(!XRegExp("[\x03]").test("3"), "Explicit default scope doesn't match inside class");
+	ok(XRegExp("\x04").test("4"), "Explicit all scope matches outside class");
+	ok(XRegExp("[\x04]").test("4"), "Explicit all scope matches inside class");
 	ok(!XRegExp("\x05").test("5"), "Trigger with hasFlag skips token when flag is missing");
 	ok(XRegExp("\x05", "5").test("5"), "Trigger with hasFlag uses token when flag is included");
 	ok(XRegExp("\x06").multiline, "Handler with setFlag activates flag when used");

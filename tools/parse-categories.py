@@ -94,7 +94,7 @@ def analyze(source):
 def main(source):
 	generator = analyze(source)
 	for category in ['L', 'Ll', 'Lu', 'Lt', 'Lm', 'Lo', 'M', 'Mn', 'Mc', 'Me', 'N', 'Nd', 'Nl', 'No', 'P', 'Pd', 'Ps', 'Pe', 'Pi', 'Pf', 'Pc', 'Po', 'S', 'Sm', 'Sc', 'Sk', 'So', 'Z', 'Zs', 'Zl', 'Zp', 'C', 'Cc', 'Cf', 'Co', 'Cs', 'Cn']:
-		print '    ' + category + ': "' + generator.generate_category(category) + '",'
+		print category + ': "' + generator.generate_category(category) + '",'
 
 if __name__ == '__main__':
 	main(sys.argv[1])

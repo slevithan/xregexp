@@ -1,6 +1,6 @@
 {
     "name": "xregexp",
-    "version": "2.0.0-beta2",
+    "version": "2.0.0-beta3",
     "homepage": "http://xregexp.com/",
     "author": "Steven Levithan <steves_list@hotmail.com>",
     "license": "MIT",
@@ -8,7 +8,7 @@
         "type": "git",
         "url": "https://github.com/slevithan/XRegExp.git"
     }],
-    "description": "Extended regular expressions",
+    "description": "Extended JavaScript regular expressions",
     "keywords": ["regex", "regexp"],
     "main": "xregexp-all.js"
 }
