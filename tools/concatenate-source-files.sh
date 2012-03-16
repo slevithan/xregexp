@@ -7,11 +7,11 @@ cd "$(dirname "$0")"
 source_files="
     ../src/xregexp.js
     ./concatenate-source-files-fix.js
-    ../src/addons/unicode/xregexp-unicode-base.js
-    ../src/addons/unicode/xregexp-unicode-blocks.js
-    ../src/addons/unicode/xregexp-unicode-categories.js
-    ../src/addons/unicode/xregexp-unicode-scripts.js
-    ../src/addons/xregexp-matchrecursive.js
+    ../src/addons/unicode/unicode-base.js
+    ../src/addons/unicode/unicode-blocks.js
+    ../src/addons/unicode/unicode-categories.js
+    ../src/addons/unicode/unicode-scripts.js
+    ../src/addons/matchrecursive.js
 "
 
 # Filename of concatenated package
