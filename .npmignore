@@ -1,3 +1,4 @@
 src/
-tests/
+tests/index.html
+tests/qunit/
 tools/

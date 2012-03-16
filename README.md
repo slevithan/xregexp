@@ -156,6 +156,14 @@ XRegExp.matchRecursive(str, '<', '>', 'gy');
 More details: [Addons: Match Recursive](http://xregexp.com/plugins/#matchRecursive).
 
 
+## How to run server-side tests
+
+~~~bash
+npm install -g qunit  # needed to run the tests
+npm test  # in the root directory
+~~~
+
+
 ## Changelog
 
 * Historical changes: [Version history](http://xregexp.com/history/).
