@@ -1,5 +1,5 @@
 /*!
- * XRegExp v2.0.0-beta.3
+ * XRegExp v2.0.0-beta-3
  * Copyright 2007-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  */
@@ -806,7 +806,7 @@ XRegExp = XRegExp || (function (undef) {
  * @memberOf XRegExp
  * @type String
  */
-    self.version = "2.0.0-beta.3";
+    self.version = "2.0.0-beta-3";
 
 /*--------------------------------------
  *  XRegExp.prototype methods
