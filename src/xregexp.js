@@ -1,5 +1,5 @@
 /*!
- * XRegExp v2.0.0-beta3
+ * XRegExp v2.0.0-beta.3
  * Copyright 2007-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  */
@@ -309,8 +309,8 @@ XRegExp = XRegExp || (function (undef) {
  *                 (?<month> [0-9]{2}) -?  # month \n\
  *                 (?<day>   [0-9]{2})     # day   ', 'x');
  *
- * // Special case: Pass a regex object to copy it, preserving special properties for named capture
- * // and augmenting with `XRegExp.prototype` methods. The copy has a fresh `lastIndex` property
+ * // Special case: Pass a regex object to copy it. The copy maintains special properties for named
+ * // capture, is augmented with `XRegExp.prototype` methods, and has a fresh `lastIndex` property
  * // (set to zero). Native regexes are not recompiled using XRegExp syntax.
  * XRegExp(/regex/);
  */
@@ -479,7 +479,7 @@ XRegExp = XRegExp || (function (undef) {
  * match.hex; // -> '2620'
  *
  * // With pos and sticky, in a loop
- * var pos = 2, result = [];
+ * var pos = 2, result = [], match;
  * while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d)>/, pos, 'sticky')) {
  *   result.push(match[1]);
  *   pos = match.index + match[0].length;
@@ -541,8 +541,8 @@ XRegExp = XRegExp || (function (undef) {
     };
 
 /**
- * Copies a regex object and adds flag g, preserving special properties for named capture and
- * augmenting with `XRegExp.prototype` methods. The copy has a fresh `lastIndex` property (set to
+ * Copies a regex object and adds flag g. The copy maintains special properties for named capture,
+ * is augmented with `XRegExp.prototype` methods, and has a fresh `lastIndex` property (set to
  * zero). Native regexes are not recompiled using XRegExp syntax.
  * @memberOf XRegExp
  * @param {RegExp} regex Regex to globalize.
@@ -806,7 +806,7 @@ XRegExp = XRegExp || (function (undef) {
  * @memberOf XRegExp
  * @type String
  */
-    self.version = "2.0.0-beta3";
+    self.version = "2.0.0-beta.3";
 
 /*--------------------------------------
  *  XRegExp.prototype methods
