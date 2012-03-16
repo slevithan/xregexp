@@ -15,6 +15,6 @@
         "test": "qunit -c xregexp:./xregexp-all.js -t ./tests/tests.js"
     },
     "devDependencies": {
-        "qunit": "0.2.x"
+        "qunit": ">= 0.2.x"
     }
 }

@@ -1,13 +1,10 @@
-// In Node.JS module is defined as some object, which makes the QUnit module
-// definitions fail. So we redefine it to be a function that does nothing. This
-// does nothing in the browser, where QUnit already defined the module function.
-if (typeof module !== "function") {
-	var module = function(name) {};
-}
+// In Node.JS, `module` is a predefined object, which makes the QUnit `module` definitions fail
+// unless we redefine it.
+module = QUnit.module;
 
-// When using node-qunit on the command line, the module is imported as is and
-// we need to point at the XRegExp class inside the module. This does nothing
-// in the browser, where XRegExp is already loaded in the global scope.
+// When using node-qunit on the command line, the module is imported as is and we need to point at
+// the XRegExp class inside the module. This does nothing in the browser, where XRegExp is already
+// loaded in the global scope.
 if (typeof XRegExp === "undefined" && typeof xregexp !== "undefined") {
 	var XRegExp = xregexp.XRegExp;
 }
@@ -64,12 +61,11 @@ test("XRegExp", function () {
 	ok(XRegExp("(?:)") instanceof RegExp, "Result is instanceof RegExp");
 	equal(XRegExp("(?:)").constructor, RegExp, "Result's constructor is RegExp");
 
-	// Don't test this, since future XRegExp might throw like modern browsers do with RegExp
-	//ok(XRegExp("(?:)", "gg").global, "Regex with duplicate flags");
+	// Don't test this, since future XRegExp will throw like modern browsers do with `RegExp`
+	//ok(XRegExp("", "gg").global, "Regex with duplicate flags");
 
-	// This might be a good test in the future, but for now, XRegExp doesn't throw on
-	// unsupported flags since it would add some complexity and overhead to keep track of any
-	// flags checked for in custom tokens
+	// Don't test this, since XRegExp can't yet throw on unsupported flags (it doesn't yet track
+	// flags checked for in custom tokens)
 	//raises(function () {XRegExp("", "?");}, Error, "Unsupported flag throws");
 });
 
@@ -204,10 +200,12 @@ test("XRegExp.globalize", function () {
 });
 
 test("XRegExp.install", function () {
+	expect(0);
 	// TODO: Add tests
 });
 
 test("XRegExp.isInstalled", function () {
+	expect(0);
 	// TODO: Add tests
 });
 
@@ -234,16 +232,15 @@ test("XRegExp.isRegExp", function () {
 	tamperedRegex.constructor = {};
 	ok(XRegExp.isRegExp(tamperedRegex), "RegExp with assigned Object constructor is RegExp");
 
-	// Use feature detection: Check whether document exists and only run the last
-	// part of the test in this case. This is to ensure the test is run only in
-	// the browser and not in server-side environments without a DOM.
+	// Check whether `document` exists and only run the frame test if so. This ensures the test is
+	// run only in the browser and not in server-side environments without a DOM.
 	if (typeof document !== "undefined") {
 		var iframe = document.createElement("iframe");
 		iframe.width = iframe.height = iframe.border = 0; //iframe.style.display = "none";
 		document.body.appendChild(iframe);
 		frames[frames.length - 1].document.write("<script>var regex = /x/;<\/script>");
 		ok(XRegExp.isRegExp(iframe.contentWindow.regex), "RegExp constructed in another frame is RegExp");
-		iframe.parentNode.removeChild(iframe);
+		iframe.parentNode.removeChild(iframe); // cleanup
 	}
 });
 
@@ -276,10 +273,12 @@ test("XRegExp.replace", function () {
 });
 
 test("XRegExp.split", function () {
+	expect(0);
 	// TODO: Add tests
 });
 
 test("XRegExp.uninstall", function () {
+	expect(0);
 	// TODO: Add tests
 });
 
@@ -559,6 +558,7 @@ test("String.prototype.replace", function () {
 test("String.prototype.split", function () {
 	XRegExp.install("natives");
 
+	expect(0);
 	// TODO: Add tests (basic functionality tests, not the long list from
 	// the cross-browser fixes module)
 
@@ -591,6 +591,7 @@ test("String.prototype.match", function () {
 test("String.prototype.replace", function () {
 	XRegExp.install("natives");
 
+	expect(0);
 	// TODO: Add tests
 
 	XRegExp.uninstall("natives");
@@ -630,30 +631,37 @@ module("New syntax and flags");
 //-------------------------------------------------------------------
 
 test("Named capture and backreferences", function () {
+	expect(0);
 	// TODO: Add tests
 });
 
 test("Inline comments", function () {
+	expect(0);
 	// TODO: Add tests
 });
 
 test("Leading mode modifier", function () {
+	expect(0);
 	// TODO: Add tests
 });
 
 test("Unicode token placeholder", function () {
+	expect(0);
 	// TODO: Add tests
 });
 
 test("n flag (explicit capture mode)", function () {
+	expect(0);
 	// TODO: Add tests
 });
 
 test("s flag (dotall mode)", function () {
+	expect(0);
 	// TODO: Add tests
 });
 
 test("x flag (extended mode)", function () {
+	expect(0);
 	// TODO: Add tests
 });
 
@@ -662,18 +670,20 @@ module("Cross-browser fixes");
 //-------------------------------------------------------------------
 
 test("Nonparticipating capture values", function () {
+	expect(0);
 	// TODO: Add tests
 });
 
 test("RegExp.prototype.lastIndex", function () {
+	expect(0);
 	// TODO: Add tests
 });
 
 test("String.prototype.split with regex separator", function () {
 	XRegExp.install("natives");
 
-	// Some of these tests are not known to fail in any browser, but many
-	// fail in at least one version of one browser
+	// Some of these tests are not known to fail in any browser, but many fail in at least one
+	// version of one browser.
 
 	deepEqual("".split(), [""]);
 	deepEqual("".split(/./), [""]);
@@ -740,10 +750,12 @@ test("String.prototype.split with regex separator", function () {
 });
 
 test("Regular expression syntax", function () {
+	expect(0);
 	// TODO: Add tests
 });
 
 test("Replacement text syntax", function () {
+	expect(0);
 	// TODO: Add tests
 });
 

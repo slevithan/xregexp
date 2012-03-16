@@ -158,9 +158,9 @@ More details: [Addons: Match Recursive](http://xregexp.com/plugins/#matchRecursi
 
 ## How to run server-side tests
 
-~~~bash
+~~~ bash
 npm install -g qunit  # needed to run the tests
-npm test  # in the root directory
+npm test  # in the xregexp root directory
 ~~~
 
 
