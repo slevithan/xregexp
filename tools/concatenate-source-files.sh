@@ -6,7 +6,6 @@ cd "$(dirname "$0")"
 # Ordered list of all source files excluding backcompat.js
 source_files="
     ../src/xregexp.js
-    ./concatenate-source-files-fix.js
     ../src/addons/unicode/unicode-base.js
     ../src/addons/unicode/unicode-blocks.js
     ../src/addons/unicode/unicode-categories.js
