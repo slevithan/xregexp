@@ -12,7 +12,7 @@
     "keywords": ["regex", "regexp"],
     "main": "xregexp-all.js",
     "scripts": {
-        "test": "qunit -c xregexp:./xregexp-all.js -t ./tests/tests.js"
+        "test": "node tests/node-qunit.js"
     },
     "devDependencies": {
         "qunit": ">= 0.2.x"
