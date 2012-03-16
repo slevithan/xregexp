@@ -13,7 +13,6 @@
  * @module xregexp
  * @requires N/A
  */
-
 var XRegExp;
 
 // Avoid running twice; that would duplicate tokens and could break references to native globals
@@ -1143,7 +1142,7 @@ XRegExp = XRegExp || (function (undef) {
         });
 
 /* Leading mode modifier, with any combination of flags except g or y: (?imnsx)
- * Does not support other uses of mode modifiers such as ..(?i), (?-i), (?i-m), (?i: ), or (?i)(?m)
+ * Does not support other uses of mode modifiers such as x(?i), (?-i), (?i: ), or (?i)(?m)
  */
     add(/^\(\?([a-z]+)\)/i,
         function (match) {

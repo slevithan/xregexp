@@ -67,7 +67,7 @@ XRegExp.matchChain(html, [
 
 // XRegExp regexes get call and apply methods
 // To demonstrate, let's first create the function we'll be using...
-function filter (array, fn) {
+function filter(array, fn) {
     var res = [];
     array.forEach(function (el) {if (fn.call(null, el)) res.push(el);});
     return res;
@@ -85,7 +85,7 @@ First include the Unicode Base script:
 
 ~~~ html
 <script src="xregexp.js"></script>
-<script src="addons/unicode/xregexp-unicode-base.js"></script>
+<script src="addons/unicode/unicode-base.js"></script>
 ~~~
 
 Then you can do this:
@@ -97,7 +97,7 @@ unicodeWord.test('日本語'); // -> true
 unicodeWord.test('العربية'); // -> true
 ~~~
 
-The base script adds `\p{L}` (and its alias, `\p{Letter}`), but other Unicode categories, scripts, and blocks require addon packages. Try these next examples after additionally including `xregexp-unicode-scripts.js`:
+The base script adds `\p{L}` (and its alias, `\p{Letter}`), but other Unicode categories, scripts, and blocks require addon packages. Try these next examples after additionally including `unicode-scripts.js`:
 
 ~~~ js
 XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
@@ -115,7 +115,7 @@ First include the Match Recursive script:
 
 ~~~ html
 <script src="xregexp.js"></script>
-<script src="addons/xregexp-matchrecursive.js"></script>
+<script src="addons/matchrecursive.js"></script>
 ~~~
 
 You can then match recursive constructs using XRegExp patterns as left and right delimiters:
