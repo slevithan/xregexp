@@ -1,3 +1,17 @@
+// In Node.JS module is defined as some object, which makes the QUnit module
+// definitions fail. So we redefine it to be a function that does nothing. This
+// does nothing in the browser, where QUnit already defined the module function.
+if (typeof module !== "function") {
+	var module = function(name) {};
+}
+
+// When using node-qunit on the command line, the module is imported as is and
+// we need to point at the XRegExp class inside the module. This does nothing
+// in the browser, where XRegExp is already loaded in the global scope.
+if (typeof XRegExp === "undefined" && typeof xregexp !== "undefined") {
+	var XRegExp = xregexp.XRegExp;
+}
+
 //-------------------------------------------------------------------
 module("API");
 //-------------------------------------------------------------------
@@ -220,12 +234,17 @@ test("XRegExp.isRegExp", function () {
 	tamperedRegex.constructor = {};
 	ok(XRegExp.isRegExp(tamperedRegex), "RegExp with assigned Object constructor is RegExp");
 
-	var iframe = document.createElement("iframe");
-	iframe.width = iframe.height = iframe.border = 0; //iframe.style.display = "none";
-	document.body.appendChild(iframe);
-	frames[frames.length - 1].document.write("<script>var regex = /x/;<\/script>");
-	ok(XRegExp.isRegExp(iframe.contentWindow.regex), "RegExp constructed in another frame is RegExp");
-	iframe.parentNode.removeChild(iframe);
+	// Use feature detection: Check whether document exists and only run the last
+	// part of the test in this case. This is to ensure the test is run only in
+	// the browser and not in server-side environments without a DOM.
+	if (typeof document !== "undefined") {
+		var iframe = document.createElement("iframe");
+		iframe.width = iframe.height = iframe.border = 0; //iframe.style.display = "none";
+		document.body.appendChild(iframe);
+		frames[frames.length - 1].document.write("<script>var regex = /x/;<\/script>");
+		ok(XRegExp.isRegExp(iframe.contentWindow.regex), "RegExp constructed in another frame is RegExp");
+		iframe.parentNode.removeChild(iframe);
+	}
 });
 
 test("XRegExp.matchChain", function () {
