@@ -1,5 +1,5 @@
 /*!
- * XRegExp Unicode Base v1.0.0-beta-2
+ * XRegExp Unicode Base v1.0.0-beta-3
  * Copyright 2008-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/>
@@ -100,7 +100,7 @@
             if (!unicode.hasOwnProperty(item)) {
                 throw new SyntaxError("invalid or unsupported Unicode item: " + match[0]);
             }
-            return scope === XRegExp.INSIDE_CLASS ?
+            return scope === "class" ?
                     (inv ? cacheInversion(item) : unicode[item]) :
                     "[" + inv + unicode[item] + "]";
         },
@@ -126,9 +126,11 @@
         if (!XRegExp.isInstalled("extensibility")) {
             throw new Error("can't add Unicode package unless extensibility is installed");
         }
-        for (p in pack) {
-            if (pack.hasOwnProperty(p)) {
-                unicode[slug(p)] = expand(pack[p]);
+        if (pack) {
+            for (p in pack) {
+                if (pack.hasOwnProperty(p)) {
+                    unicode[slug(p)] = expand(pack[p]);
+                }
             }
         }
         if (aliases) {
