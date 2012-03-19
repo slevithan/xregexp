@@ -7,9 +7,10 @@ cd "$(dirname "$0")"
 source_files="
     ../src/xregexp.js
     ../src/addons/unicode/unicode-base.js
-    ../src/addons/unicode/unicode-blocks.js
     ../src/addons/unicode/unicode-categories.js
     ../src/addons/unicode/unicode-scripts.js
+    ../src/addons/unicode/unicode-blocks.js
+    ../src/addons/unicode/unicode-properties.js
     ../src/addons/matchrecursive.js
 "
 
