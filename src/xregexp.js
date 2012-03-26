@@ -25,7 +25,6 @@ XRegExp = XRegExp || (function (undef) {
 
     var self,
         addToken,
-        fixed,
         add,
 
 // Optional features; can be installed and uninstalled
@@ -46,6 +45,9 @@ XRegExp = XRegExp || (function (undef) {
             apply: RegExp.prototype.apply,
             call: RegExp.prototype.call
         },
+
+// Storage for fixed/extended native methods
+        fixed = {},
 
 // Storage for addon tokens
         tokens = [],
@@ -190,7 +192,7 @@ XRegExp = XRegExp || (function (undef) {
     }
 
 /**
- * Runs built-in/custom tokens in order from most to least recently added, until a match is found.
+ * Runs built-in/custom tokens in reverse insertion order, until a match is found.
  * @private
  * @param {String} pattern Original pattern from which an XRegExp object is being built.
  * @param {Number} pos Position to search for tokens within `pattern`.
@@ -850,8 +852,6 @@ XRegExp = XRegExp || (function (undef) {
  *  Fixed/extended native methods
  *------------------------------------*/
 
-    fixed = {};
-
 /**
  * Adds named capture support (with backreferences returned as `result.name`), and fixes browser
  * bugs in the native `RegExp.prototype.exec`. Calling `XRegExp.install('natives')` uses this to
@@ -973,7 +973,7 @@ XRegExp = XRegExp || (function (undef) {
                     }
                 }
                 // Update `lastIndex` before calling `replacement`.
-                // Fixes IE, Chrome, Firefox, Safari bug (last tested IE 9, Chrome 17, Firefox 10, Safari 5.1)
+                // Fixes IE, Chrome, Firefox, Safari bug (last tested IE 9, Chrome 17, Firefox 11, Safari 5.1)
                 if (isRegex && search.global) {
                     search.lastIndex = args[args.length - 2] + args[0].length;
                 }
@@ -1076,8 +1076,7 @@ XRegExp = XRegExp || (function (undef) {
                 -1 >>> 0 : // Math.pow(2, 32) - 1
                 limit >>> 0; // ToUint32(limit)
         // This is required if not `separator.global`, and it avoids needing to set
-        // `separator.lastIndex` to zero and restore it to its original value when we're done using
-        // the regex
+        // `separator.lastIndex` to zero and restore it to its original value when we're done
         separator = self.globalize(separator);
         while ((match = fixed.exec.call(separator, str))) { // Fixed `exec` required for `lastIndex` fix, etc.
             if (separator.lastIndex > lastLastIndex) {
@@ -1158,12 +1157,15 @@ XRegExp = XRegExp || (function (undef) {
  */
     add(/\\k<([\w$]+)>/,
         function (match) {
-            var index = indexOf(this.captureNames, match[1]);
-            // Keep backreferences separate from subsequent literal numbers. Preserve back-
-            // references to named groups that are undefined at this point as literal strings
-            return index > -1 ?
-                    "\\" + (index + 1) + (isNaN(match.input.charAt(match.index + match[0].length)) ? "" : "(?:)") :
-                    match[0];
+            var index = isNaN(match[1]) ? (indexOf(this.captureNames, match[1]) + 1) : +match[1],
+                endIndex = match.index + match[0].length;
+            if (!index || index > this.captureNames.length) {
+                throw new ReferenceError("backreference to undefined group: " + match[0]);
+            }
+            // Keep backreferences separate from subsequent literal numbers
+            return "\\" + index + (
+                endIndex === match.input.length || isNaN(match.input.charAt(endIndex)) ? "" : "(?:)"
+            );
         });
 
 /* Whitespace and line comments, in free-spacing mode (aka extended mode, flag x) only.
@@ -1190,7 +1192,7 @@ XRegExp = XRegExp || (function (undef) {
 /* Named capturing group; match the opening delimiter only: (?<name>
  * Capture names can use the characters A-Z, a-z, 0-9, _, and $ only. Names can't be integers.
  */
-    add(/\(\?<([$\w]+)>/,
+    add(/\(\?<([\w$]+)>/,
         function (match) {
             if (!isNaN(match[1])) {
                 // Avoid incorrect lookups, since named backreferences are added to match arrays
@@ -1200,6 +1202,22 @@ XRegExp = XRegExp || (function (undef) {
             this.hasNamedCapture = true;
             return "(";
         });
+
+/* Numbered backreference or octal, plus any following digits: \0, \11, etc.
+ * Octals except \0 not followed by 0-9 and backreferences to unopened capture groups throw an
+ * error. Other matches are returned unaltered.
+ */
+    add(/\\(\d+)/,
+        function (match, scope) {
+            if (
+                !(scope === defaultScope && /^[1-9]/.test(match[1]) && +match[1] <= this.captureNames.length) &&
+                match[1] !== "0"
+            ) {
+                throw new SyntaxError("can't use octal escape or backreference to undefined group: " + match[0]);
+            }
+            return match[0];
+        },
+        {scope: "all"});
 
 /* Capturing group; match the opening parenthesis only.
  * Required for support of named capturing groups. Also adds explicit capture mode (flag n).

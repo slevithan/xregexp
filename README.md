@@ -97,7 +97,7 @@ unicodeWord.test('日本語'); // -> true
 unicodeWord.test('العربية'); // -> true
 ~~~
 
-The base script adds `\p{L}` (and its alias, `\p{Letter}`), but other Unicode categories, scripts, and blocks require addon packages. Try these next examples after additionally including `unicode-scripts.js`:
+The base script adds `\p{L}` (and its alias, `\p{Letter}`), but other Unicode categories, scripts, blocks, and properties require addon packages. Try these next examples after additionally including `unicode-scripts.js`:
 
 ~~~ js
 XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true

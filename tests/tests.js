@@ -95,11 +95,11 @@ test("XRegExp.addToken", function () {
 test("XRegExp.cache", function () {
 	var cached1 = XRegExp.cache("(?:)");
 	var cached2 = XRegExp.cache("(?:)");
-	var regexWithFlags = XRegExp(". +\\1 1", "gimsx");
+	var regexWithFlags = XRegExp(". +()\\1 1", "gimsx");
 
 	ok(cached1 instanceof RegExp, "Returns RegExp");
 	strictEqual(cached1, cached2, "References to separately cached patterns refer to same object");
-	deepEqual(XRegExp.cache(". +\\1 1", "gimsx"), regexWithFlags, "Cached pattern plus flags");
+	deepEqual(XRegExp.cache(". +()\\1 1", "gimsx"), regexWithFlags, "Cached pattern plus flags");
 });
 
 test("XRegExp.escape", function () {

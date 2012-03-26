@@ -28,7 +28,6 @@ XRegExp = XRegExp || (function (undef) {
 
     var self,
         addToken,
-        fixed,
         add,
 
 // Optional features; can be installed and uninstalled
@@ -49,6 +48,9 @@ XRegExp = XRegExp || (function (undef) {
             apply: RegExp.prototype.apply,
             call: RegExp.prototype.call
         },
+
+// Storage for fixed/extended native methods
+        fixed = {},
 
 // Storage for addon tokens
         tokens = [],
@@ -193,7 +195,7 @@ XRegExp = XRegExp || (function (undef) {
     }
 
 /**
- * Runs built-in/custom tokens in order from most to least recently added, until a match is found.
+ * Runs built-in/custom tokens in reverse insertion order, until a match is found.
  * @private
  * @param {String} pattern Original pattern from which an XRegExp object is being built.
  * @param {Number} pos Position to search for tokens within `pattern`.
@@ -853,8 +855,6 @@ XRegExp = XRegExp || (function (undef) {
  *  Fixed/extended native methods
  *------------------------------------*/
 
-    fixed = {};
-
 /**
  * Adds named capture support (with backreferences returned as `result.name`), and fixes browser
  * bugs in the native `RegExp.prototype.exec`. Calling `XRegExp.install('natives')` uses this to
@@ -976,7 +976,7 @@ XRegExp = XRegExp || (function (undef) {
                     }
                 }
                 // Update `lastIndex` before calling `replacement`.
-                // Fixes IE, Chrome, Firefox, Safari bug (last tested IE 9, Chrome 17, Firefox 10, Safari 5.1)
+                // Fixes IE, Chrome, Firefox, Safari bug (last tested IE 9, Chrome 17, Firefox 11, Safari 5.1)
                 if (isRegex && search.global) {
                     search.lastIndex = args[args.length - 2] + args[0].length;
                 }
@@ -1079,8 +1079,7 @@ XRegExp = XRegExp || (function (undef) {
                 -1 >>> 0 : // Math.pow(2, 32) - 1
                 limit >>> 0; // ToUint32(limit)
         // This is required if not `separator.global`, and it avoids needing to set
-        // `separator.lastIndex` to zero and restore it to its original value when we're done using
-        // the regex
+        // `separator.lastIndex` to zero and restore it to its original value when we're done
         separator = self.globalize(separator);
         while ((match = fixed.exec.call(separator, str))) { // Fixed `exec` required for `lastIndex` fix, etc.
             if (separator.lastIndex > lastLastIndex) {
@@ -1161,12 +1160,15 @@ XRegExp = XRegExp || (function (undef) {
  */
     add(/\\k<([\w$]+)>/,
         function (match) {
-            var index = indexOf(this.captureNames, match[1]);
-            // Keep backreferences separate from subsequent literal numbers. Preserve back-
-            // references to named groups that are undefined at this point as literal strings
-            return index > -1 ?
-                    "\\" + (index + 1) + (isNaN(match.input.charAt(match.index + match[0].length)) ? "" : "(?:)") :
-                    match[0];
+            var index = isNaN(match[1]) ? (indexOf(this.captureNames, match[1]) + 1) : +match[1],
+                endIndex = match.index + match[0].length;
+            if (!index || index > this.captureNames.length) {
+                throw new ReferenceError("backreference to undefined group: " + match[0]);
+            }
+            // Keep backreferences separate from subsequent literal numbers
+            return "\\" + index + (
+                endIndex === match.input.length || isNaN(match.input.charAt(endIndex)) ? "" : "(?:)"
+            );
         });
 
 /* Whitespace and line comments, in free-spacing mode (aka extended mode, flag x) only.
@@ -1193,7 +1195,7 @@ XRegExp = XRegExp || (function (undef) {
 /* Named capturing group; match the opening delimiter only: (?<name>
  * Capture names can use the characters A-Z, a-z, 0-9, _, and $ only. Names can't be integers.
  */
-    add(/\(\?<([$\w]+)>/,
+    add(/\(\?<([\w$]+)>/,
         function (match) {
             if (!isNaN(match[1])) {
                 // Avoid incorrect lookups, since named backreferences are added to match arrays
@@ -1203,6 +1205,22 @@ XRegExp = XRegExp || (function (undef) {
             this.hasNamedCapture = true;
             return "(";
         });
+
+/* Numbered backreference or octal, plus any following digits: \0, \11, etc.
+ * Octals except \0 not followed by 0-9 and backreferences to unopened capture groups throw an
+ * error. Other matches are returned unaltered.
+ */
+    add(/\\(\d+)/,
+        function (match, scope) {
+            if (
+                !(scope === defaultScope && /^[1-9]/.test(match[1]) && +match[1] <= this.captureNames.length) &&
+                match[1] !== "0"
+            ) {
+                throw new SyntaxError("can't use octal escape or backreference to undefined group: " + match[0]);
+            }
+            return match[0];
+        },
+        {scope: "all"});
 
 /* Capturing group; match the opening parenthesis only.
  * Required for support of named capturing groups. Also adds explicit capture mode (flag n).
@@ -1842,9 +1860,10 @@ XRegExp = XRegExp || (function (undef) {
         White_Space: "0009-000D0020008500A01680180E2000-200A20282029202F205F3000",
         Noncharacter_Code_Point: "FDD0-FDEFFFFEFFFF",
         Default_Ignorable_Code_Point: "00AD034F115F116017B417B5180B-180D200B-200F202A-202E2060-206F3164FE00-FE0FFEFFFFA0FFF0-FFF8",
-        ANY: "0000-FFFF",
+        ANY: "0000-FFFF", // \p{^Any} compiles to [^\u0000-\uFFFF]; [\p{^Any}] to []
         ASCII: "0000-007F",
         // \p{Assigned} is equivalent to \p{^Cn}
+        //ASSIGNED: XRegExp("[\\p{^Cn}]").source.replace(/[[\]]|\\u/g, "") // Negation *inside a character class* triggers inversion
         ASSIGNED: "0000-0377037A-037E0384-038A038C038E-03A103A3-05270531-05560559-055F0561-05870589058A058F0591-05C705D0-05EA05F0-05F40600-06040606-061B061E-070D070F-074A074D-07B107C0-07FA0800-082D0830-083E0840-085B085E08A008A2-08AC08E4-08FE0900-09770979-097F0981-09830985-098C098F09900993-09A809AA-09B009B209B6-09B909BC-09C409C709C809CB-09CE09D709DC09DD09DF-09E309E6-09FB0A01-0A030A05-0A0A0A0F0A100A13-0A280A2A-0A300A320A330A350A360A380A390A3C0A3E-0A420A470A480A4B-0A4D0A510A59-0A5C0A5E0A66-0A750A81-0A830A85-0A8D0A8F-0A910A93-0AA80AAA-0AB00AB20AB30AB5-0AB90ABC-0AC50AC7-0AC90ACB-0ACD0AD00AE0-0AE30AE6-0AF10B01-0B030B05-0B0C0B0F0B100B13-0B280B2A-0B300B320B330B35-0B390B3C-0B440B470B480B4B-0B4D0B560B570B5C0B5D0B5F-0B630B66-0B770B820B830B85-0B8A0B8E-0B900B92-0B950B990B9A0B9C0B9E0B9F0BA30BA40BA8-0BAA0BAE-0BB90BBE-0BC20BC6-0BC80BCA-0BCD0BD00BD70BE6-0BFA0C01-0C030C05-0C0C0C0E-0C100C12-0C280C2A-0C330C35-0C390C3D-0C440C46-0C480C4A-0C4D0C550C560C580C590C60-0C630C66-0C6F0C78-0C7F0C820C830C85-0C8C0C8E-0C900C92-0CA80CAA-0CB30CB5-0CB90CBC-0CC40CC6-0CC80CCA-0CCD0CD50CD60CDE0CE0-0CE30CE6-0CEF0CF10CF20D020D030D05-0D0C0D0E-0D100D12-0D3A0D3D-0D440D46-0D480D4A-0D4E0D570D60-0D630D66-0D750D79-0D7F0D820D830D85-0D960D9A-0DB10DB3-0DBB0DBD0DC0-0DC60DCA0DCF-0DD40DD60DD8-0DDF0DF2-0DF40E01-0E3A0E3F-0E5B0E810E820E840E870E880E8A0E8D0E94-0E970E99-0E9F0EA1-0EA30EA50EA70EAA0EAB0EAD-0EB90EBB-0EBD0EC0-0EC40EC60EC8-0ECD0ED0-0ED90EDC-0EDF0F00-0F470F49-0F6C0F71-0F970F99-0FBC0FBE-0FCC0FCE-0FDA1000-10C510C710CD10D0-1248124A-124D1250-12561258125A-125D1260-1288128A-128D1290-12B012B2-12B512B8-12BE12C012C2-12C512C8-12D612D8-13101312-13151318-135A135D-137C1380-139913A0-13F41400-169C16A0-16F01700-170C170E-17141720-17361740-17531760-176C176E-1770177217731780-17DD17E0-17E917F0-17F91800-180E1810-18191820-18771880-18AA18B0-18F51900-191C1920-192B1930-193B19401944-196D1970-19741980-19AB19B0-19C919D0-19DA19DE-1A1B1A1E-1A5E1A60-1A7C1A7F-1A891A90-1A991AA0-1AAD1B00-1B4B1B50-1B7C1B80-1BF31BFC-1C371C3B-1C491C4D-1C7F1CC0-1CC71CD0-1CF61D00-1DE61DFC-1F151F18-1F1D1F20-1F451F48-1F4D1F50-1F571F591F5B1F5D1F5F-1F7D1F80-1FB41FB6-1FC41FC6-1FD31FD6-1FDB1FDD-1FEF1FF2-1FF41FF6-1FFE2000-2064206A-20712074-208E2090-209C20A0-20B920D0-20F02100-21892190-23F32400-24262440-244A2460-26FF2701-2B4C2B50-2B592C00-2C2E2C30-2C5E2C60-2CF32CF9-2D252D272D2D2D30-2D672D6F2D702D7F-2D962DA0-2DA62DA8-2DAE2DB0-2DB62DB8-2DBE2DC0-2DC62DC8-2DCE2DD0-2DD62DD8-2DDE2DE0-2E3B2E80-2E992E9B-2EF32F00-2FD52FF0-2FFB3000-303F3041-30963099-30FF3105-312D3131-318E3190-31BA31C0-31E331F0-321E3220-32FE3300-4DB54DC0-9FCCA000-A48CA490-A4C6A4D0-A62BA640-A697A69F-A6F7A700-A78EA790-A793A7A0-A7AAA7F8-A82BA830-A839A840-A877A880-A8C4A8CE-A8D9A8E0-A8FBA900-A953A95F-A97CA980-A9CDA9CF-A9D9A9DEA9DFAA00-AA36AA40-AA4DAA50-AA59AA5C-AA7BAA80-AAC2AADB-AAF6AB01-AB06AB09-AB0EAB11-AB16AB20-AB26AB28-AB2EABC0-ABEDABF0-ABF9AC00-D7A3D7B0-D7C6D7CB-D7FBD800-FA6DFA70-FAD9FB00-FB06FB13-FB17FB1D-FB36FB38-FB3CFB3EFB40FB41FB43FB44FB46-FBC1FBD3-FD3FFD50-FD8FFD92-FDC7FDF0-FDFDFE00-FE19FE20-FE26FE30-FE52FE54-FE66FE68-FE6BFE70-FE74FE76-FEFCFEFFFF01-FFBEFFC2-FFC7FFCA-FFCFFFD2-FFD7FFDA-FFDCFFE0-FFE6FFE8-FFEEFFF9-FFFD"
     });
 
