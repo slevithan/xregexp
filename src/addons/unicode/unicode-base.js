@@ -47,7 +47,7 @@
 
 // Converts a decimal number to hexadecimal
     function hex(dec) {
-        return pad(parseInt(dec, 10).toString(16));
+        return parseInt(dec, 10).toString(16);
     }
 
 // Inverts a list of Unicode code points and ranges
@@ -118,7 +118,7 @@
  * XRegExp.addUnicodePackage({
  *   xdigit: '0030-00390041-00460061-0066' // 0-9A-Fa-f
  * }, {
- *   xdigit, 'Hexadecimal'
+ *   xdigit: 'Hexadecimal'
  * });
  */
     XRegExp.addUnicodePackage = function (pack, aliases) {
