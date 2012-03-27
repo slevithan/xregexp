@@ -46,7 +46,6 @@
             innerStart,
             leftMatch,
             rightMatch,
-            escaped,
             esc;
         left = XRegExp(left, basicFlags);
         right = XRegExp(right, basicFlags);
@@ -58,9 +57,9 @@
             if (/\\[1-9]/.test(right.source.replace(/\\[0\D]|\[(?:[^\\\]]|\\[\s\S])*]/g, ""))) {
                 throw new SyntaxError("can't use escape character if backreference in delimiter");
             }
-            escaped = XRegExp.escape(escapeChar);
+            escapeChar = XRegExp.escape(escapeChar);
             esc = new RegExp(
-                "(?:" + escaped + "[\\S\\s]|(?:(?!" + left.source + "|" + right.source + ")[^" + escaped + "])+)+",
+                "(?:" + escapeChar + "[\\S\\s]|(?:(?!" + left.source + "|" + right.source + ")[^" + escapeChar + "])+)+",
                 flags.replace(/[^im]+/g, "") // Flags gy not needed here; flags nsx handled by XRegExp
             );
         }
@@ -73,7 +72,7 @@
             }
             leftMatch = XRegExp.exec(str, left, delimEnd);
             rightMatch = XRegExp.exec(str, right, delimEnd);
-            // Keep only the leftmost result
+            // Keep the leftmost match only
             if (leftMatch && rightMatch) {
                 if (leftMatch.index <= rightMatch.index) {
                     rightMatch = null;

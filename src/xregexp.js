@@ -803,7 +803,7 @@ XRegExp = XRegExp || (function (undef) {
     };
 
 /**
- * The semantic version number.
+ * The version number. New major versions indicate syntax changes.
  * @static
  * @memberOf XRegExp
  * @type String
