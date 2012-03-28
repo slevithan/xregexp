@@ -16,7 +16,7 @@ var date = XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
 
 // XRegExp.exec gives you named backreferences on the match result
 var match = XRegExp.exec('2012-02-22', date);
-match.day; // -> '22'
+match.date; // -> '22'
 
 // It also includes optional pos and sticky arguments
 var pos = 2, result = [];
