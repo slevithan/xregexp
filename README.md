@@ -165,7 +165,7 @@ First include the script:
 <script src="addons/build.js"></script>
 ~~~
 
-You can then build complex regular expressions that use named subpatterns for readability and code reuse:
+You can then build complex regular expressions that use named subpatterns, for readability and code reuse:
 
 ~~~ js
 var color = XRegExp.build("{{keyword}}|{{func}}|{{hex}}", {
@@ -177,7 +177,7 @@ var color = XRegExp.build("{{keyword}}|{{func}}|{{hex}}", {
 });
 ~~~
 
-The `{{…}}` syntax works only for regexes created by `XRegExp.build`.
+The `{{…}}` syntax works only for regexes created by `XRegExp.build`. If present, a leading `^` and trailing `$` are stripped from subpatterns provided as regex objects.
 
 
 ## How to run server-side tests
@@ -200,7 +200,7 @@ XRegExp and addons copyright 2007-2012 by [Steven Levithan](http://stevenlevitha
 
 Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/). Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
 
-Thanks to [Lea Verou](http://lea.verou.me/) for the [inspiration](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/) behind XRegExp.build.
+Thanks to [Lea Verou](http://lea.verou.me/) for the [inspiration](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/) behind addon `XRegExp.build`.
 
 All code released under the [MIT License](http://opensource.org/licenses/mit-license.php).
 

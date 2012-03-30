@@ -13,11 +13,11 @@
     XRegExp.install("extensibility");
 
 /**
- * Builds complex regular expressions using named subpatterns for readability and code reuse.
+ * Builds complex regular expressions using named subpatterns, for readability and code reuse.
  * @memberOf XRegExp
  * @param {String} pattern XRegExp pattern using `{{..}}` for embedded subpatterns.
- * @param {Object} subs Named subpatterns as strings or regexes. Leading ^ and trailing $ are
- *   stripped from subpatterns provided as regex objects.
+ * @param {Object} subs Named subpatterns as strings or regexes. If present, a leading ^ and
+ *   trailing $ are stripped from subpatterns provided as regex objects.
  * @param {String} [flags] Any combination of XRegExp flags.
  * @returns {RegExp} Extended regular expression object.
  * @example
@@ -34,7 +34,11 @@
         var p, regex;
         data = {};
         for (p in subs) {
-            data[p] = XRegExp.isRegExp(subs[p]) ? subs[p].source.replace(/^\^|\$$/g, "") : subs[p];
+            if (subs.hasOwnProperty(p)) {
+                data[p] = XRegExp.isRegExp(subs[p]) ?
+                        subs[p].source.replace(/^\^|\$$/g, "") :
+                        String(subs[p]);
+            }
         }
         try {
             regex = XRegExp(pattern, flags);
@@ -49,7 +53,7 @@
     XRegExp.addToken(
         /{{([\w$]+)}}/,
         function (match) {
-            if (data[match[1]] === undefined) {
+            if (!data.hasOwnProperty(match[1])) {
                 throw new ReferenceError("unknown property: " + match[1]);
             }
             return "(?:" + data[match[1]] + ")";
