@@ -18,11 +18,7 @@
         throw new ReferenceError("Unicode Base must be loaded before Unicode Blocks");
     }
 
-    var extensible = XRegExp.isInstalled("extensibility");
-
-    if (!extensible) {
-        XRegExp.install("extensibility"); // Temporarily install
-    }
+    XRegExp.install("extensibility");
 
     XRegExp.addUnicodePackage({
         InBasic_Latin: "0000-007F",
@@ -182,10 +178,6 @@
         InHalfwidth_and_Fullwidth_Forms: "FF00-FFEF",
         InSpecials: "FFF0-FFFF"
     });
-
-    if (!extensible) {
-        XRegExp.uninstall("extensibility"); // Revert to previous state
-    }
 
 }(XRegExp));
 

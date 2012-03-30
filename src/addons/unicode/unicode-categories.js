@@ -18,11 +18,7 @@
         throw new ReferenceError("Unicode Base must be loaded before Unicode Categories");
     }
 
-    var extensible = XRegExp.isInstalled("extensibility");
-
-    if (!extensible) {
-        XRegExp.install("extensibility"); // Temporarily install
-    }
+    XRegExp.install("extensibility");
 
     XRegExp.addUnicodePackage({
         //L: "", // Included in the Unicode Base addon
@@ -101,10 +97,6 @@
         Cs: "Surrogate",
         Cn: "Unassigned"
     });
-
-    if (!extensible) {
-        XRegExp.uninstall("extensibility"); // Revert to previous state
-    }
 
 }(XRegExp));
 

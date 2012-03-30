@@ -1,5 +1,5 @@
 /*!
- * XRegExp Match Recursive v0.2.0-beta
+ * XRegExp.matchRecursive v0.2.0-beta
  * Copyright 2009-2012 Steven Levithan <http://xregexp.com/>
  * Available under the MIT License
  */
@@ -12,8 +12,8 @@
  * position data. An error is thrown if delimiters are unbalanced within the data.
  * @memberOf XRegExp
  * @param {String} str String to search.
- * @param {String} left Left delimiter as an XRegExp pattern string.
- * @param {String} right Right delimiter as an XRegExp pattern string.
+ * @param {String} left Left delimiter as an XRegExp pattern.
+ * @param {String} right Right delimiter as an XRegExp pattern.
  * @param {String} [flags] Flags for the left and right delimiters. Use any of: `gimnsxy`.
  * @param {Object} [options] Lets you specify `valueNames` and `escapeChar` options.
  * @returns {Array} Array of matches, or an empty array.

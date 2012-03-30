@@ -15,8 +15,7 @@
 (function (XRegExp) {
     "use strict";
 
-    var unicode = {},
-        extensible = XRegExp.isInstalled("extensibility");
+    var unicode = {};
 
 /*--------------------------------------
  *  Private helper functions
@@ -83,9 +82,7 @@
  *  Core functionality
  *------------------------------------*/
 
-    if (!extensible) {
-        XRegExp.install("extensibility"); // Temporarily install
-    }
+    XRegExp.install("extensibility");
 
 // Adds Unicode token syntax to XRegExp: \p{..} or \P{..}
     XRegExp.addToken(
@@ -116,9 +113,9 @@
  * @example
  *
  * XRegExp.addUnicodePackage({
- *   xdigit: '0030-00390041-00460061-0066' // 0-9A-Fa-f
+ *   XDigit: '0030-00390041-00460061-0066' // 0-9A-Fa-f
  * }, {
- *   xdigit: 'Hexadecimal'
+ *   XDigit: 'Hexadecimal'
  * });
  */
     XRegExp.addUnicodePackage = function (pack, aliases) {
@@ -148,10 +145,6 @@
     }, {
         L: "Letter"
     });
-
-    if (!extensible) {
-        XRegExp.uninstall("extensibility"); // Revert to previous state
-    }
 
 }(XRegExp));
 

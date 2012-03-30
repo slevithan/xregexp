@@ -97,7 +97,7 @@ unicodeWord.test('日本語'); // -> true
 unicodeWord.test('العربية'); // -> true
 ~~~
 
-The base script adds `\p{L}` (and its alias, `\p{Letter}`), but other Unicode categories, scripts, blocks, and properties require addon packages. Try these next examples after additionally including `unicode-scripts.js`:
+The base script adds `\p{Letter}` and its alias `\p{L}`, but other Unicode categories, scripts, blocks, and properties require addon packages. Try these next examples after additionally including `unicode-scripts.js`:
 
 ~~~ js
 XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
@@ -109,9 +109,9 @@ XRegExp uses the Unicode 6.1 character database (released January 2012).
 More details: [Addons: Unicode](http://xregexp.com/plugins/#unicode).
 
 
-## XRegExp Match Recursive
+## XRegExp.matchRecursive
 
-First include the Match Recursive script:
+First include the script:
 
 ~~~ html
 <script src="xregexp.js"></script>
@@ -156,6 +156,30 @@ XRegExp.matchRecursive(str, '<', '>', 'gy');
 More details: [Addons: Match Recursive](http://xregexp.com/plugins/#matchRecursive).
 
 
+## XRegExp.build
+
+First include the script:
+
+~~~ html
+<script src="xregexp.js"></script>
+<script src="addons/build.js"></script>
+~~~
+
+You can then build complex regular expressions that use named subpatterns for readability and code reuse:
+
+~~~ js
+var color = XRegExp.build("{{keyword}}|{{func}}|{{hex}}", {
+    keyword: /^(?:red|tan|[a-z]{4,20})$/,
+    func: XRegExp.build("^(?:rgb|hsl)a?\\((?:\\s*{{number}}%?\\s*,?\\s*){3,4}\\)$", {
+        number: /^-?\d+(?:\.\d+)?$/
+    }),
+    hex: /^#(?:[0-9a-f]{1,2}){3}$/
+});
+~~~
+
+The `{{…}}` syntax works only for regexes created by `XRegExp.build`.
+
+
 ## How to run server-side tests
 
 ~~~ bash
@@ -175,6 +199,8 @@ npm test  # in the xregexp root directory
 XRegExp and addons copyright 2007-2012 by [Steven Levithan](http://stevenlevithan.com/).
 
 Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/). Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
+
+Thanks to [Lea Verou](http://lea.verou.me/) for the [inspiration](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/) behind XRegExp.build.
 
 All code released under the [MIT License](http://opensource.org/licenses/mit-license.php).
 

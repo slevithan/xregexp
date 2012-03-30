@@ -18,11 +18,7 @@
         throw new ReferenceError("Unicode Base must be loaded before Unicode Scripts");
     }
 
-    var extensible = XRegExp.isInstalled("extensibility");
-
-    if (!extensible) {
-        XRegExp.install("extensibility"); // Temporarily install
-    }
+    XRegExp.install("extensibility");
 
     XRegExp.addUnicodePackage({
         Arabic: "0600-06040606-060B060D-061A061E0620-063F0641-064A0656-065E066A-066F0671-06DC06DE-06FF0750-077F08A008A2-08AC08E4-08FEFB50-FBC1FBD3-FD3DFD50-FD8FFD92-FDC7FDF0-FDFCFE70-FE74FE76-FEFC",
@@ -97,10 +93,6 @@
         Vai: "A500-A62B",
         Yi: "A000-A48CA490-A4C6"
     });
-
-    if (!extensible) {
-        XRegExp.uninstall("extensibility"); // Revert to previous state
-    }
 
 }(XRegExp));
 
