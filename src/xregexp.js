@@ -391,6 +391,7 @@ XRegExp = XRegExp || (function (undef) {
                 scope: options.scope || defaultScope,
                 trigger: options.trigger || null
             });
+            // TODO: Implement `options.customFlags`
         },
         off: function () {
             throw new Error("extensibility must be installed before running addToken");
@@ -398,10 +399,10 @@ XRegExp = XRegExp || (function (undef) {
     };
 
 /**
- * Extends or changes XRegExp syntax and allows custom flags. This is used internally by XRegExp
- * and can be used to create XRegExp addons. `XRegExp.install('extensibility')` must be run before
- * calling this function, or an error is thrown. If more than one token can match the same string,
- * the last added wins.
+ * Extends or changes XRegExp syntax and allows custom flags. This is used internally and can be
+ * used to create XRegExp addons. `XRegExp.install('extensibility')` must be run before calling
+ * this function, or an error is thrown. If more than one token can match the same string, the last
+ * added wins.
  * @memberOf XRegExp
  * @param {RegExp} regex Regex object that matches the new token.
  * @param {Function} handler Function that returns a new pattern string (using native regex syntax)
@@ -415,17 +416,45 @@ XRegExp = XRegExp || (function (undef) {
  *     if a flag is set. If `false` is returned, the matched string can be matched by other tokens.
  *     Has access to persistent properties of the regex being built, through `this` (including
  *     function `this.hasFlag`).
+ *   <li>`customFlags` {String} Nonnative flags used by the token's handler or trigger functions.
+ *     Prevents XRegExp from throwing an invalid flag error when these flags are used.
  * @returns {undefined} N/A
  * @example
  *
- * // Adds support for escape sequences: \Q..\E and \Q..
+ * // Basic usage: Adds \a for ALERT character
  * XRegExp.addToken(
- *   /\\Q([\s\S]*?)(?:\\E|$)/,
- *   function (match) {return XRegExp.escape(match[1]);},
+ *   /\\a/,
+ *   function () {return '\\x07';},
  *   {scope: 'all'}
  * );
  */
     self.addToken = addToken.off;
+
+/**
+ * Extends or changes XRegExp replacement text syntax. This is used internally and can be used to
+ * create XRegExp addons. `XRegExp.install('extensibility')` must be run before calling this
+ * function, or an error is thrown. If more than one token can match the same string, the last
+ * added wins.
+ * @memberOf XRegExp
+ * @param {RegExp} regex Regex object that matches the new replacement text token.
+ * @param {Function} handler Function that returns a replacement text substitution string, to be
+ *   used within all future XRegExp string replacements. Has access to persistent properties of the
+ *   replacement string being built, through `this`. Invoked with two arguments:
+ *   <li>The token match array, with named backreference properties.
+ *   <li>The string replacement arguments array, with the matched substring and backreferences, the
+ *     match offset, and the total string being examined.
+ * @param {Object} [options] Options object with optional properties:
+ *   <li>`trigger` {Function} Function that returns `true` when the token should be applied. If
+ *     `false` is returned, the matched string can be matched by other tokens. Has access to
+ *     persistent properties of the replacement string being built, through `this`.
+ * @returns {undefined} N/A
+ * @example
+ *
+ * // TODO: Add me
+ */
+    self.addReplacementTextToken = function (regex, handler, options) {
+        // TODO: Implement me
+    };
 
 /**
  * Caches and returns the result of calling `XRegExp(pattern, flags)`. On any subsequent call with
