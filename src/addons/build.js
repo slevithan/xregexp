@@ -35,9 +35,7 @@
         data = {};
         for (p in subs) {
             if (subs.hasOwnProperty(p)) {
-                data[p] = XRegExp.isRegExp(subs[p]) ?
-                        subs[p].source.replace(/^\^|\$$/g, "") :
-                        String(subs[p]);
+                data[p] = XRegExp.isRegExp(subs[p]) ? subs[p].source.replace(/^\^|\$$/g, "") : subs[p];
             }
         }
         try {

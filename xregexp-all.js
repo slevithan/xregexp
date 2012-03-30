@@ -434,32 +434,6 @@ XRegExp = XRegExp || (function (undef) {
     self.addToken = addToken.off;
 
 /**
- * Extends or changes XRegExp replacement text syntax. This is used internally and can be used to
- * create XRegExp addons. `XRegExp.install('extensibility')` must be run before calling this
- * function, or an error is thrown. If more than one token can match the same string, the last
- * added wins.
- * @memberOf XRegExp
- * @param {RegExp} regex Regex object that matches the new replacement text token.
- * @param {Function} handler Function that returns a replacement text substitution string, to be
- *   used within all future XRegExp string replacements. Has access to persistent properties of the
- *   replacement string being built, through `this`. Invoked with two arguments:
- *   <li>The token match array, with named backreference properties.
- *   <li>The string replacement arguments array, with the matched substring and backreferences, the
- *     match offset, and the total string being examined.
- * @param {Object} [options] Options object with optional properties:
- *   <li>`trigger` {Function} Function that returns `true` when the token should be applied. If
- *     `false` is returned, the matched string can be matched by other tokens. Has access to
- *     persistent properties of the replacement string being built, through `this`.
- * @returns {undefined} N/A
- * @example
- *
- * // TODO: Add me
- */
-    self.addReplacementTextToken = function (regex, handler, options) {
-        // TODO: Implement me
-    };
-
-/**
  * Caches and returns the result of calling `XRegExp(pattern, flags)`. On any subsequent call with
  * the same pattern and flag combination, the cached copy is returned.
  * @memberOf XRegExp
@@ -1220,9 +1194,12 @@ XRegExp = XRegExp || (function (undef) {
             // Keep tokens separated unless the following token is a quantifier
             return nativ.test.call(quantifier, match.input.slice(match.index + match[0].length)) ? "" : "(?:)";
         },
-        {trigger: function () {
-            return this.hasFlag("x");
-        }});
+        {
+            trigger: function () {
+                return this.hasFlag("x");
+            },
+            customFlags: "x"
+        });
 
 /* Dot, in dotall mode (aka singleline mode, flag s) only.
  */
@@ -1230,9 +1207,12 @@ XRegExp = XRegExp || (function (undef) {
         function () {
             return "[\\s\\S]";
         },
-        {trigger: function () {
-            return this.hasFlag("s");
-        }});
+        {
+            trigger: function () {
+                return this.hasFlag("s");
+            },
+            customFlags: "s"
+        });
 
 /* Named capturing group; match the opening delimiter only: (?<name>
  * Capture names can use the characters A-Z, a-z, 0-9, _, and $ only. Names can't be integers.
@@ -1274,7 +1254,8 @@ XRegExp = XRegExp || (function (undef) {
             }
             this.captureNames.push(null);
             return "(";
-        });
+        },
+        {customFlags: "n"});
 
 /*--------------------------------------
  *  Expose XRegExp
@@ -2066,9 +2047,7 @@ XRegExp = XRegExp || (function (undef) {
         data = {};
         for (p in subs) {
             if (subs.hasOwnProperty(p)) {
-                data[p] = XRegExp.isRegExp(subs[p]) ?
-                        subs[p].source.replace(/^\^|\$$/g, "") :
-                        String(subs[p]);
+                data[p] = XRegExp.isRegExp(subs[p]) ? subs[p].source.replace(/^\^|\$$/g, "") : subs[p];
             }
         }
         try {
