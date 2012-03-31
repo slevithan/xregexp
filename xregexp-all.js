@@ -239,7 +239,6 @@ XRegExp = XRegExp || (function (undef) {
  * Enables or disables XRegExp syntax and flag extensibility.
  * @private
  * @param {Boolean} on `true` to enable; `false` to disable.
- * @returns {undefined} N/A
  */
     function setExtensibility(on) {
         self.addToken = addToken[on ? "on" : "off"];
@@ -250,7 +249,6 @@ XRegExp = XRegExp || (function (undef) {
  * Enables or disables new `RegExp.prototype` methods.
  * @private
  * @param {Boolean} on `true` to enable; `false` to disable.
- * @returns {undefined} N/A
  */
     function setMethods(on) {
         if (on) {
@@ -276,7 +274,6 @@ XRegExp = XRegExp || (function (undef) {
  * Enables or disables native method overrides.
  * @private
  * @param {Boolean} on `true` to enable; `false` to disable.
- * @returns {undefined} N/A
  */
     function setNatives(on) {
         RegExp.prototype.exec = (on ? fixed : nativ).exec;
@@ -421,7 +418,6 @@ XRegExp = XRegExp || (function (undef) {
  *     function `this.hasFlag`).
  *   <li>`customFlags` {String} Nonnative flags used by the token's handler or trigger functions.
  *     Prevents XRegExp from throwing an invalid flag error when the specified flags are used.
- * @returns {undefined} N/A
  * @example
  *
  * // Basic usage: Adds \a for ALERT character
@@ -568,7 +564,6 @@ XRegExp = XRegExp || (function (undef) {
  * Installs optional features according to the specified options.
  * @memberOf XRegExp
  * @param {Object|String} options Options object or string.
- * @returns {undefined} N/A
  * @example
  *
  * // With an options object
@@ -774,7 +769,6 @@ XRegExp = XRegExp || (function (undef) {
  * Uninstalls optional features according to the specified options.
  * @memberOf XRegExp
  * @param {Object|String} options Options object or string.
- * @returns {undefined} N/A
  * @example
  *
  * // With an options object
@@ -1273,7 +1267,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** unicode-base.js *****/
 
 /*!
- * XRegExp Unicode Base v1.0.0-dev, 2012-03-29
+ * XRegExp Unicode Base v1.0.0-dev, 2012-03-31
  * (c) 2008-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1 <http://unicode.org/>
@@ -1383,7 +1377,6 @@ XRegExp = XRegExp || (function (undef) {
  * @memberOf XRegExp
  * @param {Object} pack Named sets of Unicode code points and ranges.
  * @param {Object} [aliases] Aliases for the primary token names.
- * @returns {undefined} N/A
  * @example
  *
  * XRegExp.addUnicodePackage({

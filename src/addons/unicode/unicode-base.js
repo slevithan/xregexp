@@ -1,5 +1,5 @@
 /*!
- * XRegExp Unicode Base v1.0.0-dev, 2012-03-29
+ * XRegExp Unicode Base v1.0.0-dev, 2012-03-31
  * (c) 2008-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1 <http://unicode.org/>
@@ -109,7 +109,6 @@
  * @memberOf XRegExp
  * @param {Object} pack Named sets of Unicode code points and ranges.
  * @param {Object} [aliases] Aliases for the primary token names.
- * @returns {undefined} N/A
  * @example
  *
  * XRegExp.addUnicodePackage({
