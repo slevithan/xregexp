@@ -70,8 +70,8 @@ XRegExp = XRegExp || (function (undef) {
 // Any backreference in replacement strings
         replacementToken = /\$(?:(\d\d?|[$&`'])|{([$\w]+)})/g,
 
-// Nonnative and duplicate flags
-        flagClip = /[^gimy]+|([\s\S])(?=[\s\S]*\1)/g,
+// Any character with a later instance in the string
+        duplicateFlags = /([\s\S])(?=[\s\S]*\1)/g,
 
 // Any greedy/lazy quantifier
         quantifier = /^(?:[?*+]|{\d+(?:,\d*)?})\??/,
@@ -83,7 +83,10 @@ XRegExp = XRegExp || (function (undef) {
         hasNativeY = RegExp.prototype.sticky !== undef,
 
 // Used to kill infinite recursion during XRegExp construction
-        isInsideConstructor = false;
+        isInsideConstructor = false,
+
+// Storage for known flags, including addon flags
+        registeredFlags = "gim" + (hasNativeY ? "y" : "");
 
 /*--------------------------------------
  *  Private helper functions
@@ -116,8 +119,8 @@ XRegExp = XRegExp || (function (undef) {
         return (regex.global     ? "g" : "") +
                (regex.ignoreCase ? "i" : "") +
                (regex.multiline  ? "m" : "") +
-               (regex.extended   ? "x" : "") + // Proposed for ES6; included in AS3
-               (regex.sticky     ? "y" : ""); // Firefox 3+
+               (regex.extended   ? "x" : "") + // Proposed for ES6, included in AS3
+               (regex.sticky     ? "y" : ""); // Proposed for ES6, included in Firefox 3+
     }
 
 /**
@@ -134,7 +137,7 @@ XRegExp = XRegExp || (function (undef) {
         if (!self.isRegExp(regex)) {
             throw new TypeError("type RegExp expected");
         }
-        var flags = getNativeFlags(regex) + (addFlags || "");
+        var flags = nativ.replace.call(getNativeFlags(regex) + (addFlags || ""), duplicateFlags, "");
         if (removeFlags) {
             // Would need to escape `removeFlags` if this was public
             flags = nativ.replace.call(flags, new RegExp("[" + removeFlags + "]+", "g"), "");
@@ -146,8 +149,6 @@ XRegExp = XRegExp || (function (undef) {
                 regex.xregexp.captureNames ? regex.xregexp.captureNames.slice(0) : null
             );
         } else {
-            // Remove duplicate flags to avoid throwing
-            flags = nativ.replace.call(flags, /([\s\S])(?=[\s\S]*\1)/g, "");
             // Augment with `XRegExp.prototype` methods, but use native `RegExp` (avoid searching for special tokens)
             regex = augment(new RegExp(regex.source, flags), null, true);
         }
@@ -251,21 +252,14 @@ XRegExp = XRegExp || (function (undef) {
  * @param {Boolean} on `true` to enable; `false` to disable.
  */
     function setMethods(on) {
+        var Rp = RegExp.prototype;
         if (on) {
-            RegExp.prototype.apply = self.prototype.apply;
-            RegExp.prototype.call = self.prototype.call;
+            Rp.apply = self.prototype.apply;
+            Rp.call = self.prototype.call;
         } else {
             // Restore methods if they existed before XRegExp ran; otherwise delete
-            if (nativ.apply) {
-                RegExp.prototype.apply = nativ.apply;
-            } else {
-                delete RegExp.prototype.apply;
-            }
-            if (nativ.call) {
-                RegExp.prototype.call = nativ.call;
-            } else {
-                delete RegExp.prototype.call;
-            }
+            nativ.apply ? Rp.apply = nativ.apply : delete Rp.apply;
+            nativ.call ? Rp.call = nativ.call : delete Rp.call;
         }
         features.methods = on;
     }
@@ -328,6 +322,7 @@ XRegExp = XRegExp || (function (undef) {
         if (isInsideConstructor) {
             throw new Error("can't call the XRegExp constructor within token definition functions");
         }
+
         var output = [],
             scope = defaultScope,
             tokenContext = {
@@ -335,9 +330,6 @@ XRegExp = XRegExp || (function (undef) {
                 captureNames: [],
                 hasFlag: function (flag) {
                     return flags.indexOf(flag) > -1;
-                },
-                setFlag: function (flag) {
-                    flags += flag;
                 }
             },
             pos = 0,
@@ -346,6 +338,24 @@ XRegExp = XRegExp || (function (undef) {
             chr;
         pattern = pattern === undef ? "" : String(pattern);
         flags = flags === undef ? "" : String(flags);
+
+        if (nativ.match.call(flags, duplicateFlags)) { // Don't use test/exec because they would update lastIndex
+            throw new SyntaxError("invalid duplicate regular expression flag");
+        }
+        // Strip/apply leading mode modifier with any combination of flags except g or y: (?imnsx)
+        pattern = nativ.replace.call(pattern, /^\(\?([a-z]+)\)/i, function ($0, $1) {
+            if (nativ.test.call(/[gy]/, $1)) {
+                throw new SyntaxError("can't use flag g or y in mode modifier");
+            }
+            flags = nativ.replace.call(flags + $1, duplicateFlags, "");
+            return "";
+        });
+        self.forEach(flags, /[\s\S]/, function (m) {
+            if (registeredFlags.indexOf(m[0]) < 0) {
+                throw new SyntaxError("invalid regular expression flag " + m[0]);
+            }
+        });
+
         while (pos < pattern.length) {
             // Check for custom tokens at the current position
             tokenResult = runTokens(pattern, pos, scope, tokenContext);
@@ -371,8 +381,9 @@ XRegExp = XRegExp || (function (undef) {
                 }
             }
         }
+
         return augment(
-            new RegExp(output.join(""), nativ.replace.call(flags, flagClip, "")),
+            new RegExp(output.join(""), nativ.replace.call(flags, /[^gimy]+/g, "")),
             tokenContext.hasNamedCapture ? tokenContext.captureNames : null
         );
     };
@@ -391,7 +402,9 @@ XRegExp = XRegExp || (function (undef) {
                 scope: options.scope || defaultScope,
                 trigger: options.trigger || null
             });
-            // TODO: Implement `options.customFlags`
+            if (options.customFlags) {
+                registeredFlags = nativ.replace.call(registeredFlags + options.customFlags, duplicateFlags, "");
+            }
         },
         off: function () {
             throw new Error("extensibility must be installed before running addToken");
@@ -1112,8 +1125,8 @@ XRegExp = XRegExp || (function (undef) {
     add = addToken.on;
 
 /* Letter identity escapes that natively match literal characters: \p, etc.
- * These should be SyntaxErrors but are allowed in web reality. XRegExp makes them so to reserve
- * the syntax, but lets them be superseded by XRegExp addons or future native functionality.
+ * Should be SyntaxErrors but are allowed in web reality. XRegExp makes them errors to reserve
+ * their syntax, but lets them be superseded by XRegExp addons.
  */
     add(/\\([ABCE-RTUVXYZaeg-mopqyz]|c(?![A-Za-z])|u(?![\dA-Fa-f]{4})|x(?![\dA-Fa-f]{2}))/,
         function (match, scope) {
@@ -1121,14 +1134,7 @@ XRegExp = XRegExp || (function (undef) {
             if (match[1] === "B" && scope === defaultScope) {
                 return match[0];
             }
-            // It's OK if compiling this regex triggers a SyntaxError in future browsers
-            var regex = new RegExp("^" + (scope === classScope ? "[" + match[0] + "]" : match[0]) + "$");
-            // If native handling is to match the literal character (bare or with backslash)
-            if (regex.test(match[1]) || regex.test(match[0])) {
-                throw new SyntaxError("can't use identity escape: " + match[0]);
-            }
-            // Allow native browser extensions or future ES syntax
-            return match[0];
+            throw new SyntaxError("invalid escape: " + match[0]);
         },
         {scope: "all"});
 
@@ -1150,18 +1156,6 @@ XRegExp = XRegExp || (function (undef) {
         function (match) {
             // Keep tokens separated unless the following token is a quantifier
             return nativ.test.call(quantifier, match.input.slice(match.index + match[0].length)) ? "" : "(?:)";
-        });
-
-/* Leading mode modifier, with any combination of flags except g or y: (?imnsx)
- * Does not support other uses of mode modifiers such as x(?i), (?-i), (?i: ), or (?i)(?m)
- */
-    add(/^\(\?([a-z]+)\)/i,
-        function (match) {
-            if (nativ.test.call(/[gy]/, match[1])) {
-                throw new SyntaxError("can't use flag g or y in mode modifier");
-            }
-            this.setFlag(match[1]);
-            return "";
         });
 
 /* Named backreference: \k<name>

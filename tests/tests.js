@@ -75,8 +75,11 @@ test("XRegExp.addToken", function () {
 	XRegExp.addToken(/\x02/, function () {return "2";}, {scope: "class"});
 	XRegExp.addToken(/\x03/, function () {return "3";}, {scope: "default"});
 	XRegExp.addToken(/\x04/, function () {return "4";}, {scope: "all"});
-	XRegExp.addToken(/\x05/, function () {return "5";}, {scope: "default", trigger: function () {return this.hasFlag("5");}});
-	XRegExp.addToken(/\x06/, function () {this.setFlag("m"); return "6";});
+	XRegExp.addToken(/\x05/, function () {return "5";}, {
+		scope: "default",
+		trigger: function () {return this.hasFlag("5");},
+		customFlags: "5"
+	});
 	XRegExp.uninstall("extensibility");
 
 	ok(XRegExp("\x01").test("1"), "Default scope matches outside class");
@@ -89,7 +92,6 @@ test("XRegExp.addToken", function () {
 	ok(XRegExp("[\x04]").test("4"), "Explicit all scope matches inside class");
 	ok(!XRegExp("\x05").test("5"), "Trigger with hasFlag skips token when flag is missing");
 	ok(XRegExp("\x05", "5").test("5"), "Trigger with hasFlag uses token when flag is included");
-	ok(XRegExp("\x06").multiline, "Handler with setFlag activates flag when used");
 });
 
 test("XRegExp.cache", function () {
