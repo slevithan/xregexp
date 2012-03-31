@@ -1,7 +1,7 @@
 /*!
- * XRegExp BackCompat v1.0.0-beta
- * Copyright 2012 Steven Levithan <http://xregexp.com/>
- * Available under the MIT License
+ * XRegExp BackCompat v1.0.0-beta, 2012-03-31
+ * (c) 2012 Steven Levithan <http://xregexp.com/>
+ * MIT License
  */
 
 /**
@@ -10,27 +10,43 @@
 (function (XRegExp) {
     "use strict";
 
-// XRegExp v2.0.0 doesn't touch global objects/methods or allow syntax extensions by default
+/**
+ * XRegExp v2.0.0 doesn't touch global objects/methods or allow syntax extensions by default. This
+ * brings back the previous functionality.
+ */
     XRegExp.install("natives methods extensibility");
 
-// Renamed in XRegExp v2.0.0
+/**
+ * @deprecated As of XRegExp v2.0.0. Replaced by {@link #globalize}.
+ */
     XRegExp.copyAsGlobal = XRegExp.globalize;
 
-// Renamed in XRegExp v2.0.0
+/**
+ * @deprecated As of XRegExp v2.0.0. Replaced by {@link #exec}.
+ */
     XRegExp.execAt = XRegExp.exec;
 
-// Renamed in XRegExp v2.0.0
+/**
+ * @deprecated As of XRegExp v2.0.0. Replaced by {@link #forEach}.
+ */
     XRegExp.iterate = XRegExp.forEach;
 
-// Removed in XRegExp v2.0.0. To make this permanent, `delete XRegExp.install` afterward
+/**
+ * @deprecated As of XRegExp v2.0.0. No relacement. To make this permanent,
+ *   `delete XRegExp.install` afterward.
+ */
     XRegExp.freezeTokens = function () {
         XRegExp.uninstall("extensibility");
     };
 
-// Renamed in XRegExp v1.5.0
+/**
+ * @deprecated As of XRegExp v1.5.0. Replaced by {@link #matchChain}.
+ */
     XRegExp.matchWithinChain = XRegExp.matchChain;
 
-// Removed in XRegExp v1.5.0
+/**
+ * @deprecated As of XRegExp v1.5.0. No replacement.
+ */
     RegExp.prototype.addFlags = function (flags) {
         var regex = XRegExp(this.source, /\/([a-z]*)$/i.exec(String(this))[1] + (flags || "")),
             captureNames = this.xregexp ? this.xregexp.captureNames : null;
@@ -41,12 +57,16 @@
         return regex;
     };
 
-// Removed in XRegExp v1.5.0
+/**
+ * @deprecated As of XRegExp v1.5.0. No replacement.
+ */
     RegExp.prototype.forEachExec = function (str, callback, context) {
         XRegExp.forEach(str, this, callback, context);
     };
 
-// Removed in XRegExp v1.5.0
+/**
+ * @deprecated As of XRegExp v1.5.0. No replacement.
+ */
     RegExp.prototype.validate = function (str) {
         var regex = new RegExp("^(?:" + this.source + ")$(?!\\s)", /\/([a-z]*)$/i.exec(String(this))[1]);
         if (this.global) {
@@ -55,7 +75,9 @@
         return str.search(regex) === 0;
     };
 
-// Removed in XRegExp v1.2.0
+/**
+ * @deprecated As of XRegExp v1.2.0. No replacement.
+ */
     RegExp.prototype.execAll = function (str) {
         return XRegExp.forEach(str, this, function (match) {
             this.push(match);

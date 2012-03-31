@@ -1,7 +1,7 @@
 /*!
- * XRegExp v2.0.0-beta-3
- * Copyright 2007-2012 Steven Levithan <http://xregexp.com/>
- * Available under the MIT License
+ * XRegExp v2.0.0-dev, 2012-03-31
+ * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
+ * MIT License
  */
 
 /**
@@ -806,12 +806,12 @@ XRegExp = XRegExp || (function (undef) {
     };
 
 /**
- * The version number. New major versions indicate syntax changes.
+ * The XRegExp version number.
  * @static
  * @memberOf XRegExp
  * @type String
  */
-    self.version = "2.0.0-beta-3";
+    self.version = "2.0.0-dev";
 
 /*--------------------------------------
  *  XRegExp.prototype methods
@@ -1115,19 +1115,18 @@ XRegExp = XRegExp || (function (undef) {
     add = addToken.on;
 
 /* Letter identity escapes that natively match literal characters: \p, etc.
- * These should be SyntaxErrors but are allowed in web reality. XRegExp therefore reserves the
- * syntax, but lets it be superseded by XRegExp addons or future native functionality.
+ * These should be SyntaxErrors but are allowed in web reality. XRegExp makes them so to reserve
+ * the syntax, but lets them be superseded by XRegExp addons or future native functionality.
  */
     add(/\\([ABCE-RTUVXYZaeg-mopqyz]|c(?![A-Za-z])|u(?![\dA-Fa-f]{4})|x(?![\dA-Fa-f]{2}))/,
         function (match, scope) {
             // \B is allowed in default scope only
-            if (scope === defaultScope && match[1] === "B") {
+            if (match[1] === "B" && scope === defaultScope) {
                 return match[0];
             }
-            // If building this regex triggers error handling in future browsers, that good
+            // It's OK if compiling this regex triggers a SyntaxError in future browsers
             var regex = new RegExp("^" + (scope === classScope ? "[" + match[0] + "]" : match[0]) + "$");
-            // Check if the native handling is to match the literal character (bare or preceded by
-            // a backslash)
+            // If native handling is to match the literal character (bare or with backslash)
             if (regex.test(match[1]) || regex.test(match[0])) {
                 throw new SyntaxError("can't use identity escape: " + match[0]);
             }

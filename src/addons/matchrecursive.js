@@ -1,7 +1,7 @@
 /*!
- * XRegExp.matchRecursive v0.2.0-beta
- * Copyright 2009-2012 Steven Levithan <http://xregexp.com/>
- * Available under the MIT License
+ * XRegExp.matchRecursive v0.2.0-beta, 2012-03-29
+ * (c) 2009-2012 Steven Levithan <http://xregexp.com/>
+ * MIT License
  */
 
 (function (XRegExp) {

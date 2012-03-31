@@ -1,8 +1,8 @@
 /*!
- * XRegExp.build v0.1.0-beta
- * Copyright 2012 Steven Levithan <http://xregexp.com/>
- * Available under the MIT License
- * Based on RegExp.create by Lea Verou <http://lea.verou.me/2011/03/create-complex-regexps-more-easily/>
+ * XRegExp.build v0.1.0-beta, 2012-03-30
+ * (c) 2012 Steven Levithan <http://xregexp.com/>
+ * MIT License
+ * Based on RegExp.create by Lea Verou <http://lea.verou.me/>
  */
 
 (function (XRegExp) {

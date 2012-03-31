@@ -1,8 +1,8 @@
 /*!
- * XRegExp Unicode Base v1.0.0-beta-3
- * Copyright 2008-2012 Steven Levithan <http://xregexp.com/>
- * Available under the MIT License
- * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/>
+ * XRegExp Unicode Base v1.0.0-dev, 2012-03-29
+ * (c) 2008-2012 Steven Levithan <http://xregexp.com/>
+ * MIT License
+ * Uses Unicode 6.1 <http://unicode.org/>
  */
 
 /**

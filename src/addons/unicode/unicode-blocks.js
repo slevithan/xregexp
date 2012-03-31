@@ -1,8 +1,8 @@
 /*!
- * XRegExp Unicode Blocks v1.2.0-beta
- * Copyright 2010-2012 Steven Levithan <http://xregexp.com/>
- * Available under the MIT License
- * Uses Unicode 6.1 <http://unicode.org/Public/6.1.0/ucd/Blocks.txt>
+ * XRegExp Unicode Blocks v1.2.0-beta, 2012-03-29
+ * (c) 2010-2012 Steven Levithan <http://xregexp.com/>
+ * MIT License
+ * Uses Unicode 6.1 <http://unicode.org/>
  */
 
 /**
