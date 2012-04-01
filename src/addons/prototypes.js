@@ -1,12 +1,12 @@
 /*!
- * XRegExp Prototype Methods v0.1.0-dev, 2012-04-01
+ * XRegExp Prototype Methods v0.1.0-beta, 2012-04-01
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
 
 /**
- * Adds a variety of methods to XRegExp.prototype, to be inherited by all XRegExp regexes. Regexes
- * copied by XRegExp also get XRegExp.prototype methods. Hence, the following work equivalently:
+ * Adds a collection of methods to `XRegExp.prototype`. RegExp objects copied by XRegExp are also
+ * augmented with any `XRegExp.prototype` methods. Hence, the following work equivalently:
  *
  * XRegExp('[a-z]', 'ig').call(null, 'abc');
  * XRegExp(/[a-z]/ig).call(null, 'abc');
@@ -32,7 +32,7 @@
     extend(XRegExp.prototype, {
 
 /**
- * Calls an XRegExp object's `test` method with the first value in the provided arguments array.
+ * Implicitly calls the regex's `test` method with the first value in the provided arguments array.
  * @memberOf XRegExp.prototype
  * @param {*} context Ignored. Accepted only for congruity with `Function.prototype.apply`.
  * @param {Array} args Array with the string to search as its first value.
@@ -46,7 +46,7 @@
         },
 
 /**
- * Calls an XRegExp object's `test` method with the provided string.
+ * Implicitly calls the regex's `test` method with the provided string.
  * @memberOf XRegExp.prototype
  * @param {*} context Ignored. Accepted only for congruity with `Function.prototype.call`.
  * @param {String} str String to search.
@@ -60,7 +60,7 @@
         },
 
 /**
- * Alias of {@link #XRegExp.forEach}.
+ * Implicitly calls {@link #XRegExp.forEach}.
  * @memberOf XRegExp.prototype
  * @example
  *
@@ -74,7 +74,7 @@
         },
 
 /**
- * Alias of {@link #XRegExp.globalize}.
+ * Implicitly calls {@link #XRegExp.globalize}.
  * @memberOf XRegExp.prototype
  * @example
  *
@@ -86,7 +86,7 @@
         },
 
 /**
- * Alias of {@link #XRegExp.exec}.
+ * Implicitly calls {@link #XRegExp.exec}.
  * @memberOf XRegExp.prototype
  * @example
  *
@@ -98,28 +98,14 @@
         },
 
 /**
- * Alias of {@link #XRegExp.replace}.
+ * Implicitly calls {@link #XRegExp.test}.
  * @memberOf XRegExp.prototype
  * @example
  *
- * var name = XRegExp('(?<first>\\w+) (?<last>\\w+)');
- * name.xreplace('John Smith', '${last}, ${first}');
- * // -> 'Smith, John'
+ * XRegExp('c').xtest('abc'); // -> true
  */
-        xreplace: function (str, replacement, scope) {
-            return XRegExp.replace(str, this, replacement, scope);
-        },
-
-/**
- * Alias of {@link #XRegExp.split}.
- * @memberOf XRegExp.prototype
- * @example
- *
- * XRegExp('(?i)([a-z]+)(\\d+)').xsplit('..word1..');
- * // -> ['..', 'word', '1', '..']
- */
-        xsplit: function (str, limit) {
-            return XRegExp.split(str, this, limit);
+        xtest: function (str, pos, sticky) {
+            return XRegExp.test(str, this, pos, sticky);
         }
 
     });

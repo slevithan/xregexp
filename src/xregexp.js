@@ -735,19 +735,45 @@ XRegExp = XRegExp || (function (undef) {
  * @example
  *
  * // Basic use
- * XRegExp.split('a b c d', ' ');
- * // -> ['a', 'b', 'c', 'd']
+ * XRegExp.split('a b c', ' ');
+ * // -> ['a', 'b', 'c']
  *
  * // With limit
- * XRegExp.split('a b c d', ' ', 2);
+ * XRegExp.split('a b c', ' ', 2);
  * // -> ['a', 'b']
  *
  * // Backreferences in result array
- * XRegExp.split('..word1 word2..', /([a-z]+)(\d+)/i);
- * // -> ['..', 'word', '1', ' ', 'word', '2', '..']
+ * XRegExp.split('..word1..', /([a-z]+)(\d+)/i);
+ * // -> ['..', 'word', '1', '..']
  */
     self.split = function (str, separator, limit) {
         return fixed.split.call(str, separator, limit);
+    };
+
+/**
+ * Executes a regex search in a specified string. Returns `true` or `false`. Optional `pos` and
+ * `sticky` arguments specify the search start position, and whether the match must start at the
+ * specified position only. The `lastIndex` property of the provided regex is not used, but is
+ * updated for compatibility. Also fixes browser bugs compared to the native
+ * `RegExp.prototype.test` and can be used reliably cross-browser.
+ * @memberOf XRegExp
+ * @param {String} str String to search.
+ * @param {RegExp} regex Regular expression to search with.
+ * @param {Number} [pos=0] Zero-based index at which to start the search.
+ * @param {Boolean|String} [sticky=false] Whether the match must start at the specified position
+ *   only. The string `'sticky'` is accepted as an alternative to `true`.
+ * @returns {Boolean} Whether the regex matched the provided value.
+ * @example
+ *
+ * // Basic use
+ * XRegExp.test('abc', /c/); // -> true
+ *
+ * // With pos and sticky
+ * XRegExp.test('abc', /c/, 0, 'sticky'); // -> false
+ */
+    self.test = function (str, regex, pos, sticky) {
+        // Do this the easy way :-)
+        return !!self.exec(str, regex, pos, sticky);
     };
 
 /**

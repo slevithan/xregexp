@@ -11,7 +11,7 @@
     "use strict";
 
 /**
- * XRegExp v2.0.0 doesn't touch native methods or allow syntax extensions by default.
+ * XRegExp v2.0.0 doesn't override native methods or allow syntax extensions by default.
  */
     XRegExp.install("natives extensibility");
 

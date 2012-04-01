@@ -27,6 +27,7 @@ test("Basic availability", function () {
 	ok(XRegExp.matchChain, "XRegExp.matchChain exists");
 	ok(XRegExp.replace, "XRegExp.replace exists");
 	ok(XRegExp.split, "XRegExp.split exists");
+	ok(XRegExp.test, "XRegExp.test exists");
 	ok(XRegExp.uninstall, "XRegExp.uninstall exists");
 	ok(XRegExp.version, "XRegExp.version exists");
 });
@@ -273,6 +274,11 @@ test("XRegExp.replace", function () {
 });
 
 test("XRegExp.split", function () {
+	expect(0);
+	// TODO: Add tests
+});
+
+test("XRegExp.test", function () {
 	expect(0);
 	// TODO: Add tests
 });
