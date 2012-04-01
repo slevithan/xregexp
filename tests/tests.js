@@ -29,8 +29,6 @@ test("Basic availability", function () {
 	ok(XRegExp.split, "XRegExp.split exists");
 	ok(XRegExp.uninstall, "XRegExp.uninstall exists");
 	ok(XRegExp.version, "XRegExp.version exists");
-	ok(XRegExp.prototype.apply, "XRegExp.prototype.apply exists");
-	ok(XRegExp.prototype.call, "XRegExp.prototype.call exists");
 });
 
 test("XRegExp", function () {
@@ -292,7 +290,7 @@ test("XRegExp.version", function () {
 	ok(!(isNaN(+parts[0]) || isNaN(+parts[1])), "Major and minor version parts are numeric");
 });
 
-test("XRegExp.prototype.apply", function () {
+/*test("XRegExp.prototype.apply", function () {
 	var regex = XRegExp("x");
 
 	deepEqual(regex.apply(null, ["x"]), regex.test("x"), "Apply with match same as test");
@@ -304,7 +302,7 @@ test("XRegExp.prototype.call", function () {
 
 	deepEqual(regex.call(null, "x"), regex.test("x"), "Call with match same as test");
 	deepEqual(regex.call(null, "y"), regex.test("y"), "Call without match same as test");
-});
+});*/
 
 //-------------------------------------------------------------------
 module("Overriden natives");
