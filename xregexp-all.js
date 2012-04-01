@@ -486,7 +486,7 @@ XRegExp = XRegExp || (function (undef) {
  * // result -> ['2', '3', '4']
  */
     self.exec = function (str, regex, pos, sticky) {
-        var r2 = copy(regex, "g" + ((sticky && hasNativeY) ? "y" : "")),
+        var r2 = copy(regex, "g" + (sticky && hasNativeY ? "y" : ""), (sticky === false ? "y" : "")),
             match;
         r2.lastIndex = pos = pos || 0;
         match = fixed.exec.call(r2, str); // Fixed `exec` required for `lastIndex` fix, etc.
@@ -1178,10 +1178,8 @@ XRegExp = XRegExp || (function (undef) {
  */
     add(/\\(\d+)/,
         function (match, scope) {
-            if (
-                !(scope === defaultScope && /^[1-9]/.test(match[1]) && +match[1] <= this.captureNames.length) &&
-                match[1] !== "0"
-            ) {
+            if (!(scope === defaultScope && /^[1-9]/.test(match[1]) && +match[1] <= this.captureNames.length) &&
+                    match[1] !== "0") {
                 throw new SyntaxError("can't use octal escape or backreference to undefined group: " + match[0]);
             }
             return match[0];

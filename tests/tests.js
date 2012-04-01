@@ -153,6 +153,11 @@ test("XRegExp.exec", function () {
 	equal(rX.lastIndex, 0, "lastIndex of global regex updated to 0 after failure");
 
 	equal(XRegExp.exec("abc", /x/, 5), null, "pos greater than string length results in failure");
+
+	if (RegExp.prototype.sticky !== undefined) {
+		ok(XRegExp.exec(str, /x/y, 0, false), "Explicit sticky=false overrides flag y");
+		ok(!XRegExp.exec(str, /x/y, 0), "Sticky follows flag y when not explicitly specified");
+	}
 });
 
 test("XRegExp.forEach", function () {
