@@ -1,5 +1,5 @@
 /*!
- * XRegExp v2.0.0-dev, 2012-03-31
+ * XRegExp v2.0.0-beta-4, 2012-04-01
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -30,7 +30,6 @@ XRegExp = XRegExp || (function (undef) {
 // Optional features; can be installed and uninstalled
         features = {
             natives: false,
-            methods: false,
             extensibility: false
         },
 
@@ -40,10 +39,7 @@ XRegExp = XRegExp || (function (undef) {
             test: RegExp.prototype.test,
             match: String.prototype.match,
             replace: String.prototype.replace,
-            split: String.prototype.split,
-            // Hold these so they can be given back if present before XRegExp runs
-            apply: RegExp.prototype.apply,
-            call: RegExp.prototype.call
+            split: String.prototype.split
         },
 
 // Storage for fixed/extended native methods
@@ -90,7 +86,7 @@ XRegExp = XRegExp || (function (undef) {
  *------------------------------------*/
 
 /**
- * Attaches methods and special properties for named capture to a regex object.
+ * Attaches XRegExp.prototype properties and named capture supporting data to a regex object.
  * @private
  * @param {RegExp} regex Regex to augment.
  * @param {Array} captureNames Array with capture names, or null.
@@ -98,10 +94,14 @@ XRegExp = XRegExp || (function (undef) {
  * @returns {RegExp} Augmented regex.
  */
     function augment(regex, captureNames, isNative) {
+        var p;
+        // Can't auto-inherit these since the XRegExp constructor returns a nonprimitive value
+        for (p in self.prototype) {
+            if (self.prototype.hasOwnProperty(p)) {
+                regex[p] = self.prototype[p];
+            }
+        }
         regex.xregexp = {captureNames: captureNames, isNative: !!isNative};
-        // Can't automatically inherit these since the XRegExp constructor returns a nonprimitive value
-        regex.apply = self.prototype.apply;
-        regex.call = self.prototype.call;
         return regex;
     }
 
@@ -183,7 +183,7 @@ XRegExp = XRegExp || (function (undef) {
     function prepareOptions(value) {
         value = value || {};
         if (value === "all" || value.all) {
-            value = {natives: true, methods: true, extensibility: true};
+            value = {natives: true, extensibility: true};
         } else if (typeof value === "string") {
             value = self.forEach(value, /[^\s,]+/, function (m) {
                 this[m] = true;
@@ -241,24 +241,6 @@ XRegExp = XRegExp || (function (undef) {
     function setExtensibility(on) {
         self.addToken = addToken[on ? "on" : "off"];
         features.extensibility = on;
-    }
-
-/**
- * Enables or disables new `RegExp.prototype` methods.
- * @private
- * @param {Boolean} on `true` to enable; `false` to disable.
- */
-    function setMethods(on) {
-        var Rp = RegExp.prototype;
-        if (on) {
-            Rp.apply = self.prototype.apply;
-            Rp.call = self.prototype.call;
-        } else {
-            // Restore methods if they existed before XRegExp ran; otherwise delete
-            nativ.apply ? Rp.apply = nativ.apply : delete Rp.apply;
-            nativ.call ? Rp.call = nativ.call : delete Rp.call;
-        }
-        features.methods = on;
     }
 
 /**
@@ -340,7 +322,7 @@ XRegExp = XRegExp || (function (undef) {
             throw new SyntaxError("invalid duplicate regular expression flag");
         }
         // Strip/apply leading mode modifier with any combination of flags except g or y: (?imnsx)
-        pattern = nativ.replace.call(pattern, /^\(\?([a-z]+)\)/i, function ($0, $1) {
+        pattern = nativ.replace.call(pattern, /^\(\?([\w$]+)\)/, function ($0, $1) {
             if (nativ.test.call(/[gy]/, $1)) {
                 throw new SyntaxError("can't use flag g or y in mode modifier");
             }
@@ -582,15 +564,12 @@ XRegExp = XRegExp || (function (undef) {
  *   // backreferences and fix numerous cross-browser bugs
  *   natives: true,
  *
- *   // Copies XRegExp.prototype methods to RegExp.prototype
- *   methods: true,
- *
- *   // Enables extensibility of XRegExp syntax and flag (used by addons)
+ *   // Enables extensibility of XRegExp syntax and flags
  *   extensibility: true
  * });
  *
  * // With an options string
- * XRegExp.install('natives methods');
+ * XRegExp.install('natives extensibility');
  *
  * // Using a shortcut to install all optional features
  * XRegExp.install('all');
@@ -599,9 +578,6 @@ XRegExp = XRegExp || (function (undef) {
         options = prepareOptions(options);
         if (!features.natives && options.natives) {
             setNatives(true);
-        }
-        if (!features.methods && options.methods) {
-            setMethods(true);
         }
         if (!features.extensibility && options.extensibility) {
             setExtensibility(true);
@@ -625,9 +601,8 @@ XRegExp = XRegExp || (function (undef) {
 /**
  * Checks whether an individual optional feature is installed.
  * @memberOf XRegExp
- * @param {String} feature Name of the feature to check. Any one of:
+ * @param {String} feature Name of the feature to check. One of:
  *   <li>`natives`
- *   <li>`methods`
  *   <li>`extensibility`
  * @returns {Boolean} Whether the feature is installed.
  * @example
@@ -786,15 +761,12 @@ XRegExp = XRegExp || (function (undef) {
  *   // Restores native regex methods
  *   natives: true,
  *
- *   // Removes added RegExp.prototype methods, or restores their original values
- *   methods: true,
- *
  *   // Disables additional syntax and flag extensions
  *   extensibility: true
  * });
  *
  * // With an options string
- * XRegExp.uninstall('natives methods');
+ * XRegExp.uninstall('natives extensibility');
  *
  * // Using a shortcut to uninstall all optional features
  * XRegExp.uninstall('all');
@@ -803,9 +775,6 @@ XRegExp = XRegExp || (function (undef) {
         options = prepareOptions(options);
         if (features.natives && options.natives) {
             setNatives(false);
-        }
-        if (features.methods && options.methods) {
-            setMethods(false);
         }
         if (features.extensibility && options.extensibility) {
             setExtensibility(false);
@@ -818,7 +787,7 @@ XRegExp = XRegExp || (function (undef) {
  * @memberOf XRegExp
  * @type String
  */
-    self.version = "2.0.0-dev";
+    self.version = "2.0.0-beta-4";
 
 /*--------------------------------------
  *  XRegExp.prototype methods

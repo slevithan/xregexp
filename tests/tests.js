@@ -603,32 +603,6 @@ test("String.prototype.replace", function () {
 //test("String.prototype.split", function () {});
 
 //-------------------------------------------------------------------
-module("RegExp.prototype extensions");
-//-------------------------------------------------------------------
-
-test("RegExp.prototype.apply", function () {
-	XRegExp.install("methods");
-
-	var regex = /x/;
-
-	deepEqual(regex.apply(null, ["x"]), regex.test("x"), "Apply with match same as test");
-	deepEqual(regex.apply(null, ["y"]), regex.test("y"), "Apply without match same as test");
-
-	XRegExp.uninstall("methods");
-});
-
-test("RegExp.prototype.call", function () {
-	XRegExp.install("methods");
-
-	var regex = /x/;
-
-	deepEqual(regex.call(null, "x"), regex.test("x"), "Call with match same as test");
-	deepEqual(regex.call(null, "y"), regex.test("y"), "Call without match same as test");
-
-	XRegExp.uninstall("methods");
-});
-
-//-------------------------------------------------------------------
 module("New syntax and flags");
 //-------------------------------------------------------------------
 
@@ -647,7 +621,7 @@ test("Leading mode modifier", function () {
 	// TODO: Add tests
 });
 
-test("Unicode token placeholder", function () {
+test("Enhanced error handling", function () {
 	expect(0);
 	// TODO: Add tests
 });

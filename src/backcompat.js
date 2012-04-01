@@ -1,5 +1,5 @@
 /*!
- * XRegExp BackCompat v1.0.0-beta, 2012-03-31
+ * XRegExp BackCompat v1.0.0-beta, 2012-04-01
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -11,36 +11,45 @@
     "use strict";
 
 /**
- * XRegExp v2.0.0 doesn't touch global objects/methods or allow syntax extensions by default. This
- * brings back the previous functionality.
+ * XRegExp v2.0.0 doesn't touch native methods or allow syntax extensions by default.
  */
-    XRegExp.install("natives methods extensibility");
+    XRegExp.install("natives extensibility");
 
 /**
- * @deprecated As of XRegExp v2.0.0. Replaced by {@link #globalize}.
+ * @deprecated As of XRegExp v2.0.0. Replaced by {@link #XRegExp.globalize}.
  */
     XRegExp.copyAsGlobal = XRegExp.globalize;
 
 /**
- * @deprecated As of XRegExp v2.0.0. Replaced by {@link #exec}.
+ * @deprecated As of XRegExp v2.0.0. Replaced by {@link #XRegExp.exec}.
  */
     XRegExp.execAt = XRegExp.exec;
 
 /**
- * @deprecated As of XRegExp v2.0.0. Replaced by {@link #forEach}.
+ * @deprecated As of XRegExp v2.0.0. Replaced by {@link #XRegExp.forEach}.
  */
     XRegExp.iterate = XRegExp.forEach;
 
 /**
- * @deprecated As of XRegExp v2.0.0. No relacement. To make this permanent,
- *   `delete XRegExp.install` afterward.
+ * @deprecated As of XRegExp v2.0.0. No relacement.
  */
     XRegExp.freezeTokens = function () {
         XRegExp.uninstall("extensibility");
+        delete XRegExp.install;
     };
 
 /**
- * @deprecated As of XRegExp v1.5.0. Replaced by {@link #matchChain}.
+ * @deprecated As of XRegExp v2.0.0. Replaced by {@link #XRegExp.prototype.apply}.
+ */
+    RegExp.prototype.apply = XRegExp.prototype.apply;
+
+/**
+ * @deprecated As of XRegExp v2.0.0. Replaced by {@link #XRegExp.prototype.call}.
+ */
+    RegExp.prototype.call = XRegExp.prototype.call;
+
+/**
+ * @deprecated As of XRegExp v1.5.0. Replaced by {@link #XRegExp.matchChain}.
  */
     XRegExp.matchWithinChain = XRegExp.matchChain;
 
