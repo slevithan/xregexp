@@ -39,14 +39,18 @@
     };
 
 /**
- * @deprecated As of XRegExp v2.0.0. Replaced by {@link #XRegExp.prototype.apply}.
+ * @deprecated As of XRegExp v2.0.0. No replacement.
  */
-    RegExp.prototype.apply = XRegExp.prototype.apply;
+    RegExp.prototype.apply = function (context, args) {
+        return this.test(args[0]);
+    };
 
 /**
- * @deprecated As of XRegExp v2.0.0. Replaced by {@link #XRegExp.prototype.call}.
+ * @deprecated As of XRegExp v2.0.0. No replacement.
  */
-    RegExp.prototype.call = XRegExp.prototype.call;
+    RegExp.prototype.call = function (context, str) {
+        return this.test(str);
+    };
 
 /**
  * @deprecated As of XRegExp v1.5.0. Replaced by {@link #XRegExp.matchChain}.
