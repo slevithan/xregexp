@@ -64,19 +64,9 @@ XRegExp.matchChain(html, [
     {regex: /<a href="([^"]+)">/i, backref: 1},
     {regex: XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
 ]); // -> ['xregexp.com', 'www.google.com']
-
-// XRegExp regexes get call and apply methods
-// To demonstrate, let's first create the function we'll be using...
-function filter(array, fn) {
-    var res = [];
-    array.forEach(function (el) {if (fn.call(null, el)) res.push(el);});
-    return res;
-}
-// Now we can filter arrays using functions and regexes
-filter(['a', 'ba', 'ab', 'b'], XRegExp('^a')); // -> ['a', 'ab']
 ~~~
 
-These examples should give you an idea of what's possible, but XRegExp has a lot more tricks that aren't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), and [browser fixes](http://xregexp.com/cross_browser/).
+These examples should give you an idea of what's possible, but XRegExp has plenty more tricks that aren't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), and [browser fixes](http://xregexp.com/cross_browser/).
 
 
 ## XRegExp Unicode Base

@@ -13,6 +13,7 @@ source_files="
     ../src/addons/unicode/unicode-properties.js
     ../src/addons/matchrecursive.js
     ../src/addons/build.js
+    ../src/addons/prototypes.js
 "
 
 # Filename of concatenated package

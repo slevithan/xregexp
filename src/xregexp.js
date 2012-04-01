@@ -511,7 +511,7 @@ XRegExp = XRegExp || (function (undef) {
  * @example
  *
  * // Extracts every other digit from a string
- * XRegExp.forEach("1a2345", /\d/, function (match, i) {
+ * XRegExp.forEach('1a2345', /\d/, function (match, i) {
  *   if (i % 2) this.push(+match[0]);
  * }, []);
  * // -> [2, 4]
@@ -788,44 +788,6 @@ XRegExp = XRegExp || (function (undef) {
  * @type String
  */
     self.version = "2.0.0-beta-4";
-
-/*--------------------------------------
- *  XRegExp.prototype methods
- *------------------------------------*/
-
-/**
- * Calls an XRegExp object's `test` method with the first value in the provided arguments array.
- * @memberOf XRegExp.prototype
- * @param {*} context Ignored. Accepted only for congruity with `Function.prototype.apply`.
- * @param {Array} args Array with the string to search as its first value.
- * @returns {Boolean} Whether the regex matched the provided value.
- * @example
- *
- * XRegExp('.').apply(null, ['abc']); // -> true
- *
- * // Regexes copied by XRegExp also get the apply method
- * XRegExp(/./).apply(null, ['abc']); // -> true
- */
-    self.prototype.apply = function (context, args) {
-        return this.test(args[0]); // Intentionally doesn't specify fixed/native `test`
-    };
-
-/**
- * Calls an XRegExp object's `test` method with the provided string.
- * @memberOf XRegExp.prototype
- * @param {*} context Ignored. Accepted only for congruity with `Function.prototype.call`.
- * @param {String} str String to search.
- * @returns {Boolean} Whether the regex matched the provided value.
- * @example
- *
- * XRegExp('.').call(null, 'abc'); // -> true
- *
- * // Regexes copied by XRegExp also get the call method
- * XRegExp(/./).call(null, 'abc'); // -> true
- */
-    self.prototype.call = function (context, str) {
-        return this.test(str); // Intentionally doesn't specify fixed/native `test`
-    };
 
 /*--------------------------------------
  *  Fixed/extended native methods
