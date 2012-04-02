@@ -1,12 +1,14 @@
 ﻿[XRegExp](http://xregexp.com/)
 ==============================
 
-XRegExp provides augmented, extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regular expression utility belt with tools to make your client-side grepping simpler and more powerful, while freeing you from worrying about pesky cross-browser inconsistencies and the dubious `lastIndex` property.
+XRegExp provides augmented, extensible, cross-browser JavaScript regular expressions. You get new syntax and flags beyond what browsers support natively, along with a collection of functions to make your client-side grepping and parsing a breeze. XRegExp also frees you from worrying about pesky inconsistencies in cross-browser regex handling and the dubious `lastIndex` property.
+
+XRegExp is fully compliant with the regular expression flavor specified in ES3 and ES5. It works with Internet Explorer 5.5+, Firefox 1.5+, Safari 3+, Chrome, and Opera 9.5+.
 
 
 ## Usage examples
 
-Note that these examples take advantage of new features in XRegExp v2.0.0-beta ([details](https://github.com/slevithan/XRegExp/wiki/Roadmap)).
+Note that these examples take advantage of new features in XRegExp v2.0.0-rc ([details](https://github.com/slevithan/XRegExp/wiki/Roadmap)).
 
 ~~~ js
 // Using named capture and flag x (free-spacing and line comments)

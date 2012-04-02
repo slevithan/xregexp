@@ -2,7 +2,7 @@
 /***** xregexp.js *****/
 
 /*!
- * XRegExp v2.0.0-beta-4, 2012-04-02
+ * XRegExp v2.0.0-rc, 2012-04-02
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -806,7 +806,7 @@ XRegExp = XRegExp || (function (undef) {
  * @memberOf XRegExp
  * @type String
  */
-    self.version = "2.0.0-beta-4";
+    self.version = "2.0.0-rc";
 
 /*--------------------------------------
  *  Fixed/extended native methods
@@ -1347,7 +1347,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** unicode-categories.js *****/
 
 /*!
- * XRegExp Unicode Categories v1.2.0-beta, 2012-03-29
+ * XRegExp Unicode Categories v1.2.0-rc, 2012-04-02
  * (c) 2010-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1 <http://unicode.org/>
@@ -1452,7 +1452,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** unicode-scripts.js *****/
 
 /*!
- * XRegExp Unicode Scripts v1.2.0-beta, 2012-03-29
+ * XRegExp Unicode Scripts v1.2.0-rc, 2012-04-02
  * (c) 2010-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1 <http://unicode.org/>
@@ -1553,7 +1553,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** unicode-blocks.js *****/
 
 /*!
- * XRegExp Unicode Blocks v1.2.0-beta, 2012-03-29
+ * XRegExp Unicode Blocks v1.2.0-rc, 2012-04-02
  * (c) 2010-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1 <http://unicode.org/>
@@ -1739,7 +1739,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** unicode-properties.js *****/
 
 /*!
- * XRegExp Unicode Properties v1.0.0-beta, 2012-03-29
+ * XRegExp Unicode Properties v1.0.0-rc, 2012-04-02
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1 <http://unicode.org/>
@@ -1780,7 +1780,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** matchrecursive.js *****/
 
 /*!
- * XRegExp.matchRecursive v0.2.0-beta, 2012-03-29
+ * XRegExp.matchRecursive v0.2.0-rc, 2012-04-02
  * (c) 2009-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -1931,7 +1931,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** build.js *****/
 
 /*!
- * XRegExp.build v0.1.0-beta, 2012-03-30
+ * XRegExp.build v0.1.0-rc, 2012-04-02
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Based on RegExp.create by Lea Verou <http://lea.verou.me/>
@@ -2002,7 +2002,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** prototypes.js *****/
 
 /*!
- * XRegExp Prototype Methods v1.0.0-beta, 2012-04-02
+ * XRegExp Prototype Methods v1.0.0-rc, 2012-04-02
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */

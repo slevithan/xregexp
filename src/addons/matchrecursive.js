@@ -1,5 +1,5 @@
 /*!
- * XRegExp.matchRecursive v0.2.0-beta, 2012-03-29
+ * XRegExp.matchRecursive v0.2.0-rc, 2012-04-02
  * (c) 2009-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
