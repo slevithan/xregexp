@@ -155,8 +155,9 @@ test("XRegExp.exec", function () {
 	equal(XRegExp.exec("abc", /x/, 5), null, "pos greater than string length results in failure");
 
 	if (RegExp.prototype.sticky !== undefined) {
-		ok(XRegExp.exec(str, /x/y, 0, false), "Explicit sticky=false overrides flag y");
-		ok(!XRegExp.exec(str, /x/y, 0), "Sticky follows flag y when not explicitly specified");
+		var stickyRegex = new RegExp("x", "y"); // can't use /x/y even behind `if` because it errors during compilation in IE9
+		ok(XRegExp.exec(str, stickyRegex, 0, false), "Explicit sticky=false overrides flag y");
+		ok(!XRegExp.exec(str, stickyRegex, 0), "Sticky follows flag y when not explicitly specified");
 	}
 });
 
@@ -189,6 +190,12 @@ test("XRegExp.forEach", function () {
 	regexG.lastIndex = 4;
 	XRegExp.forEach(str, regexG, function () {});
 	equal(regexG.lastIndex, 0, "lastIndex of global regex reset to 0 after iteration");
+
+	var interimLastIndex = 0;
+	XRegExp.forEach(str, /\d+/g, function (m, i, s, r) {
+		interimLastIndex = r.lastIndex;
+	});
+	equal(interimLastIndex, 7, "Global regex lastIndex updated during iterations");
 });
 
 test("XRegExp.globalize", function () {
@@ -745,10 +752,14 @@ test("Replacement text syntax", function () {
 });
 
 test("Type conversion", function () {
+	XRegExp.install("natives");
+
 	// these are duplicated from String.prototype.replace tests in the overridden natives module
 	equal(new String("100").replace(/0/, function ($0, pos, str) {return typeof str;}), "1string0", "String.prototype.replace: typeof last argument in replacement function is string, when called on String as context");
 	equal(String.prototype.replace.call(100, /0/, function ($0, pos, str) {return typeof str;}), "1string0", "String.prototype.replace: typeof last argument in replacement function is string, when called on number as context");
 
 	// TODO: Add tests
+
+	XRegExp.uninstall("natives");
 });
 

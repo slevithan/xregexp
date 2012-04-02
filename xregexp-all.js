@@ -169,7 +169,7 @@ XRegExp = XRegExp || (function (undef) {
             // Use the native array method if it's available
             return array.indexOf(item, from);
         }
-        for (i = from || 0; i < array.length; i++) {
+        for (i = from || 0; i < array.length; ++i) {
             if (array[i] === item) {
                 return i;
             }
@@ -359,7 +359,7 @@ XRegExp = XRegExp || (function (undef) {
                     }
                     // Advance position by one character
                     output.push(chr);
-                    pos++;
+                    ++pos;
                 }
             }
         }
@@ -520,21 +520,12 @@ XRegExp = XRegExp || (function (undef) {
  * // -> [2, 4]
  */
     self.forEach = function (str, regex, callback, context) {
-        var r2 = self.globalize(regex),
+        var pos = 0,
             i = -1,
             match;
-        while ((match = fixed.exec.call(r2, str))) { // Fixed `exec` required for `lastIndex` fix, etc.
-            if (regex.global) {
-                // Doing this to follow expectations if `lastIndex` is checked within `callback`
-                regex.lastIndex = r2.lastIndex;
-            }
+        while ((match = self.exec(str, regex, pos))) {
             callback.call(context, match, ++i, str, regex);
-            if (r2.lastIndex === match.index) {
-                r2.lastIndex++;
-            }
-        }
-        if (regex.global) {
-            regex.lastIndex = 0;
+            pos = match.index + (match[0].length || 1);
         }
         return context;
     };
@@ -643,14 +634,13 @@ XRegExp = XRegExp || (function (undef) {
     self.matchChain = function (str, chain) {
         return (function recurseChain(values, level) {
             var item = chain[level].regex ? chain[level] : {regex: chain[level]},
-                regex = self.globalize(item.regex),
                 matches = [],
                 fn = function (match) {
                     matches.push(item.backref ? (match[item.backref] || "") : match[0]);
                 },
                 i;
-            for (i = 0; i < values.length; i++) {
-                self.forEach(values[i], regex, fn);
+            for (i = 0; i < values.length; ++i) {
+                self.forEach(values[i], item.regex, fn);
             }
             return ((level === chain.length - 1) || !matches.length) ?
                     matches :
@@ -845,7 +835,7 @@ XRegExp = XRegExp || (function (undef) {
                 // matching due to characters outside the match
                 nativ.replace.call(String(str).slice(match.index), r2, function () {
                     var i;
-                    for (i = 1; i < arguments.length - 2; i++) {
+                    for (i = 1; i < arguments.length - 2; ++i) {
                         if (arguments[i] === undef) {
                             match[i] = undef;
                         }
@@ -854,7 +844,7 @@ XRegExp = XRegExp || (function (undef) {
             }
             // Attach named capture properties
             if (this.xregexp && this.xregexp.captureNames) {
-                for (i = 1; i < match.length; i++) {
+                for (i = 1; i < match.length; ++i) {
                     name = this.xregexp.captureNames[i - 1];
                     if (name) {
                         match[name] = match[i];
@@ -936,7 +926,7 @@ XRegExp = XRegExp || (function (undef) {
                     // Change the `arguments[0]` string primitive to a `String` object that can store properties
                     args[0] = new String(args[0]);
                     // Store named backreferences on the first argument
-                    for (i = 0; i < captureNames.length; i++) {
+                    for (i = 0; i < captureNames.length; ++i) {
                         if (captureNames[i]) {
                             args[0][captureNames[i]] = args[i + 1];
                         }
@@ -1026,44 +1016,32 @@ XRegExp = XRegExp || (function (undef) {
  * @returns {Array} Array of substrings.
  */
     fixed.split = function (separator, limit) {
-        // If `separator` is not a regex, use the native `split`
         if (!self.isRegExp(separator)) {
             return nativ.split.apply(this, arguments);
         }
         var str = String(this),
+            origLastIndex = separator.lastIndex,
             output = [],
             lastLastIndex = 0,
-            match,
             lastLength;
         /* Values for `limit`, per the spec:
-         * If undefined: 4294967295 // Math.pow(2, 32) - 1
+         * If undefined: pow(2,32) - 1
          * If 0, Infinity, or NaN: 0
-         * If positive number: limit = Math.floor(limit); if (limit > 4294967295) limit -= 4294967296;
-         * If negative number: 4294967296 - Math.floor(Math.abs(limit))
+         * If positive number: limit = floor(limit); if (limit >= pow(2,32)) limit -= pow(2,32);
+         * If negative number: pow(2,32) - floor(abs(limit))
          * If other: Type-convert, then use the above rules
          */
-        limit = limit === undef ?
-                -1 >>> 0 : // Math.pow(2, 32) - 1
-                limit >>> 0; // ToUint32(limit)
-        // This is required if not `separator.global`, and it avoids needing to set
-        // `separator.lastIndex` to zero and restore it to its original value when we're done
-        separator = self.globalize(separator);
-        while ((match = fixed.exec.call(separator, str))) { // Fixed `exec` required for `lastIndex` fix, etc.
-            if (separator.lastIndex > lastLastIndex) {
+        limit = (limit === undef ? -1 : limit) >>> 0;
+        self.forEach(str, separator, function (match) {
+            if ((match.index + match[0].length) > lastLastIndex) { // != `if (match[0].length)`
                 output.push(str.slice(lastLastIndex, match.index));
                 if (match.length > 1 && match.index < str.length) {
                     Array.prototype.push.apply(output, match.slice(1));
                 }
                 lastLength = match[0].length;
-                lastLastIndex = separator.lastIndex;
-                if (output.length >= limit) {
-                    break;
-                }
+                lastLastIndex = match.index + lastLength;
             }
-            if (separator.lastIndex === match.index) {
-                separator.lastIndex++;
-            }
-        }
+        });
         if (lastLastIndex === str.length) {
             if (!nativ.test.call(separator, "") || lastLength) {
                 output.push("");
@@ -1071,6 +1049,7 @@ XRegExp = XRegExp || (function (undef) {
         } else {
             output.push(str.slice(lastLastIndex));
         }
+        separator.lastIndex = origLastIndex;
         return output.length > limit ? output.slice(0, limit) : output;
     };
 
