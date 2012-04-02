@@ -8,9 +8,9 @@
  * Adds a collection of methods to `XRegExp.prototype`. RegExp objects copied by XRegExp are also
  * augmented with any `XRegExp.prototype` methods. Hence, the following work equivalently:
  *
- * XRegExp('[a-z]', 'ig').call(null, 'abc');
- * XRegExp(/[a-z]/ig).call(null, 'abc');
- * XRegExp.globalize(/[a-z]/i).call(null, 'abc');
+ * XRegExp('[a-z]', 'ig').xexec('abc');
+ * XRegExp(/[a-z]/ig).xexec('abc');
+ * XRegExp.globalize(/[a-z]/i).xexec('abc');
  */
 (function (XRegExp) {
     "use strict";
@@ -20,7 +20,6 @@
  * @private
  * @param {Object} a Object that will receive new properties.
  * @param {Object} b Object whose properties will be copied.
- * @returns {Object} Augmented `a` object.
  */
     function extend(a, b) {
         for (var p in b) {

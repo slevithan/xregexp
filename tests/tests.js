@@ -190,11 +190,21 @@ test("XRegExp.forEach", function () {
     XRegExp.forEach(str, regexG, function () {});
     equal(regexG.lastIndex, 0, "lastIndex of global regex reset to 0 after iteration");
 
-    var interimLastIndex = 0;
-    XRegExp.forEach(str, /\d+/g, function (m, i, s, r) {
-        interimLastIndex = r.lastIndex;
+    var rgOrig = /\d+/g, interimLastIndex1 = 0, interimLastIndex2 = 0;
+    XRegExp.forEach(str, rgOrig, function (m, i, s, r) {
+        interimLastIndex1 = rgOrig.lastIndex;
+        interimLastIndex2 = r.lastIndex;
     });
-    equal(interimLastIndex, 7, "Global regex lastIndex updated during iterations");
+    equal(interimLastIndex1, 7, "Global regex lastIndex updated during iterations (test 1)");
+    equal(interimLastIndex2, 7, "Global regex lastIndex updated during iterations (test 2)");
+
+    var rOrig = /\d+/, interimLastIndex1 = 0, interimLastIndex2 = 0;
+    XRegExp.forEach(str, rOrig, function (m, i, s, r) {
+        interimLastIndex1 = rOrig.lastIndex;
+        interimLastIndex2 = r.lastIndex;
+    });
+    equal(interimLastIndex1, 0, "Nonglobal regex lastIndex not updated during iterations (test 1)");
+    equal(interimLastIndex2, 0, "Nonglobal regex lastIndex not updated during iterations (test 2)");
 });
 
 test("XRegExp.globalize", function () {
