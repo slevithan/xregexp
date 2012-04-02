@@ -2,7 +2,7 @@
 /***** xregexp.js *****/
 
 /*!
- * XRegExp v2.0.0-beta-4, 2012-04-01
+ * XRegExp v2.0.0-beta-4, 2012-04-02
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -2002,7 +2002,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** prototypes.js *****/
 
 /*!
- * XRegExp Prototype Methods v0.1.0-beta, 2012-04-01
+ * XRegExp Prototype Methods v1.0.0-beta, 2012-04-02
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -2029,7 +2029,7 @@ XRegExp = XRegExp || (function (undef) {
         for (var p in b) {
             b.hasOwnProperty(p) && (a[p] = b[p]);
         }
-        return a;
+        //return a;
     }
 
     extend(XRegExp.prototype, {
