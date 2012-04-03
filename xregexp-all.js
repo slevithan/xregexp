@@ -1202,10 +1202,10 @@ XRegExp = XRegExp || (function (undef) {
  */
 
 /**
- * Adds support for the `\p{L}` or `\p{Letter}` Unicode category. Addon packages for the remaining
- * Unicode categories, scripts, and blocks are available separately. All Unicode tokens can be
+ * Adds support for the `\p{L}` or `\p{Letter}` Unicode category. Addon packages for other Unicode
+ * categories, scripts, blocks, and properties are available separately. All Unicode tokens can be
  * inverted using `\P{..}` or `\p{^..}`. Token names are case insensitive, and any spaces, hyphens,
- * and underscores are ignored.
+ * and underscores are ignored. Also adds `\u{n..}` for full 21-bit Unicode code point matching.
  * @requires XRegExp
  */
 (function (XRegExp) {
