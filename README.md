@@ -68,7 +68,7 @@ XRegExp.matchChain(html, [
 ]); // -> ['xregexp.com', 'www.google.com']
 ~~~
 
-These examples should give you an idea of what's possible, but XRegExp has plenty more tricks that aren't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. For the full scoop, see [API](http://xregexp.com/api/), [syntax](http://xregexp.com/syntax/), [flags](http://xregexp.com/flags/), and [browser fixes](http://xregexp.com/cross_browser/).
+These examples should give you an idea of what's possible, but XRegExp has plenty more tricks that aren't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own.
 
 
 ## XRegExp Unicode Base
@@ -88,7 +88,7 @@ unicodeWord.test('Русский'); // -> true
 unicodeWord.test('日本語'); // -> true
 unicodeWord.test('العربية'); // -> true
 
-// Match characters beyond the Basic Multilingual Plane with Unicode code point escapes
+// Match characters beyond the Basic Multilingual Plane with XRegExp's Unicode code point escapes
 XRegExp('\\u{10FFFF}');
 ~~~
 
@@ -100,8 +100,6 @@ XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
 ~~~
 
 XRegExp uses the Unicode 6.1 character database (released January 2012).
-
-More details: [Addons: Unicode](http://xregexp.com/plugins/#unicode).
 
 
 ## XRegExp.matchRecursive
@@ -148,8 +146,6 @@ XRegExp.matchRecursive(str, '<', '>', 'gy');
 // -> ['1', '<<2>>', '3']
 ~~~
 
-More details: [Addons: Match Recursive](http://xregexp.com/plugins/#matchRecursive).
-
 
 ## XRegExp.build
 
@@ -160,7 +156,7 @@ First include the script:
 <script src="addons/build.js"></script>
 ~~~
 
-You can then build complex regular expressions that use named subpatterns, for readability and code reuse:
+You can then build regular expressions using named subpatterns, for readability and code reuse:
 
 ~~~ js
 var color = XRegExp.build("{{keyword}}|{{func}}|{{hex}}", {
@@ -173,6 +169,37 @@ var color = XRegExp.build("{{keyword}}|{{func}}|{{hex}}", {
 ~~~
 
 The `{{…}}` syntax works only for regexes created by `XRegExp.build`. If present, a leading `^` and trailing `$` are stripped from subpatterns provided as regex objects.
+
+
+## XRegExp Prototype Methods
+
+First include the script:
+
+~~~ html
+<script src="xregexp.js"></script>
+<script src="addons/prototypes.js"></script>
+~~~
+
+New XRegExp regexes now gain a collection of useful methods: `apply`, `call`, `forEach`, `globalize`, `xexec`, and `xtest`.
+
+~~~ js
+// To demonstrate the call method, let's first create the function we'll be using...
+function filter(array, fn) {
+    var res = [];
+    array.forEach(function (el) {if (fn.call(null, el)) res.push(el);});
+    return res;
+}
+// Now we can filter arrays using functions and regexes
+filter(['a', 'ba', 'ab', 'b'], XRegExp('^a')); // -> ['a', 'ab']
+~~~
+
+RegExp objects copied by XRegExp are also augmented with any `XRegExp.prototype` methods. Hence, the following work equivalently:
+
+~~~ js
+XRegExp('[a-z]', 'ig').xexec('abc');
+XRegExp(/[a-z]/ig).xexec('abc');
+XRegExp.globalize(/[a-z]/i).xexec('abc');
+~~~
 
 
 ## How to run server-side tests
