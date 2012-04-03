@@ -88,8 +88,8 @@ unicodeWord.test('Русский'); // -> true
 unicodeWord.test('日本語'); // -> true
 unicodeWord.test('العربية'); // -> true
 
-// Match characters beyond the Basic Multilingual Plane
-XRegExp('\\u{29DF6}').test('������'); // -> true
+// Match characters beyond the Basic Multilingual Plane with Unicode code point escapes
+XRegExp('\\u{10FFFF}');
 ~~~
 
 The base script adds `\p{Letter}` and its alias `\p{L}`, but other Unicode categories, scripts, blocks, and properties require addon packages. Try these next examples after additionally including `unicode-scripts.js`:
