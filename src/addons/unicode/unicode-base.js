@@ -159,13 +159,13 @@
             if (code > 0x10FFFF) {
                 throw new RangeError("invalid Unicode code point: " + match[0]);
             }
-            // Converting to \uNNNN when possible avoids needing to escape the character and keep
-            // it separate from preceding tokens
             if (code <= 0xFFFF) {
+                // Converting to \uNNNN avoids needing to escape the character and keep it separate
+                // from preceding tokens
                 return "\\u" + pad4(hex(code));
             }
             offset = code - 0x10000;
-            return String.fromCharCode(0xD800 + (offset >> 10), 0xDC00 + (offset & 0x3FF)); // Surrogate pair
+            return "\\u" + pad4(hex(0xD800 + (offset >> 10))) + "\\u" + pad4(hex(0xDC00 + (offset & 0x3FF)));
         },
         {scope: "all"}
     );
