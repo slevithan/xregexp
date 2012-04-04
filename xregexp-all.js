@@ -1956,7 +1956,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** build.js *****/
 
 /*!
- * XRegExp.build v0.1.0-rc, 2012-04-02
+ * XRegExp.build v0.1.0-rc, 2012-04-04
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Based on RegExp.create by Lea Verou <http://lea.verou.me/>
@@ -1967,7 +1967,16 @@ XRegExp = XRegExp || (function (undef) {
 
     var data = null;
 
-    XRegExp.install("extensibility");
+/**
+ * Strips a regex's leading ^ and trailing $ anchors, if present.
+ * @private
+ * @param {RegExp} regex Regex to process.
+ * @returns {String} Source of the regex, with leading and trailing anchors removed.
+ */
+    function deanchor(regex) {
+        // Also strips `(?:)` before ^ and after $, in case they were included by an addon like /x
+        return regex.source.replace(/^(?:\(\?:\))?\^|\$(?:\(\?:\))?$/g, "");
+    }
 
 /**
  * Builds complex regular expressions using named subpatterns, for readability and code reuse.
@@ -1992,7 +2001,7 @@ XRegExp = XRegExp || (function (undef) {
         data = {};
         for (p in subs) {
             if (subs.hasOwnProperty(p)) {
-                data[p] = XRegExp.isRegExp(subs[p]) ? subs[p].source.replace(/^\^|\$$/g, "") : subs[p];
+                data[p] = XRegExp.isRegExp(subs[p]) ? deanchor(subs[p]) : subs[p];
             }
         }
         try {
@@ -2005,6 +2014,11 @@ XRegExp = XRegExp || (function (undef) {
         return regex;
     };
 
+    XRegExp.install("extensibility");
+
+/* Adds named subpattern syntax to XRegExp: {{..}}
+ * Only enabled for regexes created using XRegExp.build.
+ */
     XRegExp.addToken(
         /{{([\w$]+)}}/,
         function (match) {
@@ -2022,6 +2036,17 @@ XRegExp = XRegExp || (function (undef) {
     );
 
 }(XRegExp));
+
+/*
+ * Known issues:
+ * - A trailing unescaped backslash in provided subpatterns should be an error but isn't in the
+ *   following edge case (that would otherwise itself be an error):
+ *   `XRegExp.build('{{n}})', {n: '\\'})`. Note the pattern's trailing parenthesis. This works
+ *   because subpatterns are encased in `(?:)`, so the example becomes `(?:\))`.
+ * - Trailing escaped `\$` (to match a literal `$`) in subpatterns provided as RegExp objects
+ *   should not be stripped. But they are, and an error is thrown due to the trailing unescaped
+ *   backslash. Workaround: Provide the subpattern as a string. `'...\\$'`.
+ */
 
 
 /***** prototypes.js *****/
