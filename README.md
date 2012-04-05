@@ -8,7 +8,7 @@ XRegExp is fully compliant with the regular expression flavor specified in ES3 a
 
 ## Usage examples
 
-Note that these examples take advantage of new features in XRegExp v2.0.0-rc ([details](https://github.com/slevithan/XRegExp/wiki/Roadmap)).
+The following examples take advantage of new features in XRegExp v2.0.0-rc ([details](https://github.com/slevithan/XRegExp/wiki/Roadmap)):
 
 ~~~ js
 // Using named capture and flag x (free-spacing and line comments)
@@ -46,7 +46,7 @@ XRegExp.install('natives');
 '2012-02-22'.replace(date, function (match) {
     return match.month + '/' + match.day + '/' +match.year;
 }); // -> '02/22/2012'
-date.exec('2012-02-22').day; // -> 22
+date.exec('2012-02-22').day; // -> '22'
 
 // Extract every other digit from a string using XRegExp.forEach
 XRegExp.forEach("1a2345", /\d/, function (match, i) {
@@ -68,7 +68,7 @@ XRegExp.matchChain(html, [
 ]); // -> ['xregexp.com', 'www.google.com']
 ~~~
 
-These examples should give you an idea of what's possible, but XRegExp has plenty more tricks that aren't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own.
+These examples should give you the flavor of what's possible, but XRegExp has more syntax, flags, utils, options, browser fixes, and general badassery that isn't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. See [xregexp.com](http://xregexp.com) for more details.
 
 
 ## XRegExp Unicode Base
@@ -111,7 +111,7 @@ First include the script:
 <script src="addons/matchrecursive.js"></script>
 ~~~
 
-You can then match recursive constructs using XRegExp patterns as left and right delimiters:
+You can then match recursive constructs using XRegExp pattern strings as left and right delimiters:
 
 ~~~ js
 var str = '(t((e))s)t()(ing)';
@@ -168,12 +168,12 @@ var color = XRegExp.build('{{keyword}}|{{func}}|{{hex}}', {
 });
 ~~~
 
-The `{{…}}` syntax works only for regexes created by `XRegExp.build`, and can be escaped using `\{{…}}`. Named subpatterns can be provided as strings or regex objects. Their values are automatically wrapped in `(?:…)` so they don't interfere with the surrounding pattern in unexpected ways. If present, a leading `^` and trailing unescaped `$` are stripped from subpatterns provided as regex objects. Flags can be provided to `XRegExp.build` via its optional third argument.
+The `{{…}}` syntax works only for regexes created by `XRegExp.build`. It can be escaped using `\{{…}}`. Named subpatterns can be provided as strings or regex objects. Their values are automatically wrapped in `(?:…)` so they don't interfere with the surrounding pattern in unexpected ways. If present, a leading `^` and trailing unescaped `$` are stripped from subpatterns provided as regex objects. Flags can be provided via the `build` function's optional third argument.
 
 
 ## XRegExp Prototype Methods
 
-First include the script:
+Include the script:
 
 ~~~ html
 <script src="xregexp.js"></script>
@@ -193,7 +193,7 @@ function filter(array, fn) {
 filter(['a', 'ba', 'ab', 'b'], XRegExp('^a')); // -> ['a', 'ab']
 ~~~
 
-Native `RegExp` objects copied by `XRegExp` are also augmented with any `XRegExp.prototype` methods. Hence, the following lines work equivalently:
+Native `RegExp` objects copied by `XRegExp` are also augmented with any `XRegExp.prototype` methods. The following lines therefore work equivalently:
 
 ~~~ js
 XRegExp('[a-z]', 'ig').xexec('abc');
@@ -202,13 +202,14 @@ XRegExp.globalize(/[a-z]/i).xexec('abc');
 ~~~
 
 
-## How to run server-side tests
+## How to run the tests on the server
 
 ~~~ bash
 npm install -g qunit  # needed to run the tests
 npm test  # in the xregexp root directory
 ~~~
 
+Or just open `tests/index.html` in your browser.
 
 ## Changelog
 
