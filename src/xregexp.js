@@ -1,5 +1,5 @@
 /*!
- * XRegExp v2.0.0-rc, 2012-04-02
+ * XRegExp v2.0.0-rc, 2012-04-04
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -1085,7 +1085,7 @@ XRegExp = XRegExp || (function (undef) {
 /* Comment pattern: (?# )
  * Inline comments are an alternative to the line comments allowed in free-spacing mode (flag x).
  */
-    add(/\(\?#[^)]*\)/,
+    add(/(?:\(\?#[^)]*\))+/,
         function (match) {
             // Keep tokens separated unless the following token is a quantifier
             return nativ.test.call(quantifier, match.input.slice(match.index + match[0].length)) ? "" : "(?:)";

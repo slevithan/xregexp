@@ -21,7 +21,7 @@ var match = XRegExp.exec('2012-02-22', date);
 match.day; // -> '22'
 
 // It also includes optional pos and sticky arguments
-var pos = 2, result = [];
+var pos = 3, result = [];
 while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d+)>/, pos, 'sticky')) {
     result.push(match[1]);
     pos = match.index + match[0].length;
@@ -125,7 +125,7 @@ XRegExp.matchRecursive(str, '<div\\s*>', '</div>', 'gi', {
 });
 // -> [['between', 'Here is ', 0, 8],
 // ['left', '<div>', 8, 13],
-// ['match', 'a <div>nested</div> tag', 13, 37],
+// ['match', 'a <div>nested</div> tag', 13, 36],
 // ['right', '</div>', 36, 42],
 // ['between', ' example.', 42, 51]]
 
@@ -159,16 +159,16 @@ First include the script:
 You can then build regular expressions using named subpatterns, for readability and code reuse:
 
 ~~~ js
-var color = XRegExp.build("{{keyword}}|{{func}}|{{hex}}", {
-    keyword: /^(?:red|tan|[a-z]{4,20})$/,
-    func: XRegExp.build("^(?:rgb|hsl)a?\\((?:\\s*{{number}}%?\\s*,?\\s*){3,4}\\)$", {
-        number: /^-?\d+(?:\.\d+)?$/
+var color = XRegExp.build('{{keyword}}|{{func}}|{{hex}}', {
+    keyword: /red|tan|[a-z]{4,20}/,
+    func: XRegExp.build('(?n)(rgb|hsl)a?\\((\\s*{{number}}%?\\s*,?\\s*){3,4}\\)', {
+        number: /-?\d+(?:\.\d+)?/
     }),
-    hex: /^#(?:[0-9a-f]{1,2}){3}$/
+    hex: /#(?:[0-9A-Fa-f]{1,2}){3}/
 });
 ~~~
 
-The `{{…}}` syntax works only for regexes created by `XRegExp.build`. If present, a leading `^` and trailing `$` are stripped from subpatterns provided as regex objects.
+The `{{…}}` syntax works only for regexes created by `XRegExp.build`, and can be escaped using `\{{…}}`. Named subpatterns can be provided as strings or regex objects. Their values are automatically wrapped in `(?:…)` so they don't interfere with the surrounding pattern in unexpected ways. If present, a leading `^` and trailing unescaped `$` are stripped from subpatterns provided as regex objects. Flags can be provided to `XRegExp.build` via its optional third argument.
 
 
 ## XRegExp Prototype Methods
@@ -193,7 +193,7 @@ function filter(array, fn) {
 filter(['a', 'ba', 'ab', 'b'], XRegExp('^a')); // -> ['a', 'ab']
 ~~~
 
-RegExp objects copied by XRegExp are also augmented with any `XRegExp.prototype` methods. Hence, the following work equivalently:
+Native `RegExp` objects copied by `XRegExp` are also augmented with any `XRegExp.prototype` methods. Hence, the following lines work equivalently:
 
 ~~~ js
 XRegExp('[a-z]', 'ig').xexec('abc');

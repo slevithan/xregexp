@@ -2,7 +2,7 @@
 /***** xregexp.js *****/
 
 /*!
- * XRegExp v2.0.0-rc, 2012-04-02
+ * XRegExp v2.0.0-rc, 2012-04-04
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -1088,7 +1088,7 @@ XRegExp = XRegExp || (function (undef) {
 /* Comment pattern: (?# )
  * Inline comments are an alternative to the line comments allowed in free-spacing mode (flag x).
  */
-    add(/\(\?#[^)]*\)/,
+    add(/(?:\(\?#[^)]*\))+/,
         function (match) {
             // Keep tokens separated unless the following token is a quantifier
             return nativ.test.call(quantifier, match.input.slice(match.index + match[0].length)) ? "" : "(?:)";
@@ -1971,15 +1971,20 @@ XRegExp = XRegExp || (function (undef) {
  * Strips a regex's leading ^ and trailing $ anchors, if present.
  * @private
  * @param {RegExp} regex Regex to process.
- * @returns {String} Source of the regex, with leading and trailing anchors removed.
+ * @returns {String} Source of the regex, with edge anchors removed.
  */
     function deanchor(regex) {
-        // Also strips `(?:)` before ^ and after $, in case they were included by an addon like /x
-        return regex.source.replace(/^(?:\(\?:\))?\^|\$(?:\(\?:\))?$/g, "");
+        // Strip a leading `^` or `(?:)^`. The latter handles /x or (?#) cruft
+        var pattern = regex.source.replace(/^(?:\(\?:\))?\^/, "");
+        // Strip a trailing `$` or `$(?:)`, if it's not escaped (allow trailing `\$`)
+        if (/\$$/.test(pattern.replace(/\\[\s\S]/g, ""))) {
+            return pattern.replace(/\$(?:\(\?:\))?$/, "");
+        }
+        return pattern;
     }
 
 /**
- * Builds complex regular expressions using named subpatterns, for readability and code reuse.
+ * Builds regular expressions using named subpatterns, for readability and code reuse.
  * @memberOf XRegExp
  * @param {String} pattern XRegExp pattern using `{{..}}` for embedded subpatterns.
  * @param {Object} subs Named subpatterns as strings or regexes. If present, a leading ^ and
@@ -1988,23 +1993,30 @@ XRegExp = XRegExp || (function (undef) {
  * @returns {RegExp} Extended regular expression object.
  * @example
  *
- * var color = XRegExp.build("{{keyword}}|{{func}}|{{hex}}", {
- *   keyword: /^(?:red|tan|[a-z]{4,20})$/,
- *   func: XRegExp.build("^(?:rgb|hsl)a?\\((?:\\s*{{number}}%?\\s*,?\\s*){3,4}\\)$", {
- *     number: /^-?\d+(?:\.\d+)?$/
+ * var color = XRegExp.build('{{keyword}}|{{func}}|{{hex}}', {
+ *   keyword: /red|tan|[a-z]{4,20}/,
+ *   func: XRegExp.build('(?n)(rgb|hsl)a?\\((\\s*{{number}}%?\\s*,?\\s*){3,4}\\)', {
+ *     number: /-?\d+(?:\.\d+)?/
  *   }),
- *   hex: /^#(?:[0-9a-f]{1,2}){3}$/
+ *   hex: /#(?:[0-9A-Fa-f]{1,2}){3}/
  * });
  */
     XRegExp.build = function (pattern, subs, flags) {
-        var p, regex;
+        var regex, p;
         data = {};
-        for (p in subs) {
-            if (subs.hasOwnProperty(p)) {
-                data[p] = XRegExp.isRegExp(subs[p]) ? deanchor(subs[p]) : subs[p];
-            }
-        }
         try {
+            for (p in subs) {
+                if (subs.hasOwnProperty(p)) {
+                    if (XRegExp.isRegExp(subs[p])) {
+                        data[p] = deanchor(subs[p]);
+                    } else {
+                        // Passing through XRegExp ensures independent validity, lest a trailing
+                        // unescaped `\` breaks the `(?:)` wrapper in edge cases
+                        XRegExp(subs[p]);
+                        data[p] = subs[p];
+                    }
+                }
+            }
             regex = XRegExp(pattern, flags);
         } catch (err) {
             throw err;
@@ -2017,7 +2029,7 @@ XRegExp = XRegExp || (function (undef) {
     XRegExp.install("extensibility");
 
 /* Adds named subpattern syntax to XRegExp: {{..}}
- * Only enabled for regexes created using XRegExp.build.
+ * Only enabled for regexes created by XRegExp.build.
  */
     XRegExp.addToken(
         /{{([\w$]+)}}/,
@@ -2036,17 +2048,6 @@ XRegExp = XRegExp || (function (undef) {
     );
 
 }(XRegExp));
-
-/*
- * Known issues:
- * - A trailing unescaped backslash in provided subpatterns should be an error but isn't in the
- *   following edge case (that would otherwise itself be an error):
- *   `XRegExp.build('{{n}})', {n: '\\'})`. Note the pattern's trailing parenthesis. This works
- *   because subpatterns are encased in `(?:)`, so the example becomes `(?:\))`.
- * - Trailing escaped `\$` (to match a literal `$`) in subpatterns provided as RegExp objects
- *   should not be stripped. But they are, and an error is thrown due to the trailing unescaped
- *   backslash. Workaround: Provide the subpattern as a string. `'...\\$'`.
- */
 
 
 /***** prototypes.js *****/
