@@ -202,14 +202,15 @@ XRegExp.globalize(/[a-z]/i).xexec('abc');
 ~~~
 
 
-## How to run the tests on the server
+## How to run tests on the server with npm
 
 ~~~ bash
 npm install -g qunit  # needed to run the tests
 npm test  # in the xregexp root directory
 ~~~
 
-Or just open `tests/index.html` in your browser.
+For non-npm users, just open `tests/index.html` in your browser.
+
 
 ## Changelog
 

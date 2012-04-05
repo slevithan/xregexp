@@ -1,5 +1,5 @@
 /*!
- * XRegExp Unicode Base v1.0.0-rc, 2012-04-03
+ * XRegExp Unicode Base v1.0.0-rc, 2012-04-05
  * (c) 2008-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1 <http://unicode.org/>
@@ -149,8 +149,13 @@
     );
 
 /* Adds Unicode code point syntax to XRegExp: \u{n..}
- * `n..` is any 1-6 digit 21-bit hexadecimal code point from 0-10FFFF. Code points above FFFF are
- * converted to surrogate pairs.
+ * `n..` is any 1-6 digit 21-bit hexadecimal number from 0-10FFFF. Comes from ES6 proposals. Code
+ * points above FFFF are converted to surrogate pairs, so e.g. \u{20B20} is simply an alternate
+ * syntax for \uD842\uDF20. This can lead to broken behavior if you follow a \u{n..} token that
+ * references a code point above FFFF with a quantifier, or if you use the same in a character
+ * class. XRegExp's handling follows ES6 proposals for \u{n..}, since compatibility concerns mean
+ * that JavaScript regexes cannot change to be based on code points rather than code units by
+ * default. Workarounds include, e.g., (?:\u{10FFFF})+ or (?:\u{10FFFF}|[A-Z]).
  */
     XRegExp.addToken(
         /\\u{([0-9A-Fa-f]{1,6})}/,

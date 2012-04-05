@@ -1,5 +1,5 @@
 /*!
- * XRegExp.build v0.1.0-rc, 2012-04-04
+ * XRegExp.build v0.1.0-rc, 2012-04-05
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Based on RegExp.create by Lea Verou <http://lea.verou.me/>
@@ -19,7 +19,7 @@
     function deanchor(regex) {
         // Strip a leading `^` or `(?:)^`. The latter handles /x or (?#) cruft
         var pattern = regex.source.replace(/^(?:\(\?:\))?\^/, "");
-        // Strip a trailing `$` or `$(?:)`, if it's not escaped (allow trailing `\$`)
+        // Strip a trailing unescaped `$` or `$(?:)`
         if (/\$$/.test(pattern.replace(/\\[\s\S]/g, ""))) {
             return pattern.replace(/\$(?:\(\?:\))?$/, "");
         }
@@ -51,10 +51,11 @@
             for (p in subs) {
                 if (subs.hasOwnProperty(p)) {
                     if (XRegExp.isRegExp(subs[p])) {
+                        // Allows embedding independently useful anchored regexes
                         data[p] = deanchor(subs[p]);
                     } else {
-                        // Passing through XRegExp ensures independent validity, lest a trailing
-                        // unescaped `\` breaks the `(?:)` wrapper in edge cases
+                        // Passing to XRegExp catches errors and ensures independent validity, lest
+                        // an unescaped `(`, `)`, `[`, or trailing `\` breaks the `(?:)` wrapper
                         XRegExp(subs[p]);
                         data[p] = subs[p];
                     }

@@ -1195,7 +1195,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** unicode-base.js *****/
 
 /*!
- * XRegExp Unicode Base v1.0.0-rc, 2012-04-03
+ * XRegExp Unicode Base v1.0.0-rc, 2012-04-05
  * (c) 2008-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1 <http://unicode.org/>
@@ -1345,8 +1345,13 @@ XRegExp = XRegExp || (function (undef) {
     );
 
 /* Adds Unicode code point syntax to XRegExp: \u{n..}
- * `n..` is any 1-6 digit 21-bit hexadecimal code point from 0-10FFFF. Code points above FFFF are
- * converted to surrogate pairs.
+ * `n..` is any 1-6 digit 21-bit hexadecimal number from 0-10FFFF. Comes from ES6 proposals. Code
+ * points above FFFF are converted to surrogate pairs, so e.g. \u{20B20} is simply an alternate
+ * syntax for \uD842\uDF20. This can lead to broken behavior if you follow a \u{n..} token that
+ * references a code point above FFFF with a quantifier, or if you use the same in a character
+ * class. XRegExp's handling follows ES6 proposals for \u{n..}, since compatibility concerns mean
+ * that JavaScript regexes cannot change to be based on code points rather than code units by
+ * default. Workarounds include, e.g., (?:\u{10FFFF})+ or (?:\u{10FFFF}|[A-Z]).
  */
     XRegExp.addToken(
         /\\u{([0-9A-Fa-f]{1,6})}/,
@@ -1956,7 +1961,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** build.js *****/
 
 /*!
- * XRegExp.build v0.1.0-rc, 2012-04-04
+ * XRegExp.build v0.1.0-rc, 2012-04-05
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Based on RegExp.create by Lea Verou <http://lea.verou.me/>
@@ -1976,7 +1981,7 @@ XRegExp = XRegExp || (function (undef) {
     function deanchor(regex) {
         // Strip a leading `^` or `(?:)^`. The latter handles /x or (?#) cruft
         var pattern = regex.source.replace(/^(?:\(\?:\))?\^/, "");
-        // Strip a trailing `$` or `$(?:)`, if it's not escaped (allow trailing `\$`)
+        // Strip a trailing unescaped `$` or `$(?:)`
         if (/\$$/.test(pattern.replace(/\\[\s\S]/g, ""))) {
             return pattern.replace(/\$(?:\(\?:\))?$/, "");
         }
@@ -2008,10 +2013,11 @@ XRegExp = XRegExp || (function (undef) {
             for (p in subs) {
                 if (subs.hasOwnProperty(p)) {
                     if (XRegExp.isRegExp(subs[p])) {
+                        // Allows embedding independently useful anchored regexes
                         data[p] = deanchor(subs[p]);
                     } else {
-                        // Passing through XRegExp ensures independent validity, lest a trailing
-                        // unescaped `\` breaks the `(?:)` wrapper in edge cases
+                        // Passing to XRegExp catches errors and ensures independent validity, lest
+                        // an unescaped `(`, `)`, `[`, or trailing `\` breaks the `(?:)` wrapper
                         XRegExp(subs[p]);
                         data[p] = subs[p];
                     }
