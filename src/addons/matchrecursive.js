@@ -1,5 +1,5 @@
 /*!
- * XRegExp.matchRecursive v0.2.0-rc, 2012-04-02
+ * XRegExp.matchRecursive v0.2.0-rc, 2012-04-05
  * (c) 2009-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -104,7 +104,7 @@
                     outerStart = delimStart;
                     innerStart = delimEnd;
                 }
-                openTokens++;
+                ++openTokens;
             } else if (rightMatch && openTokens) {
                 if (!--openTokens) {
                     if (vN) {
@@ -133,7 +133,7 @@
             }
             // If the delimiter matched an empty string, avoid an infinite loop
             if (delimStart === delimEnd) {
-                delimEnd++;
+                ++delimEnd;
             }
         }
 

@@ -1810,7 +1810,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** matchrecursive.js *****/
 
 /*!
- * XRegExp.matchRecursive v0.2.0-rc, 2012-04-02
+ * XRegExp.matchRecursive v0.2.0-rc, 2012-04-05
  * (c) 2009-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -1915,7 +1915,7 @@ XRegExp = XRegExp || (function (undef) {
                     outerStart = delimStart;
                     innerStart = delimEnd;
                 }
-                openTokens++;
+                ++openTokens;
             } else if (rightMatch && openTokens) {
                 if (!--openTokens) {
                     if (vN) {
@@ -1944,7 +1944,7 @@ XRegExp = XRegExp || (function (undef) {
             }
             // If the delimiter matched an empty string, avoid an infinite loop
             if (delimStart === delimEnd) {
-                delimEnd++;
+                ++delimEnd;
             }
         }
 

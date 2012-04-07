@@ -6,6 +6,11 @@ XRegExp provides augmented, extensible, cross-browser JavaScript regular express
 XRegExp is fully compliant with the regular expression flavor specified in ES3 and ES5. It works with Internet Explorer 5.5+, Firefox 1.5+, Safari 3+, Chrome, and Opera 9.5+.
 
 
+## Performance
+
+XRegExp regular expressions compile to native RegExp objects, thus there is little if any performance difference when using XRegExp objects with native regex methods. There is a small extra cost when *compiling* XRegExps. If you want, however, you can use `XRegExp.cache` to avoid incurring the compilation cost for a given pattern more than once. Doing so can even lead to XRegExp being faster than native regexes in synthetic tests that repeatedly compile the same regex.
+
+
 ## Usage examples
 
 The following examples take advantage of new features in XRegExp v2.0.0-rc ([details](https://github.com/slevithan/XRegExp/wiki/Roadmap)):
