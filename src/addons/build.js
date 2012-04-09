@@ -1,5 +1,5 @@
 /*!
- * XRegExp.build v0.1.0-rc, 2012-04-05
+ * XRegExp.build v0.1.0-rc, 2012-04-09
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Based on RegExp.create by Lea Verou <http://lea.verou.me/>
@@ -79,7 +79,7 @@
         /{{([\w$]+)}}/,
         function (match) {
             if (!data.hasOwnProperty(match[1])) {
-                throw new ReferenceError("unknown property: " + match[1]);
+                throw new ReferenceError("undefined property " + match[0]);
             }
             return "(?:" + data[match[1]] + ")";
         },

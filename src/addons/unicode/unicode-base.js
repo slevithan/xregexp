@@ -1,5 +1,5 @@
 /*!
- * XRegExp Unicode Base v1.0.0-rc, 2012-04-05
+ * XRegExp Unicode Base v1.0.0-rc, 2012-04-09
  * (c) 2008-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1 <http://unicode.org/>
@@ -64,9 +64,9 @@
             }
             lastEnd = dec(m[2] || m[1]);
         });
-        if (lastEnd < 65535) {
+        if (lastEnd < 0xFFFF) {
             output.push("\\u" + pad4(hex(lastEnd + 1)));
-            if (lastEnd < 65534) {
+            if (lastEnd < 0xFFFE) {
                 output.push("-\\uFFFF");
             }
         }
@@ -100,7 +100,7 @@
     XRegExp.addUnicodePackage = function (pack, aliases) {
         var p;
         if (!XRegExp.isInstalled("extensibility")) {
-            throw new Error("can't add Unicode package unless extensibility is installed");
+            throw new Error("extensibility must be installed before adding Unicode packages");
         }
         if (pack) {
             for (p in pack) {
@@ -136,10 +136,10 @@
                 item = slug(match[3]);
             // The double negative \P{^..} is invalid
             if (match[1] === "P" && match[2]) {
-                throw new SyntaxError("erroneous characters: " + match[0]);
+                throw new SyntaxError("invalid double negation \\P{^");
             }
             if (!unicode.hasOwnProperty(item)) {
-                throw new SyntaxError("invalid or unsupported Unicode property: " + match[0]);
+                throw new SyntaxError("invalid or unknown Unicode property " + match[0]);
             }
             return scope === "class" ?
                     (inv ? cacheInversion(item) : unicode[item]) :
@@ -149,20 +149,20 @@
     );
 
 /* Adds Unicode code point syntax to XRegExp: \u{n..}
- * `n..` is any 1-6 digit 21-bit hexadecimal number from 0-10FFFF. Comes from ES6 proposals. Code
- * points above FFFF are converted to surrogate pairs, so e.g. \u{20B20} is simply an alternate
- * syntax for \uD842\uDF20. This can lead to broken behavior if you follow a \u{n..} token that
+ * `n..` is any 1-6 digit hexadecimal number from 0-10FFFF. Comes from ES6 proposals. Code points
+ * above FFFF are converted to surrogate pairs, so e.g. `\u{20B20}` is simply an alternate syntax
+ * for `\uD842\uDF20`. This can lead to broken behavior if you follow a `\u{n..}` token that
  * references a code point above FFFF with a quantifier, or if you use the same in a character
- * class. XRegExp's handling follows ES6 proposals for \u{n..}, since compatibility concerns mean
- * that JavaScript regexes cannot change to be based on code points rather than code units by
- * default. Workarounds include, e.g., (?:\u{10FFFF})+ or (?:\u{10FFFF}|[A-Z]).
+ * class. XRegExp's handling follows ES6 proposals for `\u{n..}`, since compatibility concerns
+ * prevent JavaScript regexes from changing to be based on code points rather than code units by
+ * default. Workarounds include, e.g., `(\u{10FFFF})+` or `(\u{10FFFF}|[A-Z])`.
  */
     XRegExp.addToken(
         /\\u{([0-9A-Fa-f]{1,6})}/,
         function (match) {
             var code = dec(match[1]), offset;
             if (code > 0x10FFFF) {
-                throw new RangeError("invalid Unicode code point: " + match[0]);
+                throw new SyntaxError("invalid Unicode code point " + match[0]);
             }
             if (code <= 0xFFFF) {
                 // Converting to \uNNNN avoids needing to escape the character and keep it separate

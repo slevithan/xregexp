@@ -1,5 +1,5 @@
 /*!
- * XRegExp BackCompat v1.0.0-rc, 2012-04-02
+ * XRegExp BackCompat v1.0.0-rc, 2012-04-09
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -39,14 +39,14 @@
     };
 
 /**
- * @deprecated As of XRegExp v2.0.0. No replacement.
+ * @deprecated As of XRegExp v2.0.0. Replaced by {@link #XRegExp.prototype.apply} in addon.
  */
     RegExp.prototype.apply = function (context, args) {
         return this.test(args[0]);
     };
 
 /**
- * @deprecated As of XRegExp v2.0.0. No replacement.
+ * @deprecated As of XRegExp v2.0.0. Replaced by {@link #XRegExp.prototype.call} in addon.
  */
     RegExp.prototype.call = function (context, str) {
         return this.test(str);

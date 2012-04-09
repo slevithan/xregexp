@@ -1,5 +1,5 @@
 /*!
- * XRegExp v2.0.0-rc, 2012-04-04
+ * XRegExp v2.0.0-rc, 2012-04-09
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -386,7 +386,7 @@ XRegExp = XRegExp || (function (undef) {
             }
         },
         off: function () {
-            throw new Error("extensibility must be installed before running addToken");
+            throw new Error("extensibility must be installed before using addToken");
         }
     };
 
@@ -1067,7 +1067,7 @@ XRegExp = XRegExp || (function (undef) {
             if (match[1] === "B" && scope === defaultScope) {
                 return match[0];
             }
-            throw new SyntaxError("invalid escape: " + match[0]);
+            throw new SyntaxError("invalid escape " + match[0]);
         },
         {scope: "all"});
 
@@ -1099,7 +1099,7 @@ XRegExp = XRegExp || (function (undef) {
             var index = isNaN(match[1]) ? (indexOf(this.captureNames, match[1]) + 1) : +match[1],
                 endIndex = match.index + match[0].length;
             if (!index || index > this.captureNames.length) {
-                throw new ReferenceError("backreference to undefined group: " + match[0]);
+                throw new SyntaxError("can't use backreference to undefined group " + match[0]);
             }
             // Keep backreferences separate from subsequent literal numbers
             return "\\" + index + (
@@ -1156,7 +1156,7 @@ XRegExp = XRegExp || (function (undef) {
         function (match, scope) {
             if (!(scope === defaultScope && /^[1-9]/.test(match[1]) && +match[1] <= this.captureNames.length) &&
                     match[1] !== "0") {
-                throw new SyntaxError("can't use octal escape or backreference to undefined group: " + match[0]);
+                throw new SyntaxError("can't use octal escape or backreference to undefined group " + match[0]);
             }
             return match[0];
         },
