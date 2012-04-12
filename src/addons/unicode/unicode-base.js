@@ -155,7 +155,7 @@
  * references a code point above FFFF with a quantifier, or if you use the same in a character
  * class. XRegExp's handling follows ES6 proposals for `\u{n..}`, since compatibility concerns
  * prevent JavaScript regexes from changing to be based on code points rather than code units by
- * default. Workarounds include, e.g., `(\u{10FFFF})+` or `(\u{10FFFF}|[A-Z])`.
+ * default. Workarounds include, e.g., `(?:\u{10FFFF})+` or `(?:\u{10FFFF}|[A-Z])`.
  */
     XRegExp.addToken(
         /\\u{([0-9A-Fa-f]{1,6})}/,

@@ -151,6 +151,8 @@ XRegExp.matchRecursive(str, '<', '>', 'gy');
 // -> ['1', '<<2>>', '3']
 ~~~
 
+If `XRegExp.matchRecursive` sees an unbalanced delimiter in the target string, it throws an exception.
+
 
 ## XRegExp.build
 
@@ -231,7 +233,7 @@ Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/). S
 
 Thanks to [Lea Verou](http://lea.verou.me/) for the [inspiration](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/) behind addon `XRegExp.build`.
 
-All code released under the [MIT License](http://opensource.org/licenses/mit-license.php).
+All code released under the [MIT License](http://mit-license.org/).
 
 Fork me to show support, fix, and extend.
 

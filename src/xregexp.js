@@ -1014,7 +1014,7 @@ XRegExp = XRegExp || (function (undef) {
  */
     fixed.split = function (separator, limit) {
         if (!self.isRegExp(separator)) {
-            return nativ.split.apply(this, arguments);
+            return nativ.split.apply(this, arguments); // use faster native method
         }
         var str = String(this),
             origLastIndex = separator.lastIndex,

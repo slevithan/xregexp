@@ -1017,7 +1017,7 @@ XRegExp = XRegExp || (function (undef) {
  */
     fixed.split = function (separator, limit) {
         if (!self.isRegExp(separator)) {
-            return nativ.split.apply(this, arguments);
+            return nativ.split.apply(this, arguments); // use faster native method
         }
         var str = String(this),
             origLastIndex = separator.lastIndex,
@@ -1351,7 +1351,7 @@ XRegExp = XRegExp || (function (undef) {
  * references a code point above FFFF with a quantifier, or if you use the same in a character
  * class. XRegExp's handling follows ES6 proposals for `\u{n..}`, since compatibility concerns
  * prevent JavaScript regexes from changing to be based on code points rather than code units by
- * default. Workarounds include, e.g., `(\u{10FFFF})+` or `(\u{10FFFF}|[A-Z])`.
+ * default. Workarounds include, e.g., `(?:\u{10FFFF})+` or `(?:\u{10FFFF}|[A-Z])`.
  */
     XRegExp.addToken(
         /\\u{([0-9A-Fa-f]{1,6})}/,
@@ -1444,11 +1444,11 @@ XRegExp = XRegExp || (function (undef) {
         Lm: "Modifier_Letter",
         Lo: "Other_Letter",
         M: "Mark",
-        Mn: "Non_Spacing_Mark",
-        Mc: "Spacing_Combining_Mark",
+        Mn: "Nonspacing_Mark",
+        Mc: "Spacing_Mark",
         Me: "Enclosing_Mark",
         N: "Number",
-        Nd: "Decimal_Digit_Number",
+        Nd: "Decimal_Number",
         Nl: "Letter_Number",
         No: "Other_Number",
         P: "Punctuation",
