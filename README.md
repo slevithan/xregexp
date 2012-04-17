@@ -54,13 +54,13 @@ XRegExp.install('natives');
 date.exec('2012-02-22').day; // -> '22'
 
 // Extract every other digit from a string using XRegExp.forEach
-XRegExp.forEach("1a2345", /\d/, function (match, i) {
+XRegExp.forEach('1a2345', /\d/, function (match, i) {
     if (i % 2) this.push(+match[0]);
 }, []); // -> [2, 4]
 
 // Get numbers within <b> tags using XRegExp.matchChain
 XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [
-    XRegExp('(?is)<b>.*?<\\/b>'),
+    XRegExp('(?is)<b>.*?</b>'),
     /\d+/
 ]); // -> ['2', '4', '56']
 
@@ -71,6 +71,10 @@ XRegExp.matchChain(html, [
     {regex: /<a href="([^"]+)">/i, backref: 1},
     {regex: XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
 ]); // -> ['xregexp.com', 'www.google.com']
+
+// XRegExp.union safely merges strings and regexes into a single pattern
+XRegExp.union(['a+b*c', 'skis', 'sleds', /(dogs)\1/, /(cats)\1/], 'i');
+// -> /a\+b\*c|skis|sleds|(dogs)\1|(cats)\2/i
 ~~~
 
 These examples should give you the flavor of what's possible, but XRegExp has more syntax, flags, utils, options, browser fixes, and general badassery that isn't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. See [xregexp.com](http://xregexp.com) for more details.
@@ -124,15 +128,17 @@ XRegExp.matchRecursive(str, '\\(', '\\)', 'g');
 // -> ['t((e))s', '', 'ing']
 
 // Extended information mode with valueNames
-str = 'Here is <div>a <div>nested</div> tag</div> example.';
+str = 'Here is <div> <div>an</div></div> example';
 XRegExp.matchRecursive(str, '<div\\s*>', '</div>', 'gi', {
     valueNames: ['between', 'left', 'match', 'right']
 });
-// -> [['between', 'Here is ', 0, 8],
-// ['left', '<div>', 8, 13],
-// ['match', 'a <div>nested</div> tag', 13, 36],
-// ['right', '</div>', 36, 42],
-// ['between', ' example.', 42, 51]]
+/* -> [
+{name: 'between', value: 'Here is ',       start: 0,  end: 8},
+{name: 'left',    value: '<div>',          start: 8,  end: 13},
+{name: 'match',   value: ' <div>an</div>', start: 13, end: 27},
+{name: 'right',   value: '</div>',         start: 27, end: 33},
+{name: 'between', value: ' example',       start: 33, end: 41}
+] */
 
 // Omitting unneeded parts with null valueNames, and using escapeChar
 str = '...{1}\\{{function(x,y){return y+x;}}';
@@ -140,10 +146,12 @@ XRegExp.matchRecursive(str, '{', '}', 'g', {
     valueNames: ['literal', null, 'value', null],
     escapeChar: '\\'
 });
-// -> [['literal', '...', 0, 3],
-// ['value', '1', 4, 5],
-// ['literal', '\\{', 6, 8],
-// ['value', 'function(x,y){return y+x;}', 9, 35]]
+/* -> [
+{name: 'literal', value: '...', start: 0, end: 3},
+{name: 'value',   value: '1',   start: 4, end: 5},
+{name: 'literal', value: '\\{', start: 6, end: 8},
+{name: 'value',   value: 'function(x,y){return y+x;}', start: 9, end: 35}
+] */
 
 // Sticky mode via flag y
 str = '<1><<<2>>><3>4<5>';
@@ -177,6 +185,8 @@ var color = XRegExp.build('{{keyword}}|{{func}}|{{hex}}', {
 
 The `{{…}}` syntax works only for regexes created by `XRegExp.build`. It can be escaped using `\{{…}}`. Named subpatterns can be provided as strings or regex objects. Their values are automatically wrapped in `(?:…)` so they don't interfere with the surrounding pattern in unexpected ways. If present, a leading `^` and trailing unescaped `$` are stripped from subpatterns provided as regex objects. Flags can be provided via the `build` function's optional third argument.
 
+See also: *[Creating Grammatical Regexes Using XRegExp.build](http://blog.stevenlevithan.com/archives/grammatical-patterns-xregexp-build)*.
+
 
 ## XRegExp Prototype Methods
 
@@ -209,6 +219,11 @@ XRegExp.globalize(/[a-z]/i).xexec('abc');
 ~~~
 
 
+## &c
+
+**Lookbehind:** Although not an official plugin, this [collection of short functions](https://gist.github.com/2387872) that use XRegExp make it easy to simulate infinite-length leading lookbehind.
+
+
 ## How to run tests on the server with npm
 
 ~~~ bash
@@ -231,7 +246,9 @@ XRegExp and addons copyright 2007-2012 by [Steven Levithan](http://stevenlevitha
 
 Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/). Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
 
-Thanks to [Lea Verou](http://lea.verou.me/) for the [inspiration](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/) behind addon `XRegExp.build`.
+`XRegExp.build` inspired by [Lea Verou](http://lea.verou.me/)'s [RegExp.create](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/).
+
+`XRegExp.union` inspired by [Ruby](http://ruby-lang.org/).
 
 All code released under the [MIT License](http://mit-license.org/).
 

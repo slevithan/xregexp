@@ -29,6 +29,7 @@ test("Basic availability", function () {
     ok(XRegExp.split, "XRegExp.split exists");
     ok(XRegExp.test, "XRegExp.test exists");
     ok(XRegExp.uninstall, "XRegExp.uninstall exists");
+    ok(XRegExp.union, "XRegExp.union exists");
     ok(XRegExp.version, "XRegExp.version exists");
 });
 
@@ -303,6 +304,11 @@ test("XRegExp.uninstall", function () {
     // TODO: Add tests
 });
 
+test("XRegExp.union", function () {
+    expect(0);
+    // TODO: Add tests
+});
+
 test("XRegExp.version", function () {
     var parts = XRegExp.version.split(".");
 
@@ -469,7 +475,6 @@ test("String.prototype.replace", function () {
     equal("xaaa".replace("a", "b"), "xbaa", "Basic string search");
     equal("xaaa".replace(/a(a)/, "$1b"), "xaba", "Backreference $1 in replacement string");
     equal("xaaa".replace(/a(a)/, "$01b"), "xaba", "Backreference $01 in replacement string");
-    equal("xaaa".replace(/a(a)/, "$001b"), "x$001ba", "$001 in replacement string");
     equal("xaaa".replace(/a()()()()()()()()()(a)/, "$10b"), "xaba", "Backreference $11 in replacement string");
     equal("xaaa".replace(/a()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()(a)/, "$99b"), "xaba", "Backreference $99 in replacement string");
     equal("xaaa".replace(/a()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()(a)/, "$100b"), "x0ba", "$100 in replacement string");
@@ -477,15 +482,11 @@ test("String.prototype.replace", function () {
     equal("xaaa".replace(/aa/, "$'b"), "xaba", "Backreference $' in replacement string");
     equal("xaaa".replace(/aa/, "$`b"), "xxba", "Backreference $` in replacement string");
     equal("xaaa".replace(/aa/, "$$b"), "x$ba", "$$ in replacement string");
-    equal("xaaa".replace(/aa/, "$0b"), "x$0ba", "$0 in replacement string");
-    equal("xaaa".replace(/aa/, "$1b"), "x$1ba", "$1 in replacement string for regex with no backreference");
-    equal("xaaa".replace("a(a)", "$1b"), "xaaa", "Parentheses in string search 1");
-    equal("xa(a)a".replace("a(a)", "$1b"), "x$1ba", "Parentheses in string search 2");
+    equal("xaaa".replace("a(a)", "$1b"), "xaaa", "Parentheses in string search doesn't match");
     equal("xaaa".replace("aa", "$&b"), "xaaba", "Backreference $& in replacement string for string search");
     equal("xaaa".replace("aa", "$'b"), "xaba", "Backreference $' in replacement string for string search");
     equal("xaaa".replace("aa", "$`b"), "xxba", "Backreference $` in replacement string for string search");
     equal("xaaa".replace("aa", "$$b"), "x$ba", "$$ in replacement string for string search");
-    equal("xaaa".replace("aa", "$0b"), "x$0ba", "$0 in replacement string for string search");
     equal("xaaa".replace(/a/, function () {return "b";}), "xbaa", "Nonglobal regex search with basic function replacement");
     equal("xaaa".replace(/a/g, function () {return "b";}), "xbbb", "Global regex search with basic function replacement");
     equal("xaaa".replace(/aa/, function ($0) {return $0 + "b";}), "xaaba", "Regex search with function replacement, using match");
@@ -519,6 +520,7 @@ test("String.prototype.replace", function () {
     equal("xaaa".replace(/a/), "xundefinedaa", "Replacement string is 'undefined', when not provided");
     equal("x".replace(/x/, /x/), "/x/", "Regex search with RegExp replacement");
     equal("xaaa".replace(), "xaaa", "Source returned when no replacement provided");
+    equal("test".replace(/t|(e)/g, "$1"), "es", "Numbered backreference to nonparticipating group");
 
     var regex = /x/;
     "123x567".replace(regex, "_");
@@ -588,7 +590,33 @@ test("String.prototype.match", function () {
 test("String.prototype.replace", function () {
     XRegExp.install("natives");
 
-    expect(0);
+    equal("xaaa".replace(/aa/, "$0b"), "xaaba", "$0 in replacement string works like $&");
+    equal("xaaa".replace(/aa/, "$00b"), "xaaba", "$00 in replacement string works like $&");
+    equal("xaaa".replace(/aa/, "$000b"), "xaa0ba", "$000 in replacement string works like $&0");
+    raises(function () {"xaaa".replace(/aa/, "$1b");}, SyntaxError, "$1 throws in replacement string for regex with no backreference");
+    raises(function () {"xaaa".replace(/aa/, "$01b");}, SyntaxError, "$01 throws in replacement string for regex with no backreference");
+    equal("xaaa".replace(/aa/, "$001b"), "xaa1ba", "$001 works like $&1 in replacement string for regex with no backreference");
+    raises(function () {"xaaa".replace(/a(a)/, "$2b");}, SyntaxError, "$2 throws in replacement string for regex with less than 2 backreferences");
+    raises(function () {"xa(a)a".replace("a(a)", "$1b");}, SyntaxError, "$1 throws in replacement string for string search with parentheses");
+    equal("xaaa".replace("aa", "$0b"), "xaaba", "$0 in replacement string for string search works like $&");
+    equal("test".replace(/t|(e)/g, "${1}"), "es", "Numbered backreference in curly brackets to nonparticipating group");
+    raises(function () {"test".replace(/t/, "${1}");}, SyntaxError, "Numbered backreference to undefined group in replacement string");
+    equal("test".replace(XRegExp("(?<test>t)", "g"), ":${test}:"), ":t:es:t:", "Named backreference in replacement string");
+    raises(function () {"test".replace(XRegExp("(?<test>t)", "g"), ":${x}:");}, SyntaxError, "Named backreference to undefined group in replacement string");
+    equal("test".replace(XRegExp("(?<a>.)(?<a>.)", "g"), "${a}"), "et", "Named backreference uses last of groups with the same name");
+
+    function mul(str, num) {
+        return Array(num + 1).join(str);
+    }
+    var lottaGroups = new RegExp(
+        "^(a)\\1" + mul("()", 8) +
+        "(b)\\10" + mul("()", 89) +
+        "(c)\\100" + mul("()", 899) +
+        "(d)\\1000$"
+    );
+    equal("aabbccdd".replace(lottaGroups, "$0 $01 $001 $0001 $1 $10 $100 $1000"), "aabbccdd a aabbccdd1 aabbccdd01 a b b0 b00", "Regex with 1,000 capturing groups, without curly brackets for backreferences");
+    equal("aabbccdd".replace(lottaGroups, "${0} ${01} ${001} ${0001} ${1} ${10} ${100} ${1000}"), "aabbccdd a a a a b c d", "Regex with 1,000 capturing groups, with curly brackets for backreferences");
+
     // TODO: Add tests
 
     XRegExp.uninstall("natives");

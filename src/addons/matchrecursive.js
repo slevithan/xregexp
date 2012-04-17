@@ -1,5 +1,5 @@
 /*!
- * XRegExp.matchRecursive v0.2.0-rc, 2012-04-05
+ * XRegExp.matchRecursive v0.2.0-rc-2, 2012-04-17
  * (c) 2009-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -8,8 +8,17 @@
     "use strict";
 
 /**
- * Returns matches between outermost left and right delimiters, or arrays of match parts and
- * position data. An error is thrown if delimiters are unbalanced within the data.
+ * Returns a match detail object composed of the provided values.
+ * @private
+ */
+    function row(value, name, start, end) {
+        return {value:value, name:name, start:start, end:end};
+    }
+
+/**
+ * Returns an array of match strings between outermost left and right delimiters, or an array of
+ * objects with detailed match parts and position data. An error is thrown if delimiters are
+ * unbalanced within the data.
  * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {String} left Left delimiter as an XRegExp pattern.
@@ -20,14 +29,40 @@
  * @example
  *
  * // Basic usage
- * XRegExp.matchRecursive('(t((e))s)t()(ing)', '\\(', '\\)', 'g');
+ * var str = '(t((e))s)t()(ing)';
+ * XRegExp.matchRecursive(str, '\\(', '\\)', 'g');
+ * // -> ['t((e))s', '', 'ing']
  *
- * // With valueNames and escapeChar
- * var str = '...{1}\\{{function(x,y){return y+x;}}';
- * XRegExp.matchRecursive(str, '{', '}', 'gi', {
- *     valueNames: ['between', 'left', 'match', 'right'],
- *     escapeChar: '\\'
+ * // Extended information mode with valueNames
+ * str = 'Here is <div> <div>an</div></div> example';
+ * XRegExp.matchRecursive(str, '<div\\s*>', '</div>', 'gi', {
+ *   valueNames: ['between', 'left', 'match', 'right']
  * });
+ * // -> [
+ * // {name: 'between', value: 'Here is ',       start: 0,  end: 8},
+ * // {name: 'left',    value: '<div>',          start: 8,  end: 13},
+ * // {name: 'match',   value: ' <div>an</div>', start: 13, end: 27},
+ * // {name: 'right',   value: '</div>',         start: 27, end: 33},
+ * // {name: 'between', value: ' example',       start: 33, end: 41}
+ * // ]
+ *
+ * // Omitting unneeded parts with null valueNames, and using escapeChar
+ * str = '...{1}\\{{function(x,y){return y+x;}}';
+ * XRegExp.matchRecursive(str, '{', '}', 'g', {
+ *   valueNames: ['literal', null, 'value', null],
+ *   escapeChar: '\\'
+ * });
+ * // -> [
+ * // {name: 'literal', value: '...', start: 0, end: 3},
+ * // {name: 'value',   value: '1',   start: 4, end: 5},
+ * // {name: 'literal', value: '\\{', start: 6, end: 8},
+ * // {name: 'value',   value: 'function(x,y){return y+x;}', start: 9, end: 35}
+ * // ]
+ *
+ * // Sticky mode via flag y
+ * str = '<1><<<2>>><3>4<5>';
+ * XRegExp.matchRecursive(str, '<', '>', 'gy');
+ * // -> ['1', '<<2>>', '3']
  */
     XRegExp.matchRecursive = function (str, left, right, flags, options) {
         flags = flags || "";
@@ -54,12 +89,10 @@
             if (escapeChar.length > 1) {
                 throw new SyntaxError("can't use more than one escape character");
             }
-            if (/\\[1-9]/.test(right.source.replace(/\\[0\D]|\[(?:[^\\\]]|\\[\s\S])*]/g, ""))) {
-                throw new SyntaxError("can't use escape character if backreference in delimiter");
-            }
             escapeChar = XRegExp.escape(escapeChar);
+            // Using XRegExp.union safely rewrites backreferences in `left` and `right`
             esc = new RegExp(
-                "(?:" + escapeChar + "[\\S\\s]|(?:(?!" + left.source + "|" + right.source + ")[^" + escapeChar + "])+)+",
+                "(?:" + escapeChar + "[\\S\\s]|(?:(?!" + XRegExp.union([left, right]).source + ")[^" + escapeChar + "])+)+",
                 flags.replace(/[^im]+/g, "") // Flags gy not needed here; flags nsx handled by XRegExp
             );
         }
@@ -109,16 +142,16 @@
                 if (!--openTokens) {
                     if (vN) {
                         if (vN[0] && outerStart > lastOuterEnd) {
-                            output.push([vN[0], str.slice(lastOuterEnd, outerStart), lastOuterEnd, outerStart]);
+                            output.push(row(vN[0], str.slice(lastOuterEnd, outerStart), lastOuterEnd, outerStart));
                         }
                         if (vN[1]) {
-                            output.push([vN[1], str.slice(outerStart, innerStart), outerStart, innerStart]);
+                            output.push(row(vN[1], str.slice(outerStart, innerStart), outerStart, innerStart));
                         }
                         if (vN[2]) {
-                            output.push([vN[2], str.slice(innerStart, delimStart), innerStart, delimStart]);
+                            output.push(row(vN[2], str.slice(innerStart, delimStart), innerStart, delimStart));
                         }
                         if (vN[3]) {
-                            output.push([vN[3], str.slice(delimStart, delimEnd), delimStart, delimEnd]);
+                            output.push(row(vN[3], str.slice(delimStart, delimEnd), delimStart, delimEnd));
                         }
                     } else {
                         output.push(str.slice(innerStart, delimStart));
@@ -138,7 +171,7 @@
         }
 
         if (global && !sticky && vN && vN[0] && str.length > lastOuterEnd) {
-            output.push([vN[0], str.slice(lastOuterEnd), lastOuterEnd, str.length]);
+            output.push(row(vN[0], str.slice(lastOuterEnd), lastOuterEnd, str.length));
         }
 
         return output;

@@ -2,7 +2,7 @@
 /***** xregexp.js *****/
 
 /*!
- * XRegExp v2.0.0-rc, 2012-04-09
+ * XRegExp v2.0.0-rc-2, 2012-04-17
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -64,7 +64,7 @@ XRegExp = XRegExp || (function (undef) {
         },
 
 // Any backreference in replacement strings
-        replacementToken = /\$(?:(\d\d?|[$&`'])|{([$\w]+)})/g,
+        replacementToken = /\$(?:{([\w$]+)}|(\d\d?|[\s\S]))/g,
 
 // Any character with a later instance in the string
         duplicateFlags = /([\s\S])(?=[\s\S]*\1)/g,
@@ -144,10 +144,8 @@ XRegExp = XRegExp || (function (undef) {
         }
         if (regex.xregexp && !regex.xregexp.isNative) {
             // Compiling the current (rather than precompilation) source preserves the effects of nonnative source flags
-            regex = augment(
-                self(regex.source, flags),
-                regex.xregexp.captureNames ? regex.xregexp.captureNames.slice(0) : null
-            );
+            regex = augment(self(regex.source, flags),
+                            regex.xregexp.captureNames ? regex.xregexp.captureNames.slice(0) : null);
         } else {
             // Augment with `XRegExp.prototype` methods, but use native `RegExp` (avoid searching for special tokens)
             regex = augment(new RegExp(regex.source, flags), null, true);
@@ -156,25 +154,35 @@ XRegExp = XRegExp || (function (undef) {
     }
 
 /*
- * Returns the first index at which a given item can be found in the array, or -1.
+ * Returns the last index at which a given value can be found in an array, or `-1` if it's not
+ * present. The array is searched backwards.
  * @private
  * @param {Array} array Array to search.
- * @param {Object} item Item to locate in the array.
- * @param {Number} [from=0] Zero-based index at which to begin the search.
- * @returns {Number} First zero-based index at which the item was found, or -1.
+ * @param {*} value Value to locate in the array.
+ * @returns {Number} Last zero-based index at which the item is found, or -1.
  */
-    function indexOf(array, item, from) {
-        var i;
-        if (Array.prototype.indexOf) {
-            // Use the native array method if it's available
-            return array.indexOf(item, from);
+    function lastIndexOf(array, value) {
+        var i = array.length;
+        if (Array.prototype.lastIndexOf) {
+            return array.lastIndexOf(value); // Use the native method if available
         }
-        for (i = from || 0; i < array.length; ++i) {
-            if (array[i] === item) {
+        while (i--) {
+            if (array[i] === value) {
                 return i;
             }
         }
         return -1;
+    }
+
+/**
+ * Returns `true` if an object is of the specified type; `false` if it isn't.
+ * @private
+ * @param {*} value Object to check.
+ * @param {String} type Type to check for.
+ * @returns {Boolean} Whether the object matches the type.
+ */
+    function isType(value, type) {
+        return Object.prototype.toString.call(value) === "[object " + type + "]";
     }
 
 /**
@@ -364,10 +372,8 @@ XRegExp = XRegExp || (function (undef) {
             }
         }
 
-        return augment(
-            new RegExp(output.join(""), nativ.replace.call(flags, /[^gimy]+/g, "")),
-            tokenContext.hasNamedCapture ? tokenContext.captureNames : null
-        );
+        return augment(new RegExp(output.join(""), nativ.replace.call(flags, /[^gimy]+/g, "")),
+                       tokenContext.hasNamedCapture ? tokenContext.captureNames : null);
     };
 
 /*--------------------------------------
@@ -589,7 +595,7 @@ XRegExp = XRegExp || (function (undef) {
  * XRegExp.isRegExp(XRegExp('(?s).')); // -> true
  */
     self.isRegExp = function (value) {
-        return Object.prototype.toString.call(value) === "[object RegExp]";
+        return isType(value, "RegExp");
     };
 
 /**
@@ -620,7 +626,7 @@ XRegExp = XRegExp || (function (undef) {
  *
  * // Basic usage; matches numbers within <b> tags
  * XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [
- *   XRegExp('(?is)<b>.*?<\\/b>'),
+ *   XRegExp('(?is)<b>.*?</b>'),
  *   /\d+/
  * ]);
  * // -> ['2', '4', '56']
@@ -801,12 +807,78 @@ XRegExp = XRegExp || (function (undef) {
     };
 
 /**
+ * Returns an XRegExp object that is the union of the given patterns. The patterns can be regex
+ * objects or strings. Any flags used by provided regex objects are replaced with the value
+ * provided via the flags argument. If no patterns are given, returns `/(?!)/`. If any provided
+ * regex objects contain capturing groups or backreferences, they are rewritten to work correctly.
+ * @memberOf XRegExp
+ * @param {Array} patterns Regexes and strings to combine.
+ * @param {String} [flags] Any combination of flags.
+ * @returns {RegExp} Union of the provided regexes and strings.
+ * @example
+ *
+ * XRegExp.union([]);
+ * // -> /(?!)/
+ *
+ * XRegExp.union(['a+b*c']);
+ * // -> /a\+b\*c/
+ *
+ * XRegExp.union(['skiing', 'sledding']);
+ * // -> /skiing|sledding/
+ *
+ * XRegExp.union([/(dogs)\1/, /(cats)\1/], 'i');
+ * // -> /(dogs)\1|(cats)\2/i
+ *
+ * XRegExp.union([XRegExp('(?<pet>dog)\\k<pet>'), XRegExp('(?<pet>cat)\\k<pet>')]);
+ * // Matches only 'dogdog' or 'catcat'. result.pet references the last group named pet.
+ */
+    self.union = function (patterns, flags) {
+        var parts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*]/g,
+            output = [],
+            numCaptures = 0,
+            priorCaptures,
+            thisIndex,
+            captureNames,
+            pattern,
+            i;
+        if (!isType(patterns, "Array")) {
+            throw new TypeError("patterns must be an array");
+        }
+        if (!patterns.length) {
+            return /^\b\B/; // (?!) should work like \b\B, but is unreliable in Firefox
+        }
+        for (i = 0; i < patterns.length; ++i) {
+            pattern = patterns[i];
+            if (self.isRegExp(pattern)) {
+                priorCaptures = numCaptures;
+                captureNames = pattern.xregexp ? pattern.xregexp.captureNames : null;
+                // Passing to XRegExp dies on octals and ensures patterns are independently valid; helps keep this simple
+                output.push(("(?:" + self(pattern.source).source + ")").replace(parts, function ($0, $1, $2) {
+                    if ($1) {
+                        thisIndex = numCaptures - priorCaptures;
+                        ++numCaptures;
+                        if (captureNames && captureNames[thisIndex]) { // If the current capture has a name
+                            return "(?<" + captureNames[thisIndex] + ">";
+                        }
+                    } else if ($2) {
+                        return "\\" + (+$2 + priorCaptures);
+                    }
+                    return $0;
+                }));
+            } else {
+                output.push(self.escape(pattern));
+            }
+        }
+        return self(output.join("|"), flags);
+    };
+
+/**
  * The XRegExp version number.
  * @static
  * @memberOf XRegExp
  * @type String
  */
-    self.version = "2.0.0-rc";
+    self.version = "2.0.0-rc-2";
 
 /*--------------------------------------
  *  Fixed/extended native methods
@@ -829,7 +901,7 @@ XRegExp = XRegExp || (function (undef) {
         if (match) {
             // Fix browsers whose `exec` methods don't consistently return `undefined` for
             // nonparticipating capturing groups
-            if (!compliantExecNpcg && match.length > 1 && indexOf(match, "") > -1) {
+            if (!compliantExecNpcg && match.length > 1 && lastIndexOf(match, "") > -1) {
                 r2 = new RegExp(this.source, nativ.replace.call(getNativeFlags(this), "g", ""));
                 // Using `str.slice(match.index)` rather than `match[0]` in case lookahead allowed
                 // matching due to characters outside the match
@@ -919,7 +991,7 @@ XRegExp = XRegExp || (function (undef) {
         } else {
             search += "";
         }
-        if (Object.prototype.toString.call(replacement) === "[object Function]") {
+        if (isType(replacement, "Function")) {
             result = nativ.replace.call(String(this), search, function () {
                 var args = arguments, i;
                 if (captureNames) {
@@ -944,56 +1016,51 @@ XRegExp = XRegExp || (function (undef) {
             result = nativ.replace.call(str, search, function () {
                 var args = arguments; // Keep this function's `arguments` available through closure
                 return nativ.replace.call(String(replacement), replacementToken, function ($0, $1, $2) {
-                    var literalNumbers, n;
-                    // Numbered backreference (without delimiters) or special variable
+                    var n;
+                    // Named or numbered backreference with curly brackets
                     if ($1) {
-                        if ($1 === "$") {
-                            return "$";
-                        }
-                        if ($1 === "&") {
-                            return args[0];
-                        }
-                        if ($1 === "`") {
-                            return args[args.length - 1].slice(0, args[args.length - 2]);
-                        }
-                        if ($1 === "'") {
-                            return args[args.length - 1].slice(args[args.length - 2] + args[0].length);
-                        }
-                        // Else, numbered backreference (without delimiters)
-                        /* Assert: `$10` in replacement is one of:
-                         *   1. Backreference 10, if 10 or more capturing groups exist.
-                         *   2. Backreference 1 followed by `0`, if 1-9 capturing groups exist.
-                         *   3. Otherwise, it's the literal string `$10`.
-                         * Details:
-                         *   - Backreferences can't be more than two digits (enforced by `replacementToken`).
-                         *   - `$01` is equivalent to `$1` if a capturing group exists, otherwise it's the string `$01`.
-                         *   - There is no `$0` token (`$&` is the entire match).
+                        /* XRegExp behavior for `${n}`:
+                         * 1. Backreference to numbered capture, where `n` is 1+ digits. `0`, `00`, etc. is the entire match.
+                         * 2. Backreference to named capture `n`, if it exists and is not a number overridden by numbered capture.
+                         * 3. Otherwise, it's an error.
                          */
-                        literalNumbers = "";
-                        $1 = +$1; // Type-convert; drop leading zero
-                        if (!$1) { // `$1` was `0` or `00`
-                            return $0;
+                        n = +$1; // Type-convert; drop leading zeros
+                        if (n <= args.length - 3) {
+                            return args[n] || "";
                         }
-                        while ($1 > args.length - 3) {
-                            literalNumbers = String.prototype.slice.call($1, -1) + literalNumbers;
-                            $1 = Math.floor($1 / 10); // Drop the last digit
+                        n = captureNames ? lastIndexOf(captureNames, $1) : -1;
+                        if (n < 0) {
+                            throw new SyntaxError("backreference to undefined group " + $0);
                         }
-                        return ($1 ? args[$1] || "" : "$") + literalNumbers;
+                        return args[n + 1] || "";
                     }
-                    // Named backreference or delimited numbered backreference
-                    /* Assert: `${n}` in replacement is one of:
-                     *   1. Backreference to numbered capture `n`. Differences from `$n`:
-                     *     - `n` can be more than two digits.
-                     *     - Backreference 0 is allowed, and is the entire match.
-                     *   2. Backreference to named capture `n`, if it exists and is not a number overridden by numbered capture.
-                     *   3. Otherwise, it's the literal string `${n}`.
+                    // Else, special variable or numbered backreference (without curly brackets)
+                    if ($2 === "$") return "$";
+                    if ($2 === "&" || +$2 === 0) return args[0]; // $&, $0 (not followed by 1-9), $00
+                    if ($2 === "`") return args[args.length - 1].slice(0, args[args.length - 2]);
+                    if ($2 === "'") return args[args.length - 1].slice(args[args.length - 2] + args[0].length);
+                    // Else, numbered backreference (without curly brackets)
+                    $2 = +$2; // Type-convert; drop leading zero
+                    /* XRegExp behavior:
+                     * - Backreferences without curly brackets end after 1 or 2 digits. Use `${..}` for more digits.
+                     * - `$1` is an error if there are no capturing groups.
+                     * - `$10` is an error if there are less than 10 capturing groups. Use `${1}0` instead.
+                     * - `$01` is equivalent to `$1` if a capturing group exists, otherwise it's an error.
+                     * - `$0` (not followed by 1-9), `$00`, and `$&` are the entire match.
+                     * Native behavior (for comparison):
+                     * - Backreferences end after 1 or 2 digits. Cannot use backreference to capturing group 100+.
+                     * - `$1` is a literal `$1` if there are no capturing groups.
+                     * - `$10` is `$1` followed by a literal `0` if there are less than 10 capturing groups.
+                     * - `$01` is equivalent to `$1` if a capturing group exists, otherwise it's a literal `$01`.
+                     * - `$0` is a literal `$0`. `$&` is the entire match.
                      */
-                    n = +$2; // Type-convert; drop leading zeros
-                    if (n <= args.length - 3) {
-                        return args[n];
+                    if (!isNaN($2)) {
+                        if ($2 > args.length - 3) {
+                            throw new SyntaxError("backreference to undefined group " + $0);
+                        }
+                        return args[$2] || "";
                     }
-                    n = captureNames ? indexOf(captureNames, $2) : -1;
-                    return n > -1 ? args[n + 1] : $0;
+                    throw new SyntaxError("invalid token " + $0);
                 });
             });
         }
@@ -1099,10 +1166,10 @@ XRegExp = XRegExp || (function (undef) {
  */
     add(/\\k<([\w$]+)>/,
         function (match) {
-            var index = isNaN(match[1]) ? (indexOf(this.captureNames, match[1]) + 1) : +match[1],
+            var index = isNaN(match[1]) ? (lastIndexOf(this.captureNames, match[1]) + 1) : +match[1],
                 endIndex = match.index + match[0].length;
             if (!index || index > this.captureNames.length) {
-                throw new SyntaxError("can't use backreference to undefined group " + match[0]);
+                throw new SyntaxError("backreference to undefined group " + match[0]);
             }
             // Keep backreferences separate from subsequent literal numbers
             return "\\" + index + (
@@ -1144,7 +1211,7 @@ XRegExp = XRegExp || (function (undef) {
         function (match) {
             if (!isNaN(match[1])) {
                 // Avoid incorrect lookups, since named backreferences are added to match arrays
-                throw new SyntaxError("can't use an integer as capture name");
+                throw new SyntaxError("can't use integer as capture name " + match[0]);
             }
             this.captureNames.push(match[1]);
             this.hasNamedCapture = true;
@@ -1377,7 +1444,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** unicode-categories.js *****/
 
 /*!
- * XRegExp Unicode Categories v1.2.0-rc, 2012-04-02
+ * XRegExp Unicode Categories v1.2.0-rc, 2012-04-12
  * (c) 2010-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1 <http://unicode.org/>
@@ -1769,7 +1836,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** unicode-properties.js *****/
 
 /*!
- * XRegExp Unicode Properties v1.0.0-rc, 2012-04-02
+ * XRegExp Unicode Properties v1.0.0-rc, 2012-04-12
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1 <http://unicode.org/>
@@ -1797,11 +1864,11 @@ XRegExp = XRegExp || (function (undef) {
         White_Space: "0009-000D0020008500A01680180E2000-200A20282029202F205F3000",
         Noncharacter_Code_Point: "FDD0-FDEFFFFEFFFF",
         Default_Ignorable_Code_Point: "00AD034F115F116017B417B5180B-180D200B-200F202A-202E2060-206F3164FE00-FE0FFEFFFFA0FFF0-FFF8",
-        ANY: "0000-FFFF", // \p{^Any} compiles to [^\u0000-\uFFFF]; [\p{^Any}] to []
-        ASCII: "0000-007F",
+        Any: "0000-FFFF", // \p{^Any} compiles to [^\u0000-\uFFFF]; [\p{^Any}] to []
+        Ascii: "0000-007F",
         // \p{Assigned} is equivalent to \p{^Cn}
-        //ASSIGNED: XRegExp("[\\p{^Cn}]").source.replace(/[[\]]|\\u/g, "") // Negation *inside a character class* triggers inversion
-        ASSIGNED: "0000-0377037A-037E0384-038A038C038E-03A103A3-05270531-05560559-055F0561-05870589058A058F0591-05C705D0-05EA05F0-05F40600-06040606-061B061E-070D070F-074A074D-07B107C0-07FA0800-082D0830-083E0840-085B085E08A008A2-08AC08E4-08FE0900-09770979-097F0981-09830985-098C098F09900993-09A809AA-09B009B209B6-09B909BC-09C409C709C809CB-09CE09D709DC09DD09DF-09E309E6-09FB0A01-0A030A05-0A0A0A0F0A100A13-0A280A2A-0A300A320A330A350A360A380A390A3C0A3E-0A420A470A480A4B-0A4D0A510A59-0A5C0A5E0A66-0A750A81-0A830A85-0A8D0A8F-0A910A93-0AA80AAA-0AB00AB20AB30AB5-0AB90ABC-0AC50AC7-0AC90ACB-0ACD0AD00AE0-0AE30AE6-0AF10B01-0B030B05-0B0C0B0F0B100B13-0B280B2A-0B300B320B330B35-0B390B3C-0B440B470B480B4B-0B4D0B560B570B5C0B5D0B5F-0B630B66-0B770B820B830B85-0B8A0B8E-0B900B92-0B950B990B9A0B9C0B9E0B9F0BA30BA40BA8-0BAA0BAE-0BB90BBE-0BC20BC6-0BC80BCA-0BCD0BD00BD70BE6-0BFA0C01-0C030C05-0C0C0C0E-0C100C12-0C280C2A-0C330C35-0C390C3D-0C440C46-0C480C4A-0C4D0C550C560C580C590C60-0C630C66-0C6F0C78-0C7F0C820C830C85-0C8C0C8E-0C900C92-0CA80CAA-0CB30CB5-0CB90CBC-0CC40CC6-0CC80CCA-0CCD0CD50CD60CDE0CE0-0CE30CE6-0CEF0CF10CF20D020D030D05-0D0C0D0E-0D100D12-0D3A0D3D-0D440D46-0D480D4A-0D4E0D570D60-0D630D66-0D750D79-0D7F0D820D830D85-0D960D9A-0DB10DB3-0DBB0DBD0DC0-0DC60DCA0DCF-0DD40DD60DD8-0DDF0DF2-0DF40E01-0E3A0E3F-0E5B0E810E820E840E870E880E8A0E8D0E94-0E970E99-0E9F0EA1-0EA30EA50EA70EAA0EAB0EAD-0EB90EBB-0EBD0EC0-0EC40EC60EC8-0ECD0ED0-0ED90EDC-0EDF0F00-0F470F49-0F6C0F71-0F970F99-0FBC0FBE-0FCC0FCE-0FDA1000-10C510C710CD10D0-1248124A-124D1250-12561258125A-125D1260-1288128A-128D1290-12B012B2-12B512B8-12BE12C012C2-12C512C8-12D612D8-13101312-13151318-135A135D-137C1380-139913A0-13F41400-169C16A0-16F01700-170C170E-17141720-17361740-17531760-176C176E-1770177217731780-17DD17E0-17E917F0-17F91800-180E1810-18191820-18771880-18AA18B0-18F51900-191C1920-192B1930-193B19401944-196D1970-19741980-19AB19B0-19C919D0-19DA19DE-1A1B1A1E-1A5E1A60-1A7C1A7F-1A891A90-1A991AA0-1AAD1B00-1B4B1B50-1B7C1B80-1BF31BFC-1C371C3B-1C491C4D-1C7F1CC0-1CC71CD0-1CF61D00-1DE61DFC-1F151F18-1F1D1F20-1F451F48-1F4D1F50-1F571F591F5B1F5D1F5F-1F7D1F80-1FB41FB6-1FC41FC6-1FD31FD6-1FDB1FDD-1FEF1FF2-1FF41FF6-1FFE2000-2064206A-20712074-208E2090-209C20A0-20B920D0-20F02100-21892190-23F32400-24262440-244A2460-26FF2701-2B4C2B50-2B592C00-2C2E2C30-2C5E2C60-2CF32CF9-2D252D272D2D2D30-2D672D6F2D702D7F-2D962DA0-2DA62DA8-2DAE2DB0-2DB62DB8-2DBE2DC0-2DC62DC8-2DCE2DD0-2DD62DD8-2DDE2DE0-2E3B2E80-2E992E9B-2EF32F00-2FD52FF0-2FFB3000-303F3041-30963099-30FF3105-312D3131-318E3190-31BA31C0-31E331F0-321E3220-32FE3300-4DB54DC0-9FCCA000-A48CA490-A4C6A4D0-A62BA640-A697A69F-A6F7A700-A78EA790-A793A7A0-A7AAA7F8-A82BA830-A839A840-A877A880-A8C4A8CE-A8D9A8E0-A8FBA900-A953A95F-A97CA980-A9CDA9CF-A9D9A9DEA9DFAA00-AA36AA40-AA4DAA50-AA59AA5C-AA7BAA80-AAC2AADB-AAF6AB01-AB06AB09-AB0EAB11-AB16AB20-AB26AB28-AB2EABC0-ABEDABF0-ABF9AC00-D7A3D7B0-D7C6D7CB-D7FBD800-FA6DFA70-FAD9FB00-FB06FB13-FB17FB1D-FB36FB38-FB3CFB3EFB40FB41FB43FB44FB46-FBC1FBD3-FD3FFD50-FD8FFD92-FDC7FDF0-FDFDFE00-FE19FE20-FE26FE30-FE52FE54-FE66FE68-FE6BFE70-FE74FE76-FEFCFEFFFF01-FFBEFFC2-FFC7FFCA-FFCFFFD2-FFD7FFDA-FFDCFFE0-FFE6FFE8-FFEEFFF9-FFFD"
+        //Assigned: XRegExp("[\\p{^Cn}]").source.replace(/[[\]]|\\u/g, "") // Negation *inside a character class* triggers inversion
+        Assigned: "0000-0377037A-037E0384-038A038C038E-03A103A3-05270531-05560559-055F0561-05870589058A058F0591-05C705D0-05EA05F0-05F40600-06040606-061B061E-070D070F-074A074D-07B107C0-07FA0800-082D0830-083E0840-085B085E08A008A2-08AC08E4-08FE0900-09770979-097F0981-09830985-098C098F09900993-09A809AA-09B009B209B6-09B909BC-09C409C709C809CB-09CE09D709DC09DD09DF-09E309E6-09FB0A01-0A030A05-0A0A0A0F0A100A13-0A280A2A-0A300A320A330A350A360A380A390A3C0A3E-0A420A470A480A4B-0A4D0A510A59-0A5C0A5E0A66-0A750A81-0A830A85-0A8D0A8F-0A910A93-0AA80AAA-0AB00AB20AB30AB5-0AB90ABC-0AC50AC7-0AC90ACB-0ACD0AD00AE0-0AE30AE6-0AF10B01-0B030B05-0B0C0B0F0B100B13-0B280B2A-0B300B320B330B35-0B390B3C-0B440B470B480B4B-0B4D0B560B570B5C0B5D0B5F-0B630B66-0B770B820B830B85-0B8A0B8E-0B900B92-0B950B990B9A0B9C0B9E0B9F0BA30BA40BA8-0BAA0BAE-0BB90BBE-0BC20BC6-0BC80BCA-0BCD0BD00BD70BE6-0BFA0C01-0C030C05-0C0C0C0E-0C100C12-0C280C2A-0C330C35-0C390C3D-0C440C46-0C480C4A-0C4D0C550C560C580C590C60-0C630C66-0C6F0C78-0C7F0C820C830C85-0C8C0C8E-0C900C92-0CA80CAA-0CB30CB5-0CB90CBC-0CC40CC6-0CC80CCA-0CCD0CD50CD60CDE0CE0-0CE30CE6-0CEF0CF10CF20D020D030D05-0D0C0D0E-0D100D12-0D3A0D3D-0D440D46-0D480D4A-0D4E0D570D60-0D630D66-0D750D79-0D7F0D820D830D85-0D960D9A-0DB10DB3-0DBB0DBD0DC0-0DC60DCA0DCF-0DD40DD60DD8-0DDF0DF2-0DF40E01-0E3A0E3F-0E5B0E810E820E840E870E880E8A0E8D0E94-0E970E99-0E9F0EA1-0EA30EA50EA70EAA0EAB0EAD-0EB90EBB-0EBD0EC0-0EC40EC60EC8-0ECD0ED0-0ED90EDC-0EDF0F00-0F470F49-0F6C0F71-0F970F99-0FBC0FBE-0FCC0FCE-0FDA1000-10C510C710CD10D0-1248124A-124D1250-12561258125A-125D1260-1288128A-128D1290-12B012B2-12B512B8-12BE12C012C2-12C512C8-12D612D8-13101312-13151318-135A135D-137C1380-139913A0-13F41400-169C16A0-16F01700-170C170E-17141720-17361740-17531760-176C176E-1770177217731780-17DD17E0-17E917F0-17F91800-180E1810-18191820-18771880-18AA18B0-18F51900-191C1920-192B1930-193B19401944-196D1970-19741980-19AB19B0-19C919D0-19DA19DE-1A1B1A1E-1A5E1A60-1A7C1A7F-1A891A90-1A991AA0-1AAD1B00-1B4B1B50-1B7C1B80-1BF31BFC-1C371C3B-1C491C4D-1C7F1CC0-1CC71CD0-1CF61D00-1DE61DFC-1F151F18-1F1D1F20-1F451F48-1F4D1F50-1F571F591F5B1F5D1F5F-1F7D1F80-1FB41FB6-1FC41FC6-1FD31FD6-1FDB1FDD-1FEF1FF2-1FF41FF6-1FFE2000-2064206A-20712074-208E2090-209C20A0-20B920D0-20F02100-21892190-23F32400-24262440-244A2460-26FF2701-2B4C2B50-2B592C00-2C2E2C30-2C5E2C60-2CF32CF9-2D252D272D2D2D30-2D672D6F2D702D7F-2D962DA0-2DA62DA8-2DAE2DB0-2DB62DB8-2DBE2DC0-2DC62DC8-2DCE2DD0-2DD62DD8-2DDE2DE0-2E3B2E80-2E992E9B-2EF32F00-2FD52FF0-2FFB3000-303F3041-30963099-30FF3105-312D3131-318E3190-31BA31C0-31E331F0-321E3220-32FE3300-4DB54DC0-9FCCA000-A48CA490-A4C6A4D0-A62BA640-A697A69F-A6F7A700-A78EA790-A793A7A0-A7AAA7F8-A82BA830-A839A840-A877A880-A8C4A8CE-A8D9A8E0-A8FBA900-A953A95F-A97CA980-A9CDA9CF-A9D9A9DEA9DFAA00-AA36AA40-AA4DAA50-AA59AA5C-AA7BAA80-AAC2AADB-AAF6AB01-AB06AB09-AB0EAB11-AB16AB20-AB26AB28-AB2EABC0-ABEDABF0-ABF9AC00-D7A3D7B0-D7C6D7CB-D7FBD800-FA6DFA70-FAD9FB00-FB06FB13-FB17FB1D-FB36FB38-FB3CFB3EFB40FB41FB43FB44FB46-FBC1FBD3-FD3FFD50-FD8FFD92-FDC7FDF0-FDFDFE00-FE19FE20-FE26FE30-FE52FE54-FE66FE68-FE6BFE70-FE74FE76-FEFCFEFFFF01-FFBEFFC2-FFC7FFCA-FFCFFFD2-FFD7FFDA-FFDCFFE0-FFE6FFE8-FFEEFFF9-FFFD"
     });
 
 }(XRegExp));
@@ -1810,7 +1877,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** matchrecursive.js *****/
 
 /*!
- * XRegExp.matchRecursive v0.2.0-rc, 2012-04-05
+ * XRegExp.matchRecursive v0.2.0-rc-2, 2012-04-17
  * (c) 2009-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -1819,8 +1886,17 @@ XRegExp = XRegExp || (function (undef) {
     "use strict";
 
 /**
- * Returns matches between outermost left and right delimiters, or arrays of match parts and
- * position data. An error is thrown if delimiters are unbalanced within the data.
+ * Returns a match detail object composed of the provided values.
+ * @private
+ */
+    function row(value, name, start, end) {
+        return {value:value, name:name, start:start, end:end};
+    }
+
+/**
+ * Returns an array of match strings between outermost left and right delimiters, or an array of
+ * objects with detailed match parts and position data. An error is thrown if delimiters are
+ * unbalanced within the data.
  * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {String} left Left delimiter as an XRegExp pattern.
@@ -1831,14 +1907,40 @@ XRegExp = XRegExp || (function (undef) {
  * @example
  *
  * // Basic usage
- * XRegExp.matchRecursive('(t((e))s)t()(ing)', '\\(', '\\)', 'g');
+ * var str = '(t((e))s)t()(ing)';
+ * XRegExp.matchRecursive(str, '\\(', '\\)', 'g');
+ * // -> ['t((e))s', '', 'ing']
  *
- * // With valueNames and escapeChar
- * var str = '...{1}\\{{function(x,y){return y+x;}}';
- * XRegExp.matchRecursive(str, '{', '}', 'gi', {
- *     valueNames: ['between', 'left', 'match', 'right'],
- *     escapeChar: '\\'
+ * // Extended information mode with valueNames
+ * str = 'Here is <div> <div>an</div></div> example';
+ * XRegExp.matchRecursive(str, '<div\\s*>', '</div>', 'gi', {
+ *   valueNames: ['between', 'left', 'match', 'right']
  * });
+ * // -> [
+ * // {name: 'between', value: 'Here is ',       start: 0,  end: 8},
+ * // {name: 'left',    value: '<div>',          start: 8,  end: 13},
+ * // {name: 'match',   value: ' <div>an</div>', start: 13, end: 27},
+ * // {name: 'right',   value: '</div>',         start: 27, end: 33},
+ * // {name: 'between', value: ' example',       start: 33, end: 41}
+ * // ]
+ *
+ * // Omitting unneeded parts with null valueNames, and using escapeChar
+ * str = '...{1}\\{{function(x,y){return y+x;}}';
+ * XRegExp.matchRecursive(str, '{', '}', 'g', {
+ *   valueNames: ['literal', null, 'value', null],
+ *   escapeChar: '\\'
+ * });
+ * // -> [
+ * // {name: 'literal', value: '...', start: 0, end: 3},
+ * // {name: 'value',   value: '1',   start: 4, end: 5},
+ * // {name: 'literal', value: '\\{', start: 6, end: 8},
+ * // {name: 'value',   value: 'function(x,y){return y+x;}', start: 9, end: 35}
+ * // ]
+ *
+ * // Sticky mode via flag y
+ * str = '<1><<<2>>><3>4<5>';
+ * XRegExp.matchRecursive(str, '<', '>', 'gy');
+ * // -> ['1', '<<2>>', '3']
  */
     XRegExp.matchRecursive = function (str, left, right, flags, options) {
         flags = flags || "";
@@ -1865,12 +1967,10 @@ XRegExp = XRegExp || (function (undef) {
             if (escapeChar.length > 1) {
                 throw new SyntaxError("can't use more than one escape character");
             }
-            if (/\\[1-9]/.test(right.source.replace(/\\[0\D]|\[(?:[^\\\]]|\\[\s\S])*]/g, ""))) {
-                throw new SyntaxError("can't use escape character if backreference in delimiter");
-            }
             escapeChar = XRegExp.escape(escapeChar);
+            // Using XRegExp.union safely rewrites backreferences in `left` and `right`
             esc = new RegExp(
-                "(?:" + escapeChar + "[\\S\\s]|(?:(?!" + left.source + "|" + right.source + ")[^" + escapeChar + "])+)+",
+                "(?:" + escapeChar + "[\\S\\s]|(?:(?!" + XRegExp.union([left, right]).source + ")[^" + escapeChar + "])+)+",
                 flags.replace(/[^im]+/g, "") // Flags gy not needed here; flags nsx handled by XRegExp
             );
         }
@@ -1920,16 +2020,16 @@ XRegExp = XRegExp || (function (undef) {
                 if (!--openTokens) {
                     if (vN) {
                         if (vN[0] && outerStart > lastOuterEnd) {
-                            output.push([vN[0], str.slice(lastOuterEnd, outerStart), lastOuterEnd, outerStart]);
+                            output.push(row(vN[0], str.slice(lastOuterEnd, outerStart), lastOuterEnd, outerStart));
                         }
                         if (vN[1]) {
-                            output.push([vN[1], str.slice(outerStart, innerStart), outerStart, innerStart]);
+                            output.push(row(vN[1], str.slice(outerStart, innerStart), outerStart, innerStart));
                         }
                         if (vN[2]) {
-                            output.push([vN[2], str.slice(innerStart, delimStart), innerStart, delimStart]);
+                            output.push(row(vN[2], str.slice(innerStart, delimStart), innerStart, delimStart));
                         }
                         if (vN[3]) {
-                            output.push([vN[3], str.slice(delimStart, delimEnd), delimStart, delimEnd]);
+                            output.push(row(vN[3], str.slice(delimStart, delimEnd), delimStart, delimEnd));
                         }
                     } else {
                         output.push(str.slice(innerStart, delimStart));
@@ -1949,7 +2049,7 @@ XRegExp = XRegExp || (function (undef) {
         }
 
         if (global && !sticky && vN && vN[0] && str.length > lastOuterEnd) {
-            output.push([vN[0], str.slice(lastOuterEnd), lastOuterEnd, str.length]);
+            output.push(row(vN[0], str.slice(lastOuterEnd), lastOuterEnd, str.length));
         }
 
         return output;
@@ -2083,7 +2183,9 @@ XRegExp = XRegExp || (function (undef) {
  */
     function extend(a, b) {
         for (var p in b) {
-            b.hasOwnProperty(p) && (a[p] = b[p]);
+            if (b.hasOwnProperty(p)) {
+                a[p] = b[p];
+            }
         }
         //return a;
     }

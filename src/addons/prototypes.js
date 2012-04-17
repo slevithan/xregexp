@@ -23,7 +23,9 @@
  */
     function extend(a, b) {
         for (var p in b) {
-            b.hasOwnProperty(p) && (a[p] = b[p]);
+            if (b.hasOwnProperty(p)) {
+                a[p] = b[p];
+            }
         }
         //return a;
     }

@@ -1,5 +1,5 @@
 /*!
- * XRegExp Unicode Categories v1.2.0-rc, 2012-04-02
+ * XRegExp Unicode Categories v1.2.0-rc, 2012-04-12
  * (c) 2010-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1 <http://unicode.org/>
