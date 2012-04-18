@@ -1124,9 +1124,9 @@ XRegExp = XRegExp || (function (undef) {
 // Shortcut
     add = addToken.on;
 
-/* Letter identity escapes that natively match literal characters: \p, etc.
- * Should be SyntaxErrors but are allowed in web reality. XRegExp makes them errors to reserve
- * their syntax, but lets them be superseded by XRegExp addons.
+/* Letter identity escapes that natively match literal characters: \p, \P, etc.
+ * Should be SyntaxErrors but are allowed in web reality. XRegExp makes them errors for cross-
+ * browser consistency and to reserve their syntax, but lets them be superseded by XRegExp addons.
  */
     add(/\\([ABCE-RTUVXYZaeg-mopqyz]|c(?![A-Za-z])|u(?![\dA-Fa-f]{4})|x(?![\dA-Fa-f]{2}))/,
         function (match, scope) {

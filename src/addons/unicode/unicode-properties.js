@@ -27,7 +27,7 @@
         White_Space: "0009-000D0020008500A01680180E2000-200A20282029202F205F3000",
         Noncharacter_Code_Point: "FDD0-FDEFFFFEFFFF",
         Default_Ignorable_Code_Point: "00AD034F115F116017B417B5180B-180D200B-200F202A-202E2060-206F3164FE00-FE0FFEFFFFA0FFF0-FFF8",
-        Any: "0000-FFFF", // \p{^Any} compiles to [^\u0000-\uFFFF]; [\p{^Any}] to []
+        Any: "0000-FFFF", // \p{^Any} compiles to [^\u0000-\uFFFF]; [\p{^Any}] to []. \p{Any} matches a code unit. To match any code point (via surrogate pairs), use (?:[\0-\uD7FF\uDC00-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF])
         Ascii: "0000-007F",
         // \p{Assigned} is equivalent to \p{^Cn}
         //Assigned: XRegExp("[\\p{^Cn}]").source.replace(/[[\]]|\\u/g, "") // Negation *inside a character class* triggers inversion

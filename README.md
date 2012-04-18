@@ -96,9 +96,6 @@ var unicodeWord = XRegExp('^\\p{L}+$');
 unicodeWord.test('Русский'); // -> true
 unicodeWord.test('日本語'); // -> true
 unicodeWord.test('العربية'); // -> true
-
-// Match characters beyond the Basic Multilingual Plane with XRegExp's Unicode code point escapes
-XRegExp('\\u{10FFFF}');
 ~~~
 
 The base script adds `\p{Letter}` and its alias `\p{L}`, but other Unicode categories, scripts, blocks, and properties require addon packages. Try these next examples after additionally including `unicode-scripts.js`:
@@ -108,7 +105,7 @@ XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
 XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
 ~~~
 
-XRegExp uses the Unicode 6.1 character database (released January 2012).
+XRegExp uses Unicode 6.1's Basic Multilingual Plane.
 
 
 ## XRegExp.matchRecursive
@@ -248,7 +245,7 @@ Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/). S
 
 `XRegExp.build` inspired by [Lea Verou](http://lea.verou.me/)'s [RegExp.create](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/).
 
-`XRegExp.union` inspired by [Ruby](http://ruby-lang.org/).
+`XRegExp.union` inspired by [Ruby](http://www.ruby-lang.org/).
 
 All code released under the [MIT License](http://mit-license.org/).
 

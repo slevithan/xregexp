@@ -1127,9 +1127,9 @@ XRegExp = XRegExp || (function (undef) {
 // Shortcut
     add = addToken.on;
 
-/* Letter identity escapes that natively match literal characters: \p, etc.
- * Should be SyntaxErrors but are allowed in web reality. XRegExp makes them errors to reserve
- * their syntax, but lets them be superseded by XRegExp addons.
+/* Letter identity escapes that natively match literal characters: \p, \P, etc.
+ * Should be SyntaxErrors but are allowed in web reality. XRegExp makes them errors for cross-
+ * browser consistency and to reserve their syntax, but lets them be superseded by XRegExp addons.
  */
     add(/\\([ABCE-RTUVXYZaeg-mopqyz]|c(?![A-Za-z])|u(?![\dA-Fa-f]{4})|x(?![\dA-Fa-f]{2}))/,
         function (match, scope) {
@@ -1416,9 +1416,10 @@ XRegExp = XRegExp || (function (undef) {
  * above FFFF are converted to surrogate pairs, so e.g. `\u{20B20}` is simply an alternate syntax
  * for `\uD842\uDF20`. This can lead to broken behavior if you follow a `\u{n..}` token that
  * references a code point above FFFF with a quantifier, or if you use the same in a character
- * class. XRegExp's handling follows ES6 proposals for `\u{n..}`, since compatibility concerns
- * prevent JavaScript regexes from changing to be based on code points rather than code units by
- * default. Workarounds include, e.g., `(?:\u{10FFFF})+` or `(?:\u{10FFFF}|[A-Z])`.
+ * class. Using `\u{n..}` with code points above FFFF is therefore not recommended, unless you know
+ * exactly what you're doing. XRegExp's handling follows ES6 proposals for `\u{n..}`, since
+ * compatibility concerns prevent JavaScript regexes from changing to be based on code points
+ * rather than code units by default.
  */
     XRegExp.addToken(
         /\\u{([0-9A-Fa-f]{1,6})}/,
@@ -1864,7 +1865,7 @@ XRegExp = XRegExp || (function (undef) {
         White_Space: "0009-000D0020008500A01680180E2000-200A20282029202F205F3000",
         Noncharacter_Code_Point: "FDD0-FDEFFFFEFFFF",
         Default_Ignorable_Code_Point: "00AD034F115F116017B417B5180B-180D200B-200F202A-202E2060-206F3164FE00-FE0FFEFFFFA0FFF0-FFF8",
-        Any: "0000-FFFF", // \p{^Any} compiles to [^\u0000-\uFFFF]; [\p{^Any}] to []
+        Any: "0000-FFFF", // \p{^Any} compiles to [^\u0000-\uFFFF]; [\p{^Any}] to []. \p{Any} matches a code unit. To match any code point (via surrogate pairs), use (?:[\0-\uD7FF\uDC00-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF])
         Ascii: "0000-007F",
         // \p{Assigned} is equivalent to \p{^Cn}
         //Assigned: XRegExp("[\\p{^Cn}]").source.replace(/[[\]]|\\u/g, "") // Negation *inside a character class* triggers inversion

@@ -153,9 +153,10 @@
  * above FFFF are converted to surrogate pairs, so e.g. `\u{20B20}` is simply an alternate syntax
  * for `\uD842\uDF20`. This can lead to broken behavior if you follow a `\u{n..}` token that
  * references a code point above FFFF with a quantifier, or if you use the same in a character
- * class. XRegExp's handling follows ES6 proposals for `\u{n..}`, since compatibility concerns
- * prevent JavaScript regexes from changing to be based on code points rather than code units by
- * default. Workarounds include, e.g., `(?:\u{10FFFF})+` or `(?:\u{10FFFF}|[A-Z])`.
+ * class. Using `\u{n..}` with code points above FFFF is therefore not recommended, unless you know
+ * exactly what you're doing. XRegExp's handling follows ES6 proposals for `\u{n..}`, since
+ * compatibility concerns prevent JavaScript regexes from changing to be based on code points
+ * rather than code units by default.
  */
     XRegExp.addToken(
         /\\u{([0-9A-Fa-f]{1,6})}/,
