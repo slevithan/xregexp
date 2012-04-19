@@ -2063,7 +2063,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** build.js *****/
 
 /*!
- * XRegExp.build v0.1.0-rc, 2012-04-09
+ * XRegExp.build v0.1.0-rc-2, 2012-04-19
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Based on RegExp.create by Lea Verou <http://lea.verou.me/>
@@ -2075,19 +2075,32 @@ XRegExp = XRegExp || (function (undef) {
     var data = null;
 
 /**
- * Strips a regex's leading ^ and trailing $ anchors, if present.
+ * Strips a leading ^ and trailing $ anchor, if present.
  * @private
- * @param {RegExp} regex Regex to process.
- * @returns {String} Source of the regex, with edge anchors removed.
+ * @param {String} pattern Pattern to process.
+ * @returns {String} Pattern with edge anchors removed.
  */
-    function deanchor(regex) {
+    function deanchor(pattern) {
+        var end$ = /\$(?:\(\?:\))?$/;
         // Strip a leading `^` or `(?:)^`. The latter handles /x or (?#) cruft
-        var pattern = regex.source.replace(/^(?:\(\?:\))?\^/, "");
+        pattern = pattern.replace(/^(?:\(\?:\))?\^/, "");
         // Strip a trailing unescaped `$` or `$(?:)`
-        if (/\$$/.test(pattern.replace(/\\[\s\S]/g, ""))) {
-            return pattern.replace(/\$(?:\(\?:\))?$/, "");
+        if (end$.test(pattern.replace(/\\[\s\S]/g, ""))) {
+            return pattern.replace(end$, "");
         }
         return pattern;
+    }
+
+/**
+ * Throw an error if the provided pattern includes backreferences.
+ * @private
+ * @param {String} pattern Pattern to check for backreferences.
+ */
+    function banBackrefs(pattern) {
+        // Disallow backrefs, since they wouldn't be independent to subpatterns or the outer regex
+        if (/\\[1-9]/.test(pattern.replace(/\\[0\D]|\[(?:[^\\\]]|\\[\s\S])*]/g, ""))) {
+            throw new SyntaxError("can't use backreferences with XRegExp.build");
+        }
     }
 
 /**
@@ -2115,17 +2128,22 @@ XRegExp = XRegExp || (function (undef) {
             for (p in subs) {
                 if (subs.hasOwnProperty(p)) {
                     if (XRegExp.isRegExp(subs[p])) {
-                        // Allows embedding independently useful anchored regexes
-                        data[p] = deanchor(subs[p]);
+                        // Deanchoring allows embedding independently useful anchored regexes
+                        data[p] = deanchor(subs[p].source);
                     } else {
-                        // Passing to XRegExp catches errors and ensures independent validity, lest
-                        // an unescaped `(`, `)`, `[`, or trailing `\` breaks the `(?:)` wrapper
-                        XRegExp(subs[p]);
-                        data[p] = subs[p];
+                        // Passing to XRegExp enables entended syntax and also ensures independent
+                        // validity, lest an unescaped `(`, `)`, `[`, or trailing `\` breaks the
+                        // `(?:)` wrapper
+                        data[p] = XRegExp(subs[p]).source;
+                        // Because of how this is set up, the `{{..}}` syntax is active in
+                        // subpatterns provided as strings; thus throws an "undefined property"
+                        // error. This is good, but may be unexpected
                     }
+                    banBackrefs(data[p]);
                 }
             }
             regex = XRegExp(pattern, flags);
+            banBackrefs(regex.source);
         } catch (err) {
             throw err;
         } finally {
