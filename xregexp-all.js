@@ -2,7 +2,7 @@
 /***** xregexp.js *****/
 
 /*!
- * XRegExp v2.0.0-rc-2, 2012-04-18
+ * XRegExp v2.0.0-rc-2, 2012-04-20
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -47,6 +47,9 @@ XRegExp = XRegExp || (function (undef) {
 
 // Storage for fixed/extended native methods
         fixed = {},
+
+// Storage for cached regexes
+        cache = {},
 
 // Storage for addon tokens
         tokens = [],
@@ -445,7 +448,7 @@ XRegExp = XRegExp || (function (undef) {
  */
     self.cache = function (pattern, flags) {
         var key = pattern + "/" + (flags || "");
-        return self.cache[key] || (self.cache[key] = self(pattern, flags));
+        return cache[key] || (cache[key] = self(pattern, flags));
     };
 
 /**
