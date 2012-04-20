@@ -641,12 +641,12 @@ XRegExp = XRegExp || (function (undef) {
         return (function recurseChain(values, level) {
             var item = chain[level].regex ? chain[level] : {regex: chain[level]},
                 matches = [],
-                fn = function (match) {
+                addMatch = function (match) {
                     matches.push(item.backref ? (match[item.backref] || "") : match[0]);
                 },
                 i;
             for (i = 0; i < values.length; ++i) {
-                self.forEach(values[i], item.regex, fn);
+                self.forEach(values[i], item.regex, addMatch);
             }
             return ((level === chain.length - 1) || !matches.length) ?
                     matches :
@@ -820,17 +820,14 @@ XRegExp = XRegExp || (function (undef) {
  * XRegExp.union([]);
  * // -> /(?!)/
  *
- * XRegExp.union(['a+b*c']);
- * // -> /a\+b\*c/
- *
- * XRegExp.union(['skiing', 'sledding']);
- * // -> /skiing|sledding/
+ * XRegExp.union(['a+b*c', 'dogs', 'cats']);
+ * // -> /a\+b\*c|dogs|cats/
  *
  * XRegExp.union([/(dogs)\1/, /(cats)\1/], 'i');
  * // -> /(dogs)\1|(cats)\2/i
  *
- * XRegExp.union([XRegExp('(?<pet>dog)\\k<pet>'), XRegExp('(?<pet>cat)\\k<pet>')]);
- * // Matches only 'dogdog' or 'catcat'. result.pet references the last group named pet.
+ * XRegExp.union([XRegExp('(?<pet>dogs)\\k<pet>'), XRegExp('(?<pet>cats)\\k<pet>')]);
+ * // -> XRegExp('(?<pet>dogs)\\k<pet>|(?<pet>cats)\\k<pet>')
  */
     self.union = function (patterns, flags) {
         var parts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*]/g,
@@ -840,6 +837,18 @@ XRegExp = XRegExp || (function (undef) {
             thisIndex,
             captureNames,
             pattern,
+            rewrite = function ($0, $1, $2) {
+                if ($1) {
+                    thisIndex = numCaptures - priorCaptures;
+                    ++numCaptures;
+                    if (captureNames && captureNames[thisIndex]) { // If the current capture has a name
+                        return "(?<" + captureNames[thisIndex] + ">";
+                    }
+                } else if ($2) {
+                    return "\\" + (+$2 + priorCaptures);
+                }
+                return $0;
+            },
             i;
         if (!isType(patterns, "Array")) {
             throw new TypeError("patterns must be an array");
@@ -852,19 +861,9 @@ XRegExp = XRegExp || (function (undef) {
             if (self.isRegExp(pattern)) {
                 priorCaptures = numCaptures;
                 captureNames = pattern.xregexp ? pattern.xregexp.captureNames : null;
-                // Passing to XRegExp dies on octals and ensures patterns are independently valid; helps keep this simple
-                output.push(("(?:" + self(pattern.source).source + ")").replace(parts, function ($0, $1, $2) {
-                    if ($1) {
-                        thisIndex = numCaptures - priorCaptures;
-                        ++numCaptures;
-                        if (captureNames && captureNames[thisIndex]) { // If the current capture has a name
-                            return "(?<" + captureNames[thisIndex] + ">";
-                        }
-                    } else if ($2) {
-                        return "\\" + (+$2 + priorCaptures);
-                    }
-                    return $0;
-                }));
+                // Rewrite backreferences. Passing to XRegExp dies on octals and ensures patterns
+                // are independently valid; helps keep this simple. Named captures are put back
+                output.push(self(pattern.source).source.replace(parts, rewrite));
             } else {
                 output.push(self.escape(pattern));
             }
