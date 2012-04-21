@@ -168,20 +168,18 @@ First include the script:
 <script src="addons/build.js"></script>
 ~~~
 
-You can then build regular expressions using named subpatterns, for readability and code reuse:
+You can then build regular expressions using named subpatterns, for readability and pattern reuse:
 
 ~~~ js
-XRegExp.build('(?i)\\b{{month}}{{separator}}{{year}}\\b', {
-    month: XRegExp.build('{{monthAbbr}}|{{monthName}}', {
-        monthAbbr: /Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/,
-        monthName: /January|February|March|April|May|June|July|August|September|October|November|December/
-    }),
-    separator: /,? /,
-    year: /\d{4}/
+var time = XRegExp.build('(?x) ^ {{hours}} : {{minutes}} $', {
+    hours: /2[0-3]|[01]?[0-9]/,
+    minutes: /[0-5]?[0-9]/
 });
+
+time.test('23:59'); // -> true
 ~~~
 
-The `{{…}}` syntax works only for regexes created by `XRegExp.build`. It can be escaped using `\{{…}}`. Named subpatterns can be provided as strings or regex objects. Their values are automatically wrapped in `(?:…)` so they can be quantified as a single unit and don't interfere with the surrounding pattern in unexpected ways. If present, a leading `^` and trailing unescaped `$` are stripped from subpatterns provided as regex objects. Flags can be provided via `XRegExp.build`'s optional third argument. Backreferences are not allowed within `XRegExp.build` patterns.
+Named subpatterns can be provided as strings or regex objects. Their values are automatically wrapped in `(?:…)` so they can be quantified as a single unit and don't interfere with the surrounding pattern in unexpected ways. If present, a leading `^` and trailing unescaped `$` are stripped from subpatterns provided as regex objects. Flags can be provided via `XRegExp.build`'s optional third argument. Backreferences are not allowed within `XRegExp.build` patterns. The `{{…}}` syntax can be escaped with a backslash.
 
 See also: *[Creating Grammatical Regexes Using XRegExp.build](http://blog.stevenlevithan.com/archives/grammatical-patterns-xregexp-build)*.
 
@@ -219,7 +217,7 @@ XRegExp.globalize(/[a-z]/i).xexec('abc');
 
 ## &c
 
-**Lookbehind:** Although not an official plugin, this [collection of short functions](https://gist.github.com/2387872) that use XRegExp make it easy to simulate infinite-length leading lookbehind.
+**Lookbehind:** Although not an official addon, there is a [collection of short functions](https://gist.github.com/2387872) available that use XRegExp and make it easy to simulate infinite-length leading lookbehind.
 
 
 ## How to run tests on the server with npm

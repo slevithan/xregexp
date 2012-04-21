@@ -2068,7 +2068,7 @@ XRegExp = XRegExp || (function (undef) {
  * XRegExp.build v0.1.0-rc-2, 2012-04-21
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
- * Based on RegExp.create by Lea Verou <http://lea.verou.me/>
+ * Inspired by RegExp.create by Lea Verou <http://lea.verou.me/>
  */
 
 (function (XRegExp) {
@@ -2106,7 +2106,7 @@ XRegExp = XRegExp || (function (undef) {
     }
 
 /**
- * Builds regular expressions using named subpatterns, for readability and code reuse.
+ * Builds regular expressions using named subpatterns, for readability and pattern reuse.
  * @memberOf XRegExp
  * @param {String} pattern XRegExp pattern using `{{..}}` for embedded subpatterns.
  * @param {Object} subs Named subpatterns as strings or regexes. If present, a leading ^ and
@@ -2115,14 +2115,10 @@ XRegExp = XRegExp || (function (undef) {
  * @returns {RegExp} Extended regular expression object.
  * @example
  *
- * XRegExp.build('(?i)\\b{{month}}{{separator}}{{year}}\\b', {
- *   month: XRegExp.build('{{monthAbbr}}|{{monthName}}', {
- *     monthAbbr: /Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/,
- *     monthName: /January|February|March|April|May|June|July|August|September|October|November|December/
- *   }),
- *   separator: /,? /,
- *   year: /\d{4}/
- * });
+ * XRegExp.build('^ {{hours}} : {{minutes}} $', {
+ *   hours: /2[0-3]|[01]?[0-9]/,
+ *   minutes: /[0-5]?[0-9]/
+ * }, 'x');
  */
     XRegExp.build = function (pattern, subs, flags) {
         var regex, p;
