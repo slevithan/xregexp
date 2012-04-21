@@ -1,5 +1,5 @@
 /*!
- * XRegExp.build v0.1.0-rc-2, 2012-04-19
+ * XRegExp.build v0.1.0-rc-2, 2012-04-21
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Based on RegExp.create by Lea Verou <http://lea.verou.me/>
@@ -49,12 +49,13 @@
  * @returns {RegExp} Extended regular expression object.
  * @example
  *
- * var color = XRegExp.build('{{keyword}}|{{func}}|{{hex}}', {
- *   keyword: /red|tan|[a-z]{4,20}/,
- *   func: XRegExp.build('(?n)(rgb|hsl)a?\\((\\s*{{number}}%?\\s*,?\\s*){3,4}\\)', {
- *     number: /-?\d+(?:\.\d+)?/
+ * XRegExp.build('(?i)\\b{{month}}{{separator}}{{year}}\\b', {
+ *   month: XRegExp.build('{{monthAbbr}}|{{monthName}}', {
+ *     monthAbbr: /Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/,
+ *     monthName: /January|February|March|April|May|June|July|August|September|October|November|December/
  *   }),
- *   hex: /#(?:[0-9A-Fa-f]{1,2}){3}/
+ *   separator: /,? /,
+ *   year: /\d{4}/
  * });
  */
     XRegExp.build = function (pattern, subs, flags) {

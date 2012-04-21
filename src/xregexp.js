@@ -1,5 +1,5 @@
 /*!
- * XRegExp v2.0.0-rc-2, 2012-04-20
+ * XRegExp v2.0.0-rc-2, 2012-04-21
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -665,12 +665,12 @@ XRegExp = XRegExp || (function (undef) {
  * @param {String} str String to search.
  * @param {RegExp|String} search Search pattern to be replaced.
  * @param {String|Function} replacement Replacement string or a function invoked to create it.
- *   Replacement strings can include special replacement patterns:
- *     <li>$$ - Inserts a "$".
- *     <li>$& - Inserts the matched substring.
- *     <li>$` - Inserts the string portion that precedes the matched substring.
- *     <li>$' - Inserts the string portion that follows the matched substring.
- *     <li>$n/$nn - Where n/nn are digits referencing an existent capturing group, inserts
+ *   Replacement strings can include special replacement syntax:
+ *     <li>$$ - Inserts a literal '$'.
+ *     <li>$&, $0 - Inserts the matched substring.
+ *     <li>$` - Inserts the string that precedes the matched substring (left context).
+ *     <li>$' - Inserts the string that follows the matched substring (right context).
+ *     <li>$n, $nn - Where n/nn are digits referencing an existent capturing group, inserts
  *       backreference n/nn.
  *     <li>${n} - Where n is a name or any number of digits that reference an existent capturing
  *       group, inserts backreference n.

@@ -171,16 +171,17 @@ First include the script:
 You can then build regular expressions using named subpatterns, for readability and code reuse:
 
 ~~~ js
-var color = XRegExp.build('{{keyword}}|{{func}}|{{hex}}', {
-    keyword: /red|tan|[a-z]{4,20}/,
-    func: XRegExp.build('(?n)(rgb|hsl)a?\\((\\s*{{number}}%?\\s*,?\\s*){3,4}\\)', {
-        number: /-?\d+(?:\.\d+)?/
+XRegExp.build('(?i)\\b{{month}}{{separator}}{{year}}\\b', {
+    month: XRegExp.build('{{monthAbbr}}|{{monthName}}', {
+        monthAbbr: /Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/,
+        monthName: /January|February|March|April|May|June|July|August|September|October|November|December/
     }),
-    hex: /#(?:[0-9A-Fa-f]{1,2}){3}/
+    separator: /,? /,
+    year: /\d{4}/
 });
 ~~~
 
-The `{{…}}` syntax works only for regexes created by `XRegExp.build`. It can be escaped using `\{{…}}`. Named subpatterns can be provided as strings or regex objects. Their values are automatically wrapped in `(?:…)` so they don't interfere with the surrounding pattern in unexpected ways. If present, a leading `^` and trailing unescaped `$` are stripped from subpatterns provided as regex objects. Flags can be provided via `XRegExp.build`'s optional third argument. Backreferences cannot be used within `XRegExp.build` patterns (an error is thrown).
+The `{{…}}` syntax works only for regexes created by `XRegExp.build`. It can be escaped using `\{{…}}`. Named subpatterns can be provided as strings or regex objects. Their values are automatically wrapped in `(?:…)` so they can be quantified as a single unit and don't interfere with the surrounding pattern in unexpected ways. If present, a leading `^` and trailing unescaped `$` are stripped from subpatterns provided as regex objects. Flags can be provided via `XRegExp.build`'s optional third argument. Backreferences are not allowed within `XRegExp.build` patterns.
 
 See also: *[Creating Grammatical Regexes Using XRegExp.build](http://blog.stevenlevithan.com/archives/grammatical-patterns-xregexp-build)*.
 
@@ -243,9 +244,7 @@ XRegExp and addons copyright 2007-2012 by [Steven Levithan](http://stevenlevitha
 
 Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/). Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
 
-`XRegExp.build` inspired by [Lea Verou](http://lea.verou.me/)'s [RegExp.create](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/).
-
-`XRegExp.union` inspired by [Ruby](http://www.ruby-lang.org/).
+Prior art: `XRegExp.build` inspired by [Lea Verou](http://lea.verou.me/)'s [RegExp.create](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/). `XRegExp.union` inspired by [Ruby](http://www.ruby-lang.org/). XRegExp's syntax extensions come from Perl, .NET, etc.
 
 All code released under the [MIT License](http://mit-license.org/).
 
