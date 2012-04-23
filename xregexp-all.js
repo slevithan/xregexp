@@ -2102,7 +2102,7 @@ XRegExp = XRegExp || (function (undef) {
  * outer pattern and provided subpatterns are automatically renumbered to work correctly. Native
  * flags used by provided subpatterns are ignored in favor of the `flags` argument.
  * @memberOf XRegExp
- * @param {String|RegExp} pattern XRegExp pattern using `{{name}}` for embedded subpatterns. Allows
+ * @param {String} pattern XRegExp pattern using `{{name}}` for embedded subpatterns. Allows
  *   `({{name}})` as shorthand for `(?<name>{{name}})`.
  * @param {Object} subs Lookup object for named subpatterns. Values can be strings or regexes. A
  *   leading `^` and trailing unescaped `$` are stripped from subpatterns, if both are present.
@@ -2121,7 +2121,8 @@ XRegExp = XRegExp || (function (undef) {
  * XRegExp.exec('10:59', time).minutes; // -> '59'
  */
     XRegExp.build = function (pattern, subs, flags) {
-        var data = {},
+        var inlineFlags = /^\(\?([\w$]+)\)/.exec(pattern),
+            data = {},
             numCaps = 0, // Caps is short for captures
             numPriorCaps,
             numOuterCaps = 0,
@@ -2129,6 +2130,14 @@ XRegExp = XRegExp || (function (undef) {
             outerCapNames,
             sub,
             p;
+
+        // Add flags within a leading mode modifier to the overall pattern's flags
+        if (inlineFlags) {
+            flags = flags || "";
+            inlineFlags[1].replace(/./g, function (flag) {
+                flags += (flags.indexOf(flag) > -1 ? "" : flag); // Don't add duplicates
+            });
+        }
 
         for (p in subs) {
             if (subs.hasOwnProperty(p)) {
