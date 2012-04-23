@@ -317,20 +317,6 @@ test("XRegExp.version", function () {
     ok(!(isNaN(+parts[0]) || isNaN(+parts[1])), "Major and minor version parts are numeric");
 });
 
-/*test("XRegExp.prototype.apply", function () {
-    var regex = XRegExp("x");
-
-    deepEqual(regex.apply(null, ["x"]), regex.test("x"), "Apply with match same as test");
-    deepEqual(regex.apply(null, ["y"]), regex.test("y"), "Apply without match same as test");
-});
-
-test("XRegExp.prototype.call", function () {
-    var regex = XRegExp("x");
-
-    deepEqual(regex.call(null, "x"), regex.test("x"), "Call with match same as test");
-    deepEqual(regex.call(null, "y"), regex.test("y"), "Call without match same as test");
-});*/
-
 //-------------------------------------------------------------------
 module("Overriden natives");
 //-------------------------------------------------------------------
@@ -768,5 +754,98 @@ test("Type conversion", function () {
     // TODO: Add tests
 
     XRegExp.uninstall("natives");
+});
+
+//-------------------------------------------------------------------
+module("Addons");
+//-------------------------------------------------------------------
+
+test("Unicode base", function () {
+    expect(0);
+    // TODO: Add tests
+});
+
+test("Unicode categories", function () {
+    expect(0);
+    // TODO: Add tests
+});
+
+test("Unicode scripts", function () {
+    expect(0);
+    // TODO: Add tests
+});
+
+test("Unicode blocks", function () {
+    expect(0);
+    // TODO: Add tests
+});
+
+test("Unicode properties", function () {
+    expect(0);
+    // TODO: Add tests
+});
+
+test("XRegExp.matchRecursive", function () {
+    ok(XRegExp.matchRecursive, "XRegExp.matchRecursive exists");
+
+    // TODO: Add tests
+});
+
+test("XRegExp.build", function () {
+    ok(XRegExp.build, "XRegExp.build exists");
+
+    var built = XRegExp.build("({{n1}})\\1(?<nX>{{n2}})\\2()\\3\\1\\2\\k<nX>", {
+        n1: XRegExp("(?<yo>a)\\1"),
+        n2: XRegExp("(?<yo>b)\\1")
+    }); // Equivalent to XRegExp("(?<n1>(?<yo>a)\2)\1(?<nX>(?<yo>b)\4)\3()\5\1\3\k<nX>");
+    var match = XRegExp.exec("aaaabbbbaabbbb", built);
+
+    ok(match);
+    equal(match.n1, "aa");
+    equal(match.n2, undefined);
+    equal(match.nX, "bb");
+    equal(match.yo, "b");
+
+    // TODO: Add tests
+});
+
+test("XRegExp.prototype.apply", function () {
+    var regex = XRegExp("x");
+
+    ok(XRegExp.prototype.apply, "XRegExp.prototype.apply exists");
+    deepEqual(regex.apply(null, ["x"]), regex.test("x"), "Apply with match same as test");
+    deepEqual(regex.apply(null, ["y"]), regex.test("y"), "Apply without match same as test");
+});
+
+test("XRegExp.prototype.call", function () {
+    var regex = XRegExp("x");
+
+    ok(XRegExp.prototype.call, "XRegExp.prototype.call exists");
+    deepEqual(regex.call(null, "x"), regex.test("x"), "Call with match same as test");
+    deepEqual(regex.call(null, "y"), regex.test("y"), "Call without match same as test");
+});
+
+test("XRegExp.prototype.forEach", function () {
+    ok(XRegExp.prototype.forEach, "XRegExp.prototype.forEach exists");
+
+    // TODO: Add tests
+});
+
+test("XRegExp.prototype.globalize", function () {
+    ok(XRegExp.prototype.globalize, "XRegExp.prototype.globalize exists");
+
+    // TODO: Add tests
+});
+
+test("XRegExp.prototype.xexec", function () {
+    ok(XRegExp.prototype.xexec, "XRegExp.prototype.xexec exists");
+
+    // TODO: Add tests
+});
+
+test("XRegExp.prototype.xtest", function () {
+    ok(XRegExp.prototype.xtest, "XRegExp.prototype.xtest exists");
+
+    // TODO: Add tests
 });
 

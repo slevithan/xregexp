@@ -171,15 +171,19 @@ First include the script:
 You can then build regular expressions using named subpatterns, for readability and pattern reuse:
 
 ~~~ js
-var time = XRegExp.build('(?x) ^ {{hours}} : {{minutes}} $', {
-    hours: /2[0-3]|[01]?[0-9]/,
-    minutes: /[0-5]?[0-9]/
+var time = XRegExp.build('(?x)^ {{hours}} : ({{minutes}}) $', {
+    hours: XRegExp.build('{{h12}} | {{h24}}', {
+        h12: /1[0-2]|0?[1-9]/,
+        h24: /2[0-3]|[01]?[0-9]/
+    }, 'x'),
+    minutes: /^[0-5]?[0-9]$/
 });
 
 time.test('23:59'); // -> true
+XRegExp.exec('23:59', time).minutes; // -> '59'
 ~~~
 
-Named subpatterns can be provided as strings or regex objects. Their values are automatically wrapped in `(?:…)` so they can be quantified as a single unit and don't interfere with the surrounding pattern in unexpected ways. If present, a leading `^` and trailing unescaped `$` are stripped from subpatterns provided as regex objects. Flags can be provided via `XRegExp.build`'s optional third argument. Backreferences are not allowed within `XRegExp.build` patterns. The `{{…}}` syntax can be escaped with a backslash.
+Named subpatterns can be provided as strings or regex objects. Their values are automatically wrapped in `(?:…)` so they can be quantified as a unit. A leading `^` and trailing unescaped `$` are stripped from subpatterns, if both are present. Flags can be provided via `XRegExp.build`'s optional third argument. Backreferences in the outer pattern and provided subpatterns are automatically renumbered to work correctly. The syntax `({{name}})` is allowed as shorthand for `(?<name>{{name}})`. The `{{…}}` syntax can be escaped with a backslash.
 
 See also: *[Creating Grammatical Regexes Using XRegExp.build](http://blog.stevenlevithan.com/archives/grammatical-patterns-xregexp-build)*.
 

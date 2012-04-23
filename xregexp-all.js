@@ -2,7 +2,7 @@
 /***** xregexp.js *****/
 
 /*!
- * XRegExp v2.0.0-rc-2, 2012-04-21
+ * XRegExp v2.0.0-rc-2, 2012-04-23
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -438,7 +438,7 @@ XRegExp = XRegExp || (function (undef) {
  * the same pattern and flag combination, the cached copy is returned.
  * @memberOf XRegExp
  * @param {String} pattern Regular expression pattern string.
- * @param {String} [flags] Any combination of flags.
+ * @param {String} [flags] Any combination of XRegExp flags.
  * @returns {RegExp} Cached XRegExp object.
  * @example
  *
@@ -810,21 +810,18 @@ XRegExp = XRegExp || (function (undef) {
     };
 
 /**
- * Returns an XRegExp object that is the union of the given patterns. The patterns can be regex
- * objects or strings. Any flags used by provided regex objects are replaced with the value
- * provided via the flags argument. If no patterns are given, returns `/(?!)/`. If any provided
- * regex objects contain capturing groups or backreferences, they are rewritten to work correctly.
+ * Returns an XRegExp object that is the union of the given patterns. Patterns can be provided as
+ * regex objects or strings. Metacharacters are escaped in patterns provided as strings.
+ * Backreferences in provided regex objects are automatically renumbered to work correctly. Native
+ * flags used by provided regexes are ignored in favor of the `flags` argument.
  * @memberOf XRegExp
  * @param {Array} patterns Regexes and strings to combine.
- * @param {String} [flags] Any combination of flags.
+ * @param {String} [flags] Any combination of XRegExp flags.
  * @returns {RegExp} Union of the provided regexes and strings.
  * @example
  *
- * XRegExp.union([]);
- * // -> /(?!)/
- *
- * XRegExp.union(['a+b*c', 'dogs', 'cats']);
- * // -> /a\+b\*c|dogs|cats/
+ * XRegExp.union(['a+b*c']);
+ * // -> /a\+b\*c/
  *
  * XRegExp.union([/(dogs)\1/, /(cats)\1/], 'i');
  * // -> /(dogs)\1|(cats)\2/i
@@ -834,36 +831,32 @@ XRegExp = XRegExp || (function (undef) {
  */
     self.union = function (patterns, flags) {
         var parts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*]/g,
-            output = [],
             numCaptures = 0,
-            priorCaptures,
-            thisIndex,
+            numPriorCaptures,
             captureNames,
-            pattern,
-            rewrite = function ($0, $1, $2) {
-                if ($1) {
-                    thisIndex = numCaptures - priorCaptures;
+            rewrite = function (match, paren, backref) {
+                var name = captureNames[numCaptures - numPriorCaptures];
+                if (paren) { // Capturing group
                     ++numCaptures;
-                    if (captureNames && captureNames[thisIndex]) { // If the current capture has a name
-                        return "(?<" + captureNames[thisIndex] + ">";
+                    if (name) { // If the current capture has a name
+                        return "(?<" + name + ">";
                     }
-                } else if ($2) {
-                    return "\\" + (+$2 + priorCaptures);
+                } else if (backref) { // Backreference
+                    return "\\" + (+backref + numPriorCaptures);
                 }
-                return $0;
+                return match;
             },
+            output = [],
+            pattern,
             i;
-        if (!isType(patterns, "Array")) {
-            throw new TypeError("patterns must be an array");
-        }
-        if (!patterns.length) {
-            return /^\b\B/; // (?!) should work like \b\B, but is unreliable in Firefox
+        if (!(isType(patterns, "Array") && patterns.length)) {
+            throw new TypeError("patterns must be a nonempty array");
         }
         for (i = 0; i < patterns.length; ++i) {
             pattern = patterns[i];
             if (self.isRegExp(pattern)) {
-                priorCaptures = numCaptures;
-                captureNames = pattern.xregexp ? pattern.xregexp.captureNames : null;
+                numPriorCaptures = numCaptures;
+                captureNames = (pattern.xregexp && pattern.xregexp.captureNames) || [];
                 // Rewrite backreferences. Passing to XRegExp dies on octals and ensures patterns
                 // are independently valid; helps keep this simple. Named captures are put back
                 output.push(self(pattern.source).source.replace(parts, rewrite));
@@ -2065,7 +2058,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** build.js *****/
 
 /*!
- * XRegExp.build v0.1.0-rc-2, 2012-04-21
+ * XRegExp.build v0.1.0-rc-3, 2012-04-23
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Inspired by RegExp.create by Lea Verou <http://lea.verou.me/>
@@ -2074,103 +2067,129 @@ XRegExp = XRegExp || (function (undef) {
 (function (XRegExp) {
     "use strict";
 
-    var data = null;
+    var subparts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*]/g,
+        parts = XRegExp.union([/\({{([\w$]+)}}\)|{{([\w$]+)}}/, subparts], "g");
 
 /**
- * Strips a leading ^ and trailing $ anchor, if present.
+ * Strips a leading `^` and trailing unescaped `$`, if both are present.
  * @private
  * @param {String} pattern Pattern to process.
  * @returns {String} Pattern with edge anchors removed.
  */
     function deanchor(pattern) {
-        var end$ = /\$(?:\(\?:\))?$/;
-        // Strip a leading `^` or `(?:)^`. The latter handles /x or (?#) cruft
-        pattern = pattern.replace(/^(?:\(\?:\))?\^/, "");
-        // Strip a trailing unescaped `$` or `$(?:)`
-        if (end$.test(pattern.replace(/\\[\s\S]/g, ""))) {
-            return pattern.replace(end$, "");
+        var startAnchor = /^(?:\(\?:\))?\^/, // Leading `^` or `(?:)^`. The latter handles /x or (?#) cruft
+            endAnchor = /\$(?:\(\?:\))?$/; // Trailing `$` or `$(?:)`. The latter handles /x or (?#) cruft
+        if (endAnchor.test(pattern.replace(/\\[\s\S]/g, ""))) { // Ensure the trailing $ isn't escaped
+            return pattern.replace(startAnchor, "").replace(endAnchor, "");
         }
         return pattern;
     }
 
 /**
- * Throw an error if the provided pattern includes backreferences.
+ * Converts the provided value to an XRegExp.
  * @private
- * @param {String} pattern Pattern to check for backreferences.
+ * @param {String|RegExp} value Value to convert.
+ * @returns {RegExp} XRegExp object with XRegExp syntax applied.
  */
-    function banBackrefs(pattern) {
-        // Disallow backrefs, since they wouldn't be independent to subpatterns or the outer regex
-        if (/\\[1-9]/.test(pattern.replace(/\\[0\D]|\[(?:[^\\\]]|\\[\s\S])*]/g, ""))) {
-            throw new SyntaxError("can't use backreferences with XRegExp.build");
-        }
+    function asXRegExp(value) {
+        return XRegExp.isRegExp(value) ?
+                (value.xregexp && !value.xregexp.isNative ? value : XRegExp(value.source)) :
+                XRegExp(value);
     }
 
 /**
- * Builds regular expressions using named subpatterns, for readability and pattern reuse.
+ * Builds regexes using named subpatterns, for readability and pattern reuse. Backreferences in the
+ * outer pattern and provided subpatterns are automatically renumbered to work correctly. Native
+ * flags used by provided subpatterns are ignored in favor of the `flags` argument.
  * @memberOf XRegExp
- * @param {String} pattern XRegExp pattern using `{{..}}` for embedded subpatterns.
- * @param {Object} subs Named subpatterns as strings or regexes. If present, a leading ^ and
- *   trailing $ are stripped from subpatterns provided as regex objects.
+ * @param {String|RegExp} pattern XRegExp pattern using `{{name}}` for embedded subpatterns. Allows
+ *   `({{name}})` as shorthand for `(?<name>{{name}})`.
+ * @param {Object} subs Lookup object for named subpatterns. Values can be strings or regexes. A
+ *   leading `^` and trailing unescaped `$` are stripped from subpatterns, if both are present.
  * @param {String} [flags] Any combination of XRegExp flags.
- * @returns {RegExp} Extended regular expression object.
+ * @returns {RegExp} Regex with interpolated subpatterns.
  * @example
  *
- * XRegExp.build('^ {{hours}} : {{minutes}} $', {
- *   hours: /2[0-3]|[01]?[0-9]/,
- *   minutes: /[0-5]?[0-9]/
- * }, 'x');
+ * var time = XRegExp.build('(?x)^ {{hours}} : ({{minutes}}) $', {
+ *   hours: XRegExp.build('{{h12}} | {{h24}}', {
+ *     h12: /1[0-2]|0?[1-9]/,
+ *     h24: /2[0-3]|[01]?[0-9]/
+ *   }, 'x'),
+ *   minutes: /^[0-5]?[0-9]$/
+ * });
+ * time.test('23:59'); // -> true
+ * XRegExp.exec('23:59', time).minutes; // -> '59'
  */
     XRegExp.build = function (pattern, subs, flags) {
-        var regex, p;
-        data = {};
-        try {
-            for (p in subs) {
-                if (subs.hasOwnProperty(p)) {
-                    if (XRegExp.isRegExp(subs[p])) {
-                        // Deanchoring allows embedding independently useful anchored regexes
-                        data[p] = deanchor(subs[p].source);
-                    } else {
-                        // Passing to XRegExp enables entended syntax and also ensures independent
-                        // validity, lest an unescaped `(`, `)`, `[`, or trailing `\` breaks the
-                        // `(?:)` wrapper
-                        data[p] = XRegExp(subs[p]).source;
-                        // Because of how this is set up, the `{{..}}` syntax is active in
-                        // subpatterns provided as strings; thus throws an "undefined property"
-                        // error. This is good, but may be unexpected
-                    }
-                    banBackrefs(data[p]);
+        var data = {},
+            numCaps = 0, // Caps is an abbr for captures
+            numPriorCaps,
+            numOuterCaps = 0,
+            outerCapsMap = [0],
+            outerCapNames,
+            sub,
+            p;
+
+        for (p in subs) {
+            if (subs.hasOwnProperty(p)) {
+                // Passing to XRegExp enables entended syntax for subpatterns provided as strings
+                // and ensures independent validity, lest an unescaped `(`, `)`, `[`, or trailing
+                // `\` breaks the `(?:)` wrapper. For subpatterns provided as regexes, it dies on
+                // octals and adds the `xregexp` property, for simplicity
+                sub = asXRegExp(subs[p]);
+                // Deanchoring allows embedding independently useful anchored regexes. If you
+                // really need to keep your anchors, double them (i.e., `^^...$$`)
+                data[p] = {pattern: deanchor(sub.source), names: sub.xregexp.captureNames || []};
+            }
+        }
+
+        // Passing to XRegExp dies on octals and ensures the outer pattern is independently valid;
+        // helps keep this simple. Named captures will be put back
+        pattern = asXRegExp(pattern);
+        outerCapNames = pattern.xregexp.captureNames || [];
+        pattern = pattern.source.replace(parts, function ($0, $1, $2, $3, $4) {
+            var subName = $1 || $2, capName, intro;
+            if (subName) { // Named subpattern
+                if (!data.hasOwnProperty(subName)) {
+                    throw new ReferenceError("undefined property " + $0);
                 }
+                if ($1) { // Named subpattern was wrapped in a capturing group
+                    capName = outerCapNames[numOuterCaps];
+                    outerCapsMap[++numOuterCaps] = ++numCaps;
+                    // If it's a named group, preserve the name. Otherwise, use the subpattern name
+                    // as the capture name
+                    intro = "(?<" + (capName || subName) + ">";
+                } else {
+                    intro = "(?:";
+                }
+                numPriorCaps = numCaps;
+                return intro + data[subName].pattern.replace(subparts, function (match, paren, backref) {
+                    if (paren) { // Capturing group
+                        capName = data[subName].names[numCaps - numPriorCaps];
+                        ++numCaps;
+                        if (capName) { // If the current capture has a name
+                            return "(?<" + capName + ">";
+                        }
+                    } else if (backref) { // Backreference
+                        return "\\" + (+backref + numPriorCaps); // Rewrite the backreference
+                    }
+                    return match;
+                }) + ")";
             }
-            regex = XRegExp(pattern, flags);
-            banBackrefs(regex.source);
-        } catch (err) {
-            throw err;
-        } finally {
-            data = null; // Reset
-        }
-        return regex;
+            if ($3) { // Capturing group
+                capName = outerCapNames[numOuterCaps];
+                outerCapsMap[++numOuterCaps] = ++numCaps;
+                if (capName) { // If the current capture has a name, preserve the name
+                    return "(?<" + capName + ">";
+                }
+            } else if ($4) { // Backreference
+                return "\\" + outerCapsMap[+$4]; // Rewrite the backreference
+            }
+            return $0;
+        });
+
+        return XRegExp(pattern, flags);
     };
-
-    XRegExp.install("extensibility");
-
-/* Adds named subpattern syntax to XRegExp: {{..}}
- * Only enabled for regexes created by XRegExp.build.
- */
-    XRegExp.addToken(
-        /{{([\w$]+)}}/,
-        function (match) {
-            if (!data.hasOwnProperty(match[1])) {
-                throw new ReferenceError("undefined property " + match[0]);
-            }
-            return "(?:" + data[match[1]] + ")";
-        },
-        {
-            trigger: function () {
-                return !!data;
-            },
-            scope: "all"
-        }
-    );
 
 }(XRegExp));
 

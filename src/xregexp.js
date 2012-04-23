@@ -1,5 +1,5 @@
 /*!
- * XRegExp v2.0.0-rc-2, 2012-04-21
+ * XRegExp v2.0.0-rc-2, 2012-04-23
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -435,7 +435,7 @@ XRegExp = XRegExp || (function (undef) {
  * the same pattern and flag combination, the cached copy is returned.
  * @memberOf XRegExp
  * @param {String} pattern Regular expression pattern string.
- * @param {String} [flags] Any combination of flags.
+ * @param {String} [flags] Any combination of XRegExp flags.
  * @returns {RegExp} Cached XRegExp object.
  * @example
  *
@@ -807,21 +807,18 @@ XRegExp = XRegExp || (function (undef) {
     };
 
 /**
- * Returns an XRegExp object that is the union of the given patterns. The patterns can be regex
- * objects or strings. Any flags used by provided regex objects are replaced with the value
- * provided via the flags argument. If no patterns are given, returns `/(?!)/`. If any provided
- * regex objects contain capturing groups or backreferences, they are rewritten to work correctly.
+ * Returns an XRegExp object that is the union of the given patterns. Patterns can be provided as
+ * regex objects or strings. Metacharacters are escaped in patterns provided as strings.
+ * Backreferences in provided regex objects are automatically renumbered to work correctly. Native
+ * flags used by provided regexes are ignored in favor of the `flags` argument.
  * @memberOf XRegExp
  * @param {Array} patterns Regexes and strings to combine.
- * @param {String} [flags] Any combination of flags.
+ * @param {String} [flags] Any combination of XRegExp flags.
  * @returns {RegExp} Union of the provided regexes and strings.
  * @example
  *
- * XRegExp.union([]);
- * // -> /(?!)/
- *
- * XRegExp.union(['a+b*c', 'dogs', 'cats']);
- * // -> /a\+b\*c|dogs|cats/
+ * XRegExp.union(['a+b*c']);
+ * // -> /a\+b\*c/
  *
  * XRegExp.union([/(dogs)\1/, /(cats)\1/], 'i');
  * // -> /(dogs)\1|(cats)\2/i
@@ -831,36 +828,32 @@ XRegExp = XRegExp || (function (undef) {
  */
     self.union = function (patterns, flags) {
         var parts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*]/g,
-            output = [],
             numCaptures = 0,
-            priorCaptures,
-            thisIndex,
+            numPriorCaptures,
             captureNames,
-            pattern,
-            rewrite = function ($0, $1, $2) {
-                if ($1) {
-                    thisIndex = numCaptures - priorCaptures;
+            rewrite = function (match, paren, backref) {
+                var name = captureNames[numCaptures - numPriorCaptures];
+                if (paren) { // Capturing group
                     ++numCaptures;
-                    if (captureNames && captureNames[thisIndex]) { // If the current capture has a name
-                        return "(?<" + captureNames[thisIndex] + ">";
+                    if (name) { // If the current capture has a name
+                        return "(?<" + name + ">";
                     }
-                } else if ($2) {
-                    return "\\" + (+$2 + priorCaptures);
+                } else if (backref) { // Backreference
+                    return "\\" + (+backref + numPriorCaptures);
                 }
-                return $0;
+                return match;
             },
+            output = [],
+            pattern,
             i;
-        if (!isType(patterns, "Array")) {
-            throw new TypeError("patterns must be an array");
-        }
-        if (!patterns.length) {
-            return /^\b\B/; // (?!) should work like \b\B, but is unreliable in Firefox
+        if (!(isType(patterns, "Array") && patterns.length)) {
+            throw new TypeError("patterns must be a nonempty array");
         }
         for (i = 0; i < patterns.length; ++i) {
             pattern = patterns[i];
             if (self.isRegExp(pattern)) {
-                priorCaptures = numCaptures;
-                captureNames = pattern.xregexp ? pattern.xregexp.captureNames : null;
+                numPriorCaptures = numCaptures;
+                captureNames = (pattern.xregexp && pattern.xregexp.captureNames) || [];
                 // Rewrite backreferences. Passing to XRegExp dies on octals and ensures patterns
                 // are independently valid; helps keep this simple. Named captures are put back
                 output.push(self(pattern.source).source.replace(parts, rewrite));
