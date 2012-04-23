@@ -797,7 +797,7 @@ test("XRegExp.build", function () {
     var built = XRegExp.build("({{n1}})\\1(?<nX>{{n2}})\\2()\\3\\1\\2\\k<nX>", {
         n1: XRegExp("(?<yo>a)\\1"),
         n2: XRegExp("(?<yo>b)\\1")
-    }); // Equivalent to XRegExp("(?<n1>(?<yo>a)\2)\1(?<nX>(?<yo>b)\4)\3()\5\1\3\k<nX>");
+    }); // Equivalent to XRegExp("(?<n1>(?<yo>a)\\2)\\1(?<nX>(?<yo>b)\\4)\\3()\\5\\1\\3\\k<nX>")
     var match = XRegExp.exec("aaaabbbbaabbbb", built);
 
     ok(match);

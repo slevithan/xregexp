@@ -18,9 +18,9 @@
  * @returns {String} Pattern with edge anchors removed.
  */
     function deanchor(pattern) {
-        var startAnchor = /^(?:\(\?:\))?\^/, // Leading `^` or `(?:)^`. The latter handles /x or (?#) cruft
-            endAnchor = /\$(?:\(\?:\))?$/; // Trailing `$` or `$(?:)`. The latter handles /x or (?#) cruft
-        if (endAnchor.test(pattern.replace(/\\[\s\S]/g, ""))) { // Ensure the trailing $ isn't escaped
+        var startAnchor = /^(?:\(\?:\))?\^/, // Leading `^` or `(?:)^` (handles /x cruft)
+            endAnchor = /\$(?:\(\?:\))?$/; // Trailing `$` or `$(?:)` (handles /x cruft)
+        if (endAnchor.test(pattern.replace(/\\[\s\S]/g, ""))) { // Ensure trailing `$` isn't escaped
             return pattern.replace(startAnchor, "").replace(endAnchor, "");
         }
         return pattern;
