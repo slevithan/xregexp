@@ -305,7 +305,10 @@ test("XRegExp.uninstall", function () {
 });
 
 test("XRegExp.union", function () {
-    expect(0);
+    equal(XRegExp.union([XRegExp("(?<a>a)\\k<a>")], "n").test("aa"), true, "Apply flag n (test 1)");
+    raises(function () {XRegExp.union([XRegExp("(?<a>a)\\k<a>"), /(b)\1/], "n");}, SyntaxError, "Apply flag n (test 2)");
+    raises(function () {XRegExp.union([XRegExp("(?<a>a)\\k<a>"), /(b)\1/, XRegExp("(?<x>)")], "n");}, SyntaxError, "Apply flag n (test 3)");
+
     // TODO: Add tests
 });
 

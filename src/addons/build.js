@@ -51,19 +51,19 @@
  * @returns {RegExp} Regex with interpolated subpatterns.
  * @example
  *
- * var time = XRegExp.build('(?x)^ {{hours}} : ({{minutes}}) $', {
- *   hours: XRegExp.build('{{h12}} | {{h24}}', {
+ * var time = XRegExp.build('(?x)^ {{hours}} ({{minutes}}) $', {
+ *   hours: XRegExp.build('{{h12}} : | {{h24}}', {
  *     h12: /1[0-2]|0?[1-9]/,
- *     h24: /2[0-3]|[01]?[0-9]/
+ *     h24: /2[0-3]|[01][0-9]/
  *   }, 'x'),
- *   minutes: /^[0-5]?[0-9]$/
+ *   minutes: /^[0-5][0-9]$/
  * });
- * time.test('23:59'); // -> true
- * XRegExp.exec('23:59', time).minutes; // -> '59'
+ * time.test('10:59'); // -> true
+ * XRegExp.exec('10:59', time).minutes; // -> '59'
  */
     XRegExp.build = function (pattern, subs, flags) {
         var data = {},
-            numCaps = 0, // Caps is an abbr for captures
+            numCaps = 0, // Caps is short for captures
             numPriorCaps,
             numOuterCaps = 0,
             outerCapsMap = [0],
@@ -108,7 +108,7 @@
                     if (paren) { // Capturing group
                         capName = data[subName].names[numCaps - numPriorCaps];
                         ++numCaps;
-                        if (capName) { // If the current capture has a name
+                        if (capName) { // If the current capture has a name, preserve the name
                             return "(?<" + capName + ">";
                         }
                     } else if (backref) { // Backreference

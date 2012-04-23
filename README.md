@@ -108,6 +108,35 @@ XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
 XRegExp uses Unicode 6.1's Basic Multilingual Plane.
 
 
+## XRegExp.build
+
+First include the script:
+
+~~~ html
+<script src="xregexp.js"></script>
+<script src="addons/build.js"></script>
+~~~
+
+You can then build regular expressions using named subpatterns, for readability and pattern reuse:
+
+~~~ js
+var time = XRegExp.build('(?x)^ {{hours}} ({{minutes}}) $', {
+    hours: XRegExp.build('{{h12}} : | {{h24}}', {
+        h12: /1[0-2]|0?[1-9]/,
+        h24: /2[0-3]|[01][0-9]/
+    }, 'x'),
+    minutes: /^[0-5][0-9]$/
+});
+
+time.test('10:59'); // -> true
+XRegExp.exec('10:59', time).minutes; // -> '59'
+~~~
+
+Named subpatterns can be provided as strings or regex objects. A leading `^` and trailing unescaped `$` are stripped from subpatterns if both are present, which allows embedding independently useful anchored patterns. `{{…}}` tokens can be quantified as a single unit. Backreferences in the outer pattern and provided subpatterns are automatically renumbered to work correctly within the larger combined pattern. The syntax `({{name}})` works as shorthand for named capture via `(?<name>{{name}})`.
+
+See also: *[Creating Grammatical Regexes Using XRegExp.build](http://blog.stevenlevithan.com/archives/grammatical-patterns-xregexp-build)*.
+
+
 ## XRegExp.matchRecursive
 
 First include the script:
@@ -157,35 +186,6 @@ XRegExp.matchRecursive(str, '<', '>', 'gy');
 ~~~
 
 `XRegExp.matchRecursive` throws an error if it sees an unbalanced delimiter in the target string.
-
-
-## XRegExp.build
-
-First include the script:
-
-~~~ html
-<script src="xregexp.js"></script>
-<script src="addons/build.js"></script>
-~~~
-
-You can then build regular expressions using named subpatterns, for readability and pattern reuse:
-
-~~~ js
-var time = XRegExp.build('(?x)^ {{hours}} : ({{minutes}}) $', {
-    hours: XRegExp.build('{{h12}} | {{h24}}', {
-        h12: /1[0-2]|0?[1-9]/,
-        h24: /2[0-3]|[01]?[0-9]/
-    }, 'x'),
-    minutes: /^[0-5]?[0-9]$/
-});
-
-time.test('23:59'); // -> true
-XRegExp.exec('23:59', time).minutes; // -> '59'
-~~~
-
-Named subpatterns can be provided as strings or regex objects. A leading `^` and trailing unescaped `$` are stripped from subpatterns if both are present, which allows embedding independently useful anchored patterns. `{{…}}` tokens can be quantified as a single unit. Backreferences in the outer pattern and provided subpatterns are automatically renumbered to work correctly within the larger combined pattern. The syntax `({{name}})` works as shorthand for named capture via `(?<name>{{name}})`.
-
-See also: *[Creating Grammatical Regexes Using XRegExp.build](http://blog.stevenlevithan.com/archives/grammatical-patterns-xregexp-build)*.
 
 
 ## XRegExp Prototype Methods
