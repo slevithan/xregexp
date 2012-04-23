@@ -1,19 +1,19 @@
 ﻿[XRegExp](http://xregexp.com/)
 ==============================
 
-XRegExp provides augmented, extensible, cross-browser JavaScript regular expressions. You get new syntax and flags beyond what browsers support natively, along with a collection of functions to make your client-side grepping and parsing a breeze. XRegExp also frees you from worrying about pesky inconsistencies in cross-browser regex handling and the dubious `lastIndex` property.
+XRegExp provides augmented, extensible, cross-browser JavaScript regular expressions. You get new syntax and flags beyond what browsers support natively, along with a collection of utils to make your client-side grepping and parsing easier. XRegExp also frees you from worrying about pesky inconsistencies in cross-browser regex handling and the dubious `lastIndex` property.
 
-XRegExp is fully compliant with the regular expression flavor specified in ES3 and ES5. It works with Internet Explorer 5.5+, Firefox 1.5+, Safari 3+, Chrome, and Opera 9.5+.
+XRegExp supports all native ES5 regular expression syntax. It clocks in at ~3.5 KB when minified and gzipped, and it works with Internet Explorer 5.5+, Firefox 1.5+, Chrome, Safari 3+, and Opera 9.5+.
 
 
 ## Performance
 
-XRegExp regular expressions compile to native RegExp objects, thus there is little if any performance difference when using XRegExp objects with native regex methods. There is a small extra cost when *compiling* XRegExps. If you want, however, you can use `XRegExp.cache` to avoid incurring the compilation cost for a given pattern more than once. Doing so can even lead to XRegExp being faster than native regexes in synthetic tests that repeatedly compile the same regex.
+XRegExp regular expressions compile to native RegExp objects, thus there is no performance difference when using XRegExp objects with native methods. There is a small performance cost when *compiling* XRegExps. If you want, however, you can use `XRegExp.cache` to avoid ever incurring the compilation cost for a given pattern more than once. Doing so can even lead to XRegExp being faster than native regexes in synthetic tests that repeatedly compile the same regex.
 
 
 ## Usage examples
 
-The following examples take advantage of new features in XRegExp v2.0.0-rc ([details](https://github.com/slevithan/XRegExp/wiki/Roadmap)):
+The following examples take advantage of new features in XRegExp v2.0.0 (see [changes](https://github.com/slevithan/XRegExp/wiki/Roadmap)):
 
 ~~~ js
 // Using named capture and flag x (free-spacing and line comments)
@@ -73,11 +73,11 @@ XRegExp.matchChain(html, [
 ]); // -> ['xregexp.com', 'www.google.com']
 
 // XRegExp.union safely merges strings and regexes into a single pattern
-XRegExp.union(['a+b*c', 'skis', 'sleds', /(dogs)\1/, /(cats)\1/], 'i');
-// -> /a\+b\*c|skis|sleds|(dogs)\1|(cats)\2/i
+XRegExp.union(['a+b*c', /(dogs)\1/, /(cats)\1/], 'i');
+// -> /a\+b\*c|(dogs)\1|(cats)\2/i
 ~~~
 
-These examples should give you the flavor of what's possible, but XRegExp has more syntax, flags, utils, options, browser fixes, and general badassery that isn't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. See [xregexp.com](http://xregexp.com) for more details.
+These examples should give you the flavor of what's possible, but XRegExp has plenty more syntax, flags, utils, options, and browser fixes that aren't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. See [xregexp.com](http://xregexp.com) for more details.
 
 
 ## XRegExp Unicode Base
@@ -156,7 +156,7 @@ XRegExp.matchRecursive(str, '<', '>', 'gy');
 // -> ['1', '<<2>>', '3']
 ~~~
 
-If `XRegExp.matchRecursive` sees an unbalanced delimiter in the target string, it throws an exception.
+`XRegExp.matchRecursive` throws an error if it sees an unbalanced delimiter in the target string.
 
 
 ## XRegExp.build
@@ -183,7 +183,7 @@ time.test('23:59'); // -> true
 XRegExp.exec('23:59', time).minutes; // -> '59'
 ~~~
 
-Named subpatterns can be provided as strings or regex objects. Their values are automatically wrapped in `(?:…)` so they can be quantified as a unit. A leading `^` and trailing unescaped `$` are stripped from subpatterns, if both are present. Flags can be provided via `XRegExp.build`'s optional third argument. Backreferences in the outer pattern and provided subpatterns are automatically renumbered to work correctly. The syntax `({{name}})` is allowed as shorthand for `(?<name>{{name}})`. The `{{…}}` syntax can be escaped with a backslash.
+Named subpatterns can be provided as strings or regex objects. A leading `^` and trailing unescaped `$` are stripped from subpatterns if both are present, which allows embedding independently useful anchored patterns. `{{…}}` tokens can be quantified as a single unit. Backreferences in the outer pattern and provided subpatterns are automatically renumbered to work correctly within the larger combined pattern. The syntax `({{name}})` works as shorthand for named capture via `(?<name>{{name}})`.
 
 See also: *[Creating Grammatical Regexes Using XRegExp.build](http://blog.stevenlevithan.com/archives/grammatical-patterns-xregexp-build)*.
 
@@ -210,7 +210,7 @@ function filter(array, fn) {
 filter(['a', 'ba', 'ab', 'b'], XRegExp('^a')); // -> ['a', 'ab']
 ~~~
 
-Native `RegExp` objects copied by `XRegExp` are also augmented with any `XRegExp.prototype` methods. The following lines therefore work equivalently:
+Native `RegExp` objects copied by `XRegExp` are augmented with any `XRegExp.prototype` methods. The following lines therefore work equivalently:
 
 ~~~ js
 XRegExp('[a-z]', 'ig').xexec('abc');
@@ -221,7 +221,7 @@ XRegExp.globalize(/[a-z]/i).xexec('abc');
 
 ## &c
 
-**Lookbehind:** Although not an official addon, there is a [collection of short functions](https://gist.github.com/2387872) available that use XRegExp and make it easy to simulate infinite-length leading lookbehind.
+**Lookbehind:** A [collection of short functions](https://gist.github.com/2387872) is available that makes it easy to simulate infinite-length leading lookbehind.
 
 
 ## How to run tests on the server with npm
