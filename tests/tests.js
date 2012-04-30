@@ -34,39 +34,41 @@ test("Basic availability", function () {
 });
 
 test("XRegExp", function () {
-    var regex = XRegExp("(?:)");
-    var regexG = XRegExp("(?:)", "g");
-    var regexGIM = XRegExp("(?:)", "gim");
-    var regexX = XRegExp("(?:)", "x");
-    var regexCopy = XRegExp(regex);
-    var regexNamedCapture = XRegExp("(?<name>a)\\k<name>");
+    var blankRegex = XRegExp("(?:)"),
+        regexGIM = XRegExp("(?:)", "gim");
 
-    equal(XRegExp("").source, RegExp("").source, "Empty regex source (test 1)");
+    equal(XRegExp("").source, new RegExp("").source, "Empty regex source (test 1)");
     equal(XRegExp("(?:)").source, /(?:)/.source, "Empty regex source (test 2)");
-    equal(XRegExp().source, RegExp().source, "undefined regex source");
-    equal(XRegExp(null).source, RegExp(null).source, "null regex source");
-    equal(XRegExp(NaN).source, RegExp(NaN).source, "NaN regex source");
-    equal(XRegExp(1).source, RegExp(1).source, "numeric regex source");
-    equal(XRegExp({}).source, RegExp({}).source, "object regex source");
-    ok(!(XRegExp("(?:)")).global, "Regex without flags");
-    ok(regexG.global, "Regex with global flag");
-    ok(regexGIM.global && regexGIM.ignoreCase && regexGIM.multiline, "Regex with multiple flags");
-    ok(!regexX.extended, "x flag stripped");
-    deepEqual(regex, XRegExp(regex), "Regex copy and original are alike");
-    notEqual(regex, XRegExp(regex), "Regex copy is new instance");
-    equal(XRegExp(XRegExp("")).xregexp.isNative, false, "Copied XRegExp !isNative");
-    equal(XRegExp(RegExp("")).xregexp.isNative, true, "Copied RegExp isNative");
-    equal(XRegExp.exec("aa", XRegExp(regexNamedCapture)).name, "a", "Regex copy retains named capture properties");
-    raises(function () {XRegExp(regex, "g");}, Error, "Regex copy with flag throws");
-    ok(XRegExp("(?:)") instanceof RegExp, "Result is instanceof RegExp");
-    equal(XRegExp("(?:)").constructor, RegExp, "Result's constructor is RegExp");
-
-    // Don't test this, since future XRegExp will throw like modern browsers do with `RegExp`
-    //ok(XRegExp("", "gg").global, "Regex with duplicate flags");
-
-    // Don't test this, since XRegExp can't yet throw on unsupported flags (it doesn't yet track
-    // flags checked for in custom tokens)
-    //raises(function () {XRegExp("", "?");}, Error, "Unsupported flag throws");
+    equal(XRegExp().source, new RegExp().source, "undefined regex source");
+    equal(XRegExp(null).source, new RegExp(null).source, "null regex source");
+    equal(XRegExp(NaN).source, new RegExp(NaN).source, "NaN regex source");
+    equal(XRegExp(1).source, new RegExp(1).source, "numeric regex source");
+    equal(XRegExp({}).source, new RegExp({}).source, "object regex source");
+    equal(XRegExp("").global, false, "Regex without flags is not global");
+    ok(XRegExp("", "g").global, "Regex with global flag is global");
+    ok(XRegExp("", "i").ignoreCase, "Regex with ignoreCase flag is ignoreCase");
+    ok(XRegExp("", "m").multiline, "Regex with multiline flag is multiline");
+    ok(regexGIM.global && regexGIM.ignoreCase && regexGIM.multiline, "Regex with flags gim is global, ignoreCase, multiline");
+    deepEqual(blankRegex, XRegExp(blankRegex), "Regex copy and original are alike");
+    notEqual(blankRegex, XRegExp(blankRegex), "Regex copy is new instance");
+    ok(XRegExp("").xregexp, "XRegExp has xregexp property");
+    notEqual(XRegExp("").xregexp.captureNames, undefined, "XRegExp has captureNames property");
+    equal(XRegExp("").xregexp.captureNames, null, "Empty XRegExp has null captureNames");
+    notEqual(XRegExp("").xregexp.isNative, undefined, "XRegExp has isNative property");
+    equal(XRegExp("").xregexp.isNative, false, "XRegExp has isNative false");
+    equal(XRegExp(XRegExp("")).xregexp.isNative, false, "Copied XRegExp has isNative false");
+    equal(XRegExp(new RegExp("")).xregexp.isNative, true, "Copied RegExp has isNative true");
+    equal(XRegExp.exec("aa", XRegExp(XRegExp("(?<name>a)\\k<name>"))).name, "a", "Copied XRegExp retains named capture properties");
+    raises(function () {XRegExp(/(?:)/, "g");}, Error, "Regex copy with flag throws");
+    ok(XRegExp("") instanceof RegExp, "XRegExp object is instanceof RegExp");
+    equal(XRegExp("").constructor, RegExp, "XRegExp object constructor is RegExp");
+    raises(function () {XRegExp("", "gg");}, SyntaxError, "Regex with duplicate native flags throws");
+    raises(function () {XRegExp("", "ss");}, SyntaxError, "Regex with duplicate nonnative flags throws (test 1)");
+    raises(function () {XRegExp("", "sis");}, SyntaxError, "Regex with duplicate nonnative flags throws (test 2)");
+    raises(function () {XRegExp("", "?");}, SyntaxError, "Unsupported flag throws");
+    if (RegExp.prototype.extended === undefined) {
+        equal(XRegExp("(?:)", "x").extended, undefined, "Nonnative flag x does not set extended property");
+    }
 });
 
 test("XRegExp.addToken", function () {
@@ -808,6 +810,10 @@ test("XRegExp.build", function () {
     equal(match.n2, undefined);
     equal(match.nX, "bb");
     equal(match.yo, "b");
+
+    raises(function () {var r = XRegExp.build('(?x){{a}}', {a: /#/});}, SyntaxError, "Mode modifier in outer pattern applies to full regex with interpolated values (test 1)");
+    equal(XRegExp.build('(?x){{a}}', {a: /1 2/}).test("12"), true, "Mode modifier in outer pattern applies to full regex with interpolated values (test 2)");
+    equal(XRegExp.build('(?m){{a}}', {a: /a/}).multiline, true, "Mode modifier with native flag in outer pattern is applied to the final result");
 
     // TODO: Add tests
 });
