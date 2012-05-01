@@ -66,9 +66,7 @@ test("XRegExp", function () {
     raises(function () {XRegExp("", "ss");}, SyntaxError, "Regex with duplicate nonnative flags throws (test 1)");
     raises(function () {XRegExp("", "sis");}, SyntaxError, "Regex with duplicate nonnative flags throws (test 2)");
     raises(function () {XRegExp("", "?");}, SyntaxError, "Unsupported flag throws");
-    if (RegExp.prototype.extended === undefined) {
-        equal(XRegExp("(?:)", "x").extended, undefined, "Nonnative flag x does not set extended property");
-    }
+    equal(XRegExp("(?:)", "x").extended, undefined, "Nonnative flag x does not set extended property");
 });
 
 test("XRegExp.addToken", function () {

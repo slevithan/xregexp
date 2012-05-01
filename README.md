@@ -35,7 +35,7 @@ while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d+)>/, pos, 'sticky')) {
 // XRegExp.replace allows named backreferences in replacements
 XRegExp.replace('2012-02-22', date, '${month}/${day}/${year}'); // -> '02/22/2012'
 XRegExp.replace('2012-02-22', date, function (match) {
-    return match.month + '/' + match.day + '/' +match.year;
+    return match.month + '/' + match.day + '/' + match.year;
 }); // -> '02/22/2012'
 
 // In fact, all XRegExps are RegExps and work perfectly with native methods
@@ -49,7 +49,7 @@ date.test('2012-02-22'); // -> true
 XRegExp.install('natives');
 '2012-02-22'.replace(date, '${month}/${day}/${year}'); // -> '02/22/2012'
 '2012-02-22'.replace(date, function (match) {
-    return match.month + '/' + match.day + '/' +match.year;
+    return match.month + '/' + match.day + '/' + match.year;
 }); // -> '02/22/2012'
 date.exec('2012-02-22').day; // -> '22'
 
