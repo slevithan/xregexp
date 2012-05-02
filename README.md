@@ -132,7 +132,7 @@ time.test('10:59'); // -> true
 XRegExp.exec('10:59', time).minutes; // -> '59'
 ~~~
 
-Named subpatterns can be provided as strings or regex objects. A leading `^` and trailing unescaped `$` are stripped from subpatterns if both are present, which allows embedding independently useful anchored patterns. `{{…}}` tokens can be quantified as a single unit. Backreferences in the outer pattern and provided subpatterns are automatically renumbered to work correctly within the larger combined pattern. The syntax `({{name}})` works as shorthand for named capture via `(?<name>{{name}})`.
+Named subpatterns can be provided as strings or regex objects. A leading `^` and trailing unescaped `$` are stripped from subpatterns if both are present, which allows embedding independently useful anchored patterns. `{{…}}` tokens can be quantified as a single unit. Backreferences in the outer pattern and provided subpatterns are automatically renumbered to work correctly within the larger combined pattern. The syntax `({{name}})` works as shorthand for named capture via `(?<name>{{name}})`. Named subpatterns cannot be embedded within character classes.
 
 See also: *[Creating Grammatical Regexes Using XRegExp.build](http://blog.stevenlevithan.com/archives/grammatical-patterns-xregexp-build)*.
 

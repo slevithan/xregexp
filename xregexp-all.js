@@ -2058,7 +2058,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** build.js *****/
 
 /*!
- * XRegExp.build v0.1.0-rc-3, 2012-04-23
+ * XRegExp.build v0.1.0-rc-3, 2012-05-02
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Inspired by RegExp.create by Lea Verou <http://lea.verou.me/>
@@ -2103,7 +2103,8 @@ XRegExp = XRegExp || (function (undef) {
  * flags used by provided subpatterns are ignored in favor of the `flags` argument.
  * @memberOf XRegExp
  * @param {String} pattern XRegExp pattern using `{{name}}` for embedded subpatterns. Allows
- *   `({{name}})` as shorthand for `(?<name>{{name}})`.
+ *   `({{name}})` as shorthand for `(?<name>{{name}})`. Patterns cannot be embedded within
+ *   character classes.
  * @param {Object} subs Lookup object for named subpatterns. Values can be strings or regexes. A
  *   leading `^` and trailing unescaped `$` are stripped from subpatterns, if both are present.
  * @param {String} [flags] Any combination of XRegExp flags.

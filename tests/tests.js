@@ -66,7 +66,7 @@ test("XRegExp", function () {
     raises(function () {XRegExp("", "ss");}, SyntaxError, "Regex with duplicate nonnative flags throws (test 1)");
     raises(function () {XRegExp("", "sis");}, SyntaxError, "Regex with duplicate nonnative flags throws (test 2)");
     raises(function () {XRegExp("", "?");}, SyntaxError, "Unsupported flag throws");
-    equal(XRegExp("(?:)", "x").extended, undefined, "Nonnative flag x does not set extended property");
+    ok(!XRegExp("(?:)", "x").extended, "Nonnative flag x does not set extended property");
 });
 
 test("XRegExp.addToken", function () {
@@ -810,8 +810,11 @@ test("XRegExp.build", function () {
     equal(match.yo, "b");
 
     raises(function () {var r = XRegExp.build('(?x){{a}}', {a: /#/});}, SyntaxError, "Mode modifier in outer pattern applies to full regex with interpolated values (test 1)");
-    equal(XRegExp.build('(?x){{a}}', {a: /1 2/}).test("12"), true, "Mode modifier in outer pattern applies to full regex with interpolated values (test 2)");
-    equal(XRegExp.build('(?m){{a}}', {a: /a/}).multiline, true, "Mode modifier with native flag in outer pattern is applied to the final result");
+    equal(XRegExp.build("(?x){{a}}", {a: /1 2/}).test("12"), true, "Mode modifier in outer pattern applies to full regex with interpolated values (test 2)");
+    equal(XRegExp.build("(?m){{a}}", {a: /a/}).multiline, true, "Mode modifier with native flag in outer pattern is applied to the final result");
+
+    equal(XRegExp.build("^[{{a}}]$", {a: "x"}).test("x"), false, "Named subpattern not interpolated within character class (test 1)");
+    equal(XRegExp.build("^{{a}}[{{a}}]$", {a: "x"}).test("x{"), true, "Named subpattern not interpolated within character class (test 2)");
 
     // TODO: Add tests
 });
