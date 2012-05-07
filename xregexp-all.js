@@ -2,7 +2,7 @@
 /***** xregexp.js *****/
 
 /*!
- * XRegExp v2.0.0-rc-2, 2012-04-23
+ * XRegExp v2.0.0-rc-2, 2012-05-07
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -1042,7 +1042,7 @@ XRegExp = XRegExp || (function (undef) {
                      * - `$10` is an error if there are less than 10 capturing groups. Use `${1}0` instead.
                      * - `$01` is equivalent to `$1` if a capturing group exists, otherwise it's an error.
                      * - `$0` (not followed by 1-9), `$00`, and `$&` are the entire match.
-                     * Native behavior (for comparison):
+                     * Native behavior, for comparison:
                      * - Backreferences end after 1 or 2 digits. Cannot use backreference to capturing group 100+.
                      * - `$1` is a literal `$1` if there are no capturing groups.
                      * - `$10` is `$1` followed by a literal `0` if there are less than 10 capturing groups.
@@ -1202,7 +1202,7 @@ XRegExp = XRegExp || (function (undef) {
 /* Named capturing group; match the opening delimiter only: (?<name>
  * Capture names can use the characters A-Z, a-z, 0-9, _, and $ only. Names can't be integers.
  */
-    add(/\(\?<([\w$]+)>/,
+    add(/\(\?P?<([\w$]+)>/,
         function (match) {
             if (!isNaN(match[1])) {
                 // Avoid incorrect lookups, since named backreferences are added to match arrays
@@ -1257,7 +1257,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** unicode-base.js *****/
 
 /*!
- * XRegExp Unicode Base v1.0.0-rc, 2012-04-18
+ * XRegExp Unicode Base v1.0.0-rc-2, 2012-05-07
  * (c) 2008-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1 <http://unicode.org/>
@@ -1267,7 +1267,7 @@ XRegExp = XRegExp || (function (undef) {
  * Adds support for the `\p{L}` or `\p{Letter}` Unicode category. Addon packages for other Unicode
  * categories, scripts, blocks, and properties are available separately. All Unicode tokens can be
  * inverted using `\P{..}` or `\p{^..}`. Token names are case insensitive, and any spaces, hyphens,
- * and underscores are ignored. Also adds `\u{n..}` for full 21-bit Unicode code point matching.
+ * and underscores are ignored.
  * @requires XRegExp
  */
 (function (XRegExp) {
@@ -1402,34 +1402,6 @@ XRegExp = XRegExp || (function (undef) {
             return scope === "class" ?
                     (inv ? cacheInversion(item) : unicode[item]) :
                     "[" + inv + unicode[item] + "]";
-        },
-        {scope: "all"}
-    );
-
-/* Adds Unicode code point syntax to XRegExp: \u{n..}
- * `n..` is any 1-6 digit hexadecimal number from 0-10FFFF. Comes from ES6 proposals. Code points
- * above FFFF are converted to surrogate pairs, so e.g. `\u{20B20}` is simply an alternate syntax
- * for `\uD842\uDF20`. This can lead to broken behavior if you follow a `\u{n..}` token that
- * references a code point above FFFF with a quantifier, or if you use the same in a character
- * class. Using `\u{n..}` with code points above FFFF is therefore not recommended, unless you know
- * exactly what you're doing. XRegExp's handling follows ES6 proposals for `\u{n..}`, since
- * compatibility concerns prevent JavaScript regexes from changing to be based on code points
- * rather than code units by default.
- */
-    XRegExp.addToken(
-        /\\u{([0-9A-Fa-f]{1,6})}/,
-        function (match) {
-            var code = dec(match[1]), offset;
-            if (code > 0x10FFFF) {
-                throw new SyntaxError("invalid Unicode code point " + match[0]);
-            }
-            if (code <= 0xFFFF) {
-                // Converting to \uNNNN avoids needing to escape the character and keep it separate
-                // from preceding tokens
-                return "\\u" + pad4(hex(code));
-            }
-            offset = code - 0x10000;
-            return "\\u" + pad4(hex(0xD800 + (offset >> 10))) + "\\u" + pad4(hex(0xDC00 + (offset & 0x3FF)));
         },
         {scope: "all"}
     );

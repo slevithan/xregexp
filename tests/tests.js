@@ -52,9 +52,9 @@ test("XRegExp", function () {
     deepEqual(blankRegex, XRegExp(blankRegex), "Regex copy and original are alike");
     notEqual(blankRegex, XRegExp(blankRegex), "Regex copy is new instance");
     ok(XRegExp("").xregexp, "XRegExp has xregexp property");
-    notEqual(XRegExp("").xregexp.captureNames, undefined, "XRegExp has captureNames property");
+    notStrictEqual(XRegExp("").xregexp.captureNames, undefined, "XRegExp has captureNames property");
     equal(XRegExp("").xregexp.captureNames, null, "Empty XRegExp has null captureNames");
-    notEqual(XRegExp("").xregexp.isNative, undefined, "XRegExp has isNative property");
+    notStrictEqual(XRegExp("").xregexp.isNative, undefined, "XRegExp has isNative property");
     equal(XRegExp("").xregexp.isNative, false, "XRegExp has isNative false");
     equal(XRegExp(XRegExp("")).xregexp.isNative, false, "Copied XRegExp has isNative false");
     equal(XRegExp(new RegExp("")).xregexp.isNative, true, "Copied RegExp has isNative true");
@@ -634,8 +634,13 @@ test("Leading mode modifier", function () {
 });
 
 test("Enhanced error handling", function () {
-    expect(0);
+    raises(function () {XRegExp("\\1");}, SyntaxError, "Octals throw");
+
     // TODO: Add tests
+
+    // Python-style named capture syntax was added to XRegExp to avoid octal-related errors in Opera. Recent Opera supports (?P<name>..) and (?P=name) based on abandoned ES4 proposals
+    equal(XRegExp("(?P<name>a)(b)\\2").test("abb"), true, "Numbered backreference to Python-style named capture not treated as octal (test 1)");
+    equal(XRegExp("(?P<name>a)(b)\\1").test("aba"), true, "Numbered backreference to Python-style named capture not treated as octal (test 2)");
 });
 
 test("n flag (explicit capture mode)", function () {

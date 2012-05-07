@@ -1,5 +1,5 @@
 /*!
- * XRegExp v2.0.0-rc-2, 2012-04-23
+ * XRegExp v2.0.0-rc-2, 2012-05-07
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -1039,7 +1039,7 @@ XRegExp = XRegExp || (function (undef) {
                      * - `$10` is an error if there are less than 10 capturing groups. Use `${1}0` instead.
                      * - `$01` is equivalent to `$1` if a capturing group exists, otherwise it's an error.
                      * - `$0` (not followed by 1-9), `$00`, and `$&` are the entire match.
-                     * Native behavior (for comparison):
+                     * Native behavior, for comparison:
                      * - Backreferences end after 1 or 2 digits. Cannot use backreference to capturing group 100+.
                      * - `$1` is a literal `$1` if there are no capturing groups.
                      * - `$10` is `$1` followed by a literal `0` if there are less than 10 capturing groups.
@@ -1199,7 +1199,7 @@ XRegExp = XRegExp || (function (undef) {
 /* Named capturing group; match the opening delimiter only: (?<name>
  * Capture names can use the characters A-Z, a-z, 0-9, _, and $ only. Names can't be integers.
  */
-    add(/\(\?<([\w$]+)>/,
+    add(/\(\?P?<([\w$]+)>/,
         function (match) {
             if (!isNaN(match[1])) {
                 // Avoid incorrect lookups, since named backreferences are added to match arrays

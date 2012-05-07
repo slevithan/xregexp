@@ -1,5 +1,5 @@
 /*!
- * XRegExp Unicode Base v1.0.0-rc, 2012-04-18
+ * XRegExp Unicode Base v1.0.0-rc-2, 2012-05-07
  * (c) 2008-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1 <http://unicode.org/>
@@ -9,7 +9,7 @@
  * Adds support for the `\p{L}` or `\p{Letter}` Unicode category. Addon packages for other Unicode
  * categories, scripts, blocks, and properties are available separately. All Unicode tokens can be
  * inverted using `\P{..}` or `\p{^..}`. Token names are case insensitive, and any spaces, hyphens,
- * and underscores are ignored. Also adds `\u{n..}` for full 21-bit Unicode code point matching.
+ * and underscores are ignored.
  * @requires XRegExp
  */
 (function (XRegExp) {
@@ -144,34 +144,6 @@
             return scope === "class" ?
                     (inv ? cacheInversion(item) : unicode[item]) :
                     "[" + inv + unicode[item] + "]";
-        },
-        {scope: "all"}
-    );
-
-/* Adds Unicode code point syntax to XRegExp: \u{n..}
- * `n..` is any 1-6 digit hexadecimal number from 0-10FFFF. Comes from ES6 proposals. Code points
- * above FFFF are converted to surrogate pairs, so e.g. `\u{20B20}` is simply an alternate syntax
- * for `\uD842\uDF20`. This can lead to broken behavior if you follow a `\u{n..}` token that
- * references a code point above FFFF with a quantifier, or if you use the same in a character
- * class. Using `\u{n..}` with code points above FFFF is therefore not recommended, unless you know
- * exactly what you're doing. XRegExp's handling follows ES6 proposals for `\u{n..}`, since
- * compatibility concerns prevent JavaScript regexes from changing to be based on code points
- * rather than code units by default.
- */
-    XRegExp.addToken(
-        /\\u{([0-9A-Fa-f]{1,6})}/,
-        function (match) {
-            var code = dec(match[1]), offset;
-            if (code > 0x10FFFF) {
-                throw new SyntaxError("invalid Unicode code point " + match[0]);
-            }
-            if (code <= 0xFFFF) {
-                // Converting to \uNNNN avoids needing to escape the character and keep it separate
-                // from preceding tokens
-                return "\\u" + pad4(hex(code));
-            }
-            offset = code - 0x10000;
-            return "\\u" + pad4(hex(0xD800 + (offset >> 10))) + "\\u" + pad4(hex(0xDC00 + (offset & 0x3FF)));
         },
         {scope: "all"}
     );
