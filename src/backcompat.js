@@ -1,5 +1,5 @@
 /*!
- * XRegExp BackCompat v1.0.0-rc, 2012-04-09
+ * XRegExp BackCompat v1.0.0-rc, 2012-05-13
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -31,7 +31,7 @@
     XRegExp.iterate = XRegExp.forEach;
 
 /**
- * @deprecated As of XRegExp v2.0.0. No relacement.
+ * @deprecated As of XRegExp v2.0.0. No replacement.
  */
     XRegExp.freezeTokens = function () {
         XRegExp.uninstall("extensibility");

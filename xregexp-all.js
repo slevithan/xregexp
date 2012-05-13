@@ -2,7 +2,7 @@
 /***** xregexp.js *****/
 
 /*!
- * XRegExp v2.0.0-rc-2, 2012-05-07
+ * XRegExp v2.0.0-rc-2, 2012-05-13
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -178,14 +178,14 @@ XRegExp = XRegExp || (function (undef) {
     }
 
 /**
- * Returns `true` if an object is of the specified type; `false` if it isn't.
+ * Determines whether an object is of the specified type.
  * @private
  * @param {*} value Object to check.
- * @param {String} type Type to check for.
+ * @param {String} type Type to check for, in lowercase.
  * @returns {Boolean} Whether the object matches the type.
  */
     function isType(value, type) {
-        return Object.prototype.toString.call(value) === "[object " + type + "]";
+        return Object.prototype.toString.call(value).toLowerCase() === "[object " + type + "]";
     }
 
 /**
@@ -198,7 +198,7 @@ XRegExp = XRegExp || (function (undef) {
         value = value || {};
         if (value === "all" || value.all) {
             value = {natives: true, extensibility: true};
-        } else if (typeof value === "string") {
+        } else if (isType(value, "string")) {
             value = self.forEach(value, /[^\s,]+/, function (m) {
                 this[m] = true;
             }, {});
@@ -598,7 +598,7 @@ XRegExp = XRegExp || (function (undef) {
  * XRegExp.isRegExp(XRegExp('(?s).')); // -> true
  */
     self.isRegExp = function (value) {
-        return isType(value, "RegExp");
+        return isType(value, "regexp");
     };
 
 /**
@@ -849,7 +849,7 @@ XRegExp = XRegExp || (function (undef) {
             output = [],
             pattern,
             i;
-        if (!(isType(patterns, "Array") && patterns.length)) {
+        if (!(isType(patterns, "array") && patterns.length)) {
             throw new TypeError("patterns must be a nonempty array");
         }
         for (i = 0; i < patterns.length; ++i) {
@@ -986,7 +986,7 @@ XRegExp = XRegExp || (function (undef) {
         } else {
             search += "";
         }
-        if (isType(replacement, "Function")) {
+        if (isType(replacement, "function")) {
             result = nativ.replace.call(String(this), search, function () {
                 var args = arguments, i;
                 if (captureNames) {
