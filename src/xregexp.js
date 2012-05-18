@@ -1,5 +1,5 @@
 /*!
- * XRegExp v2.0.0-rc-2, 2012-05-13
+ * XRegExp v2.0.0-rc-2, 2012-05-18
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -384,12 +384,16 @@ XRegExp = XRegExp || (function (undef) {
     addToken = {
         on: function (regex, handler, options) {
             options = options || {};
-            tokens.push({
-                pattern: copy(regex, "g" + (hasNativeY ? "y" : "")),
-                handler: handler,
-                scope: options.scope || defaultScope,
-                trigger: options.trigger || null
-            });
+            if (regex) {
+                tokens.push({
+                    pattern: copy(regex, "g" + (hasNativeY ? "y" : "")),
+                    handler: handler,
+                    scope: options.scope || defaultScope,
+                    trigger: options.trigger || null
+                });
+            }
+            // Providing `customFlags` with null `regex` and `handler` allows adding flags that do
+            // nothing, but don't throw an error
             if (options.customFlags) {
                 registeredFlags = nativ.replace.call(registeredFlags + options.customFlags, duplicateFlags, "");
             }
@@ -1198,6 +1202,9 @@ XRegExp = XRegExp || (function (undef) {
 
 /* Named capturing group; match the opening delimiter only: (?<name>
  * Capture names can use the characters A-Z, a-z, 0-9, _, and $ only. Names can't be integers.
+ * Supports Python-style (?P<name> as an alternate syntax to avoid issues in recent Opera (which
+ * natively supports the Python-style syntax). Otherwise, XRegExp might treat numbered
+ * backreferences to Python-style named capture as octals.
  */
     add(/\(\?P?<([\w$]+)>/,
         function (match) {
