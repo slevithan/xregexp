@@ -1219,7 +1219,8 @@ XRegExp = XRegExp || (function (undef) {
 
 /* Numbered backreference or octal, plus any following digits: \0, \11, etc.
  * Octals except \0 not followed by 0-9 and backreferences to unopened capture groups throw an
- * error. Other matches are returned unaltered.
+ * error. Other matches are returned unaltered. IE <= 8 doesn't support backreferences greater than
+ * \99 in regex syntax.
  */
     add(/\\(\d+)/,
         function (match, scope) {

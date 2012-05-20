@@ -597,14 +597,15 @@ test("String.prototype.replace", function () {
     function mul(str, num) {
         return Array(num + 1).join(str);
     }
+    // IE <= 8 doesn't allow backrefs greater than \99 in regex syntax
     var lottaGroups = new RegExp(
         "^(a)\\1" + mul("()", 8) +
         "(b)\\10" + mul("()", 89) +
-        "(c)\\100" + mul("()", 899) +
-        "(d)\\1000$"
+        "(c)" + mul("()", 899) +
+        "(d)$"
     );
-    equal("aabbccdd".replace(lottaGroups, "$0 $01 $001 $0001 $1 $10 $100 $1000"), "aabbccdd a aabbccdd1 aabbccdd01 a b b0 b00", "Regex with 1,000 capturing groups, without curly brackets for backreferences");
-    equal("aabbccdd".replace(lottaGroups, "${0} ${01} ${001} ${0001} ${1} ${10} ${100} ${1000}"), "aabbccdd a a a a b c d", "Regex with 1,000 capturing groups, with curly brackets for backreferences");
+    equal("aabbcd".replace(lottaGroups, "$0 $01 $001 $0001 $1 $10 $100 $1000"), "aabbcd a aabbcd1 aabbcd01 a b b0 b00", "Regex with 1,000 capturing groups, without curly brackets for backreferences");
+    equal("aabbcd".replace(lottaGroups, "${0} ${01} ${001} ${0001} ${1} ${10} ${100} ${1000}"), "aabbcd a a a a b c d", "Regex with 1,000 capturing groups, with curly brackets for backreferences");
 
     // TODO: Add tests
 
@@ -814,7 +815,8 @@ test("XRegExp.build", function () {
     equal(match.nX, "bb");
     equal(match.yo, "b");
 
-    raises(function () {var r = XRegExp.build('(?x){{a}}', {a: /#/});}, SyntaxError, "Mode modifier in outer pattern applies to full regex with interpolated values (test 1)");
+    // IE v7-8 (not v6 or v9) throws an Error rather than SyntaxError
+    raises(function () {var r = XRegExp.build('(?x)({{a}})', {a: /#/});}, Error, "Mode modifier in outer pattern applies to full regex with interpolated values (test 1)");
     equal(XRegExp.build("(?x){{a}}", {a: /1 2/}).test("12"), true, "Mode modifier in outer pattern applies to full regex with interpolated values (test 2)");
     equal(XRegExp.build("(?m){{a}}", {a: /a/}).multiline, true, "Mode modifier with native flag in outer pattern is applied to the final result");
 
