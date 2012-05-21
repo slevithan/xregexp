@@ -13,8 +13,6 @@ XRegExp regular expressions compile to native RegExp objects, thus there is no p
 
 ## Usage examples
 
-The following examples take advantage of new features in XRegExp v2.0.0 (see [changes](https://github.com/slevithan/XRegExp/wiki/Roadmap)):
-
 ~~~ js
 // Using named capture and flag x (free-spacing and line comments)
 var date = XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\

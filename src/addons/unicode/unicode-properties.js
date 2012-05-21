@@ -1,5 +1,5 @@
 /*!
- * XRegExp Unicode Properties v1.0.0-rc, 2012-04-18
+ * XRegExp Unicode Properties v1.0.0
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1 <http://unicode.org/>

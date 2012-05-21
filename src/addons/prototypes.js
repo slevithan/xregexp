@@ -1,5 +1,5 @@
 /*!
- * XRegExp Prototype Methods v1.0.0-rc, 2012-04-02
+ * XRegExp Prototype Methods v1.0.0
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */

@@ -1,5 +1,5 @@
 /*!
- * XRegExp Unicode Base v1.0.0-rc-2, 2012-05-07
+ * XRegExp Unicode Base v1.0.0
  * (c) 2008-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1 <http://unicode.org/>

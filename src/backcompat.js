@@ -1,5 +1,5 @@
 /*!
- * XRegExp BackCompat v1.0.0-rc, 2012-05-13
+ * XRegExp BackCompat v1.0.0
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
