@@ -2,3 +2,4 @@ src/
 tests/index.html
 tests/qunit/
 tools/
+xregexp-min.js
