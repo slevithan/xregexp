@@ -625,7 +625,10 @@ test("Named capture and backreferences", function () {
 });
 
 test("Inline comments", function () {
-    expect(0);
+    ok(XRegExp("^a(?#)b$").test("ab"), "Comment is ignored");
+    ok(XRegExp("^a(?#)+$").test("aaa"), "Quantifier following comment applies to preceding atom");
+    ok(XRegExp("^(a)\\1(?#)2$").test("aa2"), "Comment separates atoms");
+
     // TODO: Add tests
 });
 
@@ -655,7 +658,12 @@ test("s flag (dotall mode)", function () {
 });
 
 test("x flag (extended mode)", function () {
-    expect(0);
+    ok(XRegExp("^a b$", "x").test("ab"), "Whitespace is ignored");
+    ok(XRegExp("^a#comment\nb$", "x").test("ab"), "Line comment is ignored");
+    ok(XRegExp("^a +$", "x").test("aaa"), "Quantifier following whitespace applies to preceding atom");
+    ok(XRegExp("^(a)\\1 2$", "x").test("aa2"), "Whitespace separates atoms");
+    ok(XRegExp("^ [ #]+ $", "x").test(" #"), "Character classes do not use free-spacing");
+
     // TODO: Add tests
 });
 
