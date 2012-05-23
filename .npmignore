@@ -2,4 +2,5 @@ src/
 tests/index.html
 tests/qunit/
 tools/
+xregexp-all-min.js
 xregexp-min.js
