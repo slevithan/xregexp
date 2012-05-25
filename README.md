@@ -3,7 +3,7 @@
 
 XRegExp provides augmented, extensible, cross-browser JavaScript regular expressions. You get new syntax and flags beyond what browsers support natively, along with a collection of utils to make your client-side grepping and parsing easier. XRegExp also frees you from worrying about pesky inconsistencies in cross-browser regex handling and the dubious `lastIndex` property.
 
-XRegExp supports all native ES5 regular expression syntax. It clocks in at ~3.5 KB when minified and gzipped, and it works with Internet Explorer 5.5+, Firefox 1.5+, Chrome, Safari 3+, and Opera 9.5+.
+XRegExp supports all native ES5 regular expression syntax. It's about 3.5 KB when minified and gzipped. It works with Internet Explorer 5.5+, Firefox 1.5+, Chrome, Safari 3+, and Opera 9.5+.
 
 
 ## Performance
@@ -75,12 +75,17 @@ XRegExp.union(['a+b*c', /(dogs)\1/, /(cats)\1/], 'i');
 // -> /a\+b\*c|(dogs)\1|(cats)\2/i
 ~~~
 
-These examples should give you the flavor of what's possible, but XRegExp has plenty more syntax, flags, utils, options, and browser fixes that aren't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. See [xregexp.com](http://xregexp.com) for more details.
+These examples should give you the flavor of what's possible, but XRegExp has more syntax, flags, utils, options, and browser fixes that aren't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. See [xregexp.com](http://xregexp.com/) for more details.
 
 
-## XRegExp Unicode Base
+## Addons
 
-First include the Unicode Base script:
+In browsers, you can either load addons individually, or bundle all addons together with XRegExp by loading `xregexp-all.js`. XRegExp's [npm](http://npmjs.org/) package uses `xregexp-all.js`, which means that the addons are always available when XRegExp is installed on the server using npm.
+
+
+### XRegExp Unicode Base
+
+In browsers, first include the Unicode Base script:
 
 ~~~ html
 <script src="xregexp.js"></script>
@@ -103,12 +108,12 @@ XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
 XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
 ~~~
 
-XRegExp uses Unicode 6.1's Basic Multilingual Plane.
+XRegExp uses the Unicode 6.1 Basic Multilingual Plane.
 
 
-## XRegExp.build
+### XRegExp.build
 
-First include the script:
+In browsers, first include the script:
 
 ~~~ html
 <script src="xregexp.js"></script>
@@ -135,9 +140,9 @@ Named subpatterns can be provided as strings or regex objects. A leading `^` and
 See also: *[Creating Grammatical Regexes Using XRegExp.build](http://blog.stevenlevithan.com/archives/grammatical-patterns-xregexp-build)*.
 
 
-## XRegExp.matchRecursive
+### XRegExp.matchRecursive
 
-First include the script:
+In browsers, first include the script:
 
 ~~~ html
 <script src="xregexp.js"></script>
@@ -186,16 +191,16 @@ XRegExp.matchRecursive(str, '<', '>', 'gy');
 `XRegExp.matchRecursive` throws an error if it sees an unbalanced delimiter in the target string.
 
 
-## XRegExp Prototype Methods
+### XRegExp Prototype Methods
 
-Include the script:
+In browsers, first include the script:
 
 ~~~ html
 <script src="xregexp.js"></script>
 <script src="addons/prototypes.js"></script>
 ~~~
 
-New XRegExp regexes now gain a collection of useful methods: `apply`, `call`, `forEach`, `globalize`, `xexec`, and `xtest`.
+New XRegExp regexes then gain a collection of useful methods: `apply`, `call`, `forEach`, `globalize`, `xexec`, and `xtest`.
 
 ~~~ js
 // To demonstrate the call method, let's first create the function we'll be using...
@@ -217,25 +222,52 @@ XRegExp.globalize(/[a-z]/i).xexec('abc');
 ~~~
 
 
+## Installation and usage
+
+In browsers:
+
+~~~ html
+<script src="xregexp-min.js"></script>
+~~~
+
+Or, to bundle XRegExp with all of its addons:
+
+~~~ html
+<script src="xregexp-all-min.js"></script>
+~~~
+
+Using [npm](http://npmjs.org/):
+
+~~~ bash
+npm install xregexp
+~~~
+
+In [Node.js](http://nodejs.org/) and [CommonJS module](http://wiki.commonjs.org/wiki/Modules) loaders:
+
+~~~ js
+var XRegExp = require('xregexp').XRegExp;
+~~~
+
+
+### Running tests on the server with npm
+
+~~~ bash
+npm install -g qunit  # needed to run the tests
+npm test  # in the xregexp root
+~~~
+
+If XRegExp was not installed using npm, just open `tests/index.html` in your browser.
+
+
 ## &c
 
 **Lookbehind:** A [collection of short functions](https://gist.github.com/2387872) is available that makes it easy to simulate infinite-length leading lookbehind.
 
 
-## How to run tests on the server with npm
-
-~~~ bash
-npm install -g qunit  # needed to run the tests
-npm test  # in the xregexp root directory
-~~~
-
-For non-npm users, just open `tests/index.html` in your browser.
-
-
 ## Changelog
 
-* Historical changes: [Version history](http://xregexp.com/history/).
-* Planned changes: [Roadmap](https://github.com/slevithan/XRegExp/wiki/Roadmap).
+* Releases: [Version history](http://xregexp.com/history/).
+* Upcoming: [Milestones](https://github.com/slevithan/XRegExp/issues/milestones), [Roadmap](https://github.com/slevithan/XRegExp/wiki/Roadmap).
 
 
 ## About
