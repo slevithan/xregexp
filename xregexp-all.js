@@ -2127,7 +2127,7 @@ XRegExp = XRegExp || (function (undef) {
 
         for (p in subs) {
             if (subs.hasOwnProperty(p)) {
-                // Passing to XRegExp enables entended syntax for subpatterns provided as strings
+                // Passing to XRegExp enables extended syntax for subpatterns provided as strings
                 // and ensures independent validity, lest an unescaped `(`, `)`, `[`, or trailing
                 // `\` breaks the `(?:)` wrapper. For subpatterns provided as regexes, it dies on
                 // octals and adds the `xregexp` property, for simplicity
