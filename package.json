@@ -4,12 +4,15 @@
     "homepage": "http://xregexp.com/",
     "author": "Steven Levithan <steves_list@hotmail.com>",
     "license": "MIT",
-    "repository" : {
+    "repository": {
         "type": "git",
         "url": "https://github.com/slevithan/XRegExp.git"
     },
     "description": "Extended JavaScript regular expressions",
-    "keywords": ["regex", "regexp"],
+    "keywords": [
+        "regex",
+        "regexp"
+    ],
     "main": "./xregexp-all.js",
     "scripts": {
         "test": "node tests/node-qunit.js"
