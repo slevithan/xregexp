@@ -1,5 +1,5 @@
 /*!
- * XRegExp v2.0.0
+ * XRegExp v2.0.0-next
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -559,7 +559,8 @@ XRegExp = XRegExp || (function (undef) {
     };
 
 /**
- * Installs optional features according to the specified options.
+ * Installs optional features according to the specified options. Can be undone using
+ * {@link #XRegExp.uninstall}.
  * @memberOf XRegExp
  * @param {Object|String} options Options object or string.
  * @example
@@ -678,7 +679,7 @@ XRegExp = XRegExp || (function (undef) {
  * @param {RegExp|String} search Search pattern to be replaced.
  * @param {String|Function} replacement Replacement string or a function invoked to create it.
  *   Replacement strings can include special replacement syntax:
- *     <li>$$ - Inserts a literal '$'.
+ *     <li>$$ - Inserts a literal $ character.
  *     <li>$&, $0 - Inserts the matched substring.
  *     <li>$` - Inserts the string that precedes the matched substring (left context).
  *     <li>$' - Inserts the string that follows the matched substring (right context).
@@ -788,7 +789,8 @@ XRegExp = XRegExp || (function (undef) {
     };
 
 /**
- * Uninstalls optional features according to the specified options.
+ * Uninstalls optional features according to the specified options. All optional features start out
+ * uninstalled, so this is used to undo the actions of {@link #XRegExp.install}.
  * @memberOf XRegExp
  * @param {Object|String} options Options object or string.
  * @example
@@ -879,7 +881,7 @@ XRegExp = XRegExp || (function (undef) {
  * @memberOf XRegExp
  * @type String
  */
-    self.version = "2.0.0";
+    self.version = "2.0.0-next";
 
 /*--------------------------------------
  *  Fixed/extended native methods
@@ -1018,12 +1020,17 @@ XRegExp = XRegExp || (function (undef) {
                 var args = arguments; // Keep this function's `arguments` available through closure
                 return nativ.replace.call(String(replacement), replacementToken, function ($0, $1, $2) {
                     var n;
-                    // Named or numbered backreference with curly brackets
+                    // Named or numbered backreference with curly braces
                     if ($1) {
                         /* XRegExp behavior for `${n}`:
-                         * 1. Backreference to numbered capture, where `n` is 1+ digits. `0`, `00`, etc. is the entire match.
-                         * 2. Backreference to named capture `n`, if it exists and is not a number overridden by numbered capture.
-                         * 3. Otherwise, it's an error.
+                         * 1. Backreference to numbered capture, if `n` is an integer. Use `0` for
+                         *    for the entire match. Any number of leading zeros may be used.
+                         * 2. Backreference to named capture `n`, if it exists and is not an
+                         *    integer overridden by numbered capture. In practice, this does not
+                         *    overlap with numbered capture since XRegExp does not allow named
+                         *    capture to use a bare integer as the name.
+                         * 3. If the name or number does not refer to an existing capturing group,
+                         *    it's an error.
                          */
                         n = +$1; // Type-convert; drop leading zeros
                         if (n <= args.length - 3) {
@@ -1035,25 +1042,25 @@ XRegExp = XRegExp || (function (undef) {
                         }
                         return args[n + 1] || "";
                     }
-                    // Else, special variable or numbered backreference (without curly brackets)
+                    // Else, special variable or numbered backreference (without curly braces)
                     if ($2 === "$") return "$";
                     if ($2 === "&" || +$2 === 0) return args[0]; // $&, $0 (not followed by 1-9), $00
                     if ($2 === "`") return args[args.length - 1].slice(0, args[args.length - 2]);
                     if ($2 === "'") return args[args.length - 1].slice(args[args.length - 2] + args[0].length);
-                    // Else, numbered backreference (without curly brackets)
+                    // Else, numbered backreference (without curly braces)
                     $2 = +$2; // Type-convert; drop leading zero
-                    /* XRegExp behavior:
-                     * - Backreferences without curly brackets end after 1 or 2 digits. Use `${..}` for more digits.
+                    /* XRegExp behavior for `$n` and `$nn`:
+                     * - Backreferences without curly braces end after 1 or 2 digits. Use `${..}` for more digits.
                      * - `$1` is an error if there are no capturing groups.
                      * - `$10` is an error if there are less than 10 capturing groups. Use `${1}0` instead.
                      * - `$01` is equivalent to `$1` if a capturing group exists, otherwise it's an error.
-                     * - `$0` (not followed by 1-9), `$00`, and `$&` are the entire match.
+                     * - `$0` (not followed by 1-9) and `$00` are the entire match.
                      * Native behavior, for comparison:
                      * - Backreferences end after 1 or 2 digits. Cannot use backreference to capturing group 100+.
                      * - `$1` is a literal `$1` if there are no capturing groups.
                      * - `$10` is `$1` followed by a literal `0` if there are less than 10 capturing groups.
                      * - `$01` is equivalent to `$1` if a capturing group exists, otherwise it's a literal `$01`.
-                     * - `$0` is a literal `$0`. `$&` is the entire match.
+                     * - `$0` is a literal `$0`.
                      */
                     if (!isNaN($2)) {
                         if ($2 > args.length - 3) {
