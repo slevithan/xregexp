@@ -220,25 +220,24 @@ XRegExp = XRegExp || (function (undef) {
             t;
         // Protect against constructing XRegExps within token definition functions
         isInsideConstructor = true;
-        // Must reset `isInsideConstructor`, even if a token definition function throws
         try {
             while (i--) { // Run in reverse order
                 t = tokens[i];
                 if ((t.scope === "all" || t.scope === scope) && (!t.trigger || t.trigger.call(context))) {
-                    t.pattern.lastIndex = pos;
-                    match = fixed.exec.call(t.pattern, pattern); // Fixed `exec` here allows use of named backreferences, etc.
-                    if (match && match.index === pos) {
+                    match = self.exec(pattern, t.pattern, pos, "sticky");
+                    if (match) {
                         result = {
                             output: t.handler.call(context, match, scope),
                             match: match
                         };
-                        break;
+                        break; // Finished with token tests
                     }
                 }
             }
         } catch (err) {
             throw err;
         } finally {
+            // Must reset, even if a token definition function throws
             isInsideConstructor = false;
         }
         return result;
