@@ -218,9 +218,9 @@ XRegExp = XRegExp || (function (undef) {
             result = null,
             match,
             t;
-        // Protect against constructing XRegExps within token handler and trigger functions
+        // Protect against constructing XRegExps within token definition functions
         isInsideConstructor = true;
-        // Must reset `isInsideConstructor`, even if a `trigger` or `handler` throws
+        // Must reset `isInsideConstructor`, even if a token definition function throws
         try {
             while (i--) { // Run in reverse order
                 t = tokens[i];
@@ -498,16 +498,23 @@ XRegExp = XRegExp || (function (undef) {
  * // result -> ['2', '3', '4']
  */
     self.exec = function (str, regex, pos, sticky) {
-        var r2 = copy(regex, "g" + (sticky && hasNativeY ? "y" : ""), (sticky === false ? "y" : "")),
+        var r2 = regex,
+            origLastIndex = regex.lastIndex,
             match;
+        // For performance, only copy the regex when necessary
+        if ((pos && !r2.global) ||
+            (hasNativeY && ((sticky && !r2.sticky) || (sticky === false && r2.sticky)))
+        ) {
+            r2 = copy(regex,
+                    "g" + (sticky && hasNativeY ? "y" : ""), // add flags
+                    (sticky === false ? "y" : "")); // remove flags
+        }
         r2.lastIndex = pos = pos || 0;
         match = fixed.exec.call(r2, str); // Fixed `exec` required for `lastIndex` fix, etc.
         if (sticky && match && match.index !== pos) {
             match = null;
         }
-        if (regex.global) {
-            regex.lastIndex = match ? r2.lastIndex : 0;
-        }
+        regex.lastIndex = (regex.global ? (match ? r2.lastIndex : 0) : origLastIndex);
         return match;
     };
 
@@ -896,11 +903,11 @@ XRegExp = XRegExp || (function (undef) {
  * @returns {Array} Match array with named backreference properties, or null.
  */
     fixed.exec = function (str) {
-        var match, name, r2, origLastIndex, i;
-        if (!this.global) {
-            origLastIndex = this.lastIndex;
-        }
-        match = nativ.exec.apply(this, arguments);
+        var origLastIndex = this.lastIndex,
+            match = nativ.exec.apply(this, arguments),
+            name,
+            r2,
+            i;
         if (match) {
             // Fix browsers whose `exec` methods don't consistently return `undefined` for
             // nonparticipating capturing groups
@@ -910,7 +917,7 @@ XRegExp = XRegExp || (function (undef) {
                 // matching due to characters outside the match
                 nativ.replace.call(String(str).slice(match.index), r2, function () {
                     var i;
-                    for (i = 1; i < arguments.length - 2; ++i) {
+                    for (i = 1; i < arguments.length - 2; ++i) { // skip index 0 and the final 2
                         if (arguments[i] === undef) {
                             match[i] = undef;
                         }
@@ -919,7 +926,7 @@ XRegExp = XRegExp || (function (undef) {
             }
             // Attach named capture properties
             if (this.xregexp && this.xregexp.captureNames) {
-                for (i = 1; i < match.length; ++i) {
+                for (i = 1; i < match.length; ++i) { // skip index 0
                     name = this.xregexp.captureNames[i - 1];
                     if (name) {
                         match[name] = match[i];
