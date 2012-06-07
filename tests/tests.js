@@ -592,7 +592,6 @@ test("String.prototype.replace", function () {
     raises(function () {"test".replace(/t/, "${1}");}, SyntaxError, "Numbered backreference to undefined group in replacement string");
     equal("test".replace(XRegExp("(?<test>t)", "g"), ":${test}:"), ":t:es:t:", "Named backreference in replacement string");
     raises(function () {"test".replace(XRegExp("(?<test>t)", "g"), ":${x}:");}, SyntaxError, "Named backreference to undefined group in replacement string");
-    equal("test".replace(XRegExp("(?<a>.)(?<a>.)", "g"), "${a}"), "et", "Named backreference uses last of groups with the same name");
 
     function mul(str, num) {
         return Array(num + 1).join(str);
@@ -752,7 +751,8 @@ test("String.prototype.split with regex separator", function () {
 });
 
 test("Regular expression syntax", function () {
-    expect(0);
+    raises(function () {XRegExp("(?<n>1)(?<n>2)")}, SyntaxError, "Multiple groups with same name throws");
+
     // TODO: Add tests
 });
 
@@ -813,15 +813,16 @@ test("XRegExp.build", function () {
 
     var built = XRegExp.build("({{n1}})\\1(?<nX>{{n2}})\\2()\\3\\1\\2\\k<nX>", {
         n1: XRegExp("(?<yo>a)\\1"),
-        n2: XRegExp("(?<yo>b)\\1")
-    }); // Equivalent to XRegExp("(?<n1>(?<yo>a)\\2)\\1(?<nX>(?<yo>b)\\4)\\3()\\5\\1\\3\\k<nX>")
+        n2: XRegExp("(?<yo2>b)\\1")
+    }); // Equivalent to XRegExp("(?<n1>(?<yo>a)\\2)\\1(?<nX>(?<yo2>b)\\4)\\3()\\5\\1\\3\\k<nX>")
     var match = XRegExp.exec("aaaabbbbaabbbb", built);
 
     ok(match);
     equal(match.n1, "aa");
     equal(match.n2, undefined);
     equal(match.nX, "bb");
-    equal(match.yo, "b");
+    equal(match.yo, "a");
+    equal(match.yo2, "b");
 
     // IE v7-8 (not v6 or v9) throws an Error rather than SyntaxError
     raises(function () {var r = XRegExp.build('(?x)({{a}})', {a: /#/});}, Error, "Mode modifier in outer pattern applies to full regex with interpolated values (test 1)");

@@ -2,7 +2,7 @@
 /***** xregexp.js *****/
 
 /*!
- * XRegExp v2.0.0-next
+ * XRegExp v2.1.0-dev
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -884,7 +884,7 @@ XRegExp = XRegExp || (function (undef) {
  * @memberOf XRegExp
  * @type String
  */
-    self.version = "2.0.0-next";
+    self.version = "2.1.0-dev";
 
 /*--------------------------------------
  *  Fixed/extended native methods
@@ -1223,9 +1223,14 @@ XRegExp = XRegExp || (function (undef) {
  */
     add(/\(\?P?<([\w$]+)>/,
         function (match) {
+            // Disallow bare integers as names because named backreferences are added to match
+            // arrays and therefore numeric properties may lead to incorrect lookups
             if (!isNaN(match[1])) {
-                // Avoid incorrect lookups, since named backreferences are added to match arrays
                 throw new SyntaxError("can't use integer as capture name " + match[0]);
+            }
+            // Using lastIndexOf because XRegExp doesn't currently include indexOf
+            if (lastIndexOf(this.captureNames, match[1]) > -1) {
+                throw new SyntaxError("can't use same name for multiple groups " + match[0]);
             }
             this.captureNames.push(match[1]);
             this.hasNamedCapture = true;
