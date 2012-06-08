@@ -96,15 +96,18 @@ XRegExp = XRegExp || (function (undef) {
  * @private
  * @param {RegExp} regex Regex to augment.
  * @param {Array} captureNames Array with capture names, or null.
- * @param {Boolean} [isNative] Whether the regex was created by `RegExp` rather than `XRegExp`.
+ * @param {Boolean} [addProto=false] Whether to attach `XRegExp.prototype` properties.
+ * @param {Boolean} [isNative=false] Whether the regex was created by `RegExp` (not `XRegExp`).
  * @returns {RegExp} Augmented regex.
  */
-    function augment(regex, captureNames, isNative) {
+    function augment(regex, captureNames, addProto, isNative) {
         var p;
-        // Can't auto-inherit these since the XRegExp constructor returns a nonprimitive value
-        for (p in self.prototype) {
-            if (self.prototype.hasOwnProperty(p)) {
-                regex[p] = self.prototype[p];
+        if (addProto) {
+            // Can't auto-inherit these since the XRegExp constructor returns a nonprimitive value
+            for (p in self.prototype) {
+                if (self.prototype.hasOwnProperty(p)) {
+                    regex[p] = self.prototype[p];
+                }
             }
         }
         regex.xregexp = {captureNames: captureNames, isNative: !!isNative};
@@ -132,31 +135,48 @@ XRegExp = XRegExp || (function (undef) {
  * adding and removing flags while copying the regex.
  * @private
  * @param {RegExp} regex Regex to copy.
- * @param {String} [addFlags] Flags to be added while copying the regex.
- * @param {String} [removeFlags] Flags to be removed while copying the regex.
+ * @param {Object} [options] Allows specifying flags to add or remove while copying the regex, and
+ *   whether to attach `XRegExp.prototype` properties.
  * @returns {RegExp} Copy of the provided regex, possibly with modified flags.
  */
-    function copy(regex, addFlags, removeFlags) {
+    function copy(regex, options) {
         if (!self.isRegExp(regex)) {
             throw new TypeError("type RegExp expected");
         }
-        var flags = nativ.replace.call(getNativeFlags(regex) + (addFlags || ""), duplicateFlags, "");
-        if (removeFlags) {
-            // Would need to escape `removeFlags` if this was public
-            flags = nativ.replace.call(flags, new RegExp("[" + removeFlags + "]+", "g"), "");
+        var flags = getNativeFlags(regex);
+        options = options || {};
+        if (options.add) {
+            flags = nativ.replace.call(flags + options.add, duplicateFlags, "");
+        }
+        if (options.remove) {
+            // Would need to escape `options.remove` if this was public
+            flags = nativ.replace.call(flags, new RegExp("[" + options.remove + "]+", "g"), "");
         }
         if (regex.xregexp && !regex.xregexp.isNative) {
             // Compiling the current (rather than precompilation) source preserves the effects of nonnative source flags
-            regex = augment(self(regex.source, flags),
-                            regex.xregexp.captureNames ? regex.xregexp.captureNames.slice(0) : null);
+            regex = augment(
+                self(regex.source, flags),
+                regex.xregexp.captureNames ? regex.xregexp.captureNames.slice(0) : null,
+                options.addProto
+                //,false // !isNative
+            );
         } else {
             // Augment with `XRegExp.prototype` methods, but use native `RegExp` (avoid searching for special tokens)
-            regex = augment(new RegExp(regex.source, flags), null, true);
+            regex = augment(new RegExp(regex.source, flags), null, options.addProto, true);
         }
         return regex;
     }
 
-/*
+/**
+ * Returns a new copy of the `xregexp` object used for native nonaugmented regexes.
+ * @private
+ * @returns {Object} Object with `captureNames` and `isNative` properties.
+ */
+    function getNativeProps() {
+        return {captureNames: null, isNative: true};
+    }
+
+/**
  * Returns the last index at which a given value can be found in an array, or `-1` if it's not
  * present. The array is searched backwards.
  * @private
@@ -308,7 +328,7 @@ XRegExp = XRegExp || (function (undef) {
             if (flags !== undef) {
                 throw new TypeError("can't supply flags when constructing one RegExp from another");
             }
-            return copy(pattern);
+            return copy(pattern, {addProto: true});
         }
         // Tokens become part of the regex construction process, so protect against infinite recursion
         // when an XRegExp is constructed within a token handler function
@@ -375,8 +395,11 @@ XRegExp = XRegExp || (function (undef) {
             }
         }
 
-        return augment(new RegExp(output.join(""), nativ.replace.call(flags, /[^gimy]+/g, "")),
-                       tokenContext.hasNamedCapture ? tokenContext.captureNames : null);
+        return augment(
+            new RegExp(output.join(""), nativ.replace.call(flags, /[^gimy]+/g, "")),
+            tokenContext.hasNamedCapture ? tokenContext.captureNames : null,
+            true // Attach `XRegExp.prototype` properties
+        );
     };
 
 /*--------------------------------------
@@ -389,7 +412,7 @@ XRegExp = XRegExp || (function (undef) {
             options = options || {};
             if (regex) {
                 tokens.push({
-                    pattern: copy(regex, "g" + (hasNativeY ? "y" : "")),
+                    pattern: copy(regex, {add: "g" + (hasNativeY ? "y" : "")}),
                     handler: handler,
                     scope: options.scope || defaultScope,
                     trigger: options.trigger || null
@@ -500,23 +523,26 @@ XRegExp = XRegExp || (function (undef) {
  * // result -> ['2', '3', '4']
  */
     self.exec = function (str, regex, pos, sticky) {
-        var r2 = regex,
-            origLastIndex = regex.lastIndex,
-            match;
-        // For performance, only copy the regex when necessary
-        if ((pos && !r2.global) ||
-            (hasNativeY && ((sticky && !r2.sticky) || (sticky === false && r2.sticky)))
-        ) {
-            r2 = copy(regex,
-                    "g" + (sticky && hasNativeY ? "y" : ""), // add flags
-                    (sticky === false ? "y" : "")); // remove flags
+        var cacheFlags = "g", match, r2;
+        if (hasNativeY && (sticky || (regex.sticky && sticky !== false))) {
+            cacheFlags += "y";
         }
+        regex.xregexp = regex.xregexp || getNativeProps();
+        // Shares cached copies with `XRegExp.replace`
+        r2 = regex.xregexp[cacheFlags] || (
+            regex.xregexp[cacheFlags] = copy(regex, {
+                add: cacheFlags,
+                remove: sticky === false ? "y" : ""
+            })
+        );
         r2.lastIndex = pos = pos || 0;
-        match = fixed.exec.call(r2, str); // Fixed `exec` required for `lastIndex` fix, etc.
+        match = fixed.exec.call(r2, str);
         if (sticky && match && match.index !== pos) {
             match = null;
         }
-        regex.lastIndex = (regex.global ? (match ? r2.lastIndex : 0) : origLastIndex);
+        if (regex.global) {
+            regex.lastIndex = match ? r2.lastIndex : 0;
+        }
         return match;
     };
 
@@ -564,7 +590,7 @@ XRegExp = XRegExp || (function (undef) {
  * globalCopy.global; // -> true
  */
     self.globalize = function (regex) {
-        return copy(regex, "g");
+        return copy(regex, {add: "g", addProto: true});
     };
 
 /**
@@ -724,18 +750,24 @@ XRegExp = XRegExp || (function (undef) {
  */
     self.replace = function (str, search, replacement, scope) {
         var isRegex = self.isRegExp(search),
-            search2 = search,
+            global = (search.global && scope !== "one") || scope === "all",
+            cacheFlags = (global ? "g" : "") + (search.sticky ? "y" : ""),
+            s2 = search,
             result;
         if (isRegex) {
-            if (scope === undef && search.global) {
-                scope = "all"; // Follow flag g when `scope` isn't explicit
-            }
-            // Note that since a copy is used, `search`'s `lastIndex` isn't updated *during* replacement iterations
-            search2 = copy(search, scope === "all" ? "g" : "", scope === "all" ? "" : "g");
-        } else if (scope === "all") {
-            search2 = new RegExp(self.escape(String(search)), "g");
+            search.xregexp = search.xregexp || getNativeProps();
+            // Shares cached copies with `XRegExp.exec`. Note that since a copy is used, `search`'s
+            // `lastIndex` isn't updated *during* replacement iterations
+            s2 = search.xregexp[cacheFlags || "noGY"] || (
+                search.xregexp[cacheFlags || "noGY"] = copy(search, {
+                    add: cacheFlags,
+                    remove: scope === "one" ? "g" : ""
+                })
+            );
+        } else if (global) {
+            s2 = new RegExp(self.escape(String(search)), "g");
         }
-        result = fixed.replace.call(String(str), search2, replacement); // Fixed `replace` required for named backreferences, etc.
+        result = fixed.replace.call(String(str), s2, replacement); // Fixed `replace` required for named backreferences, etc.
         if (isRegex && search.global) {
             search.lastIndex = 0; // Fixes IE, Safari bug (last tested IE 9, Safari 5.1)
         }
@@ -911,15 +943,16 @@ XRegExp = XRegExp || (function (undef) {
             r2,
             i;
         if (match) {
-            // Fix browsers whose `exec` methods don't consistently return `undefined` for
-            // nonparticipating capturing groups
+            // Fix browsers whose `exec` methods don't return `undefined` for nonparticipating
+            // capturing groups. This fixes IE 5.5-8, but not IE9's quirks mode or emulation of
+            // older IEs. IE9 in standards mode follows the spec
             if (!compliantExecNpcg && match.length > 1 && lastIndexOf(match, "") > -1) {
-                r2 = new RegExp(this.source, nativ.replace.call(getNativeFlags(this), "g", ""));
+                r2 = copy(this, {remove: "g"});
                 // Using `str.slice(match.index)` rather than `match[0]` in case lookahead allowed
                 // matching due to characters outside the match
                 nativ.replace.call(String(str).slice(match.index), r2, function () {
                     var i;
-                    for (i = 1; i < arguments.length - 2; ++i) { // skip index 0 and the final 2
+                    for (i = 1; i < arguments.length - 2; ++i) { // Skip index 0 and the last 2
                         if (arguments[i] === undef) {
                             match[i] = undef;
                         }
@@ -928,7 +961,7 @@ XRegExp = XRegExp || (function (undef) {
             }
             // Attach named capture properties
             if (this.xregexp && this.xregexp.captureNames) {
-                for (i = 1; i < match.length; ++i) { // skip index 0
+                for (i = 1; i < match.length; ++i) { // Skip index 0
                     name = this.xregexp.captureNames[i - 1];
                     if (name) {
                         match[name] = match[i];
@@ -1172,7 +1205,7 @@ XRegExp = XRegExp || (function (undef) {
 /* Comment pattern: (?# )
  * Inline comments are an alternative to the line comments allowed in free-spacing mode (flag x).
  */
-    add(/(?:\(\?#[^)]*\))+/,
+    add(/\(\?#[^)]*\)/,
         function (match) {
             // Keep tokens separated unless the following token is a quantifier
             return nativ.test.call(quantifier, match.input.slice(match.index + match[0].length)) ? "" : "(?:)";
