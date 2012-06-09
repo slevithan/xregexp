@@ -155,11 +155,11 @@ test("XRegExp.exec", function () {
 
     equal(XRegExp.exec("abc", /x/, 5), null, "pos greater than string length results in failure");
 
-    if (RegExp.prototype.sticky !== undefined) {
-        var stickyRegex = new RegExp("x", "y"); // can't use /x/y even behind `if` because it errors during compilation in IE9
-        ok(XRegExp.exec(str, stickyRegex, 0, false), "Explicit sticky=false overrides flag y");
-        ok(!XRegExp.exec(str, stickyRegex, 0), "Sticky follows flag y when not explicitly specified");
-    }
+    var sticky = !!RegExp.prototype.sticky;
+    var stickyRegex = sticky ? new RegExp("x", "y") : /x/; // Can't use /x/y behind `if`; errors during compilation in IE9
+    var stickyTest = !!XRegExp.exec(str, stickyRegex, 0);
+    ok(XRegExp.exec(str, stickyRegex, 0, false), "Explicit sticky=false overrides flag y");
+    notEqual(stickyTest, sticky, "Sticky follows flag y when not explicitly specified");
 });
 
 test("XRegExp.forEach", function () {
@@ -800,28 +800,66 @@ test("Type conversion", function () {
 module("Addons");
 //-------------------------------------------------------------------
 
-test("Unicode base", function () {
+test("Unicode Base", function () {
     ok(XRegExp.addUnicodePackage, "XRegExp.addUnicodePackage exists");
 
-    // TODO: Add tests
+    XRegExp.install("extensibility");
+
+    XRegExp.addUnicodePackage({Test: "0000"});
+    ok(XRegExp("\\p{Test}").test("\u0000"), "Added Test token");
+
+    XRegExp.addUnicodePackage(null, {Test: "Alias"});
+    ok(XRegExp("\\p{Alias}").test("\u0000"), "Added alias Alias for Test token");
+
+    XRegExp.addUnicodePackage({XDigit: "0030-00390041-00460061-0066" /*0-9A-Fa-f*/}, {XDigit: "Hexadecimal"});
+    ok(XRegExp("\\p{XDigit}\\p{Hexadecimal}").test("0F"), "Added XDigit token with alias Hexadecimal");
+
+    XRegExp.uninstall("extensibility");
+
+    var L = XRegExp("^\\p{L}+$");
+    var Letter = XRegExp("^\\p{Letter}+$");
+
+    raises(function () {XRegExp("\\p{XX}");}, SyntaxError, "Unrecognized Unicode name is an error");
+    ok(L.test("Café"), "\\p{L} matches Café");
+    ok(L.test("Русский"), "\\p{L} matches Русский");
+    ok(L.test("日本語"), "\\p{L} matches 日本語");
+    ok(L.test("العربية"), "\\p{L} matches العربي");
+    ok(Letter.test("Café"), "\\p{Letter} is alias of \\p{L}");
+    ok(XRegExp("^\\p{ _-l --}+$").test("Café"), "Spaces, underscores, hyphens, and casing are ignored in Unicode token name");
+    raises(function () {XRegExp("\\p{ ^L}");}, SyntaxError, "Space before negating caret is an error");
+    ok(!XRegExp("^\\P{L}+$").test("Café"), "\\P{L} does not match Café");
+    ok(XRegExp("^\\P{L}+$").test("1+(2-3)"), "\\P{L} matches 1+(2-3)");
+    ok(!XRegExp("^\\p{^L}+$").test("Café"), "\\p{^L} does not match Café");
+    ok(XRegExp("^\\p{^L}+$").test("1+(2-3)"), "\\p{^L} matches 1+(2-3)");
+    raises(function () {XRegExp("\\P{^L}");}, SyntaxError, "\\P{^L} (double negation) is an error");
+    raises(function () {XRegExp("[\\P{^L}]");}, SyntaxError, "\\P{^L} (double negation) is an error inside character class");
+    raises(function () {XRegExp("[^\\P{^L}]");}, SyntaxError, "\\P{^L} (double negation) is an error inside negated character class");
+    ok(XRegExp("^[\\p{L}]+$").test("Café"), "\\p{L} works inside character class");
+    ok(!XRegExp("^[\\P{L}]+$").test("Café"), "\\P{L} works inside character class");
+    ok(!XRegExp("^[\\p{^L}]+$").test("Café"), "\\p{^L} works inside character class");
+    ok(!XRegExp("^[^\\p{L}]+$").test("Café"), "\\p{L} works inside negated character class");
+    ok(XRegExp("^[^\\P{L}]+$").test("Café"), "\\P{L} works inside negated character class");
+    ok(XRegExp("^[^\\p{^L}]+$").test("Café"), "\\p{^L} works inside negated character class");
 });
 
-test("Unicode categories", function () {
+test("Unicode Categories", function () {
     expect(0);
     // TODO: Add tests
 });
 
-test("Unicode scripts", function () {
+test("Unicode Scripts", function () {
+    ok(XRegExp("^\\p{Katakana}+$").test("カタカナ"), "\\p{Katakana} matches カタカナ");
+    ok(!XRegExp("^\\p{Katakana}+$").test("Latin"), "\\p{Katakana} does not match Latin");
+
+    // TODO: Add tests
+});
+
+test("Unicode Blocks", function () {
     expect(0);
     // TODO: Add tests
 });
 
-test("Unicode blocks", function () {
-    expect(0);
-    // TODO: Add tests
-});
-
-test("Unicode properties", function () {
+test("Unicode Properties", function () {
     expect(0);
     // TODO: Add tests
 });
@@ -859,43 +897,37 @@ test("XRegExp.build", function () {
     // TODO: Add tests
 });
 
-test("XRegExp.prototype.apply", function () {
+test("Prototype Methods", function () {
     var regex = XRegExp("x");
 
     ok(XRegExp.prototype.apply, "XRegExp.prototype.apply exists");
+    ok(regex.apply, "apply exists for XRegExp instance");
     deepEqual(regex.apply(null, ["x"]), regex.test("x"), "Apply with match same as test");
     deepEqual(regex.apply(null, ["y"]), regex.test("y"), "Apply without match same as test");
-});
-
-test("XRegExp.prototype.call", function () {
-    var regex = XRegExp("x");
 
     ok(XRegExp.prototype.call, "XRegExp.prototype.call exists");
+    ok(regex.call, "call exists for XRegExp instance");
     deepEqual(regex.call(null, "x"), regex.test("x"), "Call with match same as test");
     deepEqual(regex.call(null, "y"), regex.test("y"), "Call without match same as test");
-});
 
-test("XRegExp.prototype.forEach", function () {
     ok(XRegExp.prototype.forEach, "XRegExp.prototype.forEach exists");
+    ok(regex.forEach, "forEach exists for XRegExp instance");
+    deepEqual(regex.forEach("x", function (m) {
+        this.push(m);
+    }, []), XRegExp.forEach("x", regex, function (m) {
+        this.push(m);
+    }, []), "forEach method works like XRegExp.forEach");
 
-    // TODO: Add tests
-});
-
-test("XRegExp.prototype.globalize", function () {
     ok(XRegExp.prototype.globalize, "XRegExp.prototype.globalize exists");
+    ok(regex.globalize, "globalize exists for XRegExp instance");
+    deepEqual(regex.globalize(), XRegExp.globalize(regex), "globalize method works like XRegExp.globalize");
 
-    // TODO: Add tests
-});
-
-test("XRegExp.prototype.xexec", function () {
     ok(XRegExp.prototype.xexec, "XRegExp.prototype.xexec exists");
+    ok(regex.xexec, "xexec exists for XRegExp instance");
+    deepEqual(regex.xexec("x"), XRegExp.exec("x", regex), "xexec method works like XRegExp.exec");
 
-    // TODO: Add tests
-});
-
-test("XRegExp.prototype.xtest", function () {
     ok(XRegExp.prototype.xtest, "XRegExp.prototype.xtest exists");
-
-    // TODO: Add tests
+    ok(regex.xtest, "xtest exists for XRegExp instance");
+    deepEqual(regex.xtest("x"), XRegExp.test("x", regex), "xtest method works like XRegExp.test");
 });
 
