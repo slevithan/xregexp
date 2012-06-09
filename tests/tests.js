@@ -26,6 +26,7 @@ test("Basic availability", function () {
     ok(XRegExp.isRegExp, "XRegExp.isRegExp exists");
     ok(XRegExp.matchChain, "XRegExp.matchChain exists");
     ok(XRegExp.replace, "XRegExp.replace exists");
+    ok(XRegExp.replaceEach, "XRegExp.replaceEach exists");
     ok(XRegExp.split, "XRegExp.split exists");
     ok(XRegExp.test, "XRegExp.test exists");
     ok(XRegExp.uninstall, "XRegExp.uninstall exists");
@@ -276,17 +277,39 @@ test("XRegExp.matchChain", function () {
 });
 
 test("XRegExp.replace", function () {
-    equal(XRegExp.replace("test", "t", "x", "all"), "xesx", "string search with scope='all'");
-    equal(XRegExp.replace("test", "t", "x", "one"), "xest", "string search with scope='one'");
-    equal(XRegExp.replace("test", "t", "x"), "xest", "string search without scope");
-    equal(XRegExp.replace("test", /t/, "x", "all"), "xesx", "regex search with scope='all'");
-    equal(XRegExp.replace("test", /t/, "x", "one"), "xest", "regex search with scope='one'");
-    equal(XRegExp.replace("test", /t/, "x"), "xest", "regex search without scope");
-    equal(XRegExp.replace("test", /t/g, "x", "all"), "xesx", "global regex search with scope='all'");
-    equal(XRegExp.replace("test", /t/g, "x", "one"), "xest", "global regex search with scope='one'");
-    equal(XRegExp.replace("test", /t/g, "x"), "xesx", "global regex search without scope");
+    equal(XRegExp.replace("test", "t", "x", "all"),  "xesx", "String search with scope='all'");
+    equal(XRegExp.replace("test", "t", "x", "one"),  "xest", "String search with scope='one'");
+    equal(XRegExp.replace("test", "t", "x"),         "xest", "String search without scope");
+    equal(XRegExp.replace("test", /t/, "x", "all"),  "xesx", "Regex search with scope='all'");
+    equal(XRegExp.replace("test", /t/, "x", "one"),  "xest", "Regex search with scope='one'");
+    equal(XRegExp.replace("test", /t/, "x"),         "xest", "Regex search without scope");
+    equal(XRegExp.replace("test", /t/g, "x", "all"), "xesx", "Global regex search with scope='all'");
+    equal(XRegExp.replace("test", /t/g, "x", "one"), "xest", "Global regex search with scope='one'");
+    equal(XRegExp.replace("test", /t/g, "x"),        "xesx", "Global regex search without scope");
 
     // TODO: Add tests (above tests cover scope functionality only)
+});
+
+test("XRegExp.replaceEach", function () {
+    equal(XRegExp.replaceEach("aabBccddeeffgghh", [
+            [XRegExp("(?<name>a)"), "z${name}"],
+            [/b/gi, "y"],
+            [/c/g, "x", "one"],
+            [/d/, "w", "all"],
+            ["e", "v", "all"],
+            [/f/g, function ($0) {return $0.toUpperCase();}],
+            ["g", function ($0) {return $0.toUpperCase();}],
+            ["h", function ($0) {return $0.toUpperCase();}, "all"]
+        ]), "zaayyxcwwvvFFGgHH", "All basic search/replacement types and scopes");
+
+    equal(XRegExp.replaceEach("<&>", [
+            [/&/g, "&amp;"],
+            [/</g, "&lt;"],
+            [/a/g, "b"],
+            [/b/g, "c"]
+        ]), "&lt;&cmp;>", "Search string is output of prior replacements");
+
+    // TODO: Add tests
 });
 
 test("XRegExp.split", function () {
@@ -778,7 +801,8 @@ module("Addons");
 //-------------------------------------------------------------------
 
 test("Unicode base", function () {
-    expect(0);
+    ok(XRegExp.addUnicodePackage, "XRegExp.addUnicodePackage exists");
+
     // TODO: Add tests
 });
 

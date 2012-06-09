@@ -744,7 +744,7 @@ XRegExp = XRegExp || (function (undef) {
  * });
  * // -> 'Smith, John'
  *
- * // Global string search/replacement
+ * // String search, with replace-all
  * XRegExp.replace('RegExp builds RegExps', 'RegExp', 'XRegExp', 'all');
  * // -> 'XRegExp builds XRegExps'
  */
@@ -772,6 +772,38 @@ XRegExp = XRegExp || (function (undef) {
             search.lastIndex = 0; // Fixes IE, Safari bug (last tested IE 9, Safari 5.1)
         }
         return result;
+    };
+
+/**
+ * Performs batch processing of string replacements. Used like {@link #XRegExp.replace}, but
+ * accepts an array of replacement details. Later replacements operate on the output of earlier
+ * replacements. Replacement details are accepted as an array with a regex or string to search for,
+ * the replacement string or function, and an optional scope of 'one' or 'all'. Uses the XRegExp
+ * replacement text syntax, which supports named backreference properties via `${name}`.
+ * @memberOf XRegExp
+ * @param {String} str String to search.
+ * @param {Array} replacements Array of replacement detail arrays.
+ * @returns {String} New string with all replacements.
+ * @example
+ *
+ * str = XRegExp.replaceEach(str, [
+ *   [XRegExp('(?<name>a)'), 'z${name}'],
+ *   [/b/gi, 'y'],
+ *   [/c/g, 'x', 'one'], // scope 'one' overrides /g
+ *   [/d/, 'w', 'all'],  // scope 'all' overrides lack of /g
+ *   ['e', 'v', 'all'],  // scope 'all' allows replace-all for strings
+ *   [/f/g, function ($0) {
+ *     return $0.toUpperCase();
+ *   }]
+ * ]);
+ */
+    self.replaceEach = function (str, replacements) {
+        var i, r;
+        for (i = 0; i < replacements.length; ++i) {
+            r = replacements[i];
+            str = self.replace(str, r[0], r[1], r[2]);
+        }
+        return str;
     };
 
 /**
