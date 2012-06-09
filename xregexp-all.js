@@ -92,21 +92,25 @@ XRegExp = XRegExp || (function (undef) {
  *------------------------------------*/
 
 /**
- * Attaches XRegExp.prototype properties and named capture supporting data to a regex object.
+ * Attaches named capture data and `XRegExp.prototype` properties to a regex object.
  * @private
  * @param {RegExp} regex Regex to augment.
  * @param {Array} captureNames Array with capture names, or null.
  * @param {Boolean} [addProto=false] Whether to attach `XRegExp.prototype` properties.
- * @param {Boolean} [isNative=false] Whether the regex was created by `RegExp` (not `XRegExp`).
+ * @param {Boolean} [isNative=false] Whether the regex was created by `RegExp`; not `XRegExp`.
  * @returns {RegExp} Augmented regex.
  */
     function augment(regex, captureNames, addProto, isNative) {
         var p;
         if (addProto) {
             // Can't auto-inherit these since the XRegExp constructor returns a nonprimitive value
-            for (p in self.prototype) {
-                if (self.prototype.hasOwnProperty(p)) {
-                    regex[p] = self.prototype[p];
+            if (regex.__proto__) {
+                regex.__proto__ = self.prototype;
+            } else {
+                for (p in self.prototype) {
+                    if (self.prototype.hasOwnProperty(p)) {
+                        regex[p] = self.prototype[p];
+                    }
                 }
             }
         }
@@ -401,6 +405,10 @@ XRegExp = XRegExp || (function (undef) {
             true // Attach `XRegExp.prototype` properties
         );
     };
+
+// Add `RegExp.prototype` to the prototype chain, even for XRegExp instances that have their
+// prototype changed to `XRegExp.prototype` via `__proto__`
+    self.prototype = new RegExp();
 
 /*--------------------------------------
  *  Public methods/properties
