@@ -1947,7 +1947,7 @@ XRegExp = XRegExp || (function (undefined) {
 /***** matchrecursive.js *****/
 
 /*!
- * XRegExp.matchRecursive v0.2.0
+ * XRegExp.matchRecursive v0.2.1-dev
  * (c) 2009-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -1959,8 +1959,8 @@ XRegExp = XRegExp || (function (undefined) {
  * Returns a match detail object composed of the provided values.
  * @private
  */
-    function row(value, name, start, end) {
-        return {value:value, name:name, start:start, end:end};
+    function row(name, value, start, end) {
+        return {name: name, value: value, start: start, end: end};
     }
 
 /**

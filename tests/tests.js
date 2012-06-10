@@ -81,6 +81,7 @@ test("XRegExp.addToken", function () {
         trigger: function () {return this.hasFlag("5");},
         customFlags: "5"
     });
+    XRegExp.addToken(/^\x06/, function () {return "6";});
     XRegExp.uninstall("extensibility");
 
     ok(XRegExp("\x01").test("1"), "Default scope matches outside class");
@@ -93,6 +94,8 @@ test("XRegExp.addToken", function () {
     ok(XRegExp("[\x04]").test("4"), "Explicit all scope matches inside class");
     ok(!XRegExp("\x05").test("5"), "Trigger with hasFlag skips token when flag is missing");
     ok(XRegExp("\x05", "5").test("5"), "Trigger with hasFlag uses token when flag is included");
+    ok(XRegExp("\x06").test("6"), "Token with anchor applied when found at start of pattern");
+    ok(!XRegExp("a\x06").test("6"), "Token with anchor not applied when found after start of pattern");
 });
 
 test("XRegExp.cache", function () {
@@ -845,6 +848,8 @@ test("Unicode Base", function () {
 });
 
 test("Unicode Categories", function () {
+    // Tests for category L and Letter included in Unicode Base tests
+
     expect(0);
     // TODO: Add tests
 });
@@ -867,7 +872,36 @@ test("Unicode Properties", function () {
 });
 
 test("XRegExp.matchRecursive", function () {
+    var str;
     ok(XRegExp.matchRecursive, "XRegExp.matchRecursive exists");
+
+    str = "(t((e))s)t()(ing)";
+    deepEqual(XRegExp.matchRecursive(str, "\\(", "\\)", "g"), ["t((e))s", "", "ing"], "Basic usage");
+
+    str = "Here is <div> <div>an</div></div> example";
+    deepEqual(XRegExp.matchRecursive(str, "<div\\s*>", "</div>", "gi", {
+        valueNames: ["between", "left", "match", "right"]
+    }), [
+        {name: "between", value: "Here is ",       start: 0,  end: 8},
+        {name: "left",    value: "<div>",          start: 8,  end: 13},
+        {name: "match",   value: " <div>an</div>", start: 13, end: 27},
+        {name: "right",   value: "</div>",         start: 27, end: 33},
+        {name: "between", value: " example",       start: 33, end: 41}
+    ], "Extended information mode with valueNames");
+
+    str = "...{1}\\{{function(x,y){return y+x;}}";
+    deepEqual(XRegExp.matchRecursive(str, "{", "}", "g", {
+        valueNames: ["literal", null, "value", null],
+        escapeChar: "\\"
+    }), [
+        {name: "literal", value: "...", start: 0, end: 3},
+        {name: "value",   value: "1",   start: 4, end: 5},
+        {name: "literal", value: "\\{", start: 6, end: 8},
+        {name: "value",   value: "function(x,y){return y+x;}", start: 9, end: 35}
+    ], "Omitting unneeded parts with null valueNames, and using escapeChar");
+
+    str = "<1><<<2>>><3>4<5>";
+    deepEqual(XRegExp.matchRecursive(str, "<", ">", "gy"), ["1", "<<2>>", "3"], "Sticky mode via flag y");
 
     // TODO: Add tests
 });
@@ -889,7 +923,7 @@ test("XRegExp.build", function () {
     equal(match.yo2, "b");
 
     // IE v7-8 (not v6 or v9) throws an Error rather than SyntaxError
-    raises(function () {var r = XRegExp.build('(?x)({{a}})', {a: /#/});}, Error, "Mode modifier in outer pattern applies to full regex with interpolated values (test 1)");
+    raises(function () {XRegExp.build("(?x)({{a}})", {a: /#/});}, Error, "Mode modifier in outer pattern applies to full regex with interpolated values (test 1)");
     equal(XRegExp.build("(?x){{a}}", {a: /1 2/}).test("12"), true, "Mode modifier in outer pattern applies to full regex with interpolated values (test 2)");
     equal(XRegExp.build("(?m){{a}}", {a: /a/}).multiline, true, "Mode modifier with native flag in outer pattern is applied to the final result");
 
