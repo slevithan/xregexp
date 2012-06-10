@@ -16,7 +16,7 @@
 var XRegExp;
 
 // Avoid running twice; that would reset tokens and could break references to native globals
-XRegExp = XRegExp || (function (undef) {
+XRegExp = XRegExp || (function (undefined) {
     "use strict";
 
 /*--------------------------------------
@@ -73,10 +73,10 @@ XRegExp = XRegExp || (function (undef) {
         quantifier = /^(?:[?*+]|{\d+(?:,\d*)?})\??/,
 
 // Check for correct `exec` handling of nonparticipating capturing groups
-        compliantExecNpcg = nativ.exec.call(/()??/, "")[1] === undef,
+        compliantExecNpcg = nativ.exec.call(/()??/, "")[1] === undefined,
 
 // Check for flag y support (Firefox 3+)
-        hasNativeY = RegExp.prototype.sticky !== undef,
+        hasNativeY = RegExp.prototype.sticky !== undefined,
 
 // Used to kill infinite recursion during XRegExp construction
         isInsideConstructor = false,
@@ -315,9 +315,9 @@ XRegExp = XRegExp || (function (undef) {
  * @example
  *
  * // With named capture and flag x
- * date = XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
- *                 (?<month> [0-9]{2}) -?  # month \n\
- *                 (?<day>   [0-9]{2})     # day   ', 'x');
+ * XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
+ *          (?<month> [0-9]{2}) -?  # month \n\
+ *          (?<day>   [0-9]{2})     # day   ', 'x');
  *
  * // Providing a regex object copies it. Native regexes are not recompiled using XRegExp syntax.
  * // The copy maintains special properties for named capture, is augmented with
@@ -326,7 +326,7 @@ XRegExp = XRegExp || (function (undef) {
  */
     self = function (pattern, flags) {
         if (self.isRegExp(pattern)) {
-            if (flags !== undef) {
+            if (flags !== undefined) {
                 throw new TypeError("can't supply flags when constructing one RegExp from another");
             }
             return copy(pattern, {addProto: true});
@@ -350,8 +350,8 @@ XRegExp = XRegExp || (function (undef) {
             tokenResult,
             match,
             chr;
-        pattern = pattern === undef ? "" : String(pattern);
-        flags = flags === undef ? "" : String(flags);
+        pattern = pattern === undefined ? "" : String(pattern);
+        flags = flags === undefined ? "" : String(flags);
 
         if (nativ.match.call(flags, duplicateFlags)) { // Don't use test/exec because they would update lastIndex
             throw new SyntaxError("invalid duplicate regular expression flag");
@@ -990,8 +990,8 @@ XRegExp = XRegExp || (function (undef) {
                 nativ.replace.call(String(str).slice(match.index), r2, function () {
                     var i;
                     for (i = 1; i < arguments.length - 2; ++i) { // Skip index 0 and the last 2
-                        if (arguments[i] === undef) {
-                            match[i] = undef;
+                        if (arguments[i] === undefined) {
+                            match[i] = undefined;
                         }
                     }
                 });
@@ -1185,7 +1185,7 @@ XRegExp = XRegExp || (function (undef) {
          * If negative number: pow(2,32) - floor(abs(limit))
          * If other: Type-convert, then use the above rules
          */
-        limit = (limit === undef ? -1 : limit) >>> 0;
+        limit = (limit === undefined ? -1 : limit) >>> 0;
         self.forEach(str, separator, function (match) {
             if ((match.index + match[0].length) > lastLastIndex) { // != `if (match[0].length)`
                 output.push(str.slice(lastLastIndex, match.index));

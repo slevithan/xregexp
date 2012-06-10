@@ -8,7 +8,7 @@ XRegExp supports all native ES5 regular expression syntax. It's about 3.5 KB whe
 
 ## Performance
 
-XRegExp regular expressions compile to native RegExp objects, thus there is no performance difference when using XRegExp objects with native methods. There is a small performance cost when *compiling* XRegExps. If you want, however, you can use `XRegExp.cache` to avoid ever incurring the compilation cost for a given pattern more than once. Doing so can even lead to XRegExp being faster than native regexes in synthetic tests that repeatedly compile the same regex.
+XRegExp regexes compile to native RegExp regexes, thus there is no performance difference between the two. There is a small extra cost when *compiling* XRegExps. If you want, you can use `XRegExp.cache` to avoid incurring the compilation cost again for a given pattern and flags, across your entire application.
 
 
 ## Usage examples
@@ -267,7 +267,7 @@ If XRegExp was not installed using npm, just open `tests/index.html` in your bro
 ## Changelog
 
 * Releases: [Version history](http://xregexp.com/history/).
-* Upcoming: [Milestones](https://github.com/slevithan/XRegExp/issues/milestones), [Roadmap](https://github.com/slevithan/XRegExp/wiki/Roadmap).
+* Upcoming: [Issue tracker](https://github.com/slevithan/XRegExp/issues), [Roadmap](https://github.com/slevithan/XRegExp/wiki/Roadmap).
 
 
 ## About
