@@ -21,7 +21,7 @@ var date = XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
 
 // XRegExp.exec gives you named backreferences on the match result
 var match = XRegExp.exec('2012-02-22', date);
-match.day; // -> '22'
+match.year; // -> '2012'
 
 // It also includes optional pos and sticky arguments
 var pos = 3, result = [];
@@ -49,7 +49,7 @@ XRegExp.install('natives');
 '2012-02-22'.replace(date, function (match) {
     return match.month + '/' + match.day + '/' + match.year;
 }); // -> '02/22/2012'
-date.exec('2012-02-22').day; // -> '22'
+date.exec('2012-02-22').year; // -> '2012'
 
 // Extract every other digit from a string using XRegExp.forEach
 XRegExp.forEach('1a2345', /\d/, function (match, i) {

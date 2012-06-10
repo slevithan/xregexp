@@ -328,6 +328,8 @@ test("XRegExp.uninstall", function () {
 });
 
 test("XRegExp.union", function () {
+    deepEqual("a+b*c dogsdogs catscats".match(XRegExp.union(["a+b*c", /(dogs)\1/, /(cats)\1/], "g")), ["a+b*c", "dogsdogs", "catscats"], "Strings escaped and backreferences rewritten");
+    raises(function () {XRegExp.union([XRegExp('(?<pet>dogs)\\k<pet>'), XRegExp('(?<pet>cats)\\k<pet>')]);}, SyntaxError, "Groups with same name in separate regexes is an error");
     equal(XRegExp.union([XRegExp("(?<a>a)\\k<a>")], "n").test("aa"), true, "Apply flag n (test 1)");
     raises(function () {XRegExp.union([XRegExp("(?<a>a)\\k<a>"), /(b)\1/], "n");}, SyntaxError, "Apply flag n (test 2)");
     raises(function () {XRegExp.union([XRegExp("(?<a>a)\\k<a>"), /(b)\1/, XRegExp("(?<x>)")], "n");}, SyntaxError, "Apply flag n (test 3)");
