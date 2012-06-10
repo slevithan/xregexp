@@ -319,9 +319,9 @@ XRegExp = XRegExp || (function (undef) {
  *                 (?<month> [0-9]{2}) -?  # month \n\
  *                 (?<day>   [0-9]{2})     # day   ', 'x');
  *
- * // Passing a regex object to copy it. The copy maintains special properties for named capture,
- * // is augmented with `XRegExp.prototype` methods, and has a fresh `lastIndex` property (set to
- * // zero). Native regexes are not recompiled using XRegExp syntax.
+ * // Providing a regex object copies it. Native regexes are not recompiled using XRegExp syntax.
+ * // The copy maintains special properties for named capture, is augmented with
+ * // `XRegExp.prototype` methods, and has a fresh `lastIndex` property (set to zero).
  * XRegExp(/regex/);
  */
     self = function (pattern, flags) {

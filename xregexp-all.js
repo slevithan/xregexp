@@ -322,9 +322,9 @@ XRegExp = XRegExp || (function (undef) {
  *                 (?<month> [0-9]{2}) -?  # month \n\
  *                 (?<day>   [0-9]{2})     # day   ', 'x');
  *
- * // Passing a regex object to copy it. The copy maintains special properties for named capture,
- * // is augmented with `XRegExp.prototype` methods, and has a fresh `lastIndex` property (set to
- * // zero). Native regexes are not recompiled using XRegExp syntax.
+ * // Providing a regex object copies it. Native regexes are not recompiled using XRegExp syntax.
+ * // The copy maintains special properties for named capture, is augmented with
+ * // `XRegExp.prototype` methods, and has a fresh `lastIndex` property (set to zero).
  * XRegExp(/regex/);
  */
     self = function (pattern, flags) {
@@ -2283,7 +2283,7 @@ XRegExp = XRegExp || (function (undef) {
 /***** prototypes.js *****/
 
 /*!
- * XRegExp Prototype Methods v1.0.0
+ * XRegExp Prototype Methods v1.1.0-dev
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -2299,25 +2299,11 @@ XRegExp = XRegExp || (function (undef) {
 (function (XRegExp) {
     "use strict";
 
-/**
- * Copy properties of `b` to `a`.
- * @private
- * @param {Object} a Object that will receive new properties.
- * @param {Object} b Object whose properties will be copied.
- */
-    function extend(a, b) {
-        for (var p in b) {
-            if (b.hasOwnProperty(p)) {
-                a[p] = b[p];
-            }
-        }
-        //return a;
-    }
-
-    extend(XRegExp.prototype, {
+// Shortcut
+    var proto = XRegExp.prototype;
 
 /**
- * Implicitly calls the regex's `test` method with the first value in the provided arguments array.
+ * Implicitly calls the regex's `test` method with the first value in the provided `args` array.
  * @memberOf XRegExp.prototype
  * @param {*} context Ignored. Accepted only for congruity with `Function.prototype.apply`.
  * @param {Array} args Array with the string to search as its first value.
@@ -2326,9 +2312,9 @@ XRegExp = XRegExp || (function (undef) {
  *
  * XRegExp('[a-z]').apply(null, ['abc']); // -> true
  */
-        apply: function (context, args) {
-            return this.test(args[0]);
-        },
+    proto.apply = function (context, args) {
+        return this.test(args[0]);
+    };
 
 /**
  * Implicitly calls the regex's `test` method with the provided string.
@@ -2340,9 +2326,9 @@ XRegExp = XRegExp || (function (undef) {
  *
  * XRegExp('[a-z]').call(null, 'abc'); // -> true
  */
-        call: function (context, str) {
-            return this.test(str);
-        },
+    proto.call = function (context, str) {
+        return this.test(str);
+    };
 
 /**
  * Implicitly calls {@link #XRegExp.forEach}.
@@ -2354,9 +2340,9 @@ XRegExp = XRegExp || (function (undef) {
  * }, []);
  * // -> [2, 4]
  */
-        forEach: function (str, callback, context) {
-            return XRegExp.forEach(str, this, callback, context);
-        },
+    proto.forEach = function (str, callback, context) {
+        return XRegExp.forEach(str, this, callback, context);
+    };
 
 /**
  * Implicitly calls {@link #XRegExp.globalize}.
@@ -2366,9 +2352,9 @@ XRegExp = XRegExp || (function (undef) {
  * var globalCopy = XRegExp('regex').globalize();
  * globalCopy.global; // -> true
  */
-        globalize: function () {
-            return XRegExp.globalize(this);
-        },
+    proto.globalize = function () {
+        return XRegExp.globalize(this);
+    };
 
 /**
  * Implicitly calls {@link #XRegExp.exec}.
@@ -2378,9 +2364,9 @@ XRegExp = XRegExp || (function (undef) {
  * var match = XRegExp('U\\+(?<hex>[0-9A-F]{4})').xexec('U+2620');
  * match.hex; // -> '2620'
  */
-        xexec: function (str, pos, sticky) {
-            return XRegExp.exec(str, this, pos, sticky);
-        },
+    proto.xexec = function (str, pos, sticky) {
+        return XRegExp.exec(str, this, pos, sticky);
+    };
 
 /**
  * Implicitly calls {@link #XRegExp.test}.
@@ -2389,11 +2375,9 @@ XRegExp = XRegExp || (function (undef) {
  *
  * XRegExp('c').xtest('abc'); // -> true
  */
-        xtest: function (str, pos, sticky) {
-            return XRegExp.test(str, this, pos, sticky);
-        }
-
-    });
+    proto.xtest = function (str, pos, sticky) {
+        return XRegExp.test(str, this, pos, sticky);
+    };
 
 }(XRegExp));
 
