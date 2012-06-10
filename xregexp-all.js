@@ -189,10 +189,10 @@ XRegExp = XRegExp || (function (undefined) {
  * @returns {Number} Last zero-based index at which the item is found, or -1.
  */
     function lastIndexOf(array, value) {
-        var i = array.length;
         if (Array.prototype.lastIndexOf) {
             return array.lastIndexOf(value); // Use the native method if available
         }
+        var i = array.length;
         while (i--) {
             if (array[i] === value) {
                 return i;
@@ -335,14 +335,13 @@ XRegExp = XRegExp || (function (undefined) {
             return copy(pattern, {addProto: true});
         }
         // Tokens become part of the regex construction process, so protect against infinite recursion
-        // when an XRegExp is constructed within a token handler function
+        // when an XRegExp is constructed within a token definition function
         if (isInsideConstructor) {
             throw new Error("can't call the XRegExp constructor within token definition functions");
         }
-
         var output = [],
             scope = defaultScope,
-            tokenContext = {
+            context = {
                 hasNamedCapture: false,
                 captureNames: [],
                 hasFlag: function (flag) {
@@ -352,12 +351,14 @@ XRegExp = XRegExp || (function (undefined) {
             pos = 0,
             tokenResult,
             match,
-            chr;
+            chr,
+            i;
         pattern = pattern === undefined ? "" : String(pattern);
         flags = flags === undefined ? "" : String(flags);
-
-        if (nativ.match.call(flags, duplicateFlags)) { // Don't use test/exec because they would update lastIndex
-            throw new SyntaxError("invalid duplicate regular expression flag");
+        duplicateFlags.lastIndex = 0; // Uses /g, so reset starting position
+        // Most browsers throw on duplicate flags, so copy this for nonnative flags
+        if (nativ.test.call(duplicateFlags, flags)) {
+            throw new SyntaxError("invalid duplicate regex flag");
         }
         // Strip/apply leading mode modifier with any combination of flags except g or y: (?imnsx)
         pattern = nativ.replace.call(pattern, /^\(\?([\w$]+)\)/, function ($0, $1) {
@@ -367,15 +368,15 @@ XRegExp = XRegExp || (function (undefined) {
             flags = nativ.replace.call(flags + $1, duplicateFlags, "");
             return "";
         });
-        self.forEach(flags, /[\s\S]/, function (m) {
-            if (registeredFlags.indexOf(m[0]) < 0) {
-                throw new SyntaxError("invalid regular expression flag " + m[0]);
+        // Throw on unknown native or custom flags
+        for (i = 0; i < flags.length; ++i) {
+            if (registeredFlags.indexOf(flags.charAt(i)) < 0) {
+                throw new SyntaxError("invalid regex flag " + flags.charAt(i));
             }
-        });
-
+        }
         while (pos < pattern.length) {
             // Check for custom tokens at the current position
-            tokenResult = runTokens(pattern, pos, scope, tokenContext);
+            tokenResult = runTokens(pattern, pos, scope, context);
             if (tokenResult) {
                 output.push(tokenResult.output);
                 pos += (tokenResult.match[0].length || 1);
@@ -398,10 +399,9 @@ XRegExp = XRegExp || (function (undefined) {
                 }
             }
         }
-
         return augment(
             new RegExp(output.join(""), nativ.replace.call(flags, /[^gimy]+/g, "")),
-            tokenContext.hasNamedCapture ? tokenContext.captureNames : null,
+            context.hasNamedCapture ? context.captureNames : null,
             true // Attach `XRegExp.prototype` properties
         );
     };
