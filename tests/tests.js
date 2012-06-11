@@ -807,6 +807,7 @@ module("Addons");
 
 test("Unicode Base", function () {
     ok(XRegExp.addUnicodePackage, "XRegExp.addUnicodePackage exists");
+    raises(function () {XRegExp.addUnicodePackage({Fail: "0000"});}, Error, "XRegExp.addUnicodePackage throws when extensibility not installed");
 
     XRegExp.install("extensibility");
 
@@ -853,6 +854,23 @@ test("Unicode Categories", function () {
     expect(0);
     // TODO: Add tests
 });
+
+// Temporary hack to make the following tests run in the browser only (not npm), since Unicode
+// Categories Astral is not currently included in xregexp-all.js
+if (typeof xregexp === "undefined") {
+    test("Unicode Categories Astral", function () {
+        XRegExp.install("astral");
+
+        ok(XRegExp("^\\p{Ll}+$").test("\uD835\uDFCB"), "\\p{Ll} matches astral lowercase letter");
+        ok(!XRegExp("^\\P{Ll}+$").test("\uD835\uDFCB"), "\\P{Ll} does not match astral lowercase letter");
+        ok(!XRegExp("^\\p{^Ll}+$").test("\uD835\uDFCB"), "\\p{^Ll} does not match astral lowercase letter");
+        raises(function () {XRegExp("[\\p{Ll}]");}, SyntaxError, "Code point based Unicode category in character class is an error");
+
+        // TODO: Add tests
+
+        XRegExp.uninstall("astral");
+    });
+}
 
 test("Unicode Scripts", function () {
     ok(XRegExp("^\\p{Katakana}+$").test("カタカナ"), "\\p{Katakana} matches カタカナ");

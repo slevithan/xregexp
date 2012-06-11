@@ -30,7 +30,8 @@ XRegExp = XRegExp || (function (undefined) {
 // Optional features; can be installed and uninstalled
         features = {
             natives: false,
-            extensibility: false
+            extensibility: false,
+            astral: false
         },
 
 // Store native methods to use and restore ("native" is an ES3 reserved keyword)
@@ -612,7 +613,10 @@ XRegExp = XRegExp || (function (undefined) {
  *   natives: true,
  *
  *   // Enables extensibility of XRegExp syntax and flags
- *   extensibility: true
+ *   extensibility: true,
+ *
+ *   // Enables support for astral code points in the Unicode addons
+ *   astral: true
  * });
  *
  * // With an options string
@@ -629,6 +633,9 @@ XRegExp = XRegExp || (function (undefined) {
         if (!features.extensibility && options.extensibility) {
             setExtensibility(true);
         }
+        if (options.astral) {
+            features.astral = true;
+        }
     };
 
 /**
@@ -637,6 +644,7 @@ XRegExp = XRegExp || (function (undefined) {
  * @param {String} feature Name of the feature to check. One of:
  *   <li>`natives`
  *   <li>`extensibility`
+ *   <li>`astral`
  * @returns {Boolean} Whether the feature is installed.
  * @example
  *
@@ -879,7 +887,10 @@ XRegExp = XRegExp || (function (undefined) {
  *   natives: true,
  *
  *   // Disables additional syntax and flag extensions
- *   extensibility: true
+ *   extensibility: true,
+ *
+ *   // Disables support for astral code points in the Unicode addons
+ *   astral: true
  * });
  *
  * // With an options string
@@ -895,6 +906,9 @@ XRegExp = XRegExp || (function (undefined) {
         }
         if (features.extensibility && options.extensibility) {
             setExtensibility(false);
+        }
+        if (options.astral) {
+            features.astral = false;
         }
     };
 

@@ -6,9 +6,8 @@
  */
 
 /**
- * Adds support for all Unicode categories (aka properties) E.g., `\p{Lu}` or
- * `\p{Uppercase Letter}`. Token names are case insensitive, and any spaces, hyphens, and
- * underscores are ignored.
+ * Adds support for all Unicode categories. E.g., `\p{Lu}` or `\p{Uppercase Letter}`. Token names
+ * are case insensitive, and any spaces, hyphens, and underscores are ignored.
  * @requires XRegExp, XRegExp Unicode Base
  */
 (function (XRegExp) {
