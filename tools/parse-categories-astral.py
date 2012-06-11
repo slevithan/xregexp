@@ -125,7 +125,7 @@ def createRange(r):
 		return '[' + ''.join(buf) + ']'
 
 def parseList(categoryName, categoryList):
-	return categoryName + ': \'' + splitAtBMP(categoryList) + '\','
+	return categoryName + ': "' + splitAtBMP(categoryList) + '",'
 
 def main(sourceFile):
 	dictionary = parseUnicodeDatabase(sourceFile)
