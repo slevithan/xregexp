@@ -7,8 +7,8 @@
  */
 
 /**
- * Adds support for Unicode categories. E.g., `\p{Lu}` or `\p{Uppercase Letter}`. Supports astral
- * code points, via surrogate pairs.
+ * Adds support for Unicode categories. E.g., `\p{Lu}`. Supports astral code points, via surrogate
+ * pairs.
  * @requires XRegExp
  */
 (function (XRegExp) {
