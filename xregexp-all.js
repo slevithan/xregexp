@@ -3,7 +3,7 @@
 /*---- xregexp.js ----*/
 
 /*!
- * XRegExp v2.1.0-dev
+ * XRegExp 2.1.0-dev
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -1355,14 +1355,13 @@ XRegExp = XRegExp || (function (undefined) {
 
 }());
 
-
 /*---- unicode-base.js ----*/
 
 /*!
- * XRegExp Unicode Base v1.0.0
+ * XRegExp Unicode Base 1.0.0
  * (c) 2008-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
- * Uses the Unicode v6.1 BMP <http://unicode.org/>
+ * Uses the Unicode 6.1 BMP <http://unicode.org/>
  */
 
 /**
@@ -1510,14 +1509,13 @@ XRegExp = XRegExp || (function (undefined) {
 
 }(XRegExp));
 
-
 /*---- unicode-categories.js ----*/
 
 /*!
- * XRegExp Unicode Categories v1.2.0
+ * XRegExp Unicode Categories 1.2.0
  * (c) 2010-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
- * Uses the Unicode v6.1 BMP <http://unicode.org/>
+ * Uses the Unicode 6.1 BMP <http://unicode.org/>
  */
 
 /**
@@ -1615,14 +1613,13 @@ XRegExp = XRegExp || (function (undefined) {
 
 }(XRegExp));
 
-
 /*---- unicode-scripts.js ----*/
 
 /*!
- * XRegExp Unicode Scripts v1.2.0
+ * XRegExp Unicode Scripts 1.2.0
  * (c) 2010-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
- * Uses the Unicode v6.1 BMP <http://unicode.org/>
+ * Uses the Unicode 6.1 BMP <http://unicode.org/>
  */
 
 /**
@@ -1716,14 +1713,13 @@ XRegExp = XRegExp || (function (undefined) {
 
 }(XRegExp));
 
-
 /*---- unicode-blocks.js ----*/
 
 /*!
- * XRegExp Unicode Blocks v1.2.0
+ * XRegExp Unicode Blocks 1.2.0
  * (c) 2010-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
- * Uses the Unicode v6.1 BMP <http://unicode.org/>
+ * Uses the Unicode 6.1 BMP <http://unicode.org/>
  */
 
 /**
@@ -1902,14 +1898,13 @@ XRegExp = XRegExp || (function (undefined) {
 
 }(XRegExp));
 
-
 /*---- unicode-properties.js ----*/
 
 /*!
- * XRegExp Unicode Properties v1.0.0
+ * XRegExp Unicode Properties 1.0.0
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
- * Uses the Unicode v6.1 BMP <http://unicode.org/>
+ * Uses the Unicode 6.1 BMP <http://unicode.org/>
  */
 
 /**
@@ -1943,11 +1938,10 @@ XRegExp = XRegExp || (function (undefined) {
 
 }(XRegExp));
 
-
 /*---- matchrecursive.js ----*/
 
 /*!
- * XRegExp.matchRecursive v0.2.1-dev
+ * XRegExp.matchRecursive 0.2.1-dev
  * (c) 2009-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -2132,11 +2126,10 @@ XRegExp = XRegExp || (function (undefined) {
 
 }(XRegExp));
 
-
 /*---- build.js ----*/
 
 /*!
- * XRegExp.build v0.1.0
+ * XRegExp.build 0.1.0
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Inspired by RegExp.create by Lea Verou <http://lea.verou.me/>
@@ -2281,11 +2274,10 @@ XRegExp = XRegExp || (function (undefined) {
 
 }(XRegExp));
 
-
 /*---- prototypes.js ----*/
 
 /*!
- * XRegExp Prototype Methods v1.1.0-dev
+ * XRegExp Prototype Methods 1.1.0-dev
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -2382,4 +2374,3 @@ XRegExp = XRegExp || (function (undefined) {
     };
 
 }(XRegExp));
-
