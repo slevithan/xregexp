@@ -218,11 +218,9 @@ XRegExp = XRegExp || (function (undefined) {
  */
     function prepareOptions(value) {
         value = value || {};
-        if (value === "all" || value.all) {
-            value = {natives: true, extensibility: true};
-        } else if (isType(value, "string")) {
-            value = self.forEach(value, /[^\s,]+/, function (m) {
-                this[m] = true;
+        if (isType(value, "string")) {
+            value = self.forEach(value, /[^\s,]+/, function (match) {
+                this[match] = true;
             }, {});
         }
         return value;
@@ -621,9 +619,6 @@ XRegExp = XRegExp || (function (undefined) {
  *
  * // With an options string
  * XRegExp.install('natives extensibility');
- *
- * // Using a shortcut to install all optional features
- * XRegExp.install('all');
  */
     self.install = function (options) {
         options = prepareOptions(options);
@@ -895,9 +890,6 @@ XRegExp = XRegExp || (function (undefined) {
  *
  * // With an options string
  * XRegExp.uninstall('natives extensibility');
- *
- * // Using a shortcut to uninstall all optional features
- * XRegExp.uninstall('all');
  */
     self.uninstall = function (options) {
         options = prepareOptions(options);
