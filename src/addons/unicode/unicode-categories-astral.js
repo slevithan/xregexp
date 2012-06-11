@@ -8,8 +8,7 @@
 
 /**
  * Adds support for Unicode categories. E.g., `\p{Lu}` or `\p{Uppercase Letter}`. Supports astral
- * code points, via surrogate pairs. Token names are case insensitive, and any spaces, hyphens, and
- * underscores are ignored.
+ * code points, via surrogate pairs.
  * @requires XRegExp
  */
 (function (XRegExp) {
