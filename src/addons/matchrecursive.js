@@ -12,7 +12,12 @@
  * @private
  */
     function row(name, value, start, end) {
-        return {name: name, value: value, start: start, end: end};
+        return {
+            name: name,
+            value: value,
+            start: start,
+            end: end
+        };
     }
 
 /**

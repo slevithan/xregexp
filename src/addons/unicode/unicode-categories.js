@@ -2,7 +2,7 @@
  * XRegExp Unicode Categories v1.2.0
  * (c) 2010-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
- * Uses Unicode 6.1 <http://unicode.org/>
+ * Uses the Unicode v6.1 BMP <http://unicode.org/>
  */
 
 /**
