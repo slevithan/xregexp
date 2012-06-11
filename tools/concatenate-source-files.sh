@@ -4,7 +4,7 @@
 cd "$(dirname "$0")"
 
 # Ordered list of all source files excluding backcompat.js
-source_files="
+source_files='
     ../src/xregexp.js
     ../src/addons/unicode/unicode-base.js
     ../src/addons/unicode/unicode-categories.js
@@ -14,19 +14,22 @@ source_files="
     ../src/addons/matchrecursive.js
     ../src/addons/build.js
     ../src/addons/prototypes.js
-"
+'
 
 # Filename of concatenated package
-output_file="../xregexp-all.js"
+output_file='../xregexp-all.js'
 
 # Remove output file to re-write it
 rm -f $output_file
+
+# Add header comment
+echo '/*! XRegExp All */' >> $output_file
 
 # Concatenate all source files
 for file in $source_files
 do
     echo ''                                >> $output_file
-    echo "/***** $(basename $file) *****/" >> $output_file
+    echo "/*---- $(basename $file) ----*/" >> $output_file
     echo ''                                >> $output_file
     cat $file                              >> $output_file
 done
