@@ -396,8 +396,8 @@ test("RegExp.prototype.exec", function () {
     deepEqual(/1()/.exec(1), ["1", ""], "Numeric argument converted to string (test 2)");
     deepEqual(/null/.exec(null), ["null"], "null argument converted to string");
     deepEqual(/NaN/.exec(NaN), ["NaN"], "NaN argument converted to string");
-    // This is broken in old Firefox (tested v2.0; it works in v8+), but not for any fault of XRegExp.
-    // Uncomment this test if future XRegExp fixes it for old Firefox.
+    // This is broken in old Firefox (tested in Firefox 2.0; it works in Firefox 8+), but not for
+    // any fault of XRegExp. Uncomment this test if future XRegExp fixes it for old Firefox.
     //deepEqual(/undefined/.exec(), ["undefined"], "undefined argument converted to string");
     raises(function () {RegExp.prototype.exec.call("\\d", "1");}, TypeError, "TypeError thrown when context is not type RegExp");
 
@@ -516,8 +516,8 @@ test("String.prototype.replace", function () {
     equal("xaaa".replace(/(a)/, function ($0, $1, pos, str) {return str;}), "xxaaaaa", "Regex (with capturing group) search with function replacement, using source string in return string");
     equal("xaaa".replace("a", function () {return "b";}), "xbaa", "String search with basic function replacement");
     equal("xaaa".replace("a", function ($0) {return $0;}), "xaaa", "String search with function replacement, using match");
-    // This is broken in Safari (tested v5.1.2/7534.52.7), but not for any fault of XRegExp.
-    // Uncomment this test if future XRegExp fixes it for Safari.
+    // This is broken in Safari (tested in Safari 5.1.2/7534.52.7), but not for any fault of
+    // XRegExp. Uncomment this test if future XRegExp fixes it for Safari.
     //equal("xaaa".replace("a", function () {return "$&";}), "x$&aa", "String search with function replacement, using $& in return string");
     equal("xaaa".replace("a", function ($0, pos) {return "" + pos;}), "x1aa", "String search with function replacement, using pos in return string");
     equal("xaaa".replace("a", function ($0, pos, str) {return str;}), "xxaaaaa", "String search with function replacement, using source string in return string");
@@ -922,7 +922,7 @@ test("XRegExp.build", function () {
     equal(match.yo, "a");
     equal(match.yo2, "b");
 
-    // IE v7-8 (not v6 or v9) throws an Error rather than SyntaxError
+    // IE 7 and 8 (not 6 or 9) throw an Error rather than SyntaxError
     raises(function () {XRegExp.build("(?x)({{a}})", {a: /#/});}, Error, "Mode modifier in outer pattern applies to full regex with interpolated values (test 1)");
     equal(XRegExp.build("(?x){{a}}", {a: /1 2/}).test("12"), true, "Mode modifier in outer pattern applies to full regex with interpolated values (test 2)");
     equal(XRegExp.build("(?m){{a}}", {a: /a/}).multiline, true, "Mode modifier with native flag in outer pattern is applied to the final result");
@@ -966,4 +966,3 @@ test("Prototype Methods", function () {
     ok(regex.xtest, "xtest exists for XRegExp instance");
     deepEqual(regex.xtest("x"), XRegExp.test("x", regex), "xtest method works like XRegExp.test");
 });
-

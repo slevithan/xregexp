@@ -1,8 +1,8 @@
 /*!
- * XRegExp Unicode Blocks v1.2.0
+ * XRegExp Unicode Blocks 1.2.0
  * (c) 2010-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
- * Uses the Unicode v6.1 BMP <http://unicode.org/>
+ * Uses the Unicode 6.1 BMP <http://unicode.org/>
  */
 
 /**
@@ -180,4 +180,3 @@
     });
 
 }(XRegExp));
-

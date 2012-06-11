@@ -1,5 +1,5 @@
 /*!
- * XRegExp.matchRecursive v0.2.1-dev
+ * XRegExp.matchRecursive 0.2.1-dev
  * (c) 2009-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -183,4 +183,3 @@
     };
 
 }(XRegExp));
-

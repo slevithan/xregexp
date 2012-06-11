@@ -281,4 +281,3 @@ Prior art: `XRegExp.build` inspired by [Lea Verou](http://lea.verou.me/)'s [RegE
 All code released under the [MIT License](http://mit-license.org/).
 
 Fork me to show support, fix, and extend.
-

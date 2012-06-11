@@ -1,5 +1,4 @@
-// Use node-qunit to run the tests.
-
+// Use node-qunit to run the tests
 var qunit = require("qunit");
 
 qunit.run({

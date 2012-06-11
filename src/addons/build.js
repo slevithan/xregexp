@@ -1,5 +1,5 @@
 /*!
- * XRegExp.build v0.1.0
+ * XRegExp.build 0.1.0
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Inspired by RegExp.create by Lea Verou <http://lea.verou.me/>
@@ -143,4 +143,3 @@
     };
 
 }(XRegExp));
-
