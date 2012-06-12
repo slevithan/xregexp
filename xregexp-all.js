@@ -1364,7 +1364,7 @@ XRegExp = XRegExp || (function (undefined) {
 /*---- unicode-base.js ----*/
 
 /*!
- * XRegExp Unicode Base 1.0.0
+ * XRegExp Unicode Base 1.0.1-dev
  * (c) 2008-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses the Unicode 6.1 BMP <http://unicode.org/>
@@ -1510,7 +1510,12 @@ XRegExp = XRegExp || (function (undefined) {
                     (inv ? cacheInversion(item) : unicode[item]) :
                     "[" + inv + unicode[item] + "]";
         },
-        {scope: "all"}
+        {
+            scope: "all",
+            trigger: function () {
+                return !XRegExp.isInstalled("astral");
+            }
+        }
     );
 
 }(XRegExp));
