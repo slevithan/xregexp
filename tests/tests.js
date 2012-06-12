@@ -861,9 +861,9 @@ if (typeof xregexp === "undefined") {
     test("Unicode Categories Astral", function () {
         XRegExp.install("astral");
 
-        ok(XRegExp("^\\p{Ll}+$").test("\uD835\uDFCB"), "\\p{Ll} matches astral lowercase letter");
-        ok(!XRegExp("^\\P{Ll}+$").test("\uD835\uDFCB"), "\\P{Ll} does not match astral lowercase letter");
-        ok(!XRegExp("^\\p{^Ll}+$").test("\uD835\uDFCB"), "\\p{^Ll} does not match astral lowercase letter");
+        ok(XRegExp("^\\p{Ll}$").test("\uD835\uDFCB"), "\\p{Ll} matches astral lowercase letter");
+        ok(!XRegExp("^\\P{Ll}$").test("\uD835\uDFCB"), "\\P{Ll} does not match astral lowercase letter");
+        ok(!XRegExp("^\\p{^Ll}$").test("\uD835\uDFCB"), "\\p{^Ll} does not match astral lowercase letter");
         raises(function () {XRegExp("[\\p{Ll}]");}, SyntaxError, "Code point based Unicode category in character class is an error");
 
         // TODO: Add tests
