@@ -274,7 +274,7 @@ If XRegExp was not installed using npm, just open `tests/index.html` in your bro
 
 XRegExp and addons copyright 2007-2012 by [Steven Levithan](http://stevenlevithan.com/).
 
-Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/). 21-bit Unicode ranges with surrogate pairs provided by [unicode-data](https://github.com/mathiasbynens/unicode-data). Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
+Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/), and adapted from his [unicode-data](https://github.com/mathiasbynens/unicode-data) project. Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
 
 Prior art: `XRegExp.build` inspired by [Lea Verou](http://lea.verou.me/)'s [RegExp.create](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/). `XRegExp.union` inspired by [Ruby](http://www.ruby-lang.org/). XRegExp's syntax extensions come from Perl, .NET, etc.
 
