@@ -13,10 +13,7 @@
  * @module xregexp
  * @requires N/A
  */
-var XRegExp;
-
-// Avoid running twice; that would reset tokens and could break references to native globals
-XRegExp = XRegExp || (function (undefined) {
+var XRegExp = (function (undefined) {
     "use strict";
 
 /*--------------------------------------
