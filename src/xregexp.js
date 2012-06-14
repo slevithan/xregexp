@@ -106,9 +106,10 @@ XRegExp = XRegExp || (function (undefined) {
                 regex.__proto__ = self.prototype;
             } else {
                 for (p in self.prototype) {
-                    if (self.prototype.hasOwnProperty(p)) {
-                        regex[p] = self.prototype[p];
-                    }
+                    // A `self.prototype.hasOwnProperty(p)` check wouldn't be worth it here, since
+                    // this is performance sensitive, and enumerable `Object.prototype` or
+                    // `RegExp.prototype` extensions exist on `regex.prototype` anyway
+                    regex[p] = self.prototype[p];
                 }
             }
         }
