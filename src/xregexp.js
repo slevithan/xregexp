@@ -1,5 +1,5 @@
 /*!
- * XRegExp 2.1.0-dev
+ * XRegExp 2.1.0-beta
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -61,7 +61,7 @@ var XRegExp = (function (undefined) {
             "class": /^(?:\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S]))/
         },
 
-// Any backreference in replacement strings
+// Any backreference or dollar-prefixed metacharacter in replacement strings
         replacementToken = /\$(?:{([\w$]+)}|(\d\d?|[\s\S]))/g,
 
 // Any character with a later instance in the string
@@ -121,12 +121,14 @@ var XRegExp = (function (undefined) {
  * @returns {String} Native flags in use.
  */
     function getNativeFlags(regex) {
-        //return nativ.exec.call(/\/([a-z]*)$/i, String(regex))[1];
+        return nativ.exec.call(/\/([a-z]*)$/i, String(regex))[1];
+        /*
         return (regex.global     ? "g" : "") +
                (regex.ignoreCase ? "i" : "") +
                (regex.multiline  ? "m" : "") +
                (regex.extended   ? "x" : "") + // Proposed for ES6, included in AS3
                (regex.sticky     ? "y" : ""); // Proposed for ES6, included in Firefox 3+
+        */
     }
 
 /**
@@ -530,7 +532,7 @@ var XRegExp = (function (undefined) {
             cacheFlags += "y";
         }
         regex.xregexp = regex.xregexp || getNativeProps();
-        // Shares cached copies with `XRegExp.replace`
+        // Shares cached copies with `XRegExp.matchAll`/`replace`
         r2 = regex.xregexp[cacheFlags] || (
             regex.xregexp[cacheFlags] = copy(regex, {
                 add: cacheFlags,
@@ -665,6 +667,37 @@ var XRegExp = (function (undefined) {
     };
 
 /**
+ * Returns an array containing all matches. Flag g has no effect on the result. Also fixes browser
+ * bugs compared to the native `String.prototype.match` with flag g.
+ * @memberOf XRegExp
+ * @param {String} str String to search.
+ * @param {RegExp} regex Regex to search with.
+ * @returns {Array} Array with all matched strings, or an empty array.
+ * @example
+ *
+ * XRegExp.matchAll('<1><2><3>', /\d/);
+ * // -> ['1', '2', '3']
+ *
+ * XRegExp.matchAll('<1><2><3>', /a/);
+ * // -> []
+ */
+    self.matchAll = function (str, regex) {
+        var cacheFlags = 'g' + (regex.sticky ? 'y' : ''),
+            result,
+            r2;
+        regex.xregexp = regex.xregexp || getNativeProps();
+        // Shares cached copies with `XRegExp.exec`/`replace`
+        r2 = regex.xregexp[cacheFlags] || (
+            regex.xregexp[cacheFlags] = copy(regex, {add: cacheFlags})
+        );
+        result = nativ.match.call(str, r2);
+        if (regex.global) {
+            regex.lastIndex = 0;
+        }
+        return result || [];
+    };
+
+/**
  * Retrieves the matches from searching a string using a chain of regexes that successively search
  * within previous matches. The provided `chain` array can contain regexes and objects with `regex`
  * and `backref` properties. When a backreference is specified, the named or numbered backreference
@@ -762,8 +795,8 @@ var XRegExp = (function (undefined) {
             result;
         if (isRegex) {
             search.xregexp = search.xregexp || getNativeProps();
-            // Shares cached copies with `XRegExp.exec`. Note that since a copy is used, `search`'s
-            // `lastIndex` isn't updated *during* replacement iterations
+            // Shares cached copies with `XRegExp.exec`/`matchAll`. Since a copy is used,
+            // `search`'s `lastIndex` isn't updated *during* replacement iterations
             s2 = search.xregexp[cacheFlags || "noGY"] || (
                 search.xregexp[cacheFlags || "noGY"] = copy(search, {
                     add: cacheFlags,
@@ -960,7 +993,7 @@ var XRegExp = (function (undefined) {
  * @memberOf XRegExp
  * @type String
  */
-    self.version = "2.1.0-dev";
+    self.version = "2.1.0-beta";
 
 /*--------------------------------------
  *  Fixed/extended native methods
@@ -1034,7 +1067,7 @@ var XRegExp = (function (undefined) {
  * bugs in the native `String.prototype.match`. Calling `XRegExp.install('natives')` uses this to
  * override the native method.
  * @private
- * @param {RegExp} regex Regex to search with.
+ * @param {RegExp|*} regex Regex to search with. If not a regex object, it is passed to `RegExp`.
  * @returns {Array} If `regex` uses flag g, an array of match strings or null. Without flag g, the
  *   result of calling `regex.exec(this)`.
  */

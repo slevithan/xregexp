@@ -24,6 +24,7 @@ test("Basic availability", function () {
     ok(XRegExp.install, "XRegExp.install exists");
     ok(XRegExp.isInstalled, "XRegExp.isInstalled exists");
     ok(XRegExp.isRegExp, "XRegExp.isRegExp exists");
+    ok(XRegExp.matchAll, "XRegExp.matchAll exists");
     ok(XRegExp.matchChain, "XRegExp.matchChain exists");
     ok(XRegExp.replace, "XRegExp.replace exists");
     ok(XRegExp.replaceEach, "XRegExp.replaceEach exists");
@@ -263,6 +264,21 @@ test("XRegExp.isRegExp", function () {
         ok(XRegExp.isRegExp(iframe.contentWindow.regex), "RegExp constructed in another frame is RegExp");
         iframe.parentNode.removeChild(iframe); // cleanup
     }
+});
+
+test("XRegExp.matchAll", function () {
+    var nonglobal = /\d/,
+        global = /\d/g,
+        str = "1 2 3 z";
+    nonglobal.lastIndex = global.lastIndex = 2;
+
+    deepEqual(XRegExp.matchAll(str, nonglobal), ["1", "2", "3"], "Regex without flag g matches all");
+    equal(nonglobal.lastIndex, 2, "lastIndex of nonglobal regex unmodified after search");
+    deepEqual(XRegExp.matchAll(str, global), ["1", "2", "3"], "Regex with flag g matches all");
+    equal(global.lastIndex, 0, "lastIndex of global regex reset after search");
+    deepEqual(XRegExp.matchAll(str, /!/), [], "Empty array returned if no matches");
+    raises(function () {XRegExp.matchAll(str, "1");}, TypeError, "String search throws error");
+    raises(function () {XRegExp.matchAll(str, new String("1"));}, TypeError, "String object search throws error");
 });
 
 test("XRegExp.matchChain", function () {
@@ -975,6 +991,10 @@ test("Prototype Methods", function () {
     ok(XRegExp.prototype.globalize, "XRegExp.prototype.globalize exists");
     ok(regex.globalize, "globalize exists for XRegExp instance");
     deepEqual(regex.globalize(), XRegExp.globalize(regex), "globalize method works like XRegExp.globalize");
+
+    ok(XRegExp.prototype.matchAll, "XRegExp.prototype.matchAll exists");
+    ok(regex.matchAll, "matchAll exists for XRegExp instance");
+    deepEqual(regex.matchAll("x x"), XRegExp.matchAll("x x", regex), "matchAll method works like XRegExp.matchAll");
 
     ok(XRegExp.prototype.xexec, "XRegExp.prototype.xexec exists");
     ok(regex.xexec, "xexec exists for XRegExp instance");

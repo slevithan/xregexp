@@ -1,5 +1,5 @@
 /*!
- * XRegExp Prototype Methods 1.1.0-dev
+ * XRegExp Prototype Methods 1.1.0-beta
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -70,6 +70,18 @@
  */
     proto.globalize = function () {
         return XRegExp.globalize(this);
+    };
+
+/**
+ * Implicitly calls {@link #XRegExp.matchAll}.
+ * @memberOf XRegExp.prototype
+ * @example
+ *
+ * XRegExp.matchAll('<1><2><3>', /\d/);
+ * // -> ['1', '2', '3']
+ */
+    proto.matchAll = function (str) {
+        return XRegExp.matchAll(str, this);
     };
 
 /**
