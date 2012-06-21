@@ -44,10 +44,10 @@ aliases = {
 	'Cn': 'Unassigned'
 }
 
-def format(categoryName, bmpRange, astralRange, hasIndependentSets):
+def format(categoryName, bmpRange, astralRange, isBmpLast):
 	buf = []
-	if hasIndependentSets:
-		buf.append('        hasIndependentSets: true')
+	if isBmpLast:
+		buf.append('        isBmpLast: true')
 	if bmpRange != '':
 		buf.append('        bmp: \'' + bmpRange + '\'')
 	if astralRange != '':

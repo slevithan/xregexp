@@ -233,7 +233,11 @@ test("XRegExp.install", function () {
 });
 
 test("XRegExp.isInstalled", function () {
-    expect(0);
+    XRegExp.install("extensibility");
+    XRegExp.install("extensibility");
+    XRegExp.uninstall("extensibility");
+    ok(!XRegExp.isInstalled("extensibility"), "Single uninstall undoes multiple installs");
+
     // TODO: Add tests
 });
 
@@ -822,18 +826,24 @@ module("Addons");
 //-------------------------------------------------------------------
 
 test("Unicode Base", function () {
-    ok(XRegExp.addUnicodePackage, "XRegExp.addUnicodePackage exists");
-    raises(function () {XRegExp.addUnicodePackage({Fail: "0000"});}, Error, "XRegExp.addUnicodePackage throws when extensibility not installed");
+    ok(XRegExp.addUnicodeData, "XRegExp.addUnicodeData exists");
+
+    XRegExp.uninstall("extensibility");
+
+    raises(function () {
+        XRegExp.addUnicodeData([{
+            name: "Fail",
+            bmp: "0"
+        }]);
+    }, Error, "XRegExp.addUnicodeData throws when extensibility not installed");
 
     XRegExp.install("extensibility");
 
-    XRegExp.addUnicodePackage({Test: "0000"});
-    ok(XRegExp("\\p{Test}").test("\u0000"), "Added Test token");
-
-    XRegExp.addUnicodePackage(null, {Test: "Alias"});
-    ok(XRegExp("\\p{Alias}").test("\u0000"), "Added alias Alias for Test token");
-
-    XRegExp.addUnicodePackage({XDigit: "0030-00390041-00460061-0066" /*0-9A-Fa-f*/}, {XDigit: "Hexadecimal"});
+    XRegExp.addUnicodeData([{
+        name: "XDigit",
+        alias: "Hexadecimal",
+        bmp: "0-9A-Fa-f"
+    }]);
     ok(XRegExp("\\p{XDigit}\\p{Hexadecimal}").test("0F"), "Added XDigit token with alias Hexadecimal");
 
     XRegExp.uninstall("extensibility");
@@ -862,6 +872,22 @@ test("Unicode Base", function () {
     ok(!XRegExp("^[^\\p{L}]+$").test("Café"), "\\p{L} works inside negated character class");
     ok(XRegExp("^[^\\P{L}]+$").test("Café"), "\\P{L} works inside negated character class");
     ok(XRegExp("^[^\\p{^L}]+$").test("Café"), "\\p{^L} works inside negated character class");
+
+    XRegExp.install("astral");
+
+    ok(XRegExp("^\\p{L}$").test("\uD835\uDFCB"), "\\p{L} matches astral letter, in astral mode");
+    ok(!XRegExp("^\\P{L}$").test("\uD835\uDFCB"), "\\P{L} does not match astral letter, in astral mode");
+    ok(!XRegExp("^\\p{^L}$").test("\uD835\uDFCB"), "\\p{^L} does not match astral letter, in astral mode");
+    raises(function () {XRegExp("[\\p{L}]");}, SyntaxError, "Unicode token in character class is an error, in astral mode");
+
+    XRegExp.uninstall("astral");
+
+    ok(!XRegExp("^\\p{L}$").test("\uD835\uDFCB"), "\\p{L} does not match astral letter, in default (BMP) mode");
+    ok(XRegExp("(?A)^\\p{L}$").test("\uD835\uDFCB"), "\\p{L} matches astral letter, with inline flag (?A)");
+    ok(XRegExp("^\\p{L}$", "A").test("\uD835\uDFCB"), "\\p{L} matches astral letter, with flag A");
+    ok(!XRegExp("^\\P{L}$", "A").test("\uD835\uDFCB"), "\\P{L} does not match astral letter, with flag A");
+    ok(!XRegExp("^\\p{^L}$", "A").test("\uD835\uDFCB"), "\\p{^L} does not match astral letter, with flag A");
+    raises(function () {XRegExp("[\\p{L}]", "A");}, SyntaxError, "Unicode token in character class is an error, with flag A");
 });
 
 test("Unicode Categories", function () {
@@ -870,23 +896,6 @@ test("Unicode Categories", function () {
     expect(0);
     // TODO: Add tests
 });
-
-// Temporary hack to make the following tests run in the browser only (not npm), since Unicode
-// Categories Astral is not currently included in xregexp-all.js
-if (typeof xregexp === "undefined") {
-    test("Unicode Categories Astral", function () {
-        XRegExp.install("astral");
-
-        ok(XRegExp("^\\p{Ll}$").test("\uD835\uDFCB"), "\\p{Ll} matches astral lowercase letter");
-        ok(!XRegExp("^\\P{Ll}$").test("\uD835\uDFCB"), "\\P{Ll} does not match astral lowercase letter");
-        ok(!XRegExp("^\\p{^Ll}$").test("\uD835\uDFCB"), "\\p{^Ll} does not match astral lowercase letter");
-        raises(function () {XRegExp("[\\p{Ll}]");}, SyntaxError, "Code point based Unicode category in character class is an error");
-
-        // TODO: Add tests
-
-        XRegExp.uninstall("astral");
-    });
-}
 
 test("Unicode Scripts", function () {
     ok(XRegExp("^\\p{Katakana}+$").test("カタカナ"), "\\p{Katakana} matches カタカナ");

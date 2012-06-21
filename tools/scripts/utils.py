@@ -30,12 +30,12 @@ def createRange(codePointList):
 	bmp = []
 	supplementary = defaultdict(list)
 	surrogates = []
-	hasIndependentSets = False # indicates whether the range contains orphaned high surrogates
+	isBmpLast = False # indicates whether the range contains orphaned high surrogates
 	hasAstralCodePoints = False
 
 	for codePoint in codePointList:
 		if codePoint >= 0xD800 and codePoint <= 0xDBFF: # code points that are high surrogates go at the end
-			hasIndependentSets = True
+			isBmpLast = True
 			bmp.append(codePoint)
 		elif codePoint <= 0xFFFF:
 			bmp.append(codePoint)
@@ -53,21 +53,15 @@ def createRange(codePointList):
 
 	buf = []
 
-	# [bmpRange (including orphaned high surrogates), astralRange, hasIndependentSets]
+	# [bmpRange (including orphaned high surrogates), astralRange, isBmpLast]
 	if hasAstralCodePoints:
-		if hasIndependentSets: # repeat the `bmp` value in `astral`
-			for lo, hi in supplementaryDictByLowRanges.items():
-				buf.append(createBMPRange(hi) + lo)
-			buf.append('[' + bmpRange + ']')
-			astralRange = '|'.join(buf)
-		else: # don't repeat the `bmp` value in `astral`
-			for lo, hi in supplementaryDictByLowRanges.items():
-				buf.append(createBMPRange(hi) + lo)
-			astralRange = '|'.join(buf)
+		for lo, hi in supplementaryDictByLowRanges.items():
+			buf.append(createBMPRange(hi) + lo)
+		astralRange = '|'.join(buf)
 	else:
 		astralRange = ''
 
-	return [bmpRange, astralRange, hasIndependentSets and hasAstralCodePoints]
+	return [bmpRange, astralRange, isBmpLast and hasAstralCodePoints]
 
 def createBMPRange(r, addBrackets=True):
 	if len(r) == 0:

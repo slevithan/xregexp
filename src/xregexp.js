@@ -1,5 +1,5 @@
 /*!
- * XRegExp 2.1.0-beta
+ * XRegExp 2.1.0-dev
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -993,7 +993,7 @@ var XRegExp = (function (undefined) {
  * @memberOf XRegExp
  * @type String
  */
-    self.version = "2.1.0-beta";
+    self.version = "2.1.0-dev";
 
 /*--------------------------------------
  *  Fixed/extended native methods
