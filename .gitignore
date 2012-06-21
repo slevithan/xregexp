@@ -1,0 +1,2 @@
+# Compiled Python files
+*.pyc
