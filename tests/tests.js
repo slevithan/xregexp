@@ -831,13 +831,17 @@ test("Unicode Base", function () {
     XRegExp.uninstall("extensibility");
 
     raises(function () {
-        XRegExp.addUnicodeData([{
-            name: "Fail",
-            bmp: "0"
-        }]);
+        XRegExp.addUnicodeData([{name: "Fail", bmp: "0"}]);
     }, Error, "XRegExp.addUnicodeData throws when extensibility not installed");
 
     XRegExp.install("extensibility");
+
+    raises(function () {
+        XRegExp.addUnicodeData([{bmp: "0"}]);
+    }, Error, "XRegExp.addUnicodeData throws when name not provided");
+    raises(function () {
+        XRegExp.addUnicodeData([{name: "NoData"}]);
+    }, Error, "XRegExp.addUnicodeData throws when no character data provided");
 
     XRegExp.addUnicodeData([{
         name: "XDigit",
@@ -845,6 +849,20 @@ test("Unicode Base", function () {
         bmp: "0-9A-Fa-f"
     }]);
     ok(XRegExp("\\p{XDigit}\\p{Hexadecimal}").test("0F"), "Added XDigit token with alias Hexadecimal");
+
+    XRegExp.addUnicodeData([{name: "AstralOnly", astral: "0"}]);
+    ok(XRegExp("\\p{AstralOnly}", "A").test("0"), "Astral-only token matches, when in astral mode");
+    raises(function () {XRegExp("\\p{AstralOnly}");}, SyntaxError, "Astral-only token is an error, when not in astral mode");
+
+    XRegExp.addUnicodeData([{name: "BmpOnly", bmp: "0"}]);
+    ok(XRegExp("\\p{BmpOnly}").test("0"), "BMP-only token matches, when not in astral mode");
+    ok(XRegExp("\\p{BmpOnly}", "A").test("0"), "BMP-only token matches, when in astral mode");
+
+    XRegExp.addUnicodeData([{name: "BmpPlusAstral", bmp: "0", astral: "1"}]);
+    ok(XRegExp("\\p{BmpPlusAstral}").test("0"), "BMP+astral token matches BMP value, when not in astral mode");
+    ok(!XRegExp("\\p{BmpPlusAstral}").test("1"), "BMP+astral token does not match astral value, when not in astral mode");
+    ok(XRegExp("\\p{BmpPlusAstral}", "A").test("0"), "BMP+astral token matches BMP value, when in astral mode");
+    ok(XRegExp("\\p{BmpPlusAstral}", "A").test("1"), "BMP+astral token matches astral value, when in astral mode");
 
     XRegExp.uninstall("extensibility");
 
@@ -879,6 +897,7 @@ test("Unicode Base", function () {
     ok(!XRegExp("^\\P{L}$").test("\uD835\uDFCB"), "\\P{L} does not match astral letter, in astral mode");
     ok(!XRegExp("^\\p{^L}$").test("\uD835\uDFCB"), "\\p{^L} does not match astral letter, in astral mode");
     raises(function () {XRegExp("[\\p{L}]");}, SyntaxError, "Unicode token in character class is an error, in astral mode");
+    raises(function () {XRegExp("\\P{^L}");}, SyntaxError, "\\P{^L} (double negation) is an error, in astral mode");
 
     XRegExp.uninstall("astral");
 

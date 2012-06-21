@@ -16,6 +16,7 @@
 (function (XRegExp) {
     'use strict';
 
+// Storage for Unicode data
     var unicode = {};
 
 /*--------------------------------------
@@ -111,7 +112,7 @@
     XRegExp.addToken(
         /\\([pP]){(\^?)([^}]*)}/,
         function (match, scope) {
-            var negated = (match[1] === 'P' || !!match[2]),
+            var negated = match[1] === 'P' || !!match[2],
                 astralMode = this.hasFlag('A') || XRegExp.isInstalled('astral'),
                 slug = normalize(match[3]),
                 item = unicode[slug];
@@ -126,7 +127,7 @@
             }
             if (astralMode) {
                 if (scope === 'class') {
-                    throw new SyntaxError('Astral mode does not support Unicode properties within character class');
+                    throw new SyntaxError('Astral mode does not support Unicode properties within character classes');
                 }
                 return cacheAstral(slug, negated);
             }
@@ -181,8 +182,8 @@
         }
     };
 
-/* Adds data for the Unicode `Letter` category. Addon packages include other categories, scripts,
- * blocks, and properties.
+/* Add data for the Unicode `L` or `Letter` category. Separate addons are available that include
+ * additional categories, scripts, blocks, and properties.
  */
     XRegExp.addUnicodeData([{
         name: 'L',
