@@ -83,7 +83,7 @@ These examples should give you the flavor of what's possible, but XRegExp has mo
 In browsers, you can either load addons individually, or bundle all addons together with XRegExp by loading `xregexp-all.js`. XRegExp's [npm](http://npmjs.org/) package uses `xregexp-all.js`, which means that the addons are always available when XRegExp is installed on the server using npm.
 
 
-### XRegExp Unicode Base
+### Unicode
 
 In browsers, first include the Unicode Base script:
 
@@ -108,7 +108,7 @@ XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
 XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
 ~~~
 
-XRegExp uses the Unicode 6.1 Basic Multilingual Plane.
+XRegExp uses Unicode 6.1.0. By default, only code points in the Basic Multilingual Plane (up to `U+FFFF`) are supported, but you can opt-in to full 21-bit Unicode support on a per-regex basis by using flag `A`, or you can do this implicitly for all regexes by running `XRegExp.install('astral')`.
 
 
 ### XRegExp.build
@@ -191,7 +191,7 @@ XRegExp.matchRecursive(str, '<', '>', 'gy');
 `XRegExp.matchRecursive` throws an error if it sees an unbalanced delimiter in the target string.
 
 
-### XRegExp Prototypes
+### Prototypes
 
 In browsers, first include the script:
 
@@ -274,7 +274,7 @@ If XRegExp was not installed using npm, just open `tests/index.html` in your bro
 
 XRegExp and addons copyright 2007-2012 by [Steven Levithan](http://stevenlevithan.com/).
 
-Tools: Unicode range generators created by [Mathias Bynens](http://mathiasbynens.be/), and adapted from his [unicode-data](https://github.com/mathiasbynens/unicode-data) project. Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
+Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/), and adapted from his [unicode-data](https://github.com/mathiasbynens/unicode-data) project. Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
 
 Prior art: `XRegExp.build` inspired by [Lea Verou](http://lea.verou.me/)'s [RegExp.create](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/). `XRegExp.union` inspired by [Ruby](http://www.ruby-lang.org/). XRegExp's syntax extensions and flags come from Perl, .NET, etc.
 
