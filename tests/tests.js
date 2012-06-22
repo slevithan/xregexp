@@ -100,9 +100,9 @@ test("XRegExp.addToken", function () {
 });
 
 test("XRegExp.cache", function () {
-    var cached1 = XRegExp.cache("(?:)");
-    var cached2 = XRegExp.cache("(?:)");
-    var regexWithFlags = XRegExp(". +()\\1 1", "gimsx");
+    var cached1 = XRegExp.cache("(?:)"),
+        cached2 = XRegExp.cache("(?:)"),
+        regexWithFlags = XRegExp(". +()\\1 1", "gimsx");
 
     ok(cached1 instanceof RegExp, "Returns RegExp");
     strictEqual(cached1, cached2, "References to separately cached patterns refer to same object");
@@ -116,11 +116,12 @@ test("XRegExp.escape", function () {
 });
 
 test("XRegExp.exec", function () {
-    var rX = /x/g;
-    var rA = /a/g;
-    var xregexp = XRegExp("(?<name>a)"); // tests expect this to be nonglobal and use named capture
-    var str = "abcxdef";
-    var match;
+    var rX = /x/g,
+        rA = /a/g,
+        // Tests expect this to be nonglobal and use named capture
+        xregexp = XRegExp("(?<name>a)"),
+        str = "abcxdef",
+        match;
 
     ok(XRegExp.exec(str, rX, 2), "Pos test 1");
     ok(!XRegExp.exec(str, rX, 5), "Pos test 2");
@@ -159,17 +160,18 @@ test("XRegExp.exec", function () {
 
     equal(XRegExp.exec("abc", /x/, 5), null, "pos greater than string length results in failure");
 
-    var sticky = !!RegExp.prototype.sticky;
-    var stickyRegex = sticky ? new RegExp("x", "y") : /x/; // Can't use /x/y behind `if`; errors during compilation in IE9
-    var stickyTest = !!XRegExp.exec(str, stickyRegex, 0);
+    var sticky = !!RegExp.prototype.sticky,
+        // Can't hide /x/y within an `if` block, since that errors during compilation in IE9
+        stickyRegex = sticky ? new RegExp("x", "y") : /x/,
+        stickyTest = !!XRegExp.exec(str, stickyRegex, 0);
     ok(XRegExp.exec(str, stickyRegex, 0, false), "Explicit sticky=false overrides flag y");
     notEqual(stickyTest, sticky, "Sticky follows flag y when not explicitly specified");
 });
 
 test("XRegExp.forEach", function () {
-    var str = "abc 123 def";
-    var regex = XRegExp("(?<first>\\w)\\w*");
-    var regexG = XRegExp("(?<first>\\w)\\w*", "g");
+    var str = "abc 123 def",
+        regex = XRegExp("(?<first>\\w)\\w*"),
+        regexG = XRegExp("(?<first>\\w)\\w*", "g");
 
     deepEqual(XRegExp.forEach(str, regex, function (m) {this.push(m[0]);}, []), ["abc", "123", "def"], "Match strings with nonglobal regex");
     deepEqual(XRegExp.forEach(str, regexG, function (m) {this.push(m[0]);}, []), ["abc", "123", "def"], "Match strings with global regex");
@@ -214,10 +216,10 @@ test("XRegExp.forEach", function () {
 });
 
 test("XRegExp.globalize", function () {
-    var hasNativeY = typeof RegExp.prototype.sticky !== "undefined";
-    var regex = XRegExp("(?<name>a)\\k<name>", "im" + (hasNativeY ? "y" : ""));
-    var globalCopy = XRegExp.globalize(regex);
-    var globalOrig = XRegExp("(?:)", "g");
+    var hasNativeY = typeof RegExp.prototype.sticky !== "undefined",
+        regex = XRegExp("(?<name>a)\\k<name>", "im" + (hasNativeY ? "y" : "")),
+        globalCopy = XRegExp.globalize(regex),
+        globalOrig = XRegExp("(?:)", "g");
 
     notEqual(regex, globalCopy, "Copy is new instance");
     ok(globalCopy.global, "Copy is global");
@@ -266,7 +268,7 @@ test("XRegExp.isRegExp", function () {
         document.body.appendChild(iframe);
         frames[frames.length - 1].document.write("<script>var regex = /x/;<\/script>");
         ok(XRegExp.isRegExp(iframe.contentWindow.regex), "RegExp constructed in another frame is RegExp");
-        iframe.parentNode.removeChild(iframe); // cleanup
+        iframe.parentNode.removeChild(iframe); // Cleanup
     }
 });
 
@@ -298,13 +300,16 @@ test("XRegExp.match", function () {
 });
 
 test("XRegExp.matchChain", function () {
-    var html = '<html><img src="http://x.com/img.png"><script src="http://xregexp.com/path/file.ext"><img src="http://xregexp.com/path/to/img.jpg?x"><img src="http://xregexp.com/img2.gif"/></html>';
-    var xregexpImgFileNames = XRegExp.matchChain(html, [
-        {regex: /<img\b([^>]+)>/i, backref: 1}, // <img> tag attributes
-        {regex: XRegExp('(?ix) \\s src=" (?<src> [^"]+ )'), backref: "src"}, // src attribute values
-        {regex: XRegExp("^http://xregexp\\.com(/[^#?]+)", "i"), backref: 1}, // xregexp.com paths
-        /[^\/]+$/ // filenames (strip directory paths)
-    ]);
+    var html = '<html><img src="http://x.com/img.png">' +
+            '<script src="http://xregexp.com/path/file.ext">' +
+            '<img src="http://xregexp.com/path/to/img.jpg?x">' +
+            '<img src="http://xregexp.com/img2.gif"/></html>',
+        xregexpImgFileNames = XRegExp.matchChain(html, [
+            {regex: /<img\b([^>]+)>/i, backref: 1}, // <img> tag attributes
+            {regex: XRegExp('(?ix) \\s src=" (?<src> [^"]+ )'), backref: "src"}, // src attribute values
+            {regex: XRegExp("^http://xregexp\\.com(/[^#?]+)", "i"), backref: 1}, // xregexp.com paths
+            /[^\/]+$/ // filenames (strip directory paths)
+        ]);
 
     deepEqual(xregexpImgFileNames, ["img.jpg", "img2.gif"], "Four-level chain with plain regex and regex/backref objects (using named and numbered backrefs)");
     deepEqual(XRegExp.matchChain("x", [/x/, /y/]), [], "Empty array returned if no matches");
@@ -322,7 +327,7 @@ test("XRegExp.replace", function () {
     equal(XRegExp.replace("test", /t/g, "x", "one"), "xest", "Global regex search with scope='one'");
     equal(XRegExp.replace("test", /t/g, "x"),        "xesx", "Global regex search without scope");
 
-    // TODO: Add tests (above tests cover scope functionality only)
+    // TODO: Add tests (above tests cover `scope` functionality only)
 });
 
 test("XRegExp.replaceEach", function () {
@@ -336,7 +341,6 @@ test("XRegExp.replaceEach", function () {
             ["g", function ($0) {return $0.toUpperCase();}],
             ["h", function ($0) {return $0.toUpperCase();}, "all"]
         ]), "zaayyxcwwvvFFGgHH", "All basic search/replacement types and scopes");
-
     equal(XRegExp.replaceEach("<&>", [
             [/&/g, "&amp;"],
             [/</g, "&lt;"],
@@ -593,8 +597,8 @@ test("String.prototype.replace", function () {
     "123x567".replace(regexG, "_");
     equal(regexG.lastIndex, 0, "Global regex lastIndex reset to 0");
 
-    var regex2 = /x/g;
-    var interimLastIndex = 0;
+    var regex2 = /x/g,
+        interimLastIndex = 0;
     "1x2".replace(regex2, function () {
         interimLastIndex = regex2.lastIndex;
     });
@@ -625,7 +629,8 @@ test("RegExp.prototype.exec", function () {
     XRegExp.uninstall("natives");
 });
 
-// RegExp.prototype.test is overridden but not extended by XRegExp
+// No tests needed for RegExp.prototype.test in this test module, because although the method is
+// overridden by XRegExp, it is not *extended*
 //test("RegExp.prototype.test", function () {});
 
 test("String.prototype.match", function () {
@@ -656,7 +661,8 @@ test("String.prototype.replace", function () {
     function mul(str, num) {
         return Array(num + 1).join(str);
     }
-    // IE <= 8 doesn't allow backrefs greater than \99 in regex syntax
+    // IE <= 8 doesn't allow backrefs greater than \99 *within* a regex, but XRegExp still allows
+    // backreferences to groups 100+ within replacement text
     var lottaGroups = new RegExp(
         "^(a)\\1" + mul("()", 8) +
         "(b)\\10" + mul("()", 89) +
@@ -671,7 +677,8 @@ test("String.prototype.replace", function () {
     XRegExp.uninstall("natives");
 });
 
-// String.prototype.split is overridden but not extended by XRegExp
+// No tests needed for String.prototype.split in this test module, because although the method is
+// overridden by XRegExp, it is not *extended*
 //test("String.prototype.split", function () {});
 
 //-------------------------------------------------------------------
@@ -701,7 +708,8 @@ test("Enhanced error handling", function () {
 
     // TODO: Add tests
 
-    // Python-style named capture syntax was added to XRegExp to avoid octal-related errors in Opera. Recent Opera supports (?P<name>..) and (?P=name) based on abandoned ES4 proposals
+    // Python-style named capture syntax was added in XRegExp 2.0.0 to avoid octal-related errors
+    // in Opera. Recent Opera supports (?P<name>..) and (?P=name) based on abandoned ES4 proposals.
     equal(XRegExp("(?P<name>a)(b)\\2").test("abb"), true, "Numbered backreference to Python-style named capture not treated as octal (test 1)");
     equal(XRegExp("(?P<name>a)(b)\\1").test("aba"), true, "Numbered backreference to Python-style named capture not treated as octal (test 2)");
 });
@@ -743,8 +751,8 @@ test("RegExp.prototype.lastIndex", function () {
 test("String.prototype.split with regex separator", function () {
     XRegExp.install("natives");
 
-    // Some of these tests are not known to fail in any browser, but many fail in at least one
-    // version of one browser.
+    // Some of these tests are not known to fail (when using the native split) in any browser, but
+    // many fail in at least one version of one browser
 
     deepEqual("".split(), [""]);
     deepEqual("".split(/./), [""]);
@@ -803,7 +811,7 @@ test("String.prototype.split with regex separator", function () {
     deepEqual("test".split(/(t)(e)(s)(t)/), ["", "t", "e", "s", "t", ""]);
     deepEqual(".".split(/(((.((.??)))))/), ["", ".", ".", ".", "", "", ""]);
     deepEqual(".".split(/(((((.??)))))/), ["."]);
-    deepEqual("a b c d".split(/ /, -(Math.pow(2, 32) - 1)), ["a"]); // very large negative number test by Brian O
+    deepEqual("a b c d".split(/ /, -(Math.pow(2, 32) - 1)), ["a"]); // Very large negative number test by Brian O
     deepEqual("a b c d".split(/ /, Math.pow(2, 32) + 1), ["a"]);
     deepEqual("a b c d".split(/ /, Infinity), []);
 
@@ -824,7 +832,7 @@ test("Replacement text syntax", function () {
 test("Type conversion", function () {
     XRegExp.install("natives");
 
-    // these are duplicated from String.prototype.replace tests in the overridden natives module
+    // These are duplicated from String.prototype.replace tests in the overridden natives module
     equal(new String("100").replace(/0/, function ($0, pos, str) {return typeof str;}), "1string0", "String.prototype.replace: typeof last argument in replacement function is string, when called on String as context");
     equal(String.prototype.replace.call(100, /0/, function ($0, pos, str) {return typeof str;}), "1string0", "String.prototype.replace: typeof last argument in replacement function is string, when called on number as context");
 
@@ -843,17 +851,17 @@ test("Unicode Base", function () {
     XRegExp.uninstall("extensibility");
 
     raises(function () {
-        XRegExp.addUnicodeData([{name: "Fail", bmp: "0"}]);
-    }, Error, "XRegExp.addUnicodeData throws when extensibility not installed");
+            XRegExp.addUnicodeData([{name: "Fail", bmp: "0"}]);
+        }, Error, "XRegExp.addUnicodeData throws when extensibility is not installed");
 
     XRegExp.install("extensibility");
 
     raises(function () {
-        XRegExp.addUnicodeData([{bmp: "0"}]);
-    }, Error, "XRegExp.addUnicodeData throws when name not provided");
+            XRegExp.addUnicodeData([{bmp: "0"}]);
+        }, Error, "XRegExp.addUnicodeData throws when name not provided");
     raises(function () {
-        XRegExp.addUnicodeData([{name: "NoData"}]);
-    }, Error, "XRegExp.addUnicodeData throws when no character data provided");
+            XRegExp.addUnicodeData([{name: "NoData"}]);
+        }, Error, "XRegExp.addUnicodeData throws when no bmp or astral data provided");
 
     XRegExp.addUnicodeData([{
         name: "XDigit",
@@ -878,8 +886,8 @@ test("Unicode Base", function () {
 
     XRegExp.uninstall("extensibility");
 
-    var L = XRegExp("^\\p{L}+$");
-    var Letter = XRegExp("^\\p{Letter}+$");
+    var L = XRegExp("^\\p{L}+$"),
+        Letter = XRegExp("^\\p{Letter}+$");
 
     raises(function () {XRegExp("\\p{XX}");}, SyntaxError, "Unrecognized Unicode name is an error");
     ok(L.test("Café"), "\\p{L} matches Café");
@@ -947,6 +955,7 @@ test("Unicode Properties", function () {
 
 test("XRegExp.matchRecursive", function () {
     var str;
+
     ok(XRegExp.matchRecursive, "XRegExp.matchRecursive exists");
 
     str = "(t((e))s)t()(ing)";
@@ -954,25 +963,25 @@ test("XRegExp.matchRecursive", function () {
 
     str = "Here is <div> <div>an</div></div> example";
     deepEqual(XRegExp.matchRecursive(str, "<div\\s*>", "</div>", "gi", {
-        valueNames: ["between", "left", "match", "right"]
-    }), [
-        {name: "between", value: "Here is ",       start: 0,  end: 8},
-        {name: "left",    value: "<div>",          start: 8,  end: 13},
-        {name: "match",   value: " <div>an</div>", start: 13, end: 27},
-        {name: "right",   value: "</div>",         start: 27, end: 33},
-        {name: "between", value: " example",       start: 33, end: 41}
-    ], "Extended information mode with valueNames");
+            valueNames: ["between", "left", "match", "right"]
+        }), [
+            {name: "between", value: "Here is ",       start: 0,  end: 8},
+            {name: "left",    value: "<div>",          start: 8,  end: 13},
+            {name: "match",   value: " <div>an</div>", start: 13, end: 27},
+            {name: "right",   value: "</div>",         start: 27, end: 33},
+            {name: "between", value: " example",       start: 33, end: 41}
+        ], "Extended information mode with valueNames");
 
     str = "...{1}\\{{function(x,y){return y+x;}}";
     deepEqual(XRegExp.matchRecursive(str, "{", "}", "g", {
-        valueNames: ["literal", null, "value", null],
-        escapeChar: "\\"
-    }), [
-        {name: "literal", value: "...", start: 0, end: 3},
-        {name: "value",   value: "1",   start: 4, end: 5},
-        {name: "literal", value: "\\{", start: 6, end: 8},
-        {name: "value",   value: "function(x,y){return y+x;}", start: 9, end: 35}
-    ], "Omitting unneeded parts with null valueNames, and using escapeChar");
+            valueNames: ["literal", null, "value", null],
+            escapeChar: "\\"
+        }), [
+            {name: "literal", value: "...", start: 0, end: 3},
+            {name: "value",   value: "1",   start: 4, end: 5},
+            {name: "literal", value: "\\{", start: 6, end: 8},
+            {name: "value",   value: "function(x,y){return y+x;}", start: 9, end: 35}
+        ], "Omitting unneeded parts with null valueNames, and using escapeChar");
 
     str = "<1><<<2>>><3>4<5>";
     deepEqual(XRegExp.matchRecursive(str, "<", ">", "gy"), ["1", "<<2>>", "3"], "Sticky mode via flag y");
@@ -983,11 +992,12 @@ test("XRegExp.matchRecursive", function () {
 test("XRegExp.build", function () {
     ok(XRegExp.build, "XRegExp.build exists");
 
+    // Equivalent to `XRegExp("(?<n1>(?<yo>a)\\2)\\1(?<nX>(?<yo2>b)\\4)\\3()\\5\\1\\3\\k<nX>")`
     var built = XRegExp.build("({{n1}})\\1(?<nX>{{n2}})\\2()\\3\\1\\2\\k<nX>", {
-        n1: XRegExp("(?<yo>a)\\1"),
-        n2: XRegExp("(?<yo2>b)\\1")
-    }); // Equivalent to XRegExp("(?<n1>(?<yo>a)\\2)\\1(?<nX>(?<yo2>b)\\4)\\3()\\5\\1\\3\\k<nX>")
-    var match = XRegExp.exec("aaaabbbbaabbbb", built);
+            n1: XRegExp("(?<yo>a)\\1"),
+            n2: XRegExp("(?<yo2>b)\\1")
+        }),
+        match = XRegExp.exec("aaaabbbbaabbbb", built);
 
     ok(match);
     equal(match.n1, "aa");
@@ -1023,10 +1033,10 @@ test("Prototype Methods", function () {
     ok(XRegExp.prototype.forEach, "XRegExp.prototype.forEach exists");
     ok(regex.forEach, "forEach exists for XRegExp instance");
     deepEqual(regex.forEach("x", function (m) {
-        this.push(m);
-    }, []), XRegExp.forEach("x", regex, function (m) {
-        this.push(m);
-    }, []), "forEach method works like XRegExp.forEach");
+            this.push(m);
+        }, []), XRegExp.forEach("x", regex, function (m) {
+            this.push(m);
+        }, []), "forEach method works like XRegExp.forEach");
 
     ok(XRegExp.prototype.globalize, "XRegExp.prototype.globalize exists");
     ok(regex.globalize, "globalize exists for XRegExp instance");
