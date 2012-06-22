@@ -18,6 +18,8 @@ def codePointToString(codePoint):
 		string = '\\0' # http://mathiasbynens.be/notes/javascript-escapes#single
 	elif (codePoint >= 0x41 and codePoint <= 0x5A) or (codePoint >= 0x61 and codePoint <= 0x7A) or (codePoint >= 0x30 and codePoint <= 0x39): # [a-zA-Z0-9]
 		string = chr(codePoint)
+	elif codePoint in [0x24, 0x28, 0x29, 0x2A, 0x2B, 0x2D, 0x2E, 0x3F, 0x5B, 0x5C, 0x5E, 0x7B, 0x7C]: # metacharacters
+		string = '\\\\x' + '%02X' % codePoint
 	elif codePoint <= 0xFF: # http://mathiasbynens.be/notes/javascript-escapes#hexadecimal
 		string = '\\x' + '%02X' % codePoint
 	elif codePoint <= 0xFFFF: # http://mathiasbynens.be/notes/javascript-escapes#unicode
