@@ -36,33 +36,46 @@
         return str;
     }
 
+// Converts a hexadecimal number to decimal
+    function dec(hex) {
+        return parseInt(hex, 16);
+    }
+
 // Converts a decimal number to hexadecimal
     function hex(dec) {
         return parseInt(dec, 10).toString(16);
     }
 
+// Gets the decimal code of a literal code unit, \xHH, \uHHHH, or a backslash-escaped literal
+    function charCode(chr) {
+        var esc = /^\\[xu](.+)/.exec(chr);
+        return esc ?
+                dec(esc[1]) :
+                chr.charCodeAt(chr.charAt(0) === '\\' ? 1 : 0);
+    }
+
 // Inverts a list of BMP characters and ranges
     function invertBmp(range) {
-        var output = [],
+        var output = '',
             lastEnd = -1,
             start;
-        XRegExp.forEach(range, /\\?([\s\S])(?:-\\?([\s\S]))?/, function (match) {
-            start = match[1].charCodeAt(0);
+        XRegExp.forEach(range, /(\\x..|\\u....|\\?[\s\S])(?:-(\\x..|\\u....|\\?[\s\S]))?/, function (m) {
+            start = charCode(m[1]);
             if (start > (lastEnd + 1)) {
-                output.push('\\u' + pad4(hex(lastEnd + 1)));
+                output += '\\u' + pad4(hex(lastEnd + 1));
                 if (start > (lastEnd + 2)) {
-                    output.push('-\\u' + pad4(hex(start - 1)));
+                    output += '-\\u' + pad4(hex(start - 1));
                 }
             }
-            lastEnd = (match[2] || match[1]).charCodeAt(0);
+            lastEnd = charCode(m[2] || m[1]);
         });
         if (lastEnd < 0xFFFF) {
-            output.push('\\u' + pad4(hex(lastEnd + 1)));
+            output += '\\u' + pad4(hex(lastEnd + 1));
             if (lastEnd < 0xFFFE) {
-                output.push('-\\uFFFF');
+                output += '-\\uFFFF';
             }
         }
-        return output.join('');
+        return output;
     }
 
 // Generates an inverted BMP range on first use
@@ -76,7 +89,7 @@
 // Combines and optionally negates BMP and astral data
     function buildAstral(slug, negated) {
         var item = unicode[slug],
-            anyCP = '[\uD800-\uDBFF][\uDC00-\uDFFF]|[\0-\uFFFF]',
+            anyCodePoint = '[\uD800-\uDBFF][\uDC00-\uDFFF]|[\0-\uFFFF]',
             combined = '';
         if (item.bmp && !item.isBmpLast) {
             combined = '[' + item.bmp + ']' + (item.astral ? '|' : '');
@@ -89,7 +102,7 @@
         }
         // Astral Unicode tokens always match a code point, never a code unit
         return negated ?
-                '(?:(?!' + combined + ')(?:' + anyCP + '))' :
+                '(?:(?!' + combined + ')(?:' + anyCodePoint + '))' :
                 '(?:' + combined + ')';
     }
 
@@ -148,10 +161,13 @@
  *   `alias`, `isBmpLast`, `bmp`, and `astral`. All but `name` are optional, although one of `bmp`
  *   or `astral` is required. If `astral` is absent, the `bmp` data is used for BMP and astral
  *   modes. If `bmp` is absent, the name errors in BMP mode but works in astral mode. If both `bmp`
- *   and `astral` are provided, their data is combined when in astral mode. `isBmpLast` is needed
- *   when a property matches orphan high surrogates *and* uses surrogate pairs to match astral code
- *   points. The `bmp` and `astral` data should be provided as literal characters, with hyphens to
- *   create ranges. Any regex metacharacters should be escaped, except the range-creating hyphens.
+ *   and `astral` are provided, the `bmp` data (only) is used in BMP mode, and the combination of
+ *   `bmp` and `astral` data is used in astral mode. `isBmpLast` is needed when a property matches
+ *   orphan high surrogates *and* uses surrogate pairs to match astral code points. The `bmp` and
+ *   `astral` data should be a combination of literal characters and \xHH or \uHHHH escape
+ *   sequences, with hyphens to create ranges. Any regex metacharacters in the data should be
+ *   escaped, apart from range-creating hyphens. The `astral` data can additionally use character
+ *   classes and alternation, and should use surrogate pairs to represent astral code points.
  * @example
  *
  * // Basic use
@@ -160,7 +176,7 @@
  *   alias: 'Hexadecimal',
  *   bmp: '0-9A-Fa-f'
  * }]);
- * XRegExp('^\\p{XDigit}+$').test('203D'); // -> true
+ * XRegExp('\\p{XDigit}:\\p{Hexadecimal}+').test('0:3D'); // -> true
  */
     XRegExp.addUnicodeData = function (data) {
         var item, i;

@@ -613,7 +613,7 @@ var XRegExp = (function (undefined) {
  *   // Enables extensibility of XRegExp syntax and flags
  *   extensibility: true,
  *
- *   // Enables support for astral code points in the Unicode addons
+ *   // Enables support for astral code points in the Unicode addons (implicitly sets flag A)
  *   astral: true
  * });
  *
