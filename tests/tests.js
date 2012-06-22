@@ -24,7 +24,7 @@ test("Basic availability", function () {
     ok(XRegExp.install, "XRegExp.install exists");
     ok(XRegExp.isInstalled, "XRegExp.isInstalled exists");
     ok(XRegExp.isRegExp, "XRegExp.isRegExp exists");
-    ok(XRegExp.matchAll, "XRegExp.matchAll exists");
+    ok(XRegExp.match, "XRegExp.match exists");
     ok(XRegExp.matchChain, "XRegExp.matchChain exists");
     ok(XRegExp.replace, "XRegExp.replace exists");
     ok(XRegExp.replaceEach, "XRegExp.replaceEach exists");
@@ -270,19 +270,31 @@ test("XRegExp.isRegExp", function () {
     }
 });
 
-test("XRegExp.matchAll", function () {
+test("XRegExp.match", function () {
     var nonglobal = /\d/,
         global = /\d/g,
         str = "1 2 3 z";
     nonglobal.lastIndex = global.lastIndex = 2;
 
-    deepEqual(XRegExp.matchAll(str, nonglobal), ["1", "2", "3"], "Regex without flag g matches all");
+    deepEqual(XRegExp.match(str, nonglobal, "all"), ["1", "2", "3"], "Regex without flag g matches all");
     equal(nonglobal.lastIndex, 2, "lastIndex of nonglobal regex unmodified after search");
-    deepEqual(XRegExp.matchAll(str, global), ["1", "2", "3"], "Regex with flag g matches all");
+    deepEqual(XRegExp.match(str, global), ["1", "2", "3"], "Regex with flag g matches all");
     equal(global.lastIndex, 0, "lastIndex of global regex reset after search");
-    deepEqual(XRegExp.matchAll(str, /!/), [], "Empty array returned if no matches");
-    raises(function () {XRegExp.matchAll(str, "1");}, TypeError, "String search throws error");
-    raises(function () {XRegExp.matchAll(str, new String("1"));}, TypeError, "String object search throws error");
+    raises(function () {XRegExp.match(str, "1");}, TypeError, "String search throws error");
+    raises(function () {XRegExp.match(str, new String("1"));}, TypeError, "String object search throws error");
+
+    deepEqual(XRegExp.match("a bc", /\w/), "a");
+    deepEqual(XRegExp.match("a bc", /\w/, "one"), "a");
+    deepEqual(XRegExp.match("a bc", /\w/g, "one"), "a");
+    deepEqual(XRegExp.match("a bc", /x/), null);
+    deepEqual(XRegExp.match("a bc", /x/, "one"), null);
+    deepEqual(XRegExp.match("a bc", /x/g, "one"), null);
+    deepEqual(XRegExp.match("a bc", /\w/g), ["a", "b", "c"]);
+    deepEqual(XRegExp.match("a bc", /\w/g, "all"), ["a", "b", "c"]);
+    deepEqual(XRegExp.match("a bc", /\w/, "all"), ["a", "b", "c"]);
+    deepEqual(XRegExp.match("a bc", /x/g), []);
+    deepEqual(XRegExp.match("a bc", /x/g, "all"), []);
+    deepEqual(XRegExp.match("a bc", /x/, "all"), []);
 });
 
 test("XRegExp.matchChain", function () {
@@ -1020,9 +1032,9 @@ test("Prototype Methods", function () {
     ok(regex.globalize, "globalize exists for XRegExp instance");
     deepEqual(regex.globalize(), XRegExp.globalize(regex), "globalize method works like XRegExp.globalize");
 
-    ok(XRegExp.prototype.matchAll, "XRegExp.prototype.matchAll exists");
-    ok(regex.matchAll, "matchAll exists for XRegExp instance");
-    deepEqual(regex.matchAll("x x"), XRegExp.matchAll("x x", regex), "matchAll method works like XRegExp.matchAll");
+    ok(XRegExp.prototype.match, "XRegExp.prototype.match exists");
+    ok(regex.match, "match exists for XRegExp instance");
+    deepEqual(regex.match("x x", "all"), XRegExp.match("x x", regex, "all"), "match method works like XRegExp.match");
 
     ok(XRegExp.prototype.xexec, "XRegExp.prototype.xexec exists");
     ok(regex.xexec, "xexec exists for XRegExp instance");

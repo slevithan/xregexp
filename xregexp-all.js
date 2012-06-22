@@ -536,7 +536,7 @@ var XRegExp = (function (undefined) {
             cacheFlags += "y";
         }
         regex.xregexp = regex.xregexp || getNativeProps();
-        // Shares cached copies with `XRegExp.matchAll`/`replace`
+        // Shares cached copies with `XRegExp.match`/`replace`
         r2 = regex.xregexp[cacheFlags] || (
             regex.xregexp[cacheFlags] = copy(regex, {
                 add: cacheFlags,
@@ -671,34 +671,48 @@ var XRegExp = (function (undefined) {
     };
 
 /**
- * Returns an array containing all matches. Flag g has no effect on the result. Also fixes browser
- * bugs compared to the native `String.prototype.match` with flag g.
+ * Returns the first matched string, or in global mode, an array containing all matched strings.
+ * This is essentially a more convenient re-implementation of `String.prototype.match` that gives
+ * the result types you actually want (string instead of `exec`-style array in match-first mode,
+ * and an empty array instead of `null` when no matches are found in match-all mode). It also lets
+ * you override flag `g` and ignore `lastIndex`, and fixes browser bugs.
  * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp} regex Regex to search with.
- * @returns {Array} Array with all matched strings, or an empty array.
+ * @param {String} [scope='one'] Use 'one' to return the first match as a string, or null. Use
+ *   'all' to return an array of all matched strings, or an empty array. If not explicitly
+ *   specified and using a regex with flag `g`, `scope` is 'all'.
+ * @returns {String|Array} First match as a string, or an array of all matched strings.
  * @example
  *
- * XRegExp.matchAll('<1><2><3>', /\d/);
- * // -> ['1', '2', '3']
+ * // Match first
+ * XRegExp.match('abc', /\w/); // -> 'a'
+ * XRegExp.match('abc', /\w/g, 'one'); // -> 'a'
+ * XRegExp.match('abc', /x/g, 'one'); // -> null
  *
- * XRegExp.matchAll('<1><2><3>', /a/);
- * // -> []
+ * // Match all
+ * XRegExp.match('abc', /\w/g); // -> ['a', 'b', 'c']
+ * XRegExp.match('abc', /\w/, 'all'); // -> ['a', 'b', 'c']
+ * XRegExp.match('abc', /x/, 'all'); // -> []
  */
-    self.matchAll = function (str, regex) {
-        var cacheFlags = 'g' + (regex.sticky ? 'y' : ''),
+    self.match = function (str, regex, scope) {
+        var global = (regex.global && scope !== 'one') || scope === 'all',
+            cacheFlags = (global ? 'g' : '') + (regex.sticky ? 'y' : ''),
             result,
             r2;
         regex.xregexp = regex.xregexp || getNativeProps();
         // Shares cached copies with `XRegExp.exec`/`replace`
-        r2 = regex.xregexp[cacheFlags] || (
-            regex.xregexp[cacheFlags] = copy(regex, {add: cacheFlags})
+        r2 = regex.xregexp[cacheFlags || 'noGY'] || (
+            regex.xregexp[cacheFlags || 'noGY'] = copy(regex, {
+                add: cacheFlags,
+                remove: scope === 'one' ? 'g' : ''
+            })
         );
         result = nativ.match.call(str, r2);
         if (regex.global) {
             regex.lastIndex = 0;
         }
-        return result || [];
+        return global ? (result || []) : (result && result[0]);
     };
 
 /**
@@ -799,7 +813,7 @@ var XRegExp = (function (undefined) {
             result;
         if (isRegex) {
             search.xregexp = search.xregexp || getNativeProps();
-            // Shares cached copies with `XRegExp.exec`/`matchAll`. Since a copy is used,
+            // Shares cached copies with `XRegExp.exec`/`match`. Since a copy is used,
             // `search`'s `lastIndex` isn't updated *during* replacement iterations
             s2 = search.xregexp[cacheFlags || "noGY"] || (
                 search.xregexp[cacheFlags || "noGY"] = copy(search, {
@@ -3579,7 +3593,7 @@ var XRegExp = (function (undefined) {
 /*---- prototypes.js ----*/
 
 /*!
- * XRegExp Prototype Methods 1.1.0-beta
+ * XRegExp Prototypes 1.1.0-dev
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -3593,7 +3607,7 @@ var XRegExp = (function (undefined) {
  * XRegExp.globalize(/[a-z]/i).xexec('abc');
  */
 (function (XRegExp) {
-    "use strict";
+    'use strict';
 
 // Shortcut
     var proto = XRegExp.prototype;
@@ -3653,15 +3667,15 @@ var XRegExp = (function (undefined) {
     };
 
 /**
- * Implicitly calls {@link #XRegExp.matchAll}.
+ * Implicitly calls {@link #XRegExp.match}.
  * @memberOf XRegExp.prototype
  * @example
  *
- * XRegExp.matchAll('<1><2><3>', /\d/);
+ * XRegExp('\\d').match('1a23', 'all');
  * // -> ['1', '2', '3']
  */
-    proto.matchAll = function (str) {
-        return XRegExp.matchAll(str, this);
+    proto.match = function (str, scope) {
+        return XRegExp.match(str, this, scope);
     };
 
 /**

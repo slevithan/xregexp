@@ -1,5 +1,5 @@
 /*!
- * XRegExp Prototype Methods 1.1.0-beta
+ * XRegExp Prototypes 1.1.0-dev
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -13,7 +13,7 @@
  * XRegExp.globalize(/[a-z]/i).xexec('abc');
  */
 (function (XRegExp) {
-    "use strict";
+    'use strict';
 
 // Shortcut
     var proto = XRegExp.prototype;
@@ -73,15 +73,15 @@
     };
 
 /**
- * Implicitly calls {@link #XRegExp.matchAll}.
+ * Implicitly calls {@link #XRegExp.match}.
  * @memberOf XRegExp.prototype
  * @example
  *
- * XRegExp.matchAll('<1><2><3>', /\d/);
+ * XRegExp('\\d').match('1a23', 'all');
  * // -> ['1', '2', '3']
  */
-    proto.matchAll = function (str) {
-        return XRegExp.matchAll(str, this);
+    proto.match = function (str, scope) {
+        return XRegExp.match(str, this, scope);
     };
 
 /**
