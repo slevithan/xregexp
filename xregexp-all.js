@@ -3,7 +3,7 @@
 /*---- xregexp.js ----*/
 
 /*!
- * XRegExp 2.1.0-dev
+ * XRegExp 2.1.0-rc
  * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -187,20 +187,19 @@ var XRegExp = (function (undefined) {
     }
 
 /**
- * Returns the last index at which a given value can be found in an array, or `-1` if it's not
- * present. The array is searched backwards.
+ * Returns the first index at which a given value can be found in an array.
  * @private
  * @param {Array} array Array to search.
  * @param {*} value Value to locate in the array.
- * @returns {Number} Last zero-based index at which the item is found, or -1.
+ * @returns {Number} Zero-based index at which the item is found, or -1.
  */
-    function lastIndexOf(array, value) {
-        if (Array.prototype.lastIndexOf) {
-            return array.lastIndexOf(value); // Use the native method if available
+    function indexOf (array, item) {
+        // Use the native array method, if available
+        if (Array.prototype.indexOf) {
+            return array.indexOf(item);
         }
-        var i = array.length;
-        while (i--) {
-            if (array[i] === value) {
+        for (var i = 0; i < array.length; ++i) {
+            if (array[i] === item) {
                 return i;
             }
         }
@@ -254,7 +253,10 @@ var XRegExp = (function (undefined) {
         try {
             while (i--) { // Run in reverse order
                 t = tokens[i];
-                if ((t.scope === 'all' || t.scope === scope) && (!t.trigger || t.trigger.call(context))) {
+                if (
+                    (t.scope === 'all' || t.scope === scope) &&
+                    (!t.trigger || t.trigger.call(context))
+                ) {
                     match = self.exec(pattern, t.pattern, pos, 'sticky');
                     if (match) {
                         result = {
@@ -335,7 +337,7 @@ var XRegExp = (function (undefined) {
     self = function (pattern, flags) {
         if (self.isRegExp(pattern)) {
             if (flags !== undefined) {
-                throw new TypeError('Cannot supply flags when constructing one RegExp from another');
+                throw new TypeError('Cannot supply flags when copying a RegExp');
             }
             return copy(pattern, {addProto: true});
         }
@@ -434,7 +436,11 @@ var XRegExp = (function (undefined) {
             // Providing `customFlags` with null `regex` and `handler` allows adding flags that do
             // nothing, but don't throw an error
             if (options.customFlags) {
-                registeredFlags = nativ.replace.call(registeredFlags + options.customFlags, duplicateFlags, '');
+                registeredFlags = nativ.replace.call(
+                    registeredFlags + options.customFlags,
+                    duplicateFlags,
+                    ''
+                );
             }
         },
         off: function () {
@@ -549,6 +555,7 @@ var XRegExp = (function (undefined) {
             })
         );
         r2.lastIndex = pos = pos || 0;
+        // Fixed `exec` required for `lastIndex` fix, named backreferences, etc.
         match = fixed.exec.call(r2, str);
         if (sticky && match && match.index !== pos) {
             match = null;
@@ -829,7 +836,8 @@ var XRegExp = (function (undefined) {
         } else if (global) {
             s2 = new RegExp(self.escape(String(search)), 'g');
         }
-        result = fixed.replace.call(String(str), s2, replacement); // Fixed `replace` required for named backreferences, etc.
+        // Fixed `replace` required for named backreferences, etc.
+        result = fixed.replace.call(String(str), s2, replacement);
         if (isRegex && search.global) {
             // Fixes IE, Safari bug (last tested IE 9, Safari 5.1)
             search.lastIndex = 0;
@@ -1017,7 +1025,7 @@ var XRegExp = (function (undefined) {
  * @memberOf XRegExp
  * @type String
  */
-    self.version = '2.1.0-dev';
+    self.version = '2.1.0-rc';
 
 /*--------------------------------------
  *  Fixed/extended native methods
@@ -1041,7 +1049,7 @@ var XRegExp = (function (undefined) {
             // Fix browsers whose `exec` methods don't return `undefined` for nonparticipating
             // capturing groups. This fixes IE 5.5-8, but not IE9's quirks mode or emulation of
             // older IEs. IE9 in standards mode follows the spec
-            if (!compliantExecNpcg && match.length > 1 && lastIndexOf(match, '') > -1) {
+            if (!compliantExecNpcg && match.length > 1 && indexOf(match, '') > -1) {
                 r2 = copy(this, {remove: 'g'});
                 // Using `str.slice(match.index)` rather than `match[0]` in case lookahead allowed
                 // matching due to characters outside the match
@@ -1136,7 +1144,8 @@ var XRegExp = (function (undefined) {
             result = nativ.replace.call(String(this), search, function () {
                 var args = arguments, i;
                 if (captureNames) {
-                    // Change the `arguments[0]` string primitive to a `String` object that can store properties
+                    // Change the `arguments[0]` string primitive to a `String` object that can
+                    // store properties. Yes, I really do need to use the `String` constructor
                     args[0] = new String(args[0]);
                     // Store named backreferences on the first argument
                     for (i = 0; i < captureNames.length; ++i) {
@@ -1176,30 +1185,39 @@ var XRegExp = (function (undefined) {
                         if (n <= args.length - 3) {
                             return args[n] || '';
                         }
-                        n = captureNames ? lastIndexOf(captureNames, $1) : -1;
+                        // Groups with the same name is an error, else would need `lastIndexOf`
+                        n = captureNames ? indexOf(captureNames, $1) : -1;
                         if (n < 0) {
                             throw new SyntaxError('Backreference to undefined group ' + $0);
                         }
                         return args[n + 1] || '';
                     }
                     // Else, special variable or numbered backreference without curly braces
-                    if ($2 === '$') return '$';
-                    if ($2 === '&' || +$2 === 0) return args[0]; // $&, $0 (not followed by 1-9), $00
-                    if ($2 === '`') return args[args.length - 1].slice(0, args[args.length - 2]);
-                    if ($2 === "'") return args[args.length - 1].slice(args[args.length - 2] + args[0].length);
-                    // Else, numbered backreference (without curly braces)
+                    if ($2 === '$') { // $$
+                        return '$';
+                    }
+                    if ($2 === '&' || +$2 === 0) { // $&, $0 (not followed by 1-9), $00
+                        return args[0];
+                    }
+                    if ($2 === '`') { // $` (left context)
+                        return args[args.length - 1].slice(0, args[args.length - 2]);
+                    }
+                    if ($2 === "'") { // $' (right context)
+                        return args[args.length - 1].slice(args[args.length - 2] + args[0].length);
+                    }
+                    // Else, numbered backreference without curly braces
                     $2 = +$2; // Type-convert; drop leading zero
                     /* XRegExp behavior for `$n` and `$nn`:
-                     * - Backreferences without curly braces end after 1 or 2 digits. Use `${..}` for more digits.
-                     * - `$1` is an error if there are no capturing groups.
-                     * - `$10` is an error if there are less than 10 capturing groups. Use `${1}0` instead.
-                     * - `$01` is equivalent to `$1` if a capturing group exists, otherwise it's an error.
+                     * - Backrefs end after 1 or 2 digits. Use `${..}` for more digits.
+                     * - `$1` is an error if no capturing groups.
+                     * - `$10` is an error if less than 10 capturing groups. Use `${1}0` instead.
+                     * - `$01` is `$1` if at least one capturing group, else it's an error.
                      * - `$0` (not followed by 1-9) and `$00` are the entire match.
                      * Native behavior, for comparison:
-                     * - Backreferences end after 1 or 2 digits. Cannot use backreference to capturing group 100+.
-                     * - `$1` is a literal `$1` if there are no capturing groups.
-                     * - `$10` is `$1` followed by a literal `0` if there are less than 10 capturing groups.
-                     * - `$01` is equivalent to `$1` if a capturing group exists, otherwise it's a literal `$01`.
+                     * - Backrefs end after 1 or 2 digits. Cannot reference capturing group 100+.
+                     * - `$1` is a literal `$1` if no capturing groups.
+                     * - `$10` is `$1` followed by a literal `0` if less than 10 capturing groups.
+                     * - `$01` is `$1` if at least one capturing group, else it's a literal `$01`.
                      * - `$0` is a literal `$0`.
                      */
                     if (!isNaN($2)) {
@@ -1308,7 +1326,8 @@ var XRegExp = (function (undefined) {
     add(/\(\?#[^)]*\)/,
         function (match) {
             // Keep tokens separated unless the following token is a quantifier
-            return nativ.test.call(quantifier, match.input.slice(match.index + match[0].length)) ? '' : '(?:)';
+            return nativ.test.call(quantifier, match.input.slice(match.index + match[0].length)) ?
+                    '' : '(?:)';
         });
 
 /* Named backreference: \k<name>
@@ -1316,14 +1335,16 @@ var XRegExp = (function (undefined) {
  */
     add(/\\k<([\w$]+)>/,
         function (match) {
-            var index = isNaN(match[1]) ? (lastIndexOf(this.captureNames, match[1]) + 1) : +match[1],
+            // Groups with the same name is an error, else would need `lastIndexOf`
+            var index = isNaN(match[1]) ? (indexOf(this.captureNames, match[1]) + 1) : +match[1],
                 endIndex = match.index + match[0].length;
             if (!index || index > this.captureNames.length) {
                 throw new SyntaxError('Backreference to undefined group ' + match[0]);
             }
             // Keep backreferences separate from subsequent literal numbers
             return '\\' + index + (
-                endIndex === match.input.length || isNaN(match.input.charAt(endIndex)) ? '' : '(?:)'
+                endIndex === match.input.length || isNaN(match.input.charAt(endIndex)) ?
+                        '' : '(?:)'
             );
         });
 
@@ -1332,7 +1353,8 @@ var XRegExp = (function (undefined) {
     add(/(?:\s+|#.*)+/,
         function (match) {
             // Keep tokens separated unless the following token is a quantifier
-            return nativ.test.call(quantifier, match.input.slice(match.index + match[0].length)) ? '' : '(?:)';
+            return nativ.test.call(quantifier, match.input.slice(match.index + match[0].length)) ?
+                    '' : '(?:)';
         },
         {
             trigger: function () {
@@ -1367,8 +1389,7 @@ var XRegExp = (function (undefined) {
             if (!isNaN(match[1])) {
                 throw new SyntaxError('Cannot use integer as capture name ' + match[0]);
             }
-            // Using lastIndexOf because XRegExp doesn't currently include indexOf
-            if (lastIndexOf(this.captureNames, match[1]) > -1) {
+            if (indexOf(this.captureNames, match[1]) > -1) {
                 throw new SyntaxError('Cannot use same name for multiple groups ' + match[0]);
             }
             this.captureNames.push(match[1]);
@@ -1391,7 +1412,8 @@ var XRegExp = (function (undefined) {
                 ) &&
                 match[1] !== '0'
             ) {
-                throw new SyntaxError('Cannot use octal escape or backreference to undefined group ' + match[0]);
+                throw new SyntaxError('Cannot use octal escape or backreference to undefined group ' +
+                        match[0]);
             }
             return match[0];
         },
