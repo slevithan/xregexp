@@ -117,23 +117,6 @@ var XRegExp = (function (undefined) {
     }
 
 /**
- * Returns native `RegExp` flags used by a regex object.
- * @private
- * @param {RegExp} regex Regex to check.
- * @returns {String} Native flags in use.
- */
-    function getNativeFlags(regex) {
-        return nativ.exec.call(/\/([a-z]*)$/i, String(regex))[1];
-        /*
-        return (regex.global     ? 'g' : '') +
-               (regex.ignoreCase ? 'i' : '') +
-               (regex.multiline  ? 'm' : '') +
-               (regex.extended   ? 'x' : '') + // Proposed for ES6, included in AS3
-               (regex.sticky     ? 'y' : ''); // Proposed for ES6, included in Firefox 3+
-        */
-    }
-
-/**
  * Copies a regex object while preserving special properties for named capture and augmenting with
  * `XRegExp.prototype` methods. The copy has a fresh `lastIndex` property (set to zero). Allows
  * adding and removing flags while copying the regex.
@@ -147,7 +130,8 @@ var XRegExp = (function (undefined) {
         if (!self.isRegExp(regex)) {
             throw new TypeError('Type RegExp expected');
         }
-        var flags = getNativeFlags(regex);
+        // Get native flags
+        var flags = nativ.exec.call(/\/([a-z]*)$/i, String(regex))[1];
         options = options || {};
         if (options.add) {
             flags = nativ.replace.call(flags + options.add, duplicateFlags, '');
@@ -178,7 +162,7 @@ var XRegExp = (function (undefined) {
  * @private
  * @returns {Object} Object with `captureNames` and `isNative` properties.
  */
-    function getNativeProps() {
+    function getBaseProps() {
         return {captureNames: null, isNative: true};
     }
 
@@ -542,7 +526,7 @@ var XRegExp = (function (undefined) {
         if (hasNativeY && (sticky || (regex.sticky && sticky !== false))) {
             cacheFlags += 'y';
         }
-        regex.xregexp = regex.xregexp || getNativeProps();
+        regex.xregexp = regex.xregexp || getBaseProps();
         // Shares cached copies with `XRegExp.match`/`replace`
         r2 = regex.xregexp[cacheFlags] || (
             regex.xregexp[cacheFlags] = copy(regex, {
@@ -708,7 +692,7 @@ var XRegExp = (function (undefined) {
             cacheFlags = (global ? 'g' : '') + (regex.sticky ? 'y' : ''),
             result,
             r2;
-        regex.xregexp = regex.xregexp || getNativeProps();
+        regex.xregexp = regex.xregexp || getBaseProps();
         // Shares cached copies with `XRegExp.exec`/`replace`
         r2 = regex.xregexp[cacheFlags || 'noGY'] || (
             regex.xregexp[cacheFlags || 'noGY'] = copy(regex, {
@@ -820,7 +804,7 @@ var XRegExp = (function (undefined) {
             s2 = search,
             result;
         if (isRegex) {
-            search.xregexp = search.xregexp || getNativeProps();
+            search.xregexp = search.xregexp || getBaseProps();
             // Shares cached copies with `XRegExp.exec`/`match`. Since a copy is used,
             // `search`'s `lastIndex` isn't updated *during* replacement iterations
             s2 = search.xregexp[cacheFlags || 'noGY'] || (

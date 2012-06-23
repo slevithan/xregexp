@@ -8,12 +8,12 @@
  * Provides backward compatibility with XRegExp 1.x.x.
  */
 (function (XRegExp) {
-    "use strict";
+    'use strict';
 
 /**
  * XRegExp 2.0.0 doesn't override native methods or allow syntax extensions by default.
  */
-    XRegExp.install("natives extensibility");
+    XRegExp.install('natives extensibility');
 
 /**
  * @deprecated As of XRegExp 2.0.0. Replaced by {@link #XRegExp.globalize}.
@@ -34,7 +34,7 @@
  * @deprecated As of XRegExp 2.0.0. No replacement.
  */
     XRegExp.freezeTokens = function () {
-        XRegExp.uninstall("extensibility");
+        XRegExp.uninstall('extensibility');
         delete XRegExp.install;
     };
 
@@ -61,7 +61,10 @@
  * @deprecated As of XRegExp 1.5.0. No replacement.
  */
     RegExp.prototype.addFlags = function (flags) {
-        var regex = XRegExp(this.source, /\/([a-z]*)$/i.exec(String(this))[1] + (flags || "")),
+        var regex = XRegExp(
+                this.source,
+                /\/([a-z]*)$/i.exec(String(this))[1] + (flags || '')
+            ),
             captureNames = this.xregexp ? this.xregexp.captureNames : null;
         regex.xregexp = {
             captureNames: captureNames ? captureNames.slice(0) : null,
@@ -81,7 +84,10 @@
  * @deprecated As of XRegExp 1.5.0. No replacement.
  */
     RegExp.prototype.validate = function (str) {
-        var regex = new RegExp("^(?:" + this.source + ")$(?!\\s)", /\/([a-z]*)$/i.exec(String(this))[1]);
+        var regex = new RegExp(
+            '^(?:' + this.source + ')$(?!\\s)',
+            /\/([a-z]*)$/i.exec(String(this))[1]
+        );
         if (this.global) {
             this.lastIndex = 0;
         }

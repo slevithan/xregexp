@@ -1,11 +1,11 @@
 /*!
- * XRegExp.matchRecursive 0.2.1-dev
+ * XRegExp.matchRecursive 0.2.1-rc
  * (c) 2009-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
 
 (function (XRegExp) {
-    "use strict";
+    'use strict';
 
 /**
  * Returns a match detail object composed of the provided values.
@@ -28,7 +28,7 @@
  * @param {String} str String to search.
  * @param {String} left Left delimiter as an XRegExp pattern.
  * @param {String} right Right delimiter as an XRegExp pattern.
- * @param {String} [flags] Flags for the left and right delimiters. Use any of: `gimnsxy`.
+ * @param {String} [flags] Any native or XRegExp flags, used for the left and right delimiters.
  * @param {Object} [options] Lets you specify `valueNames` and `escapeChar` options.
  * @returns {Array} Array of matches, or an empty array.
  * @example
@@ -70,11 +70,11 @@
  * // -> ['1', '<<2>>', '3']
  */
     XRegExp.matchRecursive = function (str, left, right, flags, options) {
-        flags = flags || "";
+        flags = flags || '';
         options = options || {};
-        var global = flags.indexOf("g") > -1,
-            sticky = flags.indexOf("y") > -1,
-            basicFlags = flags.replace(/y/g, ""), // Flag y controlled internally
+        var global = flags.indexOf('g') > -1,
+            sticky = flags.indexOf('y') > -1,
+            basicFlags = flags.replace(/y/g, ''), // Flag `y` controlled internally
             escapeChar = options.escapeChar,
             vN = options.valueNames,
             output = [],
@@ -92,13 +92,15 @@
 
         if (escapeChar) {
             if (escapeChar.length > 1) {
-                throw new SyntaxError("can't use more than one escape character");
+                throw new SyntaxError('Cannot use more than one escape character');
             }
             escapeChar = XRegExp.escape(escapeChar);
-            // Using XRegExp.union safely rewrites backreferences in `left` and `right`
+            // Using `XRegExp.union` safely rewrites backreferences in `left` and `right`
             esc = new RegExp(
-                "(?:" + escapeChar + "[\\S\\s]|(?:(?!" + XRegExp.union([left, right]).source + ")[^" + escapeChar + "])+)+",
-                flags.replace(/[^im]+/g, "") // Flags gy not needed here; flags nsx handled by XRegExp
+                '(?:' + escapeChar + '[\\S\\s]|(?:(?!' +
+                    XRegExp.union([left, right]).source +
+                    ')[^' + escapeChar + '])+)+',
+                flags.replace(/[^im]+/g, '') // Flags `gy` not needed here
             );
         }
 
@@ -106,7 +108,7 @@
             // If using an escape character, advance to the delimiter's next starting position,
             // skipping any escaped characters in between
             if (escapeChar) {
-                delimEnd += (XRegExp.exec(str, esc, delimEnd, "sticky") || [""])[0].length;
+                delimEnd += (XRegExp.exec(str, esc, delimEnd, 'sticky') || [''])[0].length;
             }
             leftMatch = XRegExp.exec(str, left, delimEnd);
             rightMatch = XRegExp.exec(str, right, delimEnd);
@@ -118,16 +120,17 @@
                     leftMatch = null;
                 }
             }
-            /* Paths (LM:leftMatch, RM:rightMatch, OT:openTokens):
-            LM | RM | OT | Result
-            1  | 0  | 1  | loop
-            1  | 0  | 0  | loop
-            0  | 1  | 1  | loop
-            0  | 1  | 0  | throw
-            0  | 0  | 1  | throw
-            0  | 0  | 0  | break
-            * Doesn't include the sticky mode special case
-            * Loop ends after the first completed match if `!global` */
+            /* Paths (LM: leftMatch, RM: rightMatch, OT: openTokens):
+             * LM | RM | OT | Result
+             * 1  | 0  | 1  | loop
+             * 1  | 0  | 0  | loop
+             * 0  | 1  | 1  | loop
+             * 0  | 1  | 0  | throw
+             * 0  | 0  | 1  | throw
+             * 0  | 0  | 0  | break
+             * Doesn't include the sticky mode special case. The loop ends after the first
+             * completed match if not `global`.
+             */
             if (leftMatch || rightMatch) {
                 delimStart = (leftMatch || rightMatch).index;
                 delimEnd = delimStart + (leftMatch || rightMatch)[0].length;
@@ -167,7 +170,7 @@
                     }
                 }
             } else {
-                throw new Error("string contains unbalanced delimiters");
+                throw new Error('String contains unbalanced delimiters');
             }
             // If the delimiter matched an empty string, avoid an infinite loop
             if (delimStart === delimEnd) {

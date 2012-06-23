@@ -121,23 +121,6 @@ var XRegExp = (function (undefined) {
     }
 
 /**
- * Returns native `RegExp` flags used by a regex object.
- * @private
- * @param {RegExp} regex Regex to check.
- * @returns {String} Native flags in use.
- */
-    function getNativeFlags(regex) {
-        return nativ.exec.call(/\/([a-z]*)$/i, String(regex))[1];
-        /*
-        return (regex.global     ? 'g' : '') +
-               (regex.ignoreCase ? 'i' : '') +
-               (regex.multiline  ? 'm' : '') +
-               (regex.extended   ? 'x' : '') + // Proposed for ES6, included in AS3
-               (regex.sticky     ? 'y' : ''); // Proposed for ES6, included in Firefox 3+
-        */
-    }
-
-/**
  * Copies a regex object while preserving special properties for named capture and augmenting with
  * `XRegExp.prototype` methods. The copy has a fresh `lastIndex` property (set to zero). Allows
  * adding and removing flags while copying the regex.
@@ -151,7 +134,8 @@ var XRegExp = (function (undefined) {
         if (!self.isRegExp(regex)) {
             throw new TypeError('Type RegExp expected');
         }
-        var flags = getNativeFlags(regex);
+        // Get native flags
+        var flags = nativ.exec.call(/\/([a-z]*)$/i, String(regex))[1];
         options = options || {};
         if (options.add) {
             flags = nativ.replace.call(flags + options.add, duplicateFlags, '');
@@ -182,7 +166,7 @@ var XRegExp = (function (undefined) {
  * @private
  * @returns {Object} Object with `captureNames` and `isNative` properties.
  */
-    function getNativeProps() {
+    function getBaseProps() {
         return {captureNames: null, isNative: true};
     }
 
@@ -546,7 +530,7 @@ var XRegExp = (function (undefined) {
         if (hasNativeY && (sticky || (regex.sticky && sticky !== false))) {
             cacheFlags += 'y';
         }
-        regex.xregexp = regex.xregexp || getNativeProps();
+        regex.xregexp = regex.xregexp || getBaseProps();
         // Shares cached copies with `XRegExp.match`/`replace`
         r2 = regex.xregexp[cacheFlags] || (
             regex.xregexp[cacheFlags] = copy(regex, {
@@ -712,7 +696,7 @@ var XRegExp = (function (undefined) {
             cacheFlags = (global ? 'g' : '') + (regex.sticky ? 'y' : ''),
             result,
             r2;
-        regex.xregexp = regex.xregexp || getNativeProps();
+        regex.xregexp = regex.xregexp || getBaseProps();
         // Shares cached copies with `XRegExp.exec`/`replace`
         r2 = regex.xregexp[cacheFlags || 'noGY'] || (
             regex.xregexp[cacheFlags || 'noGY'] = copy(regex, {
@@ -824,7 +808,7 @@ var XRegExp = (function (undefined) {
             s2 = search,
             result;
         if (isRegex) {
-            search.xregexp = search.xregexp || getNativeProps();
+            search.xregexp = search.xregexp || getBaseProps();
             // Shares cached copies with `XRegExp.exec`/`match`. Since a copy is used,
             // `search`'s `lastIndex` isn't updated *during* replacement iterations
             s2 = search.xregexp[cacheFlags || 'noGY'] || (
@@ -3296,13 +3280,13 @@ var XRegExp = (function (undefined) {
 /*---- matchrecursive.js ----*/
 
 /*!
- * XRegExp.matchRecursive 0.2.1-dev
+ * XRegExp.matchRecursive 0.2.1-rc
  * (c) 2009-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
 
 (function (XRegExp) {
-    "use strict";
+    'use strict';
 
 /**
  * Returns a match detail object composed of the provided values.
@@ -3325,7 +3309,7 @@ var XRegExp = (function (undefined) {
  * @param {String} str String to search.
  * @param {String} left Left delimiter as an XRegExp pattern.
  * @param {String} right Right delimiter as an XRegExp pattern.
- * @param {String} [flags] Flags for the left and right delimiters. Use any of: `gimnsxy`.
+ * @param {String} [flags] Any native or XRegExp flags, used for the left and right delimiters.
  * @param {Object} [options] Lets you specify `valueNames` and `escapeChar` options.
  * @returns {Array} Array of matches, or an empty array.
  * @example
@@ -3367,11 +3351,11 @@ var XRegExp = (function (undefined) {
  * // -> ['1', '<<2>>', '3']
  */
     XRegExp.matchRecursive = function (str, left, right, flags, options) {
-        flags = flags || "";
+        flags = flags || '';
         options = options || {};
-        var global = flags.indexOf("g") > -1,
-            sticky = flags.indexOf("y") > -1,
-            basicFlags = flags.replace(/y/g, ""), // Flag y controlled internally
+        var global = flags.indexOf('g') > -1,
+            sticky = flags.indexOf('y') > -1,
+            basicFlags = flags.replace(/y/g, ''), // Flag `y` controlled internally
             escapeChar = options.escapeChar,
             vN = options.valueNames,
             output = [],
@@ -3389,13 +3373,15 @@ var XRegExp = (function (undefined) {
 
         if (escapeChar) {
             if (escapeChar.length > 1) {
-                throw new SyntaxError("can't use more than one escape character");
+                throw new SyntaxError('Cannot use more than one escape character');
             }
             escapeChar = XRegExp.escape(escapeChar);
-            // Using XRegExp.union safely rewrites backreferences in `left` and `right`
+            // Using `XRegExp.union` safely rewrites backreferences in `left` and `right`
             esc = new RegExp(
-                "(?:" + escapeChar + "[\\S\\s]|(?:(?!" + XRegExp.union([left, right]).source + ")[^" + escapeChar + "])+)+",
-                flags.replace(/[^im]+/g, "") // Flags gy not needed here; flags nsx handled by XRegExp
+                '(?:' + escapeChar + '[\\S\\s]|(?:(?!' +
+                    XRegExp.union([left, right]).source +
+                    ')[^' + escapeChar + '])+)+',
+                flags.replace(/[^im]+/g, '') // Flags `gy` not needed here
             );
         }
 
@@ -3403,7 +3389,7 @@ var XRegExp = (function (undefined) {
             // If using an escape character, advance to the delimiter's next starting position,
             // skipping any escaped characters in between
             if (escapeChar) {
-                delimEnd += (XRegExp.exec(str, esc, delimEnd, "sticky") || [""])[0].length;
+                delimEnd += (XRegExp.exec(str, esc, delimEnd, 'sticky') || [''])[0].length;
             }
             leftMatch = XRegExp.exec(str, left, delimEnd);
             rightMatch = XRegExp.exec(str, right, delimEnd);
@@ -3415,16 +3401,17 @@ var XRegExp = (function (undefined) {
                     leftMatch = null;
                 }
             }
-            /* Paths (LM:leftMatch, RM:rightMatch, OT:openTokens):
-            LM | RM | OT | Result
-            1  | 0  | 1  | loop
-            1  | 0  | 0  | loop
-            0  | 1  | 1  | loop
-            0  | 1  | 0  | throw
-            0  | 0  | 1  | throw
-            0  | 0  | 0  | break
-            * Doesn't include the sticky mode special case
-            * Loop ends after the first completed match if `!global` */
+            /* Paths (LM: leftMatch, RM: rightMatch, OT: openTokens):
+             * LM | RM | OT | Result
+             * 1  | 0  | 1  | loop
+             * 1  | 0  | 0  | loop
+             * 0  | 1  | 1  | loop
+             * 0  | 1  | 0  | throw
+             * 0  | 0  | 1  | throw
+             * 0  | 0  | 0  | break
+             * Doesn't include the sticky mode special case. The loop ends after the first
+             * completed match if not `global`.
+             */
             if (leftMatch || rightMatch) {
                 delimStart = (leftMatch || rightMatch).index;
                 delimEnd = delimStart + (leftMatch || rightMatch)[0].length;
@@ -3464,7 +3451,7 @@ var XRegExp = (function (undefined) {
                     }
                 }
             } else {
-                throw new Error("string contains unbalanced delimiters");
+                throw new Error('String contains unbalanced delimiters');
             }
             // If the delimiter matched an empty string, avoid an infinite loop
             if (delimStart === delimEnd) {
