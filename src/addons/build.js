@@ -1,15 +1,15 @@
 /*!
- * XRegExp.build 0.1.0
+ * XRegExp.build 0.1.1-dev
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Inspired by RegExp.create by Lea Verou <http://lea.verou.me/>
  */
 
 (function (XRegExp) {
-    "use strict";
+    'use strict';
 
     var subparts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*]/g,
-        parts = XRegExp.union([/\({{([\w$]+)}}\)|{{([\w$]+)}}/, subparts], "g");
+        parts = XRegExp.union([/\({{([\w$]+)}}\)|{{([\w$]+)}}/, subparts], 'g');
 
 /**
  * Strips a leading `^` and trailing unescaped `$`, if both are present.
@@ -20,8 +20,9 @@
     function deanchor(pattern) {
         var startAnchor = /^(?:\(\?:\))?\^/, // Leading `^` or `(?:)^` (handles /x cruft)
             endAnchor = /\$(?:\(\?:\))?$/; // Trailing `$` or `$(?:)` (handles /x cruft)
-        if (endAnchor.test(pattern.replace(/\\[\s\S]/g, ""))) { // Ensure trailing `$` isn't escaped
-            return pattern.replace(startAnchor, "").replace(endAnchor, "");
+        // Ensure that the trailing `$` isn't escaped
+        if (startAnchor.test(pattern) && endAnchor.test(pattern.replace(/\\[\s\S]/g, ''))) {
+            return pattern.replace(startAnchor, '').replace(endAnchor, '');
         }
         return pattern;
     }
@@ -65,7 +66,7 @@
     XRegExp.build = function (pattern, subs, flags) {
         var inlineFlags = /^\(\?([\w$]+)\)/.exec(pattern),
             data = {},
-            numCaps = 0, // Caps is short for captures
+            numCaps = 0, // 'Caps' is short for captures
             numPriorCaps,
             numOuterCaps = 0,
             outerCapsMap = [0],
@@ -75,9 +76,10 @@
 
         // Add flags within a leading mode modifier to the overall pattern's flags
         if (inlineFlags) {
-            flags = flags || "";
+            flags = flags || '';
             inlineFlags[1].replace(/./g, function (flag) {
-                flags += (flags.indexOf(flag) > -1 ? "" : flag); // Don't add duplicates
+                // Don't add duplicates
+                flags += (flags.indexOf(flag) > -1 ? '' : flag);
             });
         }
 
@@ -100,41 +102,51 @@
         outerCapNames = pattern.xregexp.captureNames || [];
         pattern = pattern.source.replace(parts, function ($0, $1, $2, $3, $4) {
             var subName = $1 || $2, capName, intro;
-            if (subName) { // Named subpattern
+            // Named subpattern
+            if (subName) {
                 if (!data.hasOwnProperty(subName)) {
-                    throw new ReferenceError("undefined property " + $0);
+                    throw new ReferenceError('Undefined property ' + $0);
                 }
-                if ($1) { // Named subpattern was wrapped in a capturing group
+                // Named subpattern was wrapped in a capturing group
+                if ($1) {
                     capName = outerCapNames[numOuterCaps];
                     outerCapsMap[++numOuterCaps] = ++numCaps;
                     // If it's a named group, preserve the name. Otherwise, use the subpattern name
                     // as the capture name
-                    intro = "(?<" + (capName || subName) + ">";
+                    intro = '(?<' + (capName || subName) + '>';
                 } else {
-                    intro = "(?:";
+                    intro = '(?:';
                 }
                 numPriorCaps = numCaps;
                 return intro + data[subName].pattern.replace(subparts, function (match, paren, backref) {
-                    if (paren) { // Capturing group
+                    // Capturing group
+                    if (paren) {
                         capName = data[subName].names[numCaps - numPriorCaps];
                         ++numCaps;
-                        if (capName) { // If the current capture has a name, preserve the name
-                            return "(?<" + capName + ">";
+                        // If the current capture has a name, preserve the name
+                        if (capName) {
+                            return '(?<' + capName + '>';
                         }
-                    } else if (backref) { // Backreference
-                        return "\\" + (+backref + numPriorCaps); // Rewrite the backreference
+                    // Backreference
+                    } else if (backref) {
+                        // Rewrite the backreference
+                        return '\\' + (+backref + numPriorCaps);
                     }
                     return match;
-                }) + ")";
+                }) + ')';
             }
-            if ($3) { // Capturing group
+            // Capturing group
+            if ($3) {
                 capName = outerCapNames[numOuterCaps];
                 outerCapsMap[++numOuterCaps] = ++numCaps;
-                if (capName) { // If the current capture has a name, preserve the name
-                    return "(?<" + capName + ">";
+                // If the current capture has a name, preserve the name
+                if (capName) {
+                    return '(?<' + capName + '>';
                 }
-            } else if ($4) { // Backreference
-                return "\\" + outerCapsMap[+$4]; // Rewrite the backreference
+            // Backreference
+            } else if ($4) {
+                // Rewrite the backreference
+                return '\\' + outerCapsMap[+$4];
             }
             return $0;
         });

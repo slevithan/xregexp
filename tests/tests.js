@@ -1010,9 +1010,17 @@ test("XRegExp.build", function () {
     raises(function () {XRegExp.build("(?x)({{a}})", {a: /#/});}, Error, "Mode modifier in outer pattern applies to full regex with interpolated values (test 1)");
     equal(XRegExp.build("(?x){{a}}", {a: /1 2/}).test("12"), true, "Mode modifier in outer pattern applies to full regex with interpolated values (test 2)");
     equal(XRegExp.build("(?m){{a}}", {a: /a/}).multiline, true, "Mode modifier with native flag in outer pattern is applied to the final result");
-
     equal(XRegExp.build("^[{{a}}]$", {a: "x"}).test("x"), false, "Named subpattern not interpolated within character class (test 1)");
     equal(XRegExp.build("^{{a}}[{{a}}]$", {a: "x"}).test("x{"), true, "Named subpattern not interpolated within character class (test 2)");
+
+    ok(XRegExp.build("{{x}}", {x: "^123$"}).test("123"), "Leading ^ and trailing unescaped $ in subpattern (test 1)");
+    ok(XRegExp.build("{{x}}", {x: "^123$"}).test("01234"), "Leading ^ and trailing unescaped $ in subpattern (test 2)");
+    ok(XRegExp.build("{{x}}", {x: "^123\\$"}).test("123$"), "Leading ^ and trailing escaped $ in subpattern (test 1)");
+    ok(!XRegExp.build("{{x}}", {x: "^123\\$"}).test("0123$4"), "Leading ^ and trailing escaped $ in subpattern (test 2)");
+    ok(XRegExp.build("{{x}}", {x: "^123"}).test("123"), "Leading ^ without trailing unescaped $ in subpattern (test 1)");
+    ok(!XRegExp.build("{{x}}", {x: "^123"}).test("01234"), "Leading ^ without trailing unescaped $ in subpattern (test 2)");
+    ok(XRegExp.build("{{x}}", {x: "123$"}).test("123"), "Trailing unescaped $ without leading ^ in subpattern (test 1)");
+    ok(!XRegExp.build("{{x}}", {x: "123$"}).test("01234"), "Trailing unescaped $ without leading ^ in subpattern (test 2)");
 
     // TODO: Add tests
 });
