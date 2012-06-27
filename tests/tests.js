@@ -932,7 +932,14 @@ test("Unicode Base", function () {
 test("Unicode Categories", function () {
     // Tests for category L and Letter included in Unicode Base tests
 
-    expect(0);
+    ok(XRegExp("\\p{P}").test("-"), "\\p{P} matches ASCII hyphen");
+    ok(XRegExp("\\p{P}").test("\u00bf"), "\\p{P} matches U+00BF");
+    ok(XRegExp("\\p{P}").test("\u301c"), "\\p{P} matches U+301C");
+    ok(!XRegExp("\\p{P}").test("0"), "\\p{P} does not match 0");
+    ok(XRegExp("\\p{Pe}").test(")"), "\\p{Pe} matches ASCII )");
+    ok(XRegExp("\\p{Pe}").test("\u300b"), "\\p{Pe} matches U+300B");
+    ok(!XRegExp("\\p{Pe}").test("0"), "\\p{Pe} does not match 0");
+
     // TODO: Add tests
 });
 
@@ -944,12 +951,36 @@ test("Unicode Scripts", function () {
 });
 
 test("Unicode Blocks", function () {
-    expect(0);
+    XRegExp.install("astral");
+
+    ok(XRegExp("^\\p{InBasic_Latin}$").test("A"), "BMP-only block \\p{InBasic_Latin} matches A, in astral mode");
+    ok(XRegExp("^\\p{InAegean_Numbers}$").test("\ud800\udd00"), "Astral-only block \\p{InAegean_Numbers} matches U+10100, in astral mode");
+
+    XRegExp.uninstall("astral");
+
+    ok(XRegExp("^\\p{InBasic_Latin}$").test("A"), "BMP-only block \\p{InBasic_Latin} matches A, in BMP mode");
+    raises(function () {XRegExp("^\\p{InAegean_Numbers}$")}, SyntaxError, "Astral-only block \\p{InAegean_Numbers} throws SyntaxError, in BMP mode");
+
     // TODO: Add tests
 });
 
 test("Unicode Properties", function () {
-    expect(0);
+    ok(XRegExp("\\p{ASCII}").test("\0"), "\\p{ASCII} matches \\0");
+    ok(XRegExp("\\p{ASCII}").test("\x7F"), "\\p{ASCII} matches \\x7F");
+    ok(!XRegExp("\\p{ASCII}").test("\x80"), "\\p{ASCII} does not match \\x80");
+
+    XRegExp.install("astral");
+
+    ok(XRegExp("^\\p{Any}$").test("\ud800\udc00"), "\\p{Any} matches surrogate pair, in astral mode");
+    ok(XRegExp("^\\p{Any}$").test("\ud800"), "\\p{Any} matches orphan high surrogate, in astral mode");
+    ok(XRegExp("^\\p{Any}$").test("\udc00"), "\\p{Any} matches orphan low surrogate, in astral mode");
+
+    XRegExp.uninstall("astral");
+
+    ok(!XRegExp("^\\p{Any}$").test("\ud800\udc00"), "\\p{Any} does not match surrogate pair, in BMP mode");
+    ok(XRegExp("^\\p{Any}$").test("\ud800"), "\\p{Any} matches orphan high surrogate, in BMP mode");
+    ok(XRegExp("^\\p{Any}$").test("\udc00"), "\\p{Any} matches orphan low surrogate, in BMP mode");
+
     // TODO: Add tests
 });
 
@@ -1012,7 +1043,6 @@ test("XRegExp.build", function () {
     equal(XRegExp.build("(?m){{a}}", {a: /a/}).multiline, true, "Mode modifier with native flag in outer pattern is applied to the final result");
     equal(XRegExp.build("^[{{a}}]$", {a: "x"}).test("x"), false, "Named subpattern not interpolated within character class (test 1)");
     equal(XRegExp.build("^{{a}}[{{a}}]$", {a: "x"}).test("x{"), true, "Named subpattern not interpolated within character class (test 2)");
-
     ok(XRegExp.build("{{x}}", {x: "^123$"}).test("123"), "Leading ^ and trailing unescaped $ in subpattern (test 1)");
     ok(XRegExp.build("{{x}}", {x: "^123$"}).test("01234"), "Leading ^ and trailing unescaped $ in subpattern (test 2)");
     ok(XRegExp.build("{{x}}", {x: "^123\\$"}).test("123$"), "Leading ^ and trailing escaped $ in subpattern (test 1)");
