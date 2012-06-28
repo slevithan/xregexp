@@ -38,4 +38,8 @@ python scripts/script-regex.py "data/${version}-scripts.txt" > "output/scripts.j
 echo "Parsing Unicode v${version} blocks..."
 python scripts/block-regex.py "data/${version}-blocks.txt" > "output/blocks.js"
 
+# Generate the properties output data
+echo "Parsing Unicode v${version} properties..."
+python scripts/property-regex.py > "output/properties.js"
+
 echo "Done."
