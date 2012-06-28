@@ -1,5 +1,5 @@
 /*!
- * XRegExp.build 0.1.1-dev
+ * XRegExp 2.1.0-rc: XRegExp.build
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Inspired by RegExp.create by Lea Verou <http://lea.verou.me/>

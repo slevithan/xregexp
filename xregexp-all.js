@@ -177,13 +177,13 @@ var XRegExp = (function (undefined) {
  * @param {*} value Value to locate in the array.
  * @returns {Number} Zero-based index at which the item is found, or -1.
  */
-    function indexOf (array, item) {
+    function indexOf (array, value) {
         // Use the native array method, if available
         if (Array.prototype.indexOf) {
-            return array.indexOf(item);
+            return array.indexOf(value);
         }
         for (var i = 0; i < array.length; ++i) {
-            if (array[i] === item) {
+            if (array[i] === value) {
                 return i;
             }
         }
@@ -1432,7 +1432,7 @@ var XRegExp = (function (undefined) {
 /*---- unicode-base.js ----*/
 
 /*!
- * XRegExp Unicode Base 2.0.0-dev
+ * XRegExp 2.1.0-rc: Unicode Base
  * (c) 2008-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1.0 <http://unicode.org/>
@@ -1646,7 +1646,7 @@ var XRegExp = (function (undefined) {
 /*---- unicode-categories.js ----*/
 
 /*!
- * XRegExp Unicode Categories 2.0.0-dev
+ * XRegExp 2.1.0-rc: Unicode Categories
  * (c) 2010-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1.0 <http://unicode.org/>
@@ -1883,7 +1883,7 @@ var XRegExp = (function (undefined) {
 /*---- unicode-scripts.js ----*/
 
 /*!
- * XRegExp Unicode Scripts 2.0.0-dev
+ * XRegExp 2.1.0-rc: Unicode Scripts
  * (c) 2010-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1.0 <http://unicode.org/>
@@ -2328,7 +2328,7 @@ var XRegExp = (function (undefined) {
 /*---- unicode-blocks.js ----*/
 
 /*!
- * XRegExp Unicode Blocks 2.0.0-dev
+ * XRegExp 2.1.0-rc: Unicode Blocks
  * (c) 2010-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1.0 <http://unicode.org/>
@@ -3237,7 +3237,7 @@ var XRegExp = (function (undefined) {
 /*---- unicode-properties.js ----*/
 
 /*!
- * XRegExp Unicode Properties 2.0.0-dev
+ * XRegExp 2.1.0-rc: Unicode Properties
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Uses Unicode 6.1.0 <http://unicode.org/>
@@ -3312,7 +3312,7 @@ var XRegExp = (function (undefined) {
 /*---- matchrecursive.js ----*/
 
 /*!
- * XRegExp.matchRecursive 0.2.1-rc
+ * XRegExp 2.1.0-rc: XRegExp.matchRecursive
  * (c) 2009-2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -3503,7 +3503,7 @@ var XRegExp = (function (undefined) {
 /*---- build.js ----*/
 
 /*!
- * XRegExp.build 0.1.1-dev
+ * XRegExp 2.1.0-rc: XRegExp.build
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  * Inspired by RegExp.create by Lea Verou <http://lea.verou.me/>
@@ -3663,7 +3663,7 @@ var XRegExp = (function (undefined) {
 /*---- prototypes.js ----*/
 
 /*!
- * XRegExp Prototypes 1.1.0-dev
+ * XRegExp 2.1.0-rc: Prototypes
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */

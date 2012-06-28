@@ -3,12 +3,12 @@
 
 XRegExp provides augmented, extensible, cross-browser JavaScript regular expressions. You get new syntax and flags beyond what browsers support natively, along with a collection of utils to make your client-side grepping and parsing easier. XRegExp also frees you from worrying about pesky inconsistencies in cross-browser regex handling and the dubious `lastIndex` property.
 
-XRegExp supports all native ES5 regular expression syntax. It's about 3.5 KB when minified and gzipped. It works with Internet Explorer 5.5+, Firefox 1.5+, Chrome, Safari 3+, and Opera 9.5+.
+XRegExp supports all native ES5 regular expression syntax. It's about 3.6 KB when minified and gzipped. It works with Internet Explorer 5.5+, Firefox 1.5+, Chrome, Safari 3+, and Opera 9.5+. You can also use it on the server with Node.js.
 
 
 ## Performance
 
-XRegExp regexes compile to native RegExp regexes, thus there is no performance difference between the two. There is a small extra cost when *compiling* XRegExps. If you want, you can use `XRegExp.cache` to avoid incurring the compilation cost again for a given pattern and flags, across your entire application.
+XRegExp regexes compile to native `RegExp` regex objects, thus there is no performance difference between the two. There is a small extra cost when compiling XRegExps. If you want, you can use `XRegExp.cache` to avoid incurring the compilation cost again for a given pattern and flags, across your entire application.
 
 
 ## Usage examples
@@ -75,7 +75,7 @@ XRegExp.union(['a+b*c', /(dogs)\1/, /(cats)\1/], 'i');
 // -> /a\+b\*c|(dogs)\1|(cats)\2/i
 ~~~
 
-These examples should give you the flavor of what's possible, but XRegExp has more syntax, flags, utils, options, and browser fixes that aren't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. See [xregexp.com](http://xregexp.com/) for more details.
+These examples should give you the flavor of what's possible, but XRegExp has more syntax, flags, methods, options, and browser fixes that aren't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. See [xregexp.com](http://xregexp.com/) for more details.
 
 
 ## Addons
@@ -88,8 +88,8 @@ In browsers, you can either load addons individually, or bundle all addons toget
 In browsers, first include the Unicode Base script:
 
 ~~~ html
-<script src="xregexp.js"></script>
-<script src="addons/unicode/unicode-base.js"></script>
+<script src="src/xregexp.js"></script>
+<script src="src/addons/unicode/unicode-base.js"></script>
 ~~~
 
 Then you can do this:
@@ -116,8 +116,8 @@ XRegExp uses Unicode 6.1.0. By default, only code points in the Basic Multilingu
 In browsers, first include the script:
 
 ~~~ html
-<script src="xregexp.js"></script>
-<script src="addons/build.js"></script>
+<script src="src/xregexp.js"></script>
+<script src="src/addons/build.js"></script>
 ~~~
 
 You can then build regular expressions using named subpatterns, for readability and pattern reuse:
@@ -135,7 +135,7 @@ time.test('10:59'); // -> true
 XRegExp.exec('10:59', time).minutes; // -> '59'
 ~~~
 
-Named subpatterns can be provided as strings or regex objects. A leading `^` and trailing unescaped `$` are stripped from subpatterns if both are present, which allows embedding independently useful anchored patterns. `{{…}}` tokens can be quantified as a single unit. Backreferences in the outer pattern and provided subpatterns are automatically renumbered to work correctly within the larger combined pattern. The syntax `({{name}})` works as shorthand for named capture via `(?<name>{{name}})`. Named subpatterns cannot be embedded within character classes.
+Named subpatterns can be provided as strings or regex objects. A leading `^` and trailing unescaped `$` are stripped from subpatterns if both are present, which allows embedding independently-useful anchored patterns. `{{…}}` tokens can be quantified as a single unit. Backreferences in the outer pattern and provided subpatterns are automatically renumbered to work correctly within the larger combined pattern. The syntax `({{name}})` works as shorthand for named capture via `(?<name>{{name}})`. Named subpatterns cannot be embedded within character classes.
 
 See also: *[Creating Grammatical Regexes Using XRegExp.build](http://blog.stevenlevithan.com/archives/grammatical-patterns-xregexp-build)*.
 
@@ -145,8 +145,8 @@ See also: *[Creating Grammatical Regexes Using XRegExp.build](http://blog.steven
 In browsers, first include the script:
 
 ~~~ html
-<script src="xregexp.js"></script>
-<script src="addons/matchrecursive.js"></script>
+<script src="src/xregexp.js"></script>
+<script src="src/addons/matchrecursive.js"></script>
 ~~~
 
 You can then match recursive constructs using XRegExp pattern strings as left and right delimiters:
@@ -196,8 +196,8 @@ XRegExp.matchRecursive(str, '<', '>', 'gy');
 In browsers, first include the script:
 
 ~~~ html
-<script src="xregexp.js"></script>
-<script src="addons/prototypes.js"></script>
+<script src="src/xregexp.js"></script>
+<script src="src/addons/prototypes.js"></script>
 ~~~
 
 New XRegExp regexes then gain a collection of useful methods: `apply`, `call`, `forEach`, `globalize`, `match`, `xexec`, and `xtest`.
@@ -227,13 +227,13 @@ XRegExp.globalize(/[a-z]/i).xexec('abc');
 In browsers:
 
 ~~~ html
-<script src="xregexp-min.js"></script>
+<script src="build/xregexp-min.js"></script>
 ~~~
 
 Or, to bundle XRegExp with all of its addons:
 
 ~~~ html
-<script src="xregexp-all-min.js"></script>
+<script src="build/xregexp-all-min.js"></script>
 ~~~
 
 Using [npm](http://npmjs.org/):
@@ -257,11 +257,6 @@ npm test  # in the xregexp root
 ~~~
 
 If XRegExp was not installed using npm, just open `tests/index.html` in your browser.
-
-
-## &c
-
-**Lookbehind:** A [collection of short functions](https://gist.github.com/2387872) is available that makes it easy to simulate infinite-length leading lookbehind.
 
 
 ## Changelog

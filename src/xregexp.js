@@ -173,13 +173,13 @@ var XRegExp = (function (undefined) {
  * @param {*} value Value to locate in the array.
  * @returns {Number} Zero-based index at which the item is found, or -1.
  */
-    function indexOf (array, item) {
+    function indexOf (array, value) {
         // Use the native array method, if available
         if (Array.prototype.indexOf) {
-            return array.indexOf(item);
+            return array.indexOf(value);
         }
         for (var i = 0; i < array.length; ++i) {
-            if (array[i] === item) {
+            if (array[i] === value) {
                 return i;
             }
         }

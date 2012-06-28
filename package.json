@@ -1,6 +1,6 @@
 {
     "name": "xregexp",
-    "version": "2.1.0-dev",
+    "version": "2.1.0-rc",
     "homepage": "http://xregexp.com/",
     "author": "Steven Levithan <steves_list@hotmail.com>",
     "license": "MIT",

@@ -1,5 +1,5 @@
 /*!
- * XRegExp BackCompat 1.0.0
+ * XRegExp 2.1.0-rc: BackCompat
  * (c) 2012 Steven Levithan <http://xregexp.com/>
  * MIT License
  */
@@ -99,8 +99,8 @@
  */
     RegExp.prototype.execAll = function (str) {
         return XRegExp.forEach(str, this, function (match) {
-            this.push(match);
-        }, []);
+                this.push(match);
+            }, []);
     };
 
 }(XRegExp));
