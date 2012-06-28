@@ -9,7 +9,7 @@
 /**
  * Adds support for all Unicode scripts. E.g., `\p{Latin}`. Token names are case insensitive, and
  * any spaces, hyphens, and underscores are ignored.
- * @requires XRegExp, XRegExp Unicode Base
+ * @requires XRegExp, Unicode Base
  */
 (function (XRegExp) {
     'use strict';
