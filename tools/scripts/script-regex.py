@@ -7,12 +7,12 @@ import sys
 def format(scriptName, bmpRange, astralRange, isBmpLast):
 	buf = []
 	if isBmpLast:
-		buf.append('        isBmpLast: true')
+		buf.append('            isBmpLast: true')
 	if bmpRange != '':
-		buf.append('        bmp: \'' + bmpRange + '\'')
+		buf.append('            bmp: \'' + bmpRange + '\'')
 	if astralRange != '':
-		buf.append('        astral: \'' + astralRange + '\'')
-	return '    {\n        name: \'' + scriptName + '\',\n' + ',\n'.join(buf) + '\n    }'
+		buf.append('            astral: \'' + astralRange + '\'')
+	return '        {\n            name: \'' + scriptName + '\',\n' + ',\n'.join(buf) + '\n        }'
 
 def main(sourceFile):
 	dictionary = parseScriptsOrProps(sourceFile)
