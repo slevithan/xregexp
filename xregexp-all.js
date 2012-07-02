@@ -26,7 +26,10 @@ var XRegExp = (function (undefined) {
 
     var // ...
 
+// Internal reference to the XRegExp global object
     self,
+
+// Shortcuts
     addToken,
     add,
 
@@ -194,11 +197,11 @@ var XRegExp = (function (undefined) {
  * Determines whether an object is of the specified type.
  * @private
  * @param {*} value Object to check.
- * @param {String} type Type to check for, in lowercase.
+ * @param {String} type Type to check for, in TitleCase.
  * @returns {Boolean} Whether the object matches the type.
  */
     function isType(value, type) {
-        return Object.prototype.toString.call(value).toLowerCase() === '[object ' + type + ']';
+        return Object.prototype.toString.call(value) === '[object ' + type + ']';
     }
 
 /**
@@ -209,10 +212,10 @@ var XRegExp = (function (undefined) {
  */
     function prepareOptions(value) {
         value = value || {};
-        if (isType(value, 'string')) {
+        if (isType(value, 'String')) {
             value = self.forEach(value, /[^\s,]+/, function (match) {
-                this[match] = true;
-            }, {});
+                    this[match] = true;
+                }, {});
         }
         return value;
     }
@@ -232,7 +235,7 @@ var XRegExp = (function (undefined) {
             result = null,
             match,
             t;
-        // Protect against constructing XRegExps within token definition functions
+        // Protect against constructing XRegExp objects within token definition functions
         isInsideConstructor = true;
         try {
             while (i--) { // Run in reverse order
@@ -330,7 +333,8 @@ var XRegExp = (function (undefined) {
         if (isInsideConstructor) {
             throw new Error('Cannot build XRegExp objects within token definition functions');
         }
-        var output = [],
+
+        var output = '',
             scope = defaultScope,
             context = {
                 hasNamedCapture: false,
@@ -346,36 +350,41 @@ var XRegExp = (function (undefined) {
             i;
         pattern = pattern === undefined ? '' : String(pattern);
         flags = flags === undefined ? '' : String(flags);
-        duplicateFlags.lastIndex = 0; // Uses /g, so reset starting position
-        // Most browsers throw on duplicate flags, so copy this for nonnative flags
+
+        // Shared regex uses /g, so reset lastIndex
+        duplicateFlags.lastIndex = 0;
+        // Most browsers throw on duplicate flags; copy the behavior for nonnative flags
         if (nativ.test.call(duplicateFlags, flags)) {
-            throw new SyntaxError('Invalid duplicate regex flag');
+            throw new SyntaxError('Invalid duplicate regex flag ' + flags);
         }
-        // Strip/apply leading mode modifier with any combination of flags except g or y: (?imnsx)
+        // Strip/apply leading mode modifier with any combination of flags except g or y
         pattern = nativ.replace.call(pattern, /^\(\?([\w$]+)\)/, function ($0, $1) {
             if (nativ.test.call(/[gy]/, $1)) {
-                throw new SyntaxError('Cannot use flag g or y in mode modifier');
+                throw new SyntaxError('Cannot use flag g or y in mode modifier ' + $0);
             }
             flags = nativ.replace.call(flags + $1, duplicateFlags, '');
             return '';
         });
-        // Throw on unknown native or custom flags
+        // Throw on unknown native or nonnative flags
         for (i = 0; i < flags.length; ++i) {
             if (registeredFlags.indexOf(flags.charAt(i)) < 0) {
-                throw new SyntaxError('Invalid regex flag ' + flags.charAt(i));
+                throw new SyntaxError('Unknown regex flag ' + flags.charAt(i));
             }
         }
+
         while (pos < pattern.length) {
             // Check for custom tokens at the current position
             tokenResult = runTokens(pattern, pos, scope, context);
             if (tokenResult) {
-                output.push(tokenResult.output);
+                output += tokenResult.output;
                 pos += (tokenResult.match[0].length || 1);
             } else {
-                // Check for native tokens (except character classes) at the current position
-                match = nativ.exec.call(nativeTokens[scope], pattern.slice(pos));
+                // Check for native tokens (except character classes) at the current position. This
+                // could use the native exec, except that sticky processing avoids string slicing
+                // in browsers that support /y
+                match = self.exec(pattern, nativeTokens[scope], pos, 'sticky');
                 if (match) {
-                    output.push(match[0]);
+                    output += match[0];
                     pos += match[0].length;
                 } else {
                     chr = pattern.charAt(pos);
@@ -385,15 +394,16 @@ var XRegExp = (function (undefined) {
                         scope = defaultScope;
                     }
                     // Advance position by one character
-                    output.push(chr);
+                    output += chr;
                     ++pos;
                 }
             }
         }
+
         return augment(
-            new RegExp(output.join(''), nativ.replace.call(flags, /[^gimy]+/g, '')),
+            new RegExp(output, nativ.replace.call(flags, /[^gimy]+/g, '')),
             context.hasNamedCapture ? context.captureNames : null,
-            true // Attach `XRegExp.prototype` properties
+            true // `addProto`
         );
     };
 
@@ -451,10 +461,10 @@ var XRegExp = (function (undefined) {
  *     Has access to persistent properties of the regex being built, through `this` (including
  *     function `this.hasFlag`).
  *   <li>`customFlags` {String} Nonnative flags used by the token's handler or trigger functions.
- *     Prevents XRegExp from throwing an invalid flag error when the specified flags are used.
+ *     Prevents XRegExp from throwing an 'unknown flag' error when the specified flags are used.
  * @example
  *
- * // Basic usage: Adds \a for ALERT character
+ * // Basic usage: Add \a for the ALERT control code
  * XRegExp.addToken(
  *   /\\a/,
  *   function () {return '\\x07';},
@@ -575,6 +585,10 @@ var XRegExp = (function (undefined) {
             i = -1,
             match;
         while ((match = self.exec(str, regex, pos))) {
+            // Because `regex` is provided to `callback`, the function can use the deprecated/
+            // nonstandard `RegExp.prototype.compile` to mutate the regex. However, since
+            // `XRegExp.exec` doesn't use `lastIndex` to set the search position, this can't lead
+            // to an infinite loop, at least
             callback.call(context, match, ++i, str, regex);
             pos = match.index + (match[0].length || 1);
         }
@@ -663,7 +677,7 @@ var XRegExp = (function (undefined) {
  * XRegExp.isRegExp(XRegExp('(?s).')); // -> true
  */
     self.isRegExp = function (value) {
-        return isType(value, 'regexp');
+        return isType(value, 'RegExp');
     };
 
 /**
@@ -675,10 +689,11 @@ var XRegExp = (function (undefined) {
  * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp} regex Regex to search with.
- * @param {String} [scope='one'] Use 'one' to return the first match as a string, or null. Use
- *   'all' to return an array of all matched strings, or an empty array. If not explicitly
- *   specified and using a regex with flag `g`, `scope` is 'all'.
- * @returns {String|Array} First match as a string, or an array of all matched strings.
+ * @param {String} [scope='one'] Use 'one' to return the first match as a string. Use 'all' to
+ *   return an array of all matched strings. If not explicitly specified and `regex` uses flag `g`,
+ *   `scope` is 'all'.
+ * @returns {String|Array} In match-first mode: First match as a string, or `null`. In match-all
+ *   mode: Array of all matched strings, or an empty array.
  * @example
  *
  * // Match first
@@ -985,9 +1000,11 @@ var XRegExp = (function (undefined) {
             output = [],
             pattern,
             i;
-        if (!(isType(patterns, 'array') && patterns.length)) {
+
+        if (!(isType(patterns, 'Array') && patterns.length)) {
             throw new TypeError('Must provide a nonempty array of patterns to merge');
         }
+
         for (i = 0; i < patterns.length; ++i) {
             pattern = patterns[i];
             if (self.isRegExp(pattern)) {
@@ -1000,6 +1017,7 @@ var XRegExp = (function (undefined) {
                 output.push(self.escape(pattern));
             }
         }
+
         return self(output.join('|'), flags);
     };
 
@@ -1029,6 +1047,7 @@ var XRegExp = (function (undefined) {
             name,
             r2,
             i;
+
         if (match) {
             // Fix browsers whose `exec` methods don't return `undefined` for nonparticipating
             // capturing groups. This fixes IE 5.5-8, but not IE9's quirks mode or emulation of
@@ -1060,10 +1079,12 @@ var XRegExp = (function (undefined) {
                 this.lastIndex = match.index;
             }
         }
+
         if (!this.global) {
             // Fixes IE, Opera bug (last tested IE 9, Opera 11.6)
             this.lastIndex = origLastIndex;
         }
+
         return match;
     };
 
@@ -1113,7 +1134,12 @@ var XRegExp = (function (undefined) {
  * @returns {String} New string with one or all matches replaced.
  */
     fixed.replace = function (search, replacement) {
-        var isRegex = self.isRegExp(search), captureNames, result, str, origLastIndex;
+        var isRegex = self.isRegExp(search),
+            captureNames,
+            result,
+            str,
+            origLastIndex;
+
         if (isRegex) {
             if (search.xregexp) {
                 captureNames = search.xregexp.captureNames;
@@ -1122,9 +1148,10 @@ var XRegExp = (function (undefined) {
                 origLastIndex = search.lastIndex;
             }
         } else {
-            search += '';
+            search += ''; // Type-convert
         }
-        if (isType(replacement, 'function')) {
+
+        if (isType(replacement, 'Function')) {
             result = nativ.replace.call(String(this), search, function () {
                 var args = arguments, i;
                 if (captureNames) {
@@ -1214,6 +1241,7 @@ var XRegExp = (function (undefined) {
                 });
             });
         }
+
         if (isRegex) {
             if (search.global) {
                 // Fixes IE, Safari bug (last tested IE 9, Safari 5.1)
@@ -1223,6 +1251,7 @@ var XRegExp = (function (undefined) {
                 search.lastIndex = origLastIndex;
             }
         }
+
         return result;
     };
 

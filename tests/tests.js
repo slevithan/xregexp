@@ -213,6 +213,17 @@ test("XRegExp.forEach", function () {
     });
     equal(interimLastIndex1, 0, "Nonglobal regex lastIndex not updated during iterations (test 1)");
     equal(interimLastIndex2, 0, "Nonglobal regex lastIndex not updated during iterations (test 2)");
+
+    // Opera 11's compile method has a bug (it wraps '/'..'/' around the regex), so I can't test
+    // the entire result (Opera 11 gives [false, true] here instead of [false, true, true]). This
+    // test merely checks that using compile to mutate the regex within the callback works in
+    // principle and doesn't trigger an infinite loop
+    var flagIResults = XRegExp.forEach("str", /./, function (m, i, s, r) {
+            this.push(r.ignoreCase);
+            r.compile("..", "i");
+        }, []);
+    ok(!flagIResults[0], "RegExp.prototype.compile in callback [0]");
+    ok(flagIResults[1], "RegExp.prototype.compile in callback [1]");
 });
 
 test("XRegExp.globalize", function () {
