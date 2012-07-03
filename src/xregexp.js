@@ -10,10 +10,8 @@
  * with tools to make your client-side grepping simpler and more powerful, while freeing you from
  * worrying about pesky cross-browser inconsistencies and the dubious `lastIndex` property. See
  * XRegExp's documentation (http://xregexp.com/) for more details.
- * @module xregexp
- * @requires N/A
  */
-var XRegExp = (function (undefined) {
+var XRegExp = (function () {
     'use strict';
 
 /*--------------------------------------
@@ -95,7 +93,7 @@ var XRegExp = (function (undefined) {
  * Attaches named capture data and `XRegExp.prototype` properties to a regex object.
  * @private
  * @param {RegExp} regex Regex to augment.
- * @param {Array} captureNames Array with capture names, or null.
+ * @param {Array} captureNames Array with capture names, or `null`.
  * @param {Boolean} [addProto=false] Whether to attach `XRegExp.prototype` properties.
  * @param {Boolean} [isNative=false] Whether the regex was created by `RegExp`; not `XRegExp`.
  * @returns {RegExp} Augmented regex.
@@ -224,7 +222,7 @@ var XRegExp = (function (undefined) {
  * @param {Number} scope Current regex scope.
  * @param {Object} context Context object assigned to token handler functions.
  * @returns {Object} Object with properties `output` (the substitution string returned by the
- *   successful token handler) and `match` (the token's match array), or null.
+ *   successful token handler) and `match` (the token's match array), or `null`.
  */
     function runTokens(pattern, pos, scope, context) {
         var i = tokens.length,
@@ -234,7 +232,8 @@ var XRegExp = (function (undefined) {
         // Protect against constructing XRegExp objects within token definition functions
         isInsideConstructor = true;
         try {
-            while (i--) { // Run in reverse order
+            // Run in reverse insertion order
+            while (i--) {
                 t = tokens[i];
                 if (
                     (t.scope === 'all' || t.scope === scope) &&
@@ -246,7 +245,8 @@ var XRegExp = (function (undefined) {
                             output: t.handler.call(context, match, scope),
                             match: match
                         };
-                        break; // Finished with token tests
+                        // Finished with token tests
+                        break;
                     }
                 }
             }
@@ -294,15 +294,17 @@ var XRegExp = (function (undefined) {
  * @class XRegExp
  * @constructor
  * @param {String|RegExp} pattern Regex pattern string, or an existing `RegExp` object to copy.
- * @param {String} [flags] Any combination of flags:
- *   <li>`g` - global
- *   <li>`i` - ignore case
- *   <li>`m` - multiline anchors
- *   <li>`n` - explicit capture
- *   <li>`s` - dot matches all (aka singleline)
- *   <li>`x` - free-spacing and line comments (aka extended)
- *   <li>`y` - sticky (Firefox 3+ only)
- *   <li>`A` - astral (requires the Unicode Base addon)
+ * @param {String} [flags] Any combination of flags.
+ *   Native flags:
+ *     <li>`g` - global
+ *     <li>`i` - ignore case
+ *     <li>`m` - multiline anchors
+ *     <li>`y` - sticky (Firefox 3+)
+ *   Additional XRegExp flags:
+ *     <li>`n` - explicit capture
+ *     <li>`s` - dot matches all (aka singleline)
+ *     <li>`x` - free-spacing and line comments (aka extended)
+ *     <li>`A` - astral (requires the Unicode Base addon)
  *   Flags cannot be provided when constructing one `RegExp` from another.
  * @returns {RegExp} Extended regular expression object.
  * @example
@@ -516,7 +518,7 @@ var XRegExp = (function (undefined) {
  * @param {Number} [pos=0] Zero-based index at which to start the search.
  * @param {Boolean|String} [sticky=false] Whether the match must start at the specified position
  *   only. The string `'sticky'` is accepted as an alternative to `true`.
- * @returns {Array} Match array with named backreference properties, or null.
+ * @returns {Array} Match array with named backreference properties, or `null`.
  * @example
  *
  * // Basic use, with named backreference
@@ -681,12 +683,12 @@ var XRegExp = (function (undefined) {
  * This is essentially a more convenient re-implementation of `String.prototype.match` that gives
  * the result types you actually want (string instead of `exec`-style array in match-first mode,
  * and an empty array instead of `null` when no matches are found in match-all mode). It also lets
- * you override flag `g` and ignore `lastIndex`, and fixes browser bugs.
+ * you override flag g and ignore `lastIndex`, and fixes browser bugs.
  * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp} regex Regex to search with.
  * @param {String} [scope='one'] Use 'one' to return the first match as a string. Use 'all' to
- *   return an array of all matched strings. If not explicitly specified and `regex` uses flag `g`,
+ *   return an array of all matched strings. If not explicitly specified and `regex` uses flag g,
  *   `scope` is 'all'.
  * @returns {String|Array} In match-first mode: First match as a string, or `null`. In match-all
  *   mode: Array of all matched strings, or an empty array.
@@ -769,7 +771,7 @@ var XRegExp = (function (undefined) {
 /**
  * Returns a new string with one or all matches of a pattern replaced. The pattern can be a string
  * or regex, and the replacement can be a string or a function to be called for each match. To
- * perform a global search and replace, use the optional `scope` argument or include flag `g` if
+ * perform a global search and replace, use the optional `scope` argument or include flag g if
  * using a regex. Replacement strings can use `${n}` for named and numbered backreferences.
  * Replacement functions can use named backreferences via `arguments[0].name`. Also fixes browser
  * bugs compared to the native `String.prototype.replace` and can be used reliably cross-browser.
@@ -793,7 +795,7 @@ var XRegExp = (function (undefined) {
  *     <li>The zero-based index of the match within the total search string.
  *     <li>The total string being searched.
  * @param {String} [scope='one'] Use 'one' to replace the first match only, or 'all'. If not
- *   explicitly specified and using a regex with flag `g`, `scope` is 'all'.
+ *   explicitly specified and using a regex with flag g, `scope` is 'all'.
  * @returns {String} New string with one or all matches replaced.
  * @example
  *
@@ -983,12 +985,16 @@ var XRegExp = (function (undefined) {
             captureNames,
             rewrite = function (match, paren, backref) {
                 var name = captureNames[numCaptures - numPriorCaptures];
-                if (paren) { // Capturing group
+                // Capturing group
+                if (paren) {
                     ++numCaptures;
-                    if (name) { // If the current capture has a name
+                    // If the current capture has a name, preserve the name
+                    if (name) {
                         return '(?<' + name + '>';
                     }
-                } else if (backref) { // Backreference
+                // Backreference
+                } else if (backref) {
+                    // Rewrite the backreference
                     return '\\' + (+backref + numPriorCaptures);
                 }
                 return match;
@@ -1035,7 +1041,7 @@ var XRegExp = (function (undefined) {
  * override the native method. Use via `XRegExp.exec` without overriding natives.
  * @private
  * @param {String} str String to search.
- * @returns {Array} Match array with named backreference properties, or null.
+ * @returns {Array} Match array with named backreference properties, or `null`.
  */
     fixed.exec = function (str) {
         var origLastIndex = this.lastIndex,
@@ -1053,8 +1059,8 @@ var XRegExp = (function (undefined) {
                 // Using `str.slice(match.index)` rather than `match[0]` in case lookahead allowed
                 // matching due to characters outside the match
                 nativ.replace.call(String(str).slice(match.index), r2, function () {
-                    var i;
-                    for (i = 1; i < arguments.length - 2; ++i) { // Skip index 0 and the last 2
+                    // Skip index 0 and the last 2
+                    for (var i = 1; i < arguments.length - 2; ++i) {
                         if (arguments[i] === undefined) {
                             match[i] = undefined;
                         }
@@ -1063,7 +1069,8 @@ var XRegExp = (function (undefined) {
             }
             // Attach named capture properties
             if (this.xregexp && this.xregexp.captureNames) {
-                for (i = 1; i < match.length; ++i) { // Skip index 0
+                // Skip index 0
+                for (i = 1; i < match.length; ++i) {
                     name = this.xregexp.captureNames[i - 1];
                     if (name) {
                         match[name] = match[i];
@@ -1102,8 +1109,8 @@ var XRegExp = (function (undefined) {
  * override the native method.
  * @private
  * @param {RegExp|*} regex Regex to search with. If not a regex object, it is passed to `RegExp`.
- * @returns {Array} If `regex` uses flag g, an array of match strings or null. Without flag g, the
- *   result of calling `regex.exec(this)`.
+ * @returns {Array} If `regex` uses flag g, an array of match strings or `null`. Without flag g,
+ *   the result of calling `regex.exec(this)`.
  */
     fixed.match = function (regex) {
         if (!self.isRegExp(regex)) {
@@ -1261,8 +1268,10 @@ var XRegExp = (function (undefined) {
  */
     fixed.split = function (separator, limit) {
         if (!self.isRegExp(separator)) {
-            return nativ.split.apply(this, arguments); // use faster native method
+            // Browsers handle nonregex split correctly, so use the faster native method
+            return nativ.split.apply(this, arguments);
         }
+
         var str = String(this),
             origLastIndex = separator.lastIndex,
             output = [],
@@ -1276,8 +1285,10 @@ var XRegExp = (function (undefined) {
          * If other: Type-convert, then use the above rules
          */
         limit = (limit === undefined ? -1 : limit) >>> 0;
+
         self.forEach(str, separator, function (match) {
-            if ((match.index + match[0].length) > lastLastIndex) { // != `if (match[0].length)`
+            // This condition is not the same as `if (match[0].length)`
+            if ((match.index + match[0].length) > lastLastIndex) {
                 output.push(str.slice(lastLastIndex, match.index));
                 if (match.length > 1 && match.index < str.length) {
                     Array.prototype.push.apply(output, match.slice(1));
@@ -1293,6 +1304,7 @@ var XRegExp = (function (undefined) {
         } else {
             output.push(str.slice(lastLastIndex));
         }
+
         separator.lastIndex = origLastIndex;
         return output.length > limit ? output.slice(0, limit) : output;
     };
@@ -1304,9 +1316,9 @@ var XRegExp = (function (undefined) {
 // Shortcut
     add = addToken.on;
 
-/* Letter identity escapes that natively match literal characters: \p, \P, etc.
- * Should be SyntaxErrors but are allowed in web reality. XRegExp makes them errors for cross-
- * browser consistency and to reserve their syntax, but lets them be superseded by addons.
+/* Letter identity escapes that natively match literal characters: `\a`, `\A`, etc. These should be
+ * SyntaxErrors but are allowed in web reality. XRegExp makes them errors for cross-browser
+ * consistency and to reserve their syntax, but lets them be superseded by addons.
  */
     add(/\\([ABCE-RTUVXYZaeg-mopqyz]|c(?![A-Za-z])|u(?![\dA-Fa-f]{4})|x(?![\dA-Fa-f]{2}))/,
         function (match, scope) {
@@ -1318,19 +1330,19 @@ var XRegExp = (function (undefined) {
         },
         {scope: 'all'});
 
-/* Empty character class: [] or [^]
- * Fixes a critical cross-browser syntax inconsistency. Unless this is standardized (per the spec),
- * regex syntax can't be accurately parsed because character class endings can't be determined.
+/* Empty character class: `[]` or `[^]`. This fixes a critical cross-browser syntax inconsistency.
+ * Unless this is standardized (per the ES spec), regex syntax can't be accurately parsed because
+ * character class endings can't be determined.
  */
     add(/\[(\^?)]/,
         function (match) {
             // For cross-browser compatibility with ES3, convert [] to \b\B and [^] to [\s\S].
-            // (?!) should work like \b\B, but is unreliable in Firefox
+            // (?!) should work like \b\B, but is unreliable in some versions of Firefox
             return match[1] ? '[\\s\\S]' : '\\b\\B';
         });
 
-/* Comment pattern: (?# )
- * Inline comments are an alternative to the line comments allowed in free-spacing mode (flag x).
+/* Comment pattern: `(?# )`. Inline comments are an alternative to the line comments allowed in
+ * free-spacing mode (flag x).
  */
     add(/\(\?#[^)]*\)/,
         function (match) {
@@ -1339,8 +1351,8 @@ var XRegExp = (function (undefined) {
                     '' : '(?:)';
         });
 
-/* Named backreference: \k<name>
- * Backreference names can use the characters A-Z, a-z, 0-9, _, and $ only.
+/* Named backreference: `\k<name>`. Backreference names can use the characters A-Z, a-z, 0-9, _,
+ * and $ only.
  */
     add(/\\k<([\w$]+)>/,
         function (match) {
@@ -1385,11 +1397,11 @@ var XRegExp = (function (undefined) {
             customFlags: 's'
         });
 
-/* Named capturing group; match the opening delimiter only: (?<name>
- * Capture names can use the characters A-Z, a-z, 0-9, _, and $ only. Names can't be integers.
- * Supports Python-style (?P<name> as an alternate syntax to avoid issues in recent Opera (which
- * natively supports the Python-style syntax). Otherwise, XRegExp might treat numbered
- * backreferences to Python-style named capture as octals.
+/* Named capturing group; match the opening delimiter only: `(?<name>`. Capture names can use the
+ * characters A-Z, a-z, 0-9, _, and $ only. Names can't be integers. Supports Python-style
+ * `(?P<name>` as an alternate syntax to avoid issues in recent Opera (which natively supports the
+ * Python-style syntax). Otherwise, XRegExp might treat numbered backreferences to Python-style
+ * named capture as octals.
  */
     add(/\(\?P?<([\w$]+)>/,
         function (match) {
@@ -1406,10 +1418,9 @@ var XRegExp = (function (undefined) {
             return '(';
         });
 
-/* Numbered backreference or octal, plus any following digits: \0, \11, etc.
- * Octals except \0 not followed by 0-9 and backreferences to unopened capture groups throw an
- * error. Other matches are returned unaltered. IE <= 8 doesn't support backreferences greater than
- * \99 in regex syntax.
+/* Numbered backreference or octal, plus any following digits: `\0`, `\11`, etc. Octals except `\0`
+ * not followed by 0-9 and backreferences to unopened capture groups throw an error. Other matches
+ * are returned unaltered. IE < 9 doesn't support backreferences above `\99` in regex syntax.
  */
     add(/\\(\d+)/,
         function (match, scope) {
@@ -1428,8 +1439,8 @@ var XRegExp = (function (undefined) {
         },
         {scope: 'all'});
 
-/* Capturing group; match the opening parenthesis only.
- * Required for support of named capturing groups. Also adds explicit capture mode (flag n).
+/* Capturing group; match the opening parenthesis only. Required for support of named capturing
+ * groups. Also adds explicit capture mode (flag n).
  */
     add(/\((?!\?)/,
         function () {

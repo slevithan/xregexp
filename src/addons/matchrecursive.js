@@ -74,7 +74,8 @@
         options = options || {};
         var global = flags.indexOf('g') > -1,
             sticky = flags.indexOf('y') > -1,
-            basicFlags = flags.replace(/y/g, ''), // Flag `y` controlled internally
+            // Flag `y` is controlled internally
+            basicFlags = flags.replace(/y/g, ''),
             escapeChar = options.escapeChar,
             vN = options.valueNames,
             output = [],
@@ -98,9 +99,10 @@
             // Using `XRegExp.union` safely rewrites backreferences in `left` and `right`
             esc = new RegExp(
                 '(?:' + escapeChar + '[\\S\\s]|(?:(?!' +
-                    XRegExp.union([left, right]).source +
-                    ')[^' + escapeChar + '])+)+',
-                flags.replace(/[^im]+/g, '') // Flags `gy` not needed here
+                        XRegExp.union([left, right]).source +
+                        ')[^' + escapeChar + '])+)+',
+                // Flags `gy` not needed here
+                flags.replace(/[^im]+/g, '')
             );
         }
 
@@ -170,7 +172,7 @@
                     }
                 }
             } else {
-                throw new Error('String contains unbalanced delimiters');
+                throw new Error('Unbalanced delimiter found in string');
             }
             // If the delimiter matched an empty string, avoid an infinite loop
             if (delimStart === delimEnd) {

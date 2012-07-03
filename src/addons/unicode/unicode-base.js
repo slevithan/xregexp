@@ -89,7 +89,6 @@
 // Combines and optionally negates BMP and astral data
     function buildAstral(slug, negated) {
         var item = unicode[slug],
-            anyCodePoint = '[\uD800-\uDBFF][\uDC00-\uDFFF]|[\0-\uFFFF]',
             combined = '';
         if (item.bmp && !item.isBmpLast) {
             combined = '[' + item.bmp + ']' + (item.astral ? '|' : '');
@@ -102,7 +101,7 @@
         }
         // Astral Unicode tokens always match a code point, never a code unit
         return negated ?
-                '(?:(?!' + combined + ')(?:' + anyCodePoint + '))' :
+                '(?:(?!' + combined + ')(?:[\uD800-\uDBFF][\uDC00-\uDFFF]|[\0-\uFFFF]))' :
                 '(?:' + combined + ')';
     }
 
@@ -120,7 +119,7 @@
 
     XRegExp.install('extensibility');
 
-/* Adds Unicode property syntax to XRegExp: \p{..}, \P{..}, \p{^..}
+/* Add Unicode property syntax: \p{..}, \P{..}, \p{^..}. Also add astral mode (flag A).
  */
     XRegExp.addToken(
         /\\([pP]){(\^?)([^}]*)}/,
@@ -155,7 +154,7 @@
     );
 
 /**
- * Adds to the list of Unicode properties that XRegExp regexes can match via \p{..} or \P{..}.
+ * Adds to the list of Unicode properties that XRegExp regexes can match via `\p` or `\P`.
  * @memberOf XRegExp
  * @param {Array} data Objects with named character ranges. Each object may have properties `name`,
  *   `alias`, `isBmpLast`, `bmp`, and `astral`. All but `name` are optional, although one of `bmp`
@@ -164,7 +163,7 @@
  *   and `astral` are provided, the `bmp` data (only) is used in BMP mode, and the combination of
  *   `bmp` and `astral` data is used in astral mode. `isBmpLast` is needed when a property matches
  *   orphan high surrogates *and* uses surrogate pairs to match astral code points. The `bmp` and
- *   `astral` data should be a combination of literal characters and \xHH or \uHHHH escape
+ *   `astral` data should be a combination of literal characters and `\xHH` or `\uHHHH` escape
  *   sequences, with hyphens to create ranges. Any regex metacharacters in the data should be
  *   escaped, apart from range-creating hyphens. The `astral` data can additionally use character
  *   classes and alternation, and should use surrogate pairs to represent astral code points.
@@ -198,8 +197,8 @@
         }
     };
 
-/* Add data for the Unicode `L` or `Letter` category. Separate addons are available that include
- * additional categories, scripts, blocks, and properties.
+/* Add data for the Unicode `L` or `Letter` category. Separate addons are available that add other
+ * categories, scripts, blocks, and properties.
  */
     XRegExp.addUnicodeData([{
         name: 'L',
