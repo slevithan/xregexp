@@ -4,16 +4,16 @@
 
 /*!
  * XRegExp 2.1.0-rc
- * (c) 2007-2012 Steven Levithan <http://xregexp.com/>
+ * <http://xregexp.com/>
+ * (c) 2007-2012 Steven Levithan
  * MIT License
  */
 
 /**
- * XRegExp provides augmented, extensible JavaScript regular expressions. You get new syntax,
- * flags, and methods beyond what browsers support natively. XRegExp is also a regex utility belt
- * with tools to make your client-side grepping simpler and more powerful, while freeing you from
- * worrying about pesky cross-browser inconsistencies and the dubious `lastIndex` property. See
- * XRegExp's documentation (http://xregexp.com/) for more details.
+ * XRegExp provides augmented, extensible regular expressions. You get new syntax, flags, and
+ * methods beyond what browsers support natively. XRegExp is also a regex utility belt with tools
+ * to make your client-side grepping simpler and more powerful, while freeing you from worrying
+ * about pesky cross-browser inconsistencies and the dubious `lastIndex` property.
  */
 var XRegExp = (function () {
     'use strict';
@@ -183,7 +183,9 @@ var XRegExp = (function () {
         if (Array.prototype.indexOf) {
             return array.indexOf(value);
         }
-        for (var i = 0; i < array.length; ++i) {
+        var len = array.length, i;
+        // Not a very good shim, but good enough for XRegExp's use of it
+        for (i = 0; i < len; ++i) {
             if (array[i] === value) {
                 return i;
             }
@@ -297,7 +299,7 @@ var XRegExp = (function () {
  * is in fact a native `RegExp` and works with all native methods.
  * @class XRegExp
  * @constructor
- * @param {String|RegExp} pattern Regex pattern string, or an existing `RegExp` object to copy.
+ * @param {String|RegExp} pattern Regex pattern string, or an existing regex object to copy.
  * @param {String} [flags] Any combination of flags.
  *   Native flags:
  *     <li>`g` - global
@@ -314,13 +316,13 @@ var XRegExp = (function () {
  * @example
  *
  * // With named capture and flag x
- * XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
- *          (?<month> [0-9]{2}) -?  # month \n\
- *          (?<day>   [0-9]{2})     # day   ', 'x');
+ * XRegExp('(?<year>  [0-9]{4} ) -?  # year  \n\
+ *          (?<month> [0-9]{2} ) -?  # month \n\
+ *          (?<day>   [0-9]{2} )     # day   ', 'x');
  *
- * // Providing a regex object copies it. Native regexes are not recompiled using XRegExp syntax.
- * // The copy maintains special properties for named capture, is augmented with
- * // `XRegExp.prototype` methods, and has a fresh `lastIndex` property (set to zero).
+ * // Providing a regex object copies it. Native regexes are recompiled using native (not XRegExp)
+ * // syntax. Copies maintain special properties for named capture, are augmented with
+ * // `XRegExp.prototype` methods, and have fresh `lastIndex` properties (set to zero).
  * XRegExp(/regex/);
  */
     self = function (pattern, flags) {
@@ -409,8 +411,8 @@ var XRegExp = (function () {
         );
     };
 
-// Add `RegExp.prototype` to the prototype chain, even for XRegExp instances that have their
-// prototype changed to `XRegExp.prototype` via `__proto__`
+// Add `RegExp.prototype` to the prototype chain for XRegExp instances that have their prototype
+// changed to `XRegExp.prototype` via `__proto__`
     self.prototype = new RegExp();
 
 /*--------------------------------------
@@ -1056,15 +1058,16 @@ var XRegExp = (function () {
 
         if (match) {
             // Fix browsers whose `exec` methods don't return `undefined` for nonparticipating
-            // capturing groups. This fixes IE 5.5-8, but not IE9's quirks mode or emulation of
-            // older IEs. IE9 in standards mode follows the spec
+            // capturing groups. This fixes IE 5.5-8, but not IE 9's quirks mode or emulation of
+            // older IEs. IE 9 in standards mode follows the spec
             if (!compliantExecNpcg && match.length > 1 && indexOf(match, '') > -1) {
                 r2 = copy(this, {remove: 'g'});
                 // Using `str.slice(match.index)` rather than `match[0]` in case lookahead allowed
                 // matching due to characters outside the match
                 nativ.replace.call(String(str).slice(match.index), r2, function () {
+                    var len = arguments.length, i;
                     // Skip index 0 and the last 2
-                    for (var i = 1; i < arguments.length - 2; ++i) {
+                    for (i = 1; i < len - 2; ++i) {
                         if (arguments[i] === undefined) {
                             match[i] = undefined;
                         }
@@ -1281,6 +1284,7 @@ var XRegExp = (function () {
             output = [],
             lastLastIndex = 0,
             lastLength;
+
         /* Values for `limit`, per the spec:
          * If undefined: pow(2,32) - 1
          * If 0, Infinity, or NaN: 0
@@ -1310,11 +1314,12 @@ var XRegExp = (function () {
         }
 
         separator.lastIndex = origLastIndex;
+
         return output.length > limit ? output.slice(0, limit) : output;
     };
 
 /*--------------------------------------
- *  Built-in tokens
+ *  Built-in syntax/flag tokens
  *------------------------------------*/
 
 // Shortcut
@@ -1461,7 +1466,7 @@ var XRegExp = (function () {
  *------------------------------------*/
 
 // For CommonJS enviroments
-    if (typeof exports !== 'undefined') {
+    if (typeof exports === 'object') {
         exports.XRegExp = self;
     }
 
@@ -1473,7 +1478,8 @@ var XRegExp = (function () {
 
 /*!
  * XRegExp 2.1.0-rc: Unicode Base
- * (c) 2008-2012 Steven Levithan <http://xregexp.com/>
+ * <http://xregexp.com/>
+ * (c) 2008-2012 Steven Levithan
  * MIT License
  * Uses Unicode 6.1.0 <http://unicode.org/>
  * Unicode data generated by Mathias Bynens <http://mathiasbynens.be/>
@@ -1686,7 +1692,8 @@ var XRegExp = (function () {
 
 /*!
  * XRegExp 2.1.0-rc: Unicode Categories
- * (c) 2010-2012 Steven Levithan <http://xregexp.com/>
+ * <http://xregexp.com/>
+ * (c) 2010-2012 Steven Levithan
  * MIT License
  * Uses Unicode 6.1.0 <http://unicode.org/>
  * Unicode data generated by Mathias Bynens <http://mathiasbynens.be/>
@@ -1923,7 +1930,8 @@ var XRegExp = (function () {
 
 /*!
  * XRegExp 2.1.0-rc: Unicode Scripts
- * (c) 2010-2012 Steven Levithan <http://xregexp.com/>
+ * <http://xregexp.com/>
+ * (c) 2010-2012 Steven Levithan
  * MIT License
  * Uses Unicode 6.1.0 <http://unicode.org/>
  * Unicode data generated by Mathias Bynens <http://mathiasbynens.be/>
@@ -2368,7 +2376,8 @@ var XRegExp = (function () {
 
 /*!
  * XRegExp 2.1.0-rc: Unicode Blocks
- * (c) 2010-2012 Steven Levithan <http://xregexp.com/>
+ * <http://xregexp.com/>
+ * (c) 2010-2012 Steven Levithan
  * MIT License
  * Uses Unicode 6.1.0 <http://unicode.org/>
  * Unicode data generated by Mathias Bynens <http://mathiasbynens.be/>
@@ -3277,7 +3286,8 @@ var XRegExp = (function () {
 
 /*!
  * XRegExp 2.1.0-rc: Unicode Properties
- * (c) 2012 Steven Levithan <http://xregexp.com/>
+ * <http://xregexp.com/>
+ * (c) 2012 Steven Levithan
  * MIT License
  * Uses Unicode 6.1.0 <http://unicode.org/>
  * Unicode data generated by Mathias Bynens <http://mathiasbynens.be/>
@@ -3352,7 +3362,8 @@ var XRegExp = (function () {
 
 /*!
  * XRegExp 2.1.0-rc: XRegExp.matchRecursive
- * (c) 2009-2012 Steven Levithan <http://xregexp.com/>
+ * <http://xregexp.com/>
+ * (c) 2009-2012 Steven Levithan
  * MIT License
  */
 
@@ -3545,9 +3556,10 @@ var XRegExp = (function () {
 
 /*!
  * XRegExp 2.1.0-rc: XRegExp.build
- * (c) 2012 Steven Levithan <http://xregexp.com/>
+ * <http://xregexp.com/>
+ * (c) 2012 Steven Levithan
  * MIT License
- * Inspired by RegExp.create by Lea Verou <http://lea.verou.me/>
+ * Inspired by Lea Verou's RegExp.create <http://lea.verou.me/>
  */
 
 (function (XRegExp) {
@@ -3705,7 +3717,8 @@ var XRegExp = (function () {
 
 /*!
  * XRegExp 2.1.0-rc: Prototypes
- * (c) 2012 Steven Levithan <http://xregexp.com/>
+ * <http://xregexp.com/>
+ * (c) 2012 Steven Levithan
  * MIT License
  */
 
