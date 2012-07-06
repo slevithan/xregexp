@@ -2,9 +2,5 @@
 *.pyc
 
 # Folder view configuration files
-Desktop.ini
+desktop.ini
 .DS_Store
-
-# Thumbnail cache files
-Thumbs.db
-._*

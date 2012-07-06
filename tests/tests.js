@@ -73,30 +73,41 @@ test('XRegExp', function () {
 
 test('XRegExp.addToken', function () {
     XRegExp.install('extensibility');
+
     XRegExp.addToken(/\x01/, function () {return '1';});
+    ok(XRegExp('\x01').test('1'), 'Default scope matches outside class');
+    ok(!XRegExp('[\x01]').test('1'), 'Default scope does not match inside class');
+
     XRegExp.addToken(/\x02/, function () {return '2';}, {scope: 'class'});
+    ok(!XRegExp('\x02').test('2'), 'Explicit class scope does not match outside class');
+    ok(XRegExp('[\x02]').test('2'), 'Explicit class scope matches inside class');
+
     XRegExp.addToken(/\x03/, function () {return '3';}, {scope: 'default'});
+    ok(XRegExp('\x03').test('3'), 'Explicit default scope matches outside class');
+    ok(!XRegExp('[\x03]').test('3'), 'Explicit default scope does not match inside class');
+
     XRegExp.addToken(/\x04/, function () {return '4';}, {scope: 'all'});
+    ok(XRegExp('\x04').test('4'), 'Explicit all scope matches outside class');
+    ok(XRegExp('[\x04]').test('4'), 'Explicit all scope matches inside class');
+
     XRegExp.addToken(/\x05/, function () {return '5';}, {
-        scope: 'default',
         trigger: function () {return this.hasFlag('5');},
         customFlags: '5'
     });
-    XRegExp.addToken(/^\x06/, function () {return '6';});
-    XRegExp.uninstall('extensibility');
-
-    ok(XRegExp('\x01').test('1'), 'Default scope matches outside class');
-    ok(!XRegExp('[\x01]').test('1'), 'Default scope does not match inside class');
-    ok(!XRegExp('\x02').test('2'), 'Explicit class scope does not match outside class');
-    ok(XRegExp('[\x02]').test('2'), 'Explicit class scope matches inside class');
-    ok(XRegExp('\x03').test('3'), 'Explicit default scope matches outside class');
-    ok(!XRegExp('[\x03]').test('3'), 'Explicit default scope does not match inside class');
-    ok(XRegExp('\x04').test('4'), 'Explicit all scope matches outside class');
-    ok(XRegExp('[\x04]').test('4'), 'Explicit all scope matches inside class');
     ok(!XRegExp('\x05').test('5'), 'Trigger with hasFlag skips token when flag is missing');
     ok(XRegExp('\x05', '5').test('5'), 'Trigger with hasFlag uses token when flag is included');
+
+    XRegExp.addToken(/^\x06/, function () {return '6';});
     ok(XRegExp('\x06').test('6'), 'Token with anchor applied when found at start of pattern');
     ok(!XRegExp('a\x06').test('6'), 'Token with anchor not applied when found after start of pattern');
+
+    // Include the `/` delimiters in case of naive string conversion
+    raises(function () {XRegExp.addToken('/7/', function () {return '';});}, TypeError, 'Cannot provide string as regex pattern');
+
+    XRegExp.addToken(/x00/, function () {return 'BOOM';});
+    ok(XRegExp('^x\\x00$').test('x\x00'), 'Native multicharacter token in default scope handled correctly when not overriden');
+
+    XRegExp.uninstall('extensibility');
 });
 
 test('XRegExp.cache', function () {

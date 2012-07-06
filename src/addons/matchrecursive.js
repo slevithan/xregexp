@@ -1,8 +1,7 @@
 /*!
- * XRegExp 2.1.0-rc: XRegExp.matchRecursive
+ * XRegExp.matchRecursive 2.1.0-rc
  * <http://xregexp.com/>
- * (c) 2009-2012 Steven Levithan
- * MIT License
+ * Steven Levithan © 2009-2012 MIT License
  */
 
 (function (XRegExp) {
@@ -100,8 +99,8 @@
             // Using `XRegExp.union` safely rewrites backreferences in `left` and `right`
             esc = new RegExp(
                 '(?:' + escapeChar + '[\\S\\s]|(?:(?!' +
-                        XRegExp.union([left, right]).source +
-                        ')[^' + escapeChar + '])+)+',
+                    XRegExp.union([left, right]).source +
+                    ')[^' + escapeChar + '])+)+',
                 // Flags `gy` not needed here
                 flags.replace(/[^im]+/g, '')
             );

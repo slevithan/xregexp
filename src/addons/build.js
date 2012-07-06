@@ -1,16 +1,16 @@
 /*!
- * XRegExp 2.1.0-rc: XRegExp.build
+ * XRegExp.build 2.1.0-rc
  * <http://xregexp.com/>
- * (c) 2012 Steven Levithan
- * MIT License
+ * Steven Levithan © 2012 MIT License
  * Inspired by Lea Verou's RegExp.create <http://lea.verou.me/>
  */
 
 (function (XRegExp) {
     'use strict';
 
-    var subparts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*]/g,
-        parts = XRegExp.union([/\({{([\w$]+)}}\)|{{([\w$]+)}}/, subparts], 'g');
+    var REGEX_DATA = 'xregexp',
+        subParts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*]/g,
+        parts = XRegExp.union([/\({{([\w$]+)}}\)|{{([\w$]+)}}/, subParts], 'g');
 
 /**
  * Strips a leading `^` and trailing unescaped `$`, if both are present.
@@ -19,8 +19,8 @@
  * @returns {String} Pattern with edge anchors removed.
  */
     function deanchor(pattern) {
-        var startAnchor = /^(?:\(\?:\))*\^/, // Leading `^` or `(?:)^` (handles /x cruft)
-            endAnchor = /\$(?:\(\?:\))*$/; // Trailing `$` or `$(?:)` (handles /x cruft)
+        var startAnchor = /^(?:\(\?:\))*\^/, // Leading `^` or `(?:)^` (handles token cruft)
+            endAnchor = /\$(?:\(\?:\))*$/; // Trailing `$` or `$(?:)` (handles token cruft)
         // Ensure that the trailing `$` isn't escaped
         if (startAnchor.test(pattern) && endAnchor.test(pattern.replace(/\\[\s\S]/g, ''))) {
             return pattern.replace(startAnchor, '').replace(endAnchor, '');
@@ -29,15 +29,18 @@
     }
 
 /**
- * Converts the provided value to an XRegExp.
+ * Converts the provided value to an XRegExp. Native RegExp flags are not preserved.
  * @private
  * @param {String|RegExp} value Value to convert.
  * @returns {RegExp} XRegExp object with XRegExp syntax applied.
  */
     function asXRegExp(value) {
         return XRegExp.isRegExp(value) ?
-                (value.xregexp && !value.xregexp.isNative ? value : XRegExp(value.source)) :
-                XRegExp(value);
+            (value[REGEX_DATA] && !value[REGEX_DATA].isNative ?
+                value : // No need to recompile
+                XRegExp(value.source) // Recompile native RegExp as XRegExp
+            ) :
+            XRegExp(value); // Compile string as XRegExp
     }
 
 /**
@@ -86,21 +89,24 @@
 
         for (p in subs) {
             if (subs.hasOwnProperty(p)) {
-                // Passing to XRegExp enables extended syntax for subpatterns provided as strings
-                // and ensures independent validity, lest an unescaped `(`, `)`, `[`, or trailing
-                // `\` breaks the `(?:)` wrapper. For subpatterns provided as regexes, it dies on
-                // octals and adds the `xregexp` property, for simplicity
+                // Passing to XRegExp enables extended syntax and ensures independent validity,
+                // lest an unescaped `(`, `)`, `[`, or trailing `\` breaks the `(?:)` wrapper. For
+                // subpatterns provided as native regexes, it dies on octals and adds the property
+                // used to hold extended regex instance data, for simplicity
                 sub = asXRegExp(subs[p]);
-                // Deanchoring allows embedding independently useful anchored regexes. If you
-                // really need to keep your anchors, double them (i.e., `^^...$$`)
-                data[p] = {pattern: deanchor(sub.source), names: sub.xregexp.captureNames || []};
+                data[p] = {
+                    // Deanchoring allows embedding independently useful anchored regexes. If you
+                    // really need to keep your anchors, double them (i.e., `^^...$$`)
+                    pattern: deanchor(sub.source),
+                    names: sub[REGEX_DATA].captureNames || []
+                };
             }
         }
 
         // Passing to XRegExp dies on octals and ensures the outer pattern is independently valid;
         // helps keep this simple. Named captures will be put back
         pattern = asXRegExp(pattern);
-        outerCapNames = pattern.xregexp.captureNames || [];
+        outerCapNames = pattern[REGEX_DATA].captureNames || [];
         pattern = pattern.source.replace(parts, function ($0, $1, $2, $3, $4) {
             var subName = $1 || $2, capName, intro;
             // Named subpattern
@@ -119,7 +125,7 @@
                     intro = '(?:';
                 }
                 numPriorCaps = numCaps;
-                return intro + data[subName].pattern.replace(subparts, function (match, paren, backref) {
+                return intro + data[subName].pattern.replace(subParts, function (match, paren, backref) {
                     // Capturing group
                     if (paren) {
                         capName = data[subName].names[numCaps - numPriorCaps];

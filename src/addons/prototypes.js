@@ -1,8 +1,7 @@
 /*!
- * XRegExp 2.1.0-rc: Prototypes
+ * XRegExp Prototypes 2.1.0-rc
  * <http://xregexp.com/>
- * (c) 2012 Steven Levithan
- * MIT License
+ * Steven Levithan © 2012 MIT License
  */
 
 /**

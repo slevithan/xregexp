@@ -1,8 +1,7 @@
 /*!
- * XRegExp 2.1.0-rc: BackCompat
+ * XRegExp BackCompat 2.1.0-rc
  * <http://xregexp.com/>
- * (c) 2012 Steven Levithan
- * MIT License
+ * Steven Levithan © 2012 MIT License
  */
 
 /**
@@ -10,6 +9,8 @@
  */
 (function (XRegExp) {
     'use strict';
+
+    var REGEX_DATA = 'xregexp';
 
 /**
  * XRegExp 2.0.0 doesn't override native methods or allow syntax extensions by default.
@@ -66,8 +67,8 @@
                 this.source,
                 /\/([a-z]*)$/i.exec(String(this))[1] + (flags || '')
             ),
-            captureNames = this.xregexp ? this.xregexp.captureNames : null;
-        regex.xregexp = {
+            captureNames = this[REGEX_DATA] ? this[REGEX_DATA].captureNames : null;
+        regex[REGEX_DATA] = {
             captureNames: captureNames ? captureNames.slice(0) : null,
             isNative: false // Always passed through `XRegExp`
         };
@@ -100,8 +101,8 @@
  */
     RegExp.prototype.execAll = function (str) {
         return XRegExp.forEach(str, this, function (match) {
-                this.push(match);
-            }, []);
+            this.push(match);
+        }, []);
     };
 
 }(XRegExp));
