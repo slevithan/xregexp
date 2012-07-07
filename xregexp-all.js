@@ -1506,13 +1506,8 @@ var XRegExp = (function () {
     );
 
 /*--------------------------------------
- *  Expose XRegExp
+ *  Return XRegExp
  *------------------------------------*/
-
-// For CommonJS enviroments
-    if (typeof exports === 'object') {
-        exports.XRegExp = self;
-    }
 
     return self;
 
