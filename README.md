@@ -15,9 +15,9 @@ XRegExp regexes compile to native `RegExp` regex objects, thus there is no perfo
 
 ~~~ js
 // Using named capture and flag x (free-spacing and line comments)
-var date = XRegExp('(?<year>  [0-9]{4}) -?  # year  \n\
-                    (?<month> [0-9]{2}) -?  # month \n\
-                    (?<day>   [0-9]{2})     # day   ', 'x');
+var date = XRegExp('(?<year>  [0-9]{4} ) -?  # year  \n\
+                    (?<month> [0-9]{2} ) -?  # month \n\
+                    (?<day>   [0-9]{2} )     # day   ', 'x');
 
 // XRegExp.exec gives you named backreferences on the match result
 var match = XRegExp.exec('2012-02-22', date);
