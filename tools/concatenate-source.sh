@@ -28,6 +28,7 @@ rm -f $output_file
 for file in $source_files
 do
     cat $file >> $output_file
+    echo ''   >> $output_file
 done
 
 echo "Successfully created $(basename $output_file)"

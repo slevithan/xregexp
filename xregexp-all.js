@@ -19,6 +19,7 @@
         XRegExp = definition();
     }
 }(function () {
+
 /*!
  * XRegExp 2.1.0-rc
  * <http://xregexp.com/>
@@ -1512,6 +1513,7 @@ var XRegExp = (function () {
     return self;
 
 }());
+
 /*!
  * XRegExp.build 2.1.0-rc
  * <http://xregexp.com/>
@@ -1676,6 +1678,7 @@ var XRegExp = (function () {
     };
 
 }(XRegExp));
+
 /*!
  * XRegExp.matchRecursive 2.1.0-rc
  * <http://xregexp.com/>
@@ -1866,6 +1869,7 @@ var XRegExp = (function () {
     };
 
 }(XRegExp));
+
 /*!
  * XRegExp Prototypes 2.1.0-rc
  * <http://xregexp.com/>
@@ -1976,6 +1980,7 @@ var XRegExp = (function () {
     };
 
 }(XRegExp));
+
 /*!
  * XRegExp Unicode Base 2.1.0-rc
  * <http://xregexp.com/>
@@ -2186,6 +2191,7 @@ var XRegExp = (function () {
     }]);
 
 }(XRegExp));
+
 /*!
  * XRegExp Unicode Blocks 2.1.0-rc
  * <http://xregexp.com/>
@@ -3092,6 +3098,7 @@ var XRegExp = (function () {
     ]);
 
 }(XRegExp));
+
 /*!
  * XRegExp Unicode Categories 2.1.0-rc
  * <http://xregexp.com/>
@@ -3326,6 +3333,7 @@ var XRegExp = (function () {
     ]);
 
 }(XRegExp));
+
 /*!
  * XRegExp Unicode Properties 2.1.0-rc
  * <http://xregexp.com/>
@@ -3399,6 +3407,7 @@ var XRegExp = (function () {
     ]);
 
 }(XRegExp));
+
 /*!
  * XRegExp Unicode Scripts 2.1.0-rc
  * <http://xregexp.com/>
@@ -3841,6 +3850,8 @@ var XRegExp = (function () {
     ]);
 
 }(XRegExp));
+
 return XRegExp;
 
 }));
+
