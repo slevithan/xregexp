@@ -25,7 +25,7 @@ var XRegExp = (function () {
 // Internal reference to the `XRegExp` object
     self,
 
-// Optional features; can be installed and uninstalled
+// Optional features, can be installed and uninstalled
     features = {
         natives: false,
         extensibility: false,
@@ -83,8 +83,8 @@ var XRegExp = (function () {
 // Storage for known flags, including addon flags
     registeredFlags = 'gim' + (hasNativeY ? 'y' : ''),
 
-// Storage for the installed and uninstalled states of `XRegExp.addToken`
-    addToken = {},
+// Storage for the installed and uninstalled state of `XRegExp.addToken`
+    addToken,
 
 // Shortcut to `addToken.on`
     add;
@@ -186,7 +186,7 @@ var XRegExp = (function () {
  * @param {*} value Value to locate in the array.
  * @returns {Number} Zero-based index at which the item is found, or -1.
  */
-    function indexOf (array, value) {
+    function indexOf(array, value) {
         // Use the native array method, if available
         if (Array.prototype.indexOf) {
             return array.indexOf(value);
@@ -424,37 +424,37 @@ var XRegExp = (function () {
     self.prototype = new RegExp();
 
 /*--------------------------------------
- *  Public methods/properties
+ *  Public methods and properties
  *------------------------------------*/
 
-// Installed state for `XRegExp.addToken` (private)
-    addToken.on = function (regex, handler, options) {
-        options = options || {};
-        if (regex) {
-            // Add to the private list of syntax tokens
-            tokens.push({
-                regex: copy(regex, {add: 'g' + (hasNativeY ? 'y' : '')}),
-                handler: handler,
-                scope: options.scope || defaultScope,
-                trigger: options.trigger || null
-            });
+// Installed and uninstalled states for `XRegExp.addToken` (private)
+    addToken = {
+        on: function (regex, handler, options) {
+            options = options || {};
+            if (regex) {
+                // Add to the private list of syntax tokens
+                tokens.push({
+                    regex: copy(regex, {add: 'g' + (hasNativeY ? 'y' : '')}),
+                    handler: handler,
+                    scope: options.scope || defaultScope,
+                    trigger: options.trigger || null
+                });
+            }
+            // Assert: By providing `customFlags` with null `regex` and `handler`, you can add
+            // no-op flags that don't throw an error
+            if (options.customFlags) {
+                registeredFlags = nativ.replace.call(
+                    registeredFlags + options.customFlags,
+                    duplicateFlags,
+                    ''
+                );
+            }
+        },
+        off: function () {
+            // By making extensibility an optional feature, users are able to delete or override
+            // `XRegExp.install` if they want to lock down any further syntax extensions
+            throw new Error('Extensibility must be installed before calling addToken');
         }
-        // Assert: By providing `customFlags` with null `regex` and `handler`, you can add no-op
-        // flags that don't throw an error
-        if (options.customFlags) {
-            registeredFlags = nativ.replace.call(
-                registeredFlags + options.customFlags,
-                duplicateFlags,
-                ''
-            );
-        }
-    };
-
-// Uninstalled state for `XRegExp.addToken` (private)
-    addToken.off = function () {
-        // By making extensibility an optional feature, users are able to delete or override
-        // `XRegExp.install` if they want to lock down any further syntax extensions
-        throw new Error('Extensibility must be installed before calling addToken');
     };
 
 /**
@@ -1325,7 +1325,7 @@ var XRegExp = (function () {
     };
 
 /*--------------------------------------
- *  Built-in syntax/flag tokens
+ *  Built-in syntax and flag tokens
  *------------------------------------*/
 
     add = addToken.on;
