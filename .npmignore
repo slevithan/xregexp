@@ -1,4 +1,4 @@
-min/
+build/
 src/
 tests/index.html
 tests/qunit/
