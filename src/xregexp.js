@@ -1485,7 +1485,7 @@ var XRegExp = (function () {
     );
 
 /*--------------------------------------
- *  Return XRegExp
+ *  Expose XRegExp
  *------------------------------------*/
 
     return self;

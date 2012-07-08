@@ -3,7 +3,7 @@ var qunit = require('qunit');
 
 qunit.run({
     code: {
-        namespace: 'xregexp',
+        namespace: 'XRegExp',
         path: __dirname + '/../xregexp-all.js'
     },
     tests: __dirname + '/tests.js'

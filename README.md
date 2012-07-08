@@ -224,7 +224,7 @@ XRegExp.globalize(/[a-z]/i).xexec('abc');
 
 ## Installation and usage
 
-In browsers:
+Load in browsers:
 
 ~~~ html
 <script src="build/xregexp-min.js"></script>
@@ -236,16 +236,24 @@ Or, to bundle XRegExp with all of its addons:
 <script src="build/xregexp-all-min.js"></script>
 ~~~
 
-Using [npm](http://npmjs.org/):
+Load using [RequireJS](http://requirejs.org/):
+
+~~~ js
+require(['build/xregexp-all-min'], function (XRegExp) {
+    // This function is called when xregexp-all-min.js is loaded
+});
+~~~
+
+Install using [npm](http://npmjs.org/):
 
 ~~~ bash
 npm install xregexp
 ~~~
 
-In [Node.js](http://nodejs.org/) and [CommonJS module](http://wiki.commonjs.org/wiki/Modules) loaders:
+Load in [Node.js](http://nodejs.org/):
 
 ~~~ js
-var XRegExp = require('xregexp').XRegExp;
+var XRegExp = require('xregexp');
 ~~~
 
 

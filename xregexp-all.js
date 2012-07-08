@@ -5,14 +5,17 @@
  */
 
 ;(function (definition) {
-    // Don't turn on strict mode for this function, so we can assign to global.XRegExp
+    // Don't turn on strict mode for this function, so it can assign to global
+    var self;
 
     // RequireJS
     if (typeof define === 'function') {
         define(definition);
     // CommonJS
     } else if (typeof exports === 'object') {
-        exports.XRegExp = definition();
+        self = definition();
+        // Use Node.js's module.exports spec extension
+        (typeof module === 'object' ? (module.exports = self) : exports).XRegExp = self;
     // <script>
     } else {
         // Create global
@@ -1507,7 +1510,7 @@ var XRegExp = (function () {
     );
 
 /*--------------------------------------
- *  Return XRegExp
+ *  Expose XRegExp
  *------------------------------------*/
 
     return self;

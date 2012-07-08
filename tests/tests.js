@@ -1,13 +1,6 @@
-// In Node.JS, `module` is a predefined object, which makes the QUnit `module` definitions fail
-// unless we redefine it.
+// In Node.js, `module` is a predefined object, which makes the QUnit `module` definitions fail
+// unless we redefine it
 module = QUnit.module;
-
-// When using node-qunit on the command line, the module is imported as is and we need to point at
-// the XRegExp class inside the module. This does nothing in the browser, where XRegExp is already
-// loaded in the global scope.
-if (typeof XRegExp === 'undefined' && typeof xregexp !== 'undefined') {
-    var XRegExp = xregexp.XRegExp;
-}
 
 //-------------------------------------------------------------------
 module('API');
