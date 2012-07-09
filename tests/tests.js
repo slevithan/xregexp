@@ -1006,12 +1006,16 @@ test('Unicode Properties', function () {
     ok(XRegExp('^\\p{Any}$').test('\ud800\udc00'), '\\p{Any} matches surrogate pair, in astral mode');
     ok(XRegExp('^\\p{Any}$').test('\ud800'), '\\p{Any} matches orphan high surrogate, in astral mode');
     ok(XRegExp('^\\p{Any}$').test('\udc00'), '\\p{Any} matches orphan low surrogate, in astral mode');
+    ok(XRegExp('^\\p{Assigned}$').test('\ud800\udc00'), '\\p{Assigned} matches U+10000, in astral mode');
+    ok(!XRegExp('^\\P{Assigned}$').test('\ud800\udc00'), '\\P{Assigned} does not match U+10000, in astral mode');
 
     XRegExp.uninstall('astral');
 
     ok(!XRegExp('^\\p{Any}$').test('\ud800\udc00'), '\\p{Any} does not match surrogate pair, in BMP mode');
     ok(XRegExp('^\\p{Any}$').test('\ud800'), '\\p{Any} matches orphan high surrogate, in BMP mode');
     ok(XRegExp('^\\p{Any}$').test('\udc00'), '\\p{Any} matches orphan low surrogate, in BMP mode');
+    ok(XRegExp('^\\p{Assigned}$').test('A'), '\\p{Assigned} matches A, in BMP mode');
+    ok(!XRegExp('^\\P{Assigned}$').test('A'), '\\P{Assigned} does not match A, in BMP mode');
 
     // TODO: Add tests
 });

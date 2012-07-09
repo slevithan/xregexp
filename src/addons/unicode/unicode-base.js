@@ -122,7 +122,7 @@
 /* Add Unicode property syntax: \p{..}, \P{..}, \p{^..}. Also add astral mode (flag A).
  */
     XRegExp.addToken(
-        /\\([pP]){(\^?)([^}]*)}/,
+        /\\([pP]){(\^?)([^}]+)}/,
         function (match, scope) {
             var negated = match[1] === 'P' || !!match[2],
                 astralMode = this.hasFlag('A') || XRegExp.isInstalled('astral'),
@@ -133,6 +133,14 @@
             }
             if (!unicode.hasOwnProperty(slug)) {
                 throw new SyntaxError('Unknown Unicode property ' + match[0]);
+            }
+            if (item.inverseOf) {
+                slug = normalize(item.inverseOf);
+                if (!unicode.hasOwnProperty(slug)) {
+                    throw new Error('Unicode property ' + match[0] + ' missing data ' + item.inverseOf);
+                }
+                item = unicode[slug];
+                negated = !negated;
             }
             if (!(item.bmp || astralMode)) {
                 throw new SyntaxError('Astral mode required for Unicode property ' + match[0]);
@@ -157,16 +165,18 @@
  * Adds to the list of Unicode properties that XRegExp regexes can match via `\p` or `\P`.
  * @memberOf XRegExp
  * @param {Array} data Objects with named character ranges. Each object may have properties `name`,
- *   `alias`, `isBmpLast`, `bmp`, and `astral`. All but `name` are optional, although one of `bmp`
- *   or `astral` is required. If `astral` is absent, the `bmp` data is used for BMP and astral
- *   modes. If `bmp` is absent, the name errors in BMP mode but works in astral mode. If both `bmp`
- *   and `astral` are provided, the `bmp` data (only) is used in BMP mode, and the combination of
- *   `bmp` and `astral` data is used in astral mode. `isBmpLast` is needed when a property matches
- *   orphan high surrogates *and* uses surrogate pairs to match astral code points. The `bmp` and
- *   `astral` data should be a combination of literal characters and `\xHH` or `\uHHHH` escape
- *   sequences, with hyphens to create ranges. Any regex metacharacters in the data should be
- *   escaped, apart from range-creating hyphens. The `astral` data can additionally use character
- *   classes and alternation, and should use surrogate pairs to represent astral code points.
+ *   `alias`, `isBmpLast`, `inverseOf`, `bmp`, and `astral`. All but `name` are optional, although
+ *   one of `bmp` or `astral` is required (unless `inverseOf` is set). If `astral` is absent, the
+ *   `bmp` data is used for BMP and astral modes. If `bmp` is absent, the name errors in BMP mode
+ *   but works in astral mode. If both `bmp` and `astral` are provided, the `bmp` data only is used
+ *   in BMP mode, and the combination of `bmp` and `astral` data is used in astral mode.
+ *   `isBmpLast` is needed when a property matches orphan high surrogates *and* uses surrogate
+ *   pairs to match astral code points. The `bmp` and `astral` data should be a combination of
+ *   literal characters and `\xHH` or `\uHHHH` escape sequences, with hyphens to create ranges. Any
+ *   regex metacharacters in the data should be escaped, apart from range-creating hyphens. The
+ *   `astral` data can additionally use character classes and alternation, and should use surrogate
+ *   pairs to represent astral code points. `inverseOf` can be used to avoid duplicating character
+ *   data if a Unicode property is defined as the exact inverse of another property.
  * @example
  *
  * // Basic use
@@ -187,7 +197,7 @@
             if (!item.name) {
                 throw new Error('Unicode property requires name');
             }
-            if (!(item.bmp || item.astral)) {
+            if (!(item.inverseOf || item.bmp || item.astral)) {
                 throw new Error('Unicode property has no character data ' + item.name);
             }
             unicode[normalize(item.name)] = item;

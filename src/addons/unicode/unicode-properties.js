@@ -37,13 +37,11 @@
             bmp: '\0-\uFFFF',
             astral: '[\uD800-\uDBFF][\uDC00-\uDFFF]'
         },
-        // Included in Unicode Categories as `\P{Cn}` or `\P{Unassigned}`
-        /*{
+        // Defined as the inverse of Unicode category Cn (Unassigned)
+        {
             name: 'Assigned',
-            isBmpLast: true,
-            bmp: '...',
-            astral: '...'
-        },*/
+            inverseOf: 'Cn'
+        },
         {
             name: 'Default_Ignorable_Code_Point',
             bmp: '\xAD\u034F\u115F\u1160\u17B4\u17B5\u180B-\u180D\u200B-\u200F\u202A-\u202E\u2060-\u206F\u3164\uFE00-\uFE0F\uFEFF\uFFA0\uFFF0-\uFFF8',
