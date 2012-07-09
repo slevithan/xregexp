@@ -239,7 +239,12 @@ Or, to bundle XRegExp with all of its addons:
 Load using [RequireJS](http://requirejs.org/):
 
 ~~~ js
-require(['build/xregexp-all-min'], function (XRegExp) {
+require.config({
+    paths: {
+        xregexp: 'build/xregexp-all-min'
+    }
+});
+require(['xregexp'], function (XRegExp) {
     // This function is called when xregexp-all-min.js is loaded
 });
 ~~~
