@@ -101,14 +101,28 @@ unicodeWord.test('日本語'); // -> true
 unicodeWord.test('العربية'); // -> true
 ~~~
 
-The base script adds `\p{Letter}` and its alias `\p{L}`, but other Unicode categories, scripts, blocks, and properties require addon packages. Try these next examples after additionally including `unicode-scripts.js`:
+The base script adds `\p{L}` and its full name `\p{Letter}`, but other Unicode categories, scripts, blocks, and properties require addon packages. Try these next examples after additionally including `unicode-scripts.js`:
 
 ~~~ js
 XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
 XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
 ~~~
 
-XRegExp uses Unicode 6.1.0. By default, only code points in the Basic Multilingual Plane (up to `U+FFFF`) are supported, but you can opt-in to full 21-bit Unicode support on a per-regex basis by using flag `A`, or you can do this implicitly for all regexes by running `XRegExp.install('astral')`.
+By default, only code points in the Basic Multilingual Plane (up to `U+FFFF`) are supported, but you can opt-in to full 21-bit Unicode support on a per-regex basis by using flag `A`, or you can do this implicitly for all regexes by running `XRegExp.install('astral')`. When using flag `A`, `\p{..}` and `\P{..}` always match a full code point rather than a code unit.
+
+~~~ js
+// Using flag A
+XRegExp('^\\pL$', 'A').test('\uD835\uDFCB'); // -> true
+
+// Inline flag A
+XRegExp('(?A)^\\pL$').test('\uD835\uDFCB'); // -> true
+
+// Implicit flag A
+XRegExp.install('astral');
+XRegExp('^\\pL$').test('\uD835\uDFCB'); // -> true
+~~~
+
+XRegExp uses Unicode 6.2.0.
 
 
 ### XRegExp.build

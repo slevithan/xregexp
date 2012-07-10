@@ -937,6 +937,7 @@ test('Unicode Base', function () {
     raises(function () {XRegExp('\\p{^}');}, SyntaxError, 'Missing Unicode name \\p{^} is an error');
     // Erroring on bare `\p` is actually handled by xregexp.js, not Unicode Base
     raises(function () {XRegExp('\\p');}, SyntaxError, 'Missing Unicode name \\p is an error');
+    raises(function () {XRegExp('\\p^L');}, SyntaxError, 'Negated short form \\p^L is an error');
     ok(XRegExp('^\\p{L}+$').test('Café'), '\\p{L} matches Café');
     ok(XRegExp('^\\p{L}+$').test('Русский'), '\\p{L} matches Русский');
     ok(XRegExp('^\\p{L}+$').test('日本語'), '\\p{L} matches 日本語');
@@ -949,30 +950,40 @@ test('Unicode Base', function () {
     raises(function () {XRegExp('\\p{ ^L}');}, SyntaxError, 'Space before negating caret is an error');
     raises(function () {XRegExp('\\p{L+}');}, SyntaxError, 'Plus sign in name is an error');
     ok(!XRegExp('^\\P{L}+$').test('Café'), '\\P{L} does not match Café');
+    ok(!XRegExp('^\\PL+$').test('Café'), '\\PL does not match Café');
     ok(XRegExp('^\\P{L}+$').test('1+(2-3)'), '\\P{L} matches 1+(2-3)');
+    ok(XRegExp('^\\PL+$').test('1+(2-3)'), '\\PL matches 1+(2-3)');
     ok(!XRegExp('^\\p{^L}+$').test('Café'), '\\p{^L} does not match Café');
     ok(XRegExp('^\\p{^L}+$').test('1+(2-3)'), '\\p{^L} matches 1+(2-3)');
     raises(function () {XRegExp('\\P{^L}');}, SyntaxError, '\\P{^L} (double negation) is an error');
     raises(function () {XRegExp('[\\P{^L}]');}, SyntaxError, '\\P{^L} (double negation) is an error inside character class');
     raises(function () {XRegExp('[^\\P{^L}]');}, SyntaxError, '\\P{^L} (double negation) is an error inside negated character class');
     ok(XRegExp('^[\\p{L}]+$').test('Café'), '\\p{L} works inside character class');
+    ok(XRegExp('^[\\pL]+$').test('Café'), '\\pL works inside character class');
     ok(!XRegExp('^[\\P{L}]+$').test('Café'), '\\P{L} works inside character class');
+    ok(!XRegExp('^[\\PL]+$').test('Café'), '\\PL works inside character class');
     ok(!XRegExp('^[\\p{^L}]+$').test('Café'), '\\p{^L} works inside character class');
     ok(!XRegExp('^[^\\p{L}]+$').test('Café'), '\\p{L} works inside negated character class');
+    ok(!XRegExp('^[^\\pL]+$').test('Café'), '\\pL works inside negated character class');
     ok(XRegExp('^[^\\P{L}]+$').test('Café'), '\\P{L} works inside negated character class');
+    ok(XRegExp('^[^\\PL]+$').test('Café'), '\\PL works inside negated character class');
     ok(XRegExp('^[^\\p{^L}]+$').test('Café'), '\\p{^L} works inside negated character class');
 
     XRegExp.install('astral');
 
     ok(XRegExp('^\\p{L}$').test('\uD835\uDFCB'), '\\p{L} matches astral letter, in astral mode');
+    ok(XRegExp('^\\pL$').test('\uD835\uDFCB'), '\\pL matches astral letter, in astral mode');
     ok(!XRegExp('^\\P{L}$').test('\uD835\uDFCB'), '\\P{L} does not match astral letter, in astral mode');
+    ok(!XRegExp('^\\PL$').test('\uD835\uDFCB'), '\\PL does not match astral letter, in astral mode');
     ok(!XRegExp('^\\p{^L}$').test('\uD835\uDFCB'), '\\p{^L} does not match astral letter, in astral mode');
-    raises(function () {XRegExp('[\\p{L}]');}, SyntaxError, 'Unicode token in character class is an error, in astral mode');
+    raises(function () {XRegExp('[\\p{L}]');}, SyntaxError, 'Unicode token \\p{L} in character class is an error, in astral mode');
+    raises(function () {XRegExp('[\\pL]');}, SyntaxError, 'Unicode token \\pL in character class is an error, in astral mode');
     raises(function () {XRegExp('\\P{^L}');}, SyntaxError, '\\P{^L} (double negation) is an error, in astral mode');
 
     XRegExp.uninstall('astral');
 
     ok(!XRegExp('^\\p{L}$').test('\uD835\uDFCB'), '\\p{L} does not match astral letter, in default (BMP) mode');
+    ok(!XRegExp('^\\pL$').test('\uD835\uDFCB'), '\\pL does not match astral letter, in default (BMP) mode');
     ok(XRegExp('(?A)^\\p{L}$').test('\uD835\uDFCB'), '\\p{L} matches astral letter, with inline flag (?A)');
     ok(XRegExp('^\\p{L}$', 'A').test('\uD835\uDFCB'), '\\p{L} matches astral letter, with flag A');
     ok(!XRegExp('^\\P{L}$', 'A').test('\uD835\uDFCB'), '\\P{L} does not match astral letter, with flag A');
