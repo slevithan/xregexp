@@ -1,5 +1,5 @@
 /*!
- * XRegExp All 2.1.0-rc
+ * XRegExp All 3.0.0-pre
  * <http://xregexp.com/>
  * Steven Levithan © 2012 MIT License
  */
@@ -26,7 +26,7 @@
 }(function () {
 
 /*!
- * XRegExp 2.1.0-rc
+ * XRegExp 3.0.0-pre
  * <http://xregexp.com/>
  * Steven Levithan © 2007-2012 MIT License
  */
@@ -1520,7 +1520,7 @@ var XRegExp = (function () {
 }());
 
 /*!
- * XRegExp.build 2.1.0-rc
+ * XRegExp.build 3.0.0-pre
  * <http://xregexp.com/>
  * Steven Levithan © 2012 MIT License
  * Inspired by Lea Verou's RegExp.create <http://lea.verou.me/>
@@ -1685,7 +1685,7 @@ var XRegExp = (function () {
 }(XRegExp));
 
 /*!
- * XRegExp.matchRecursive 2.1.0-rc
+ * XRegExp.matchRecursive 3.0.0-pre
  * <http://xregexp.com/>
  * Steven Levithan © 2009-2012 MIT License
  */
@@ -1876,7 +1876,7 @@ var XRegExp = (function () {
 }(XRegExp));
 
 /*!
- * XRegExp Prototypes 2.1.0-rc
+ * XRegExp Prototypes 3.0.0-pre
  * <http://xregexp.com/>
  * Steven Levithan © 2012 MIT License
  */
@@ -1987,7 +1987,7 @@ var XRegExp = (function () {
 }(XRegExp));
 
 /*!
- * XRegExp Unicode Base 2.1.0-rc
+ * XRegExp Unicode Base 3.0.0-pre
  * <http://xregexp.com/>
  * Steven Levithan © 2008-2012 MIT License
  * Uses Unicode 6.1.0 <http://unicode.org/>
@@ -2230,7 +2230,7 @@ var XRegExp = (function () {
 }(XRegExp));
 
 /*!
- * XRegExp Unicode Blocks 2.1.0-rc
+ * XRegExp Unicode Blocks 3.0.0-pre
  * <http://xregexp.com/>
  * Steven Levithan © 2010-2012 MIT License
  * Uses Unicode 6.1.0 <http://unicode.org/>
@@ -3137,7 +3137,7 @@ var XRegExp = (function () {
 }(XRegExp));
 
 /*!
- * XRegExp Unicode Categories 2.1.0-rc
+ * XRegExp Unicode Categories 3.0.0-pre
  * <http://xregexp.com/>
  * Steven Levithan © 2010-2012 MIT License
  * Uses Unicode 6.1.0 <http://unicode.org/>
@@ -3372,7 +3372,7 @@ var XRegExp = (function () {
 }(XRegExp));
 
 /*!
- * XRegExp Unicode Properties 2.1.0-rc
+ * XRegExp Unicode Properties 3.0.0-pre
  * <http://xregexp.com/>
  * Steven Levithan © 2012 MIT License
  * Uses Unicode 6.1.0 <http://unicode.org/>
@@ -3444,7 +3444,7 @@ var XRegExp = (function () {
 }(XRegExp));
 
 /*!
- * XRegExp Unicode Scripts 2.1.0-rc
+ * XRegExp Unicode Scripts 3.0.0-pre
  * <http://xregexp.com/>
  * Steven Levithan © 2010-2012 MIT License
  * Uses Unicode 6.1.0 <http://unicode.org/>
