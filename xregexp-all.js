@@ -2075,7 +2075,7 @@ var XRegExp = (function () {
     }
 
 // Combines and optionally negates BMP and astral data
-    function buildAstral(slug, negated) {
+    function buildAstral(slug, isNegated) {
         var item = unicode[slug],
             combined = '';
         if (item.bmp && !item.isBmpLast) {
@@ -2088,16 +2088,16 @@ var XRegExp = (function () {
             combined += (item.astral ? '|' : '') + '[' + item.bmp + ']';
         }
         // Astral Unicode tokens always match a code point, never a code unit
-        return negated ?
+        return isNegated ?
             '(?:(?!' + combined + ')(?:[\uD800-\uDBFF][\uDC00-\uDFFF]|[\0-\uFFFF]))' :
             '(?:' + combined + ')';
     }
 
 // Builds a complete astral pattern on first use
-    function cacheAstral(slug, negated) {
-        var prop = negated ? 'a!' : 'a=';
+    function cacheAstral(slug, isNegated) {
+        var prop = isNegated ? 'a!' : 'a=';
         return unicode[slug][prop] || (
-            unicode[slug][prop] = buildAstral(slug, negated)
+            unicode[slug][prop] = buildAstral(slug, isNegated)
         );
     }
 
@@ -2107,41 +2107,56 @@ var XRegExp = (function () {
 
     XRegExp.install('extensibility');
 
-/* Add Unicode property syntax: \p{..}, \P{..}, \p{^..}. Also add astral mode (flag A).
+/* Add Unicode token syntax: \p{..}, \P{..}, \p{^..}. Also add astral mode (flag A).
  */
     XRegExp.addToken(
-        /\\([pP]){(\^?)([^}]+)}/,
+        /\\([pP]){(\^?)([^}]*)}/,
         function (match, scope) {
-            var negated = match[1] === 'P' || !!match[2],
-                astralMode = this.hasFlag('A') || XRegExp.isInstalled('astral'),
+            var ERR_DOUBLE_NEG = 'Invalid double negation ',
+                ERR_UNKNOWN_NAME = 'Unknown Unicode token ',
+                ERR_UNKNOWN_REF = 'Unicode token missing data ',
+                ERR_ASTRAL_ONLY = 'Astral mode required for Unicode token ',
+                ERR_ASTRAL_IN_CLASS = 'Astral mode does not support Unicode tokens within character classes',
+                // Negate via \P{..} or \p{^..}
+                isNegated = match[1] === 'P' || !!match[2],
+                // Switch from BMP (U+FFFF) to astral (U+10FFFF) mode via flag A or implicit opt-in
+                isAstralMode = this.hasFlag('A') || XRegExp.isInstalled('astral'),
+                // Token lookup name
                 slug = normalize(match[3]),
+                // Token data object
                 item = unicode[slug];
+
             if (match[1] === 'P' && match[2]) {
-                throw new SyntaxError('Invalid double negation \\P{^');
+                throw new SyntaxError(ERR_DOUBLE_NEG + match[0]);
             }
             if (!unicode.hasOwnProperty(slug)) {
-                throw new SyntaxError('Unknown Unicode property ' + match[0]);
+                throw new SyntaxError(ERR_UNKNOWN_NAME + match[0]);
             }
+
+            // Switch to the negated form of the referenced Unicode token
             if (item.inverseOf) {
                 slug = normalize(item.inverseOf);
                 if (!unicode.hasOwnProperty(slug)) {
-                    throw new Error('Unicode property ' + match[0] + ' missing data ' + item.inverseOf);
+                    throw new ReferenceError(ERR_UNKNOWN_REF + match[0] + ' -> ' + item.inverseOf);
                 }
                 item = unicode[slug];
-                negated = !negated;
+                isNegated = !isNegated;
             }
-            if (!(item.bmp || astralMode)) {
-                throw new SyntaxError('Astral mode required for Unicode property ' + match[0]);
+
+            if (!(item.bmp || isAstralMode)) {
+                throw new SyntaxError(ERR_ASTRAL_ONLY + match[0]);
             }
-            if (astralMode) {
+            if (isAstralMode) {
                 if (scope === 'class') {
-                    throw new SyntaxError('Astral mode does not support Unicode properties within character classes');
+                    throw new SyntaxError(ERR_ASTRAL_IN_CLASS);
                 }
-                return cacheAstral(slug, negated);
+
+                return cacheAstral(slug, isNegated);
             }
+
             return scope === 'class' ?
-                (negated ? cacheInvertedBmp(slug) : item.bmp) :
-                (negated ? '[^' : '[') + item.bmp + ']';
+                (isNegated ? cacheInvertedBmp(slug) : item.bmp) :
+                (isNegated ? '[^' : '[') + item.bmp + ']';
         },
         {
             scope: 'all',
@@ -2150,7 +2165,7 @@ var XRegExp = (function () {
     );
 
 /**
- * Adds to the list of Unicode properties that XRegExp regexes can match via `\p` or `\P`.
+ * Adds to the list of Unicode tokens that XRegExp regexes can match via `\p` or `\P`.
  * @memberOf XRegExp
  * @param {Array} data Objects with named character ranges. Each object may have properties `name`,
  *   `alias`, `isBmpLast`, `inverseOf`, `bmp`, and `astral`. All but `name` are optional, although
@@ -2158,13 +2173,13 @@ var XRegExp = (function () {
  *   `bmp` data is used for BMP and astral modes. If `bmp` is absent, the name errors in BMP mode
  *   but works in astral mode. If both `bmp` and `astral` are provided, the `bmp` data only is used
  *   in BMP mode, and the combination of `bmp` and `astral` data is used in astral mode.
- *   `isBmpLast` is needed when a property matches orphan high surrogates *and* uses surrogate
- *   pairs to match astral code points. The `bmp` and `astral` data should be a combination of
- *   literal characters and `\xHH` or `\uHHHH` escape sequences, with hyphens to create ranges. Any
- *   regex metacharacters in the data should be escaped, apart from range-creating hyphens. The
- *   `astral` data can additionally use character classes and alternation, and should use surrogate
- *   pairs to represent astral code points. `inverseOf` can be used to avoid duplicating character
- *   data if a Unicode property is defined as the exact inverse of another property.
+ *   `isBmpLast` is needed when a token matches orphan high surrogates *and* uses surrogate pairs
+ *   to match astral code points. The `bmp` and `astral` data should be a combination of literal
+ *   characters and `\xHH` or `\uHHHH` escape sequences, with hyphens to create ranges. Any regex
+ *   metacharacters in the data should be escaped, apart from range-creating hyphens. The `astral`
+ *   data can additionally use character classes and alternation, and should use surrogate pairs to
+ *   represent astral code points. `inverseOf` can be used to avoid duplicating character data if a
+ *   Unicode token is defined as the exact inverse of another token.
  * @example
  *
  * // Basic use
@@ -2176,17 +2191,23 @@ var XRegExp = (function () {
  * XRegExp('\\p{XDigit}:\\p{Hexadecimal}+').test('0:3D'); // -> true
  */
     XRegExp.addUnicodeData = function (data) {
-        var item, i;
+        var ERR_NOT_EXTENSIBLE = 'Extensibility must be installed before adding Unicode data',
+            ERR_NO_NAME = 'Unicode token requires name',
+            ERR_NO_DATA = 'Unicode token has no character data ',
+            item,
+            i;
+
         if (!XRegExp.isInstalled('extensibility')) {
-            throw new Error('Extensibility must be installed before adding Unicode data');
+            throw new Error(ERR_NOT_EXTENSIBLE);
         }
+
         for (i = 0; i < data.length; ++i) {
             item = data[i];
             if (!item.name) {
-                throw new Error('Unicode property requires name');
+                throw new Error(ERR_NO_NAME);
             }
             if (!(item.inverseOf || item.bmp || item.astral)) {
-                throw new Error('Unicode property has no character data ' + item.name);
+                throw new Error(ERR_NO_DATA + item.name);
             }
             unicode[normalize(item.name)] = item;
             if (item.alias) {
