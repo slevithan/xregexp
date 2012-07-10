@@ -993,6 +993,9 @@ test('Unicode Categories', function () {
     ok(XRegExp('\\p{Sc}').test('$'), '\\p{Sc} matches $');
     ok(XRegExp('\\p{Sc}').test('\u20B9'), '\\p{Sc} matches U+20B9');
     ok(!XRegExp('\\p{Sc}').test('0'), '\\p{Sc} does not match 0');
+    // Turkish Lira Sign U+20BA added in Unicode 6.2.0
+    ok(XRegExp('\\p{Sc}').test('\u20BA'), '\\p{Sc} matches U+20BA (Unicode 6.2.0)');
+    ok(!XRegExp('\\p{Cn}').test('\u20BA'), '\\p{Cn} does not match U+20BA (Unicode 6.2.0)');
 
     // TODO: Add tests
 });
@@ -1000,6 +1003,9 @@ test('Unicode Categories', function () {
 test('Unicode Scripts', function () {
     ok(XRegExp('^\\p{Katakana}+$').test('カタカナ'), '\\p{Katakana} matches カタカナ');
     ok(!XRegExp('^\\p{Katakana}+$').test('Latin'), '\\p{Katakana} does not match Latin');
+    // U+065F moved from Inherited to Arabic script in Unicode 6.2.0
+    ok(XRegExp('\\p{Arabic}').test('\u065F'), '\\p{Arabic} matches U+065F (Unicode 6.2.0)');
+    ok(!XRegExp('\\p{Inherited}').test('\u065F'), '\\p{Inherited} does not match U+065F (Unicode 6.2.0)');
 
     // TODO: Add tests
 });
@@ -1038,6 +1044,8 @@ test('Unicode Properties', function () {
     ok(XRegExp('\\p{Any}').test('\uDC00'), '\\p{Any} matches orphan low surrogate, in BMP mode');
     ok(XRegExp('\\p{Assigned}').test('A'), '\\p{Assigned} matches A, in BMP mode');
     ok(!XRegExp('\\P{Assigned}').test('A'), '\\P{Assigned} does not match A, in BMP mode');
+    // Turkish Lira Sign U+20BA added in Unicode 6.2.0
+    ok(XRegExp('\\p{Assigned}').test('\u20BA'), '\\p{Assigned} matches U+20BA (Unicode 6.2.0)');
 
     // TODO: Add tests
 });
