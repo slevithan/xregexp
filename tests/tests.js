@@ -902,6 +902,18 @@ test('Unicode Base', function () {
     }]);
     ok(XRegExp('\\p{XDigit}\\p{Hexadecimal}').test('0F'), 'Added XDigit token with alias Hexadecimal');
 
+    XRegExp.addUnicodeData([{
+        name: 'NotXDigit',
+        inverseOf: 'XDigit'
+    }]);
+    ok(XRegExp('\\p{NotXDigit}\\P{NotXDigit}').test('Z0'), 'Added NotXDigit token as inverse of XDigit');
+
+    XRegExp.addUnicodeData([{
+        name: 'MissingRef',
+        inverseOf: 'MissingToken'
+    }]);
+    raises(function () {XRegExp('\\p{MissingRef}');}, ReferenceError, 'Missing inverseOf target throws error on use');
+
     XRegExp.addUnicodeData([{name: 'AstralOnly', astral: '0'}]);
     ok(XRegExp('\\p{AstralOnly}', 'A').test('0'), 'Astral-only token matches, when in astral mode');
     raises(function () {XRegExp('\\p{AstralOnly}');}, SyntaxError, 'Astral-only token is an error, when not in astral mode');
@@ -918,17 +930,24 @@ test('Unicode Base', function () {
 
     XRegExp.uninstall('extensibility');
 
-    var L = XRegExp('^\\p{L}+$'),
-        Letter = XRegExp('^\\p{Letter}+$');
-
-    raises(function () {XRegExp('\\p{XX}');}, SyntaxError, 'Unrecognized Unicode name is an error');
-    ok(L.test('Café'), '\\p{L} matches Café');
-    ok(L.test('Русский'), '\\p{L} matches Русский');
-    ok(L.test('日本語'), '\\p{L} matches 日本語');
-    ok(L.test('العربية'), '\\p{L} matches العربي');
-    ok(Letter.test('Café'), '\\p{Letter} is alias of \\p{L}');
+    raises(function () {XRegExp('\\pX');}, SyntaxError, 'Unrecognized Unicode name \\pX is an error');
+    raises(function () {XRegExp('\\p{X}');}, SyntaxError, 'Unrecognized Unicode name \\p{X} is an error');
+    raises(function () {XRegExp('\\p{^X}');}, SyntaxError, 'Unrecognized Unicode name \\p{^X} is an error');
+    raises(function () {XRegExp('\\p{}');}, SyntaxError, 'Missing Unicode name \\p{} is an error');
+    raises(function () {XRegExp('\\p{^}');}, SyntaxError, 'Missing Unicode name \\p{^} is an error');
+    // Erroring on bare `\p` is actually handled by xregexp.js, not Unicode Base
+    raises(function () {XRegExp('\\p');}, SyntaxError, 'Missing Unicode name \\p is an error');
+    ok(XRegExp('^\\p{L}+$').test('Café'), '\\p{L} matches Café');
+    ok(XRegExp('^\\p{L}+$').test('Русский'), '\\p{L} matches Русский');
+    ok(XRegExp('^\\p{L}+$').test('日本語'), '\\p{L} matches 日本語');
+    ok(XRegExp('^\\p{L}+$').test('العربية'), '\\p{L} matches العربي');
+    ok(XRegExp('^\\pL+$').test('Café'), '\\pL matches Café');
+    ok(XRegExp('^\\p{Letter}+$').test('Café'), '\\p{Letter} is alias of \\p{L}');
+    ok(!XRegExp('^\\pLetter+$').test('Café'), '\\pLetter+ does not match Café');
+    ok(XRegExp('^\\pLetter+$').test('Aetterrr'), '\\pLetter+ matches Aetterrr');
     ok(XRegExp('^\\p{ _-l --}+$').test('Café'), 'Spaces, underscores, hyphens, and casing are ignored in Unicode token name');
     raises(function () {XRegExp('\\p{ ^L}');}, SyntaxError, 'Space before negating caret is an error');
+    raises(function () {XRegExp('\\p{L+}');}, SyntaxError, 'Plus sign in name is an error');
     ok(!XRegExp('^\\P{L}+$').test('Café'), '\\P{L} does not match Café');
     ok(XRegExp('^\\P{L}+$').test('1+(2-3)'), '\\P{L} matches 1+(2-3)');
     ok(!XRegExp('^\\p{^L}+$').test('Café'), '\\p{^L} does not match Café');
@@ -965,12 +984,15 @@ test('Unicode Categories', function () {
     // Tests for category L and Letter included in Unicode Base tests
 
     ok(XRegExp('\\p{P}').test('-'), '\\p{P} matches ASCII hyphen');
-    ok(XRegExp('\\p{P}').test('\u00bf'), '\\p{P} matches U+00BF');
-    ok(XRegExp('\\p{P}').test('\u301c'), '\\p{P} matches U+301C');
+    ok(XRegExp('\\p{P}').test('\u00BF'), '\\p{P} matches U+00BF');
+    ok(XRegExp('\\p{P}').test('\u301C'), '\\p{P} matches U+301C');
     ok(!XRegExp('\\p{P}').test('0'), '\\p{P} does not match 0');
     ok(XRegExp('\\p{Pe}').test(')'), '\\p{Pe} matches ASCII )');
-    ok(XRegExp('\\p{Pe}').test('\u300b'), '\\p{Pe} matches U+300B');
+    ok(XRegExp('\\p{Pe}').test('\u300B'), '\\p{Pe} matches U+300B');
     ok(!XRegExp('\\p{Pe}').test('0'), '\\p{Pe} does not match 0');
+    ok(XRegExp('\\p{Sc}').test('$'), '\\p{Sc} matches $');
+    ok(XRegExp('\\p{Sc}').test('\u20B9'), '\\p{Sc} matches U+20B9');
+    ok(!XRegExp('\\p{Sc}').test('0'), '\\p{Sc} does not match 0');
 
     // TODO: Add tests
 });
@@ -1003,19 +1025,19 @@ test('Unicode Properties', function () {
 
     XRegExp.install('astral');
 
-    ok(XRegExp('^\\p{Any}$').test('\ud800\udc00'), '\\p{Any} matches surrogate pair, in astral mode');
-    ok(XRegExp('^\\p{Any}$').test('\ud800'), '\\p{Any} matches orphan high surrogate, in astral mode');
-    ok(XRegExp('^\\p{Any}$').test('\udc00'), '\\p{Any} matches orphan low surrogate, in astral mode');
-    ok(XRegExp('^\\p{Assigned}$').test('\ud800\udc00'), '\\p{Assigned} matches U+10000, in astral mode');
-    ok(!XRegExp('^\\P{Assigned}$').test('\ud800\udc00'), '\\P{Assigned} does not match U+10000, in astral mode');
+    ok(XRegExp('^\\p{Any}$').test('\uD800\uDC00'), '\\p{Any} matches surrogate pair, in astral mode');
+    ok(XRegExp('\\p{Any}').test('\uD800'), '\\p{Any} matches orphan high surrogate, in astral mode');
+    ok(XRegExp('\\p{Any}').test('\uDC00'), '\\p{Any} matches orphan low surrogate, in astral mode');
+    ok(XRegExp('^\\p{Assigned}$').test('\uD800\uDC00'), '\\p{Assigned} matches U+10000, in astral mode');
+    ok(!XRegExp('^\\P{Assigned}$').test('\uD800\uDC00'), '\\P{Assigned} does not match U+10000, in astral mode');
 
     XRegExp.uninstall('astral');
 
-    ok(!XRegExp('^\\p{Any}$').test('\ud800\udc00'), '\\p{Any} does not match surrogate pair, in BMP mode');
-    ok(XRegExp('^\\p{Any}$').test('\ud800'), '\\p{Any} matches orphan high surrogate, in BMP mode');
-    ok(XRegExp('^\\p{Any}$').test('\udc00'), '\\p{Any} matches orphan low surrogate, in BMP mode');
-    ok(XRegExp('^\\p{Assigned}$').test('A'), '\\p{Assigned} matches A, in BMP mode');
-    ok(!XRegExp('^\\P{Assigned}$').test('A'), '\\P{Assigned} does not match A, in BMP mode');
+    ok(!XRegExp('^\\p{Any}$').test('\uD800\uDC00'), '\\p{Any} does not match surrogate pair, in BMP mode');
+    ok(XRegExp('\\p{Any}').test('\uD800'), '\\p{Any} matches orphan high surrogate, in BMP mode');
+    ok(XRegExp('\\p{Any}').test('\uDC00'), '\\p{Any} matches orphan low surrogate, in BMP mode');
+    ok(XRegExp('\\p{Assigned}').test('A'), '\\p{Assigned} matches A, in BMP mode');
+    ok(!XRegExp('\\P{Assigned}').test('A'), '\\P{Assigned} does not match A, in BMP mode');
 
     // TODO: Add tests
 });

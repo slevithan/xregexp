@@ -2110,7 +2110,8 @@ var XRegExp = (function () {
 /* Add Unicode token syntax: \p{..}, \P{..}, \p{^..}. Also add astral mode (flag A).
  */
     XRegExp.addToken(
-        /\\([pP]){(\^?)([^}]*)}/,
+        // Use `*` instead of `+` to avoid capturing `^` as the token name in `\p{^}`
+        /\\([pP])(?:{(\^?)([^}]*)}|([A-Za-z]))/,
         function (match, scope) {
             var ERR_DOUBLE_NEG = 'Invalid double negation ',
                 ERR_UNKNOWN_NAME = 'Unknown Unicode token ',
@@ -2121,8 +2122,8 @@ var XRegExp = (function () {
                 isNegated = match[1] === 'P' || !!match[2],
                 // Switch from BMP (U+FFFF) to astral (U+10FFFF) mode via flag A or implicit opt-in
                 isAstralMode = this.hasFlag('A') || XRegExp.isInstalled('astral'),
-                // Token lookup name
-                slug = normalize(match[3]),
+                // Token lookup name. Check `[4]` first to avoid passing `undefined` via `\p{}`
+                slug = normalize(match[4] || match[3]),
                 // Token data object
                 item = unicode[slug];
 
