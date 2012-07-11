@@ -1181,18 +1181,17 @@ var XRegExp = (function () {
  */
     fixed.replace = function (search, replacement) {
         var isRegex = self.isRegExp(search),
+            origLastIndex,
             captureNames,
             result,
-            str,
-            origLastIndex;
+            str;
 
         if (isRegex) {
             if (search[REGEX_DATA]) {
                 captureNames = search[REGEX_DATA].captureNames;
             }
-            if (!search.global) {
-                origLastIndex = search.lastIndex;
-            }
+            // Only needed if `search` is nonglobal
+            origLastIndex = search.lastIndex;
         } else {
             search += ''; // Type-convert
         }
@@ -1202,7 +1201,7 @@ var XRegExp = (function () {
                 var args = arguments, i;
                 if (captureNames) {
                     // Change the `arguments[0]` string primitive to a `String` object that can
-                    // store properties. Yes, I really do need to use the `String` constructor
+                    // store properties. Yes, this really does need to use the `String` constructor
                     args[0] = new String(args[0]);
                     // Store named backreferences on the first argument
                     for (i = 0; i < captureNames.length; ++i) {
@@ -1216,7 +1215,7 @@ var XRegExp = (function () {
                 if (isRegex && search.global) {
                     search.lastIndex = args[args.length - 2] + args[0].length;
                 }
-                return replacement.apply(null, args);
+                return replacement.apply(undefined, args);
             });
         } else {
             // Ensure `args[args.length - 1]` will be a string when given nonstring `this`

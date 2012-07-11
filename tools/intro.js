@@ -15,7 +15,7 @@
     // CommonJS
     } else if (typeof exports === 'object') {
         self = definition();
-        // Use Node.js's `module.exports`. This approach supports both `require('xregexp')` and
+        // Use Node.js's `module.exports`. This supports both `require('xregexp')` and
         // `require('xregexp').XRegExp`
         (typeof module === 'object' ? (module.exports = self) : exports).XRegExp = self;
     // <script>
