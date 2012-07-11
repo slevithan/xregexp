@@ -229,14 +229,14 @@ var XRegExp = (function () {
     }
 
 /**
- * Runs built-in/custom tokens in reverse insertion order, until a match is found.
+ * Runs built-in and custom regex syntax tokens in reverse insertion order at the specified
+ * position, until a match is found.
  * @private
  * @param {String} pattern Original pattern from which an XRegExp object is being built.
  * @param {Number} pos Position to search for tokens within `pattern`.
- * @param {Number} scope Current regex scope.
- * @param {Object} context Context object assigned to token handler functions.
- * @returns {Object} Object with properties `output` (the substitution string returned by the
- *   successful token handler) and `match` (the token's match array), or `null`.
+ * @param {Number} scope Regex scope to apply: 'default' or 'class'.
+ * @param {Object} context Context object to use for token definition functions.
+ * @returns {Object} Object with properties `len`, `replacement`, and `reparse`; or `null`.
  */
     function runTokens(pattern, pos, scope, context) {
         var i = tokens.length,
@@ -245,6 +245,7 @@ var XRegExp = (function () {
             t;
         // Protect against constructing XRegExp objects within token definition functions
         isInsideConstructor = true;
+        // Tokens may throw `SyntaxError`s, etc.
         try {
             // Run in reverse insertion order
             while (i--) {
@@ -256,8 +257,9 @@ var XRegExp = (function () {
                     match = self.exec(pattern, t.regex, pos, 'sticky');
                     if (match) {
                         result = {
-                            output: t.handler.call(context, match, scope),
-                            match: match
+                            len: match[0].length,
+                            replacement: t.handler.call(context, match, scope),
+                            reparse: t.reparse
                         };
                         // Finished with token tests
                         break;
@@ -334,19 +336,12 @@ var XRegExp = (function () {
  * XRegExp(/regex/);
  */
     self = function (pattern, flags) {
-        if (self.isRegExp(pattern)) {
-            if (flags !== undefined) {
-                throw new TypeError('Cannot supply flags when copying a RegExp');
-            }
-            return copy(pattern, {addProto: true});
-        }
-        // Tokens become part of the regex construction process, so protect against infinite
-        // recursion when an XRegExp is constructed within a token definition function
-        if (isInsideConstructor) {
-            throw new Error('Cannot build XRegExp objects within token definition functions');
-        }
-
-        var output = '',
+        var ERR_COPY_WITH_FLAGS = 'Cannot supply flags when copying a RegExp',
+            ERR_CONSTRUTOR_RECURSION = 'Cannot build XRegExp objects within token definition functions',
+            ERR_DUPLICATE_FLAG = 'Invalid duplicate regex flag ',
+            ERR_BAD_INLINE_FLAG = 'Cannot use flag g or y in mode modifier ',
+            ERR_UNKNOWN_FLAG = 'Unknown regex flag ',
+            output = '',
             scope = defaultScope,
             context = {
                 hasNamedCapture: false,
@@ -360,19 +355,33 @@ var XRegExp = (function () {
             match,
             chr,
             i;
+
+        if (self.isRegExp(pattern)) {
+            if (flags !== undefined) {
+                throw new TypeError(ERR_COPY_WITH_FLAGS);
+            }
+            return copy(pattern, {addProto: true});
+        }
+        // Tokens become part of the regex construction process, so protect against infinite
+        // recursion when an XRegExp is constructed within a token definition function
+        if (isInsideConstructor) {
+            throw new Error(ERR_CONSTRUTOR_RECURSION);
+        }
+
+        // Copy the native argument behavior of `RegExp`
         pattern = pattern === undefined ? '' : String(pattern);
         flags = flags === undefined ? '' : String(flags);
 
-        // Shared regex uses /g, so reset lastIndex
+        // Shared regex uses flag g, so reset `lastIndex`
         duplicateFlags.lastIndex = 0;
-        // Most browsers throw on duplicate flags; copy the behavior for nonnative flags
+        // Most browsers throw on duplicate flags, so copy this behavior for nonnative flags
         if (nativ.test.call(duplicateFlags, flags)) {
-            throw new SyntaxError('Invalid duplicate regex flag ' + flags);
+            throw new SyntaxError(ERR_DUPLICATE_FLAG + flags);
         }
         // Strip/apply leading mode modifier with any combination of flags except g or y
         pattern = nativ.replace.call(pattern, /^\(\?([\w$]+)\)/, function ($0, $1) {
             if (nativ.test.call(/[gy]/, $1)) {
-                throw new SyntaxError('Cannot use flag g or y in mode modifier ' + $0);
+                throw new SyntaxError(ERR_BAD_INLINE_FLAG + $0);
             }
             flags = nativ.replace.call(flags + $1, duplicateFlags, '');
             return '';
@@ -380,20 +389,29 @@ var XRegExp = (function () {
         // Throw on unknown native or nonnative flags
         for (i = 0; i < flags.length; ++i) {
             if (registeredFlags.indexOf(flags.charAt(i)) < 0) {
-                throw new SyntaxError('Unknown regex flag ' + flags.charAt(i));
+                throw new SyntaxError(ERR_UNKNOWN_FLAG + flags.charAt(i));
             }
         }
 
+        // `pattern.length` may change on each iteration, if tokens use the `reparse` option
         while (pos < pattern.length) {
             // Check for custom tokens at the current position
-            tokenResult = runTokens(pattern, pos, scope, context);
+            do {
+                tokenResult = runTokens(pattern, pos, scope, context);
+                if (tokenResult && tokenResult.reparse) {
+                    pattern = pattern.slice(0, pos) +
+                        tokenResult.replacement +
+                        pattern.slice(pos + tokenResult.len);
+                }
+            } while (tokenResult && tokenResult.reparse);
+
             if (tokenResult) {
-                output += tokenResult.output;
-                pos += (tokenResult.match[0].length || 1);
+                output += tokenResult.replacement;
+                pos += (tokenResult.len || 1);
             } else {
-                // Check for native tokens (except character classes) at the current position. This
-                // could use the native exec, except that sticky processing avoids string slicing
-                // in browsers that support /y
+                // Check for native multicharacter tokens (not counting character classes) at the
+                // current position. This could use the native `exec`, except that sticky
+                // processing avoids string slicing in browsers that support flag y
                 match = self.exec(pattern, nativeTokens[scope], pos, 'sticky');
                 if (match) {
                     output += match[0];
@@ -413,7 +431,9 @@ var XRegExp = (function () {
         }
 
         return augment(
+            // Strip all but native flags
             new RegExp(output, nativ.replace.call(flags, /[^gimy]+/g, '')),
+            // `context.captureNames` contains an item for each capturing group, even if unnamed
             context.hasNamedCapture ? context.captureNames : null,
             true // `addProto`
         );
@@ -427,17 +447,18 @@ var XRegExp = (function () {
  *  Public methods and properties
  *------------------------------------*/
 
-// Installed and uninstalled states for `XRegExp.addToken` (private)
+// Installed and uninstalled states for `XRegExp.addToken`
     addToken = {
         on: function (regex, handler, options) {
             options = options || {};
-            if (regex) {
+            if (regex && handler) {
                 // Add to the private list of syntax tokens
                 tokens.push({
                     regex: copy(regex, {add: 'g' + (hasNativeY ? 'y' : '')}),
                     handler: handler,
                     scope: options.scope || defaultScope,
-                    trigger: options.trigger || null
+                    trigger: options.trigger || null,
+                    reparse: options.reparse || false
                 });
             }
             // Assert: By providing `customFlags` with null `regex` and `handler`, you can add
@@ -475,8 +496,12 @@ var XRegExp = (function () {
  *     if a flag is set. If `false` is returned, the matched string can be matched by other tokens.
  *     Has access to persistent properties of the regex being built, through `this` (including
  *     function `this.hasFlag`).
- *   <li>`customFlags` {String} Nonnative flags used by the token's handler or trigger functions.
- *     Prevents XRegExp from throwing an 'unknown flag' error when the specified flags are used.
+ *   <li>`customFlags` {String} Nonnative flags used by the token's `handler` or `trigger`
+ *     functions. Prevents XRegExp from throwing an 'unknown flag' error when the specified flags
+ *     are used.
+ *   <li>`reparse` {Boolean} Whether the `handler` function's output should not be treated as
+ *     final, and instead be reparseable by other tokens (including the current token). Allows
+ *     token chaining or deferring.
  * @example
  *
  * // Basic usage: Add \a for the ALERT control code
@@ -647,7 +672,7 @@ var XRegExp = (function () {
  * });
  *
  * // With an options string
- * XRegExp.install('natives extensibility');
+ * XRegExp.install('natives extensibility astral');
  */
     self.install = function (options) {
         options = prepareOptions(options);
@@ -966,7 +991,7 @@ var XRegExp = (function () {
  * });
  *
  * // With an options string
- * XRegExp.uninstall('natives extensibility');
+ * XRegExp.uninstall('natives extensibility astral');
  */
     self.uninstall = function (options) {
         options = prepareOptions(options);

@@ -67,6 +67,16 @@ test('XRegExp', function () {
 test('XRegExp.addToken', function () {
     XRegExp.install('extensibility');
 
+    // Include the `/` delimiters in case of naive string conversion of `RegExp` object
+    raises(function () {XRegExp.addToken('/0/', function () {return '';});}, TypeError, 'Cannot provide string as regex pattern');
+
+    XRegExp.addToken(/x00/, function () {return 'BOOM';});
+    ok(XRegExp('^x\\x00$').test('x\x00'), 'Native multicharacter token in default scope handled correctly when not overriden');
+
+    XRegExp.addToken(/\x00/, function () {return 'overridden';});
+    XRegExp.addToken(/\x00/, function () {return '0';});
+    ok(XRegExp('\x00').test('0'), 'More recently added token wins');
+
     XRegExp.addToken(/\x01/, function () {return '1';});
     ok(XRegExp('\x01').test('1'), 'Default scope matches outside class');
     ok(!XRegExp('[\x01]').test('1'), 'Default scope does not match inside class');
@@ -91,14 +101,20 @@ test('XRegExp.addToken', function () {
     ok(XRegExp('\x05', '5').test('5'), 'Trigger with hasFlag uses token when flag is included');
 
     XRegExp.addToken(/^\x06/, function () {return '6';});
-    ok(XRegExp('\x06').test('6'), 'Token with anchor applied when found at start of pattern');
-    ok(!XRegExp('a\x06').test('6'), 'Token with anchor not applied when found after start of pattern');
+    ok(XRegExp('\x06').test('6'), 'Token with anchor is applied when found at start of pattern');
+    ok(!XRegExp('a\x06').test('6'), 'Token with anchor is not applied when found after start of pattern');
 
-    // Include the `/` delimiters in case of naive string conversion
-    raises(function () {XRegExp.addToken('/7/', function () {return '';});}, TypeError, 'Cannot provide string as regex pattern');
+    XRegExp.addToken(/\x07/, function () {return '\x01';});
+    ok(XRegExp('\x07').test('\x01'), 'Tokens are not chained when reparse is not set');
 
-    XRegExp.addToken(/x00/, function () {return 'BOOM';});
-    ok(XRegExp('^x\\x00$').test('x\x00'), 'Native multicharacter token in default scope handled correctly when not overriden');
+    XRegExp.addToken(/\x07/, function () {return '\x01';}, {reparse: true});
+    ok(XRegExp('\x07').test('1'), 'Tokens are chained when reparse is true');
+
+    XRegExp.addToken(/\x07/, function () {return '\x01';}, {reparse: false});
+    ok(XRegExp('\x07').test('\x01'), 'Tokens are not chained when reparse is false');
+
+    XRegExp.addToken(/\x08/, function () {return '\x01.[\x02]';}, {reparse: true});
+    ok(XRegExp('\x08').test('1x2'), 'Deferring to multiple tokens works when reparse is true');
 
     XRegExp.uninstall('extensibility');
 });
