@@ -10,7 +10,7 @@
  * to make your client-side grepping simpler and more powerful, while freeing you from worrying
  * about pesky cross-browser inconsistencies and the dubious `lastIndex` property.
  */
-var XRegExp = (function () {
+var XRegExp = (function (undefined) {
     'use strict';
 
 /*--------------------------------------
@@ -68,13 +68,13 @@ var XRegExp = (function () {
 // Any character with a later instance in the string
     duplicateFlags = /([\s\S])(?=[\s\S]*\1)/g,
 
-// Any greedy/lazy quantifier
+// Any greedy or lazy quantifier
     quantifier = /^(?:[?*+]|{\d+(?:,\d*)?})\??/,
 
 // Check for correct `exec` handling of nonparticipating capturing groups
-    compliantExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined,
+    correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined,
 
-// Check for flag y support (Firefox 3+)
+// Check for flag y support
     hasNativeY = RegExp.prototype.sticky !== undefined,
 
 // Used to kill infinite recursion during XRegExp construction
@@ -83,7 +83,7 @@ var XRegExp = (function () {
 // Storage for known flags, including addon flags
     registeredFlags = 'gim' + (hasNativeY ? 'y' : ''),
 
-// Storage for the installed and uninstalled state of `XRegExp.addToken`
+// Storage for the installed and uninstalled states of `XRegExp.addToken`
     addToken,
 
 // Shortcut to `addToken.on`
@@ -202,7 +202,7 @@ var XRegExp = (function () {
     }
 
 /**
- * Determines whether an object is of the specified type.
+ * Determines whether a value is of the specified type, by resolving its internal [[Class]].
  * @private
  * @param {*} value Object to check.
  * @param {String} type Type to check for, in TitleCase.
@@ -245,7 +245,7 @@ var XRegExp = (function () {
             t;
         // Protect against constructing XRegExp objects within token definition functions
         isInsideConstructor = true;
-        // Tokens may throw `SyntaxError`s, etc.
+        // Token definition functions may throw `SyntaxError`s, etc.
         try {
             // Run in reverse insertion order
             while (i--) {
@@ -368,7 +368,7 @@ var XRegExp = (function () {
             throw new Error(ERR_CONSTRUTOR_RECURSION);
         }
 
-        // Copy the native argument behavior of `RegExp`
+        // Copy the argument behavior of `RegExp`
         pattern = pattern === undefined ? '' : String(pattern);
         flags = flags === undefined ? '' : String(flags);
 
@@ -1071,7 +1071,7 @@ var XRegExp = (function () {
  * @memberOf XRegExp
  * @type String
  */
-    self.version = '2.1.0-rc';
+    self.version = '3.0.0-pre';
 
 /*--------------------------------------
  *  Fixed/extended native methods
@@ -1096,7 +1096,7 @@ var XRegExp = (function () {
             // Fix browsers whose `exec` methods don't return `undefined` for nonparticipating
             // capturing groups. This fixes IE 5.5-8, but not IE 9's quirks mode or emulation of
             // older IEs. IE 9 in standards mode follows the spec
-            if (!compliantExecNpcg && match.length > 1 && indexOf(match, '') > -1) {
+            if (!correctExecNpcg && match.length > 1 && indexOf(match, '') > -1) {
                 r2 = copy(this, {remove: 'g'});
                 // Using `str.slice(match.index)` rather than `match[0]` in case lookahead allowed
                 // matching due to characters outside the match
@@ -1196,6 +1196,7 @@ var XRegExp = (function () {
             search += ''; // Type-convert
         }
 
+        // Don't use `typeof`; some older browsers return 'function' for regex objects
         if (isType(replacement, 'Function')) {
             result = nativ.replace.call(String(this), search, function () {
                 var args = arguments, i;

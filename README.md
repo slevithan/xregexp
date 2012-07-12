@@ -108,7 +108,7 @@ XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
 XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
 ~~~
 
-By default, `\p{..}` and `\P{..}` support code points up to `U+FFFF` (i.e., the Basic Multilingual Plane). You can opt-in to full 21-bit Unicode support (with code points up to `U+10FFFF`&mdash;XRegExp calls this *astral mode*) on a per-regex basis by using flag `A`, or you can do this implicitly for all regexes by running `XRegExp.install('astral')`. When in astral mode, `\p{..}` and `\P{..}` always match a full code point rather than a code unit, using surrogate pairs for code points above `U+FFFF`. Opting in to astral mode disables the use of `\p{..}` and `\P{..}` within character classes (use, e.g, `(?:\pL|\pM|[0-9])+` instead of `[\pL\pM0-9]+`).
+By default, `\p{..}` and `\P{..}` support code points up to `U+FFFF` (i.e., the Basic Multilingual Plane). You can opt-in to full 21-bit Unicode support (with code points up to `U+10FFFF`&mdash;XRegExp calls this *astral mode*) on a per-regex basis by using flag `A`. You can do this implicitly for all regexes by running `XRegExp.install('astral')`. When in astral mode, `\p{..}` and `\P{..}` always match a full code point rather than a code unit, using surrogate pairs for code points above `U+FFFF`. Opting in to astral mode disables the use of `\p{..}` and `\P{..}` within character classes (use, e.g, `(?:\pL|\pM|[0-9])+` instead of `[\pL\pM0-9]+`).
 
 ~~~ js
 // Using flag A. The test string uses a surrogate pair to represent U+1F4A9
@@ -238,7 +238,7 @@ XRegExp.globalize(/[a-z]/i).xexec('abc');
 
 ## Installation and usage
 
-Load in browsers:
+In browsers:
 
 ~~~ html
 <script src="build/xregexp-min.js"></script>
@@ -250,33 +250,27 @@ Or, to bundle XRegExp with all of its addons:
 <script src="build/xregexp-all-min.js"></script>
 ~~~
 
-Load using [RequireJS](http://requirejs.org/):
-
-~~~ js
-require.config({
-    paths: {
-        xregexp: 'build/xregexp-all-min'
-    }
-});
-require(['xregexp'], function (XRegExp) {
-    // This function is called when xregexp-all-min.js is loaded
-});
-~~~
-
-Install using [npm](http://npmjs.org/):
+Using [npm](http://npmjs.org/):
 
 ~~~ bash
 npm install xregexp
 ~~~
 
-Load in [Node.js](http://nodejs.org/):
+In [Node.js](http://nodejs.org/):
 
 ~~~ js
 var XRegExp = require('xregexp');
 ~~~
 
+In an AMD loader like [RequireJS](http://requirejs.org/):
 
-### Running tests on the server with npm
+~~~ js
+require({paths: {xregexp: 'build/xregexp-all-min'}}, ['xregexp'], function (XRegExp) {
+    console.log(XRegExp.version);
+});
+~~~
+
+Running tests on the server with npm:
 
 ~~~ bash
 npm install -g qunit  # needed to run the tests
@@ -298,8 +292,10 @@ XRegExp and addons copyright 2007-2012 by [Steven Levithan](http://stevenlevitha
 
 Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/), and adapted from his [unicode-data](https://github.com/mathiasbynens/unicode-data) project. Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
 
-Prior art: `XRegExp.build` inspired by [Lea Verou](http://lea.verou.me/)'s [RegExp.create](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/). `XRegExp.union` inspired by [Ruby](http://www.ruby-lang.org/). XRegExp's syntax extensions and flags come from Perl, .NET, etc.
+Tests: Uses the [QUnit](http://qunitjs.com/) unit testing framework and [node-qunit](https://github.com/kof/node-qunit).
 
-All code released under the [MIT License](http://mit-license.org/).
+Prior art: `XRegExp.build` inspired by [Lea Verou](http://lea.verou.me/)'s [RegExp.create](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/). `XRegExp.union` inspired by [Ruby](http://www.ruby-lang.org/). XRegExp's syntax extensions and flags come from [Perl](http://www.perl.org/), [.NET](http://www.microsoft.com/net), etc.
+
+All code released under the terms of the [MIT License](http://mit-license.org/).
 
 Fork me to show support, fix, and extend.

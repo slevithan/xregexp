@@ -39,7 +39,7 @@ test('XRegExp', function () {
     equal(XRegExp(NaN).source, new RegExp(NaN).source, 'NaN regex source');
     equal(XRegExp(1).source, new RegExp(1).source, 'numeric regex source');
     equal(XRegExp({}).source, new RegExp({}).source, 'object regex source');
-    equal(XRegExp('').global, false, 'Regex without flags is not global');
+    ok(!XRegExp('').global, 'Regex without flags is not global');
     ok(XRegExp('', 'g').global, 'Regex with global flag is global');
     ok(XRegExp('', 'i').ignoreCase, 'Regex with ignoreCase flag is ignoreCase');
     ok(XRegExp('', 'm').multiline, 'Regex with multiline flag is multiline');
@@ -48,11 +48,11 @@ test('XRegExp', function () {
     notEqual(blankRegex, XRegExp(blankRegex), 'Regex copy is new instance');
     ok(XRegExp('').xregexp, 'XRegExp has xregexp property');
     notStrictEqual(XRegExp('').xregexp.captureNames, undefined, 'XRegExp has captureNames property');
-    equal(XRegExp('').xregexp.captureNames, null, 'Empty XRegExp has null captureNames');
+    strictEqual(XRegExp('').xregexp.captureNames, null, 'Empty XRegExp has null captureNames');
     notStrictEqual(XRegExp('').xregexp.isNative, undefined, 'XRegExp has isNative property');
-    equal(XRegExp('').xregexp.isNative, false, 'XRegExp has isNative false');
-    equal(XRegExp(XRegExp('')).xregexp.isNative, false, 'Copied XRegExp has isNative false');
-    equal(XRegExp(new RegExp('')).xregexp.isNative, true, 'Copied RegExp has isNative true');
+    ok(!XRegExp('').xregexp.isNative, 'XRegExp has isNative false');
+    ok(!XRegExp(XRegExp('')).xregexp.isNative, 'Copied XRegExp has isNative false');
+    ok(XRegExp(new RegExp('')).xregexp.isNative, 'Copied RegExp has isNative true');
     equal(XRegExp.exec('aa', XRegExp(XRegExp('(?<name>a)\\k<name>'))).name, 'a', 'Copied XRegExp retains named capture properties');
     raises(function () {XRegExp(/(?:)/, 'g');}, Error, 'Regex copy with flag throws');
     ok(XRegExp('') instanceof RegExp, 'XRegExp object is instanceof RegExp');
@@ -77,10 +77,12 @@ test('XRegExp.addToken', function () {
     XRegExp.addToken(/\x00/, function () {return '0';});
     ok(XRegExp('\x00').test('0'), 'More recently added token wins');
 
+    // This token is deferred to by later token tests
     XRegExp.addToken(/\x01/, function () {return '1';});
     ok(XRegExp('\x01').test('1'), 'Default scope matches outside class');
     ok(!XRegExp('[\x01]').test('1'), 'Default scope does not match inside class');
 
+    // This token is deferred to by later token tests
     XRegExp.addToken(/\x02/, function () {return '2';}, {scope: 'class'});
     ok(!XRegExp('\x02').test('2'), 'Explicit class scope does not match outside class');
     ok(XRegExp('[\x02]').test('2'), 'Explicit class scope matches inside class');
@@ -115,6 +117,12 @@ test('XRegExp.addToken', function () {
 
     XRegExp.addToken(/\x08/, function () {return '\x01.[\x02]';}, {reparse: true});
     ok(XRegExp('\x08').test('1x2'), 'Deferring to multiple tokens works when reparse is true');
+
+    XRegExp.addToken(/\x09/, function () {return '\x08';}, {reparse: true});
+    ok(XRegExp('\x09').test('1x2'), 'Token chaining works in a two-step chain');
+
+    XRegExp.addToken(/\x0A/, function () {return '\x09';}, {reparse: true});
+    ok(XRegExp('\x0A').test('1x2'), 'Token chaining works in a three-step chain');
 
     XRegExp.uninstall('extensibility');
 });
@@ -160,7 +168,7 @@ test('XRegExp.exec', function () {
     ok(!XRegExp.exec(str, rX, 0, true), 'Sticky match fails if match possible after (but not at) pos');
     ok(!XRegExp.exec(str, rX, 0, 'sticky'), 'String "sticky" triggers sticky mode');
     ok(XRegExp.exec(str, rX, 3, true), 'Sticky match succeeds if match at pos');
-    equal(XRegExp.exec(str, rX, 5), null, 'Result of failure is null');
+    strictEqual(XRegExp.exec(str, rX, 5), null, 'Result of failure is null');
     deepEqual(XRegExp.exec(str, xregexp), ['a', 'a'], 'Result of successful match is array with backreferences');
 
     match = XRegExp.exec(str, xregexp);
@@ -178,7 +186,7 @@ test('XRegExp.exec', function () {
     XRegExp.exec(str, rX, 2, true);
     equal(rX.lastIndex, 0, 'lastIndex of global regex updated to 0 after failure');
 
-    equal(XRegExp.exec('abc', /x/, 5), null, 'pos greater than string length results in failure');
+    strictEqual(XRegExp.exec('abc', /x/, 5), null, 'pos greater than string length results in failure');
 
     var sticky = !!RegExp.prototype.sticky,
         // Cannot hide /x/y within an `if` block, since that errors during compilation in IE9
@@ -267,6 +275,7 @@ test('XRegExp.install', function () {
 
 test('XRegExp.isInstalled', function () {
     XRegExp.install('natives extensibility astral');
+
     ok(XRegExp.isInstalled('natives'), 'natives is installed');
     ok(XRegExp.isInstalled('extensibility'), 'extensibility is installed');
     ok(XRegExp.isInstalled('astral'), 'astral is installed');
@@ -277,6 +286,7 @@ test('XRegExp.isInstalled', function () {
     ok(!XRegExp.isInstalled('bogus'), 'Unknown feature is not installed');
 
     XRegExp.uninstall('natives extensibility astral');
+
     ok(!XRegExp.isInstalled('natives'), 'natives is not installed');
     ok(!XRegExp.isInstalled('extensibility'), 'extensibility is not installed');
     ok(!XRegExp.isInstalled('astral'), 'astral is not installed');
@@ -411,11 +421,15 @@ test('XRegExp.uninstall', function () {
 });
 
 test('XRegExp.union', function () {
-    deepEqual('a+b*c dogsdogs catscats'.match(XRegExp.union(['a+b*c', /(dogs)\1/, /(cats)\1/], 'g')), ['a+b*c', 'dogsdogs', 'catscats'], 'Strings escaped and backreferences rewritten');
-    raises(function () {XRegExp.union([XRegExp('(?<pet>dogs)\\k<pet>'), XRegExp('(?<pet>cats)\\k<pet>')]);}, SyntaxError, 'Groups with same name in separate regexes is an error');
-    equal(XRegExp.union([XRegExp('(?<a>a)\\k<a>')], 'n').test('aa'), true, 'Apply flag n (test 1)');
-    raises(function () {XRegExp.union([XRegExp('(?<a>a)\\k<a>'), /(b)\1/], 'n');}, SyntaxError, 'Apply flag n (test 2)');
-    raises(function () {XRegExp.union([XRegExp('(?<a>a)\\k<a>'), /(b)\1/, XRegExp('(?<x>)')], 'n');}, SyntaxError, 'Apply flag n (test 3)');
+    deepEqual('a+b*c dogsdogs catscats'.match(XRegExp.union(['a+b*c', /(dogs)\1/, /(cats)\1/], 'g')),
+        ['a+b*c', 'dogsdogs', 'catscats'], 'Strings escaped and backreferences rewritten');
+    raises(function () {XRegExp.union([XRegExp('(?<pet>dogs)\\k<pet>'), XRegExp('(?<pet>cats)\\k<pet>')]);},
+        SyntaxError, 'Groups with same name in separate regexes is an error');
+    ok(XRegExp.union([XRegExp('(?<a>a)\\k<a>')], 'n').test('aa'), 'Apply flag n (test 1)');
+    raises(function () {XRegExp.union([XRegExp('(?<a>a)\\k<a>'), /(b)\1/], 'n');},
+        SyntaxError, 'Apply flag n (test 2)');
+    raises(function () {XRegExp.union([XRegExp('(?<a>a)\\k<a>'), /(b)\1/, XRegExp('(?<x>)')], 'n');},
+        SyntaxError, 'Apply flag n (test 3)');
 
     // TODO: Add tests
 });
@@ -487,8 +501,8 @@ test('RegExp.prototype.exec', function () {
 test('RegExp.prototype.test', function () {
     XRegExp.install('natives');
 
-    deepEqual(/x/.test('a'), false, 'Nonmatch returns false');
-    deepEqual(/a/.test('a'), true, 'Match returns true');
+    strictEqual(/x/.test('a'), false, 'Nonmatch returns false');
+    strictEqual(/a/.test('a'), true, 'Match returns true');
 
     var regex = /x/;
     regex.test('123x567');
@@ -506,7 +520,7 @@ test('RegExp.prototype.test', function () {
     equal(regexG.lastIndex, 4, 'Global regex lastIndex is updated after match');
 
     regexG.lastIndex = 4;
-    equal(regexG.test('123x567'), false, 'Global regex starts match at lastIndex');
+    ok(!regexG.test('123x567'), 'Global regex starts match at lastIndex');
 
     equal(regexG.lastIndex, 0, 'Global regex lastIndex reset to 0 after failure');
 
@@ -515,12 +529,12 @@ test('RegExp.prototype.test', function () {
     equal(regexZeroLength.lastIndex, 0, 'Global regex lastIndex is not incremented after zero-length match');
 
     regexG.lastIndex = '3';
-    deepEqual(regexG.test('123x567'), true, 'lastIndex converted to integer (test 1)');
+    ok(regexG.test('123x567'), 'lastIndex converted to integer (test 1)');
 
     regexG.lastIndex = '4';
-    deepEqual(regexG.test('123x567'), false, 'lastIndex converted to integer (test 2)');
+    ok(!regexG.test('123x567'), 'lastIndex converted to integer (test 2)');
 
-    deepEqual(/1/.test(1), true, 'Argument converted to string');
+    ok(/1/.test(1), 'Argument converted to string');
     raises(function () {RegExp.prototype.test.call('\\d', '1');}, TypeError, 'TypeError thrown when context is not type RegExp');
 
     XRegExp.uninstall('natives');
