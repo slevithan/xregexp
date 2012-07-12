@@ -39,7 +39,7 @@ XRegExp.replace('2012-02-22', date, function (match) {
 // In fact, all XRegExps are RegExps and work perfectly with native methods
 date.test('2012-02-22'); // -> true
 
-// The *only* caveat is that named captures must be referred to using numbered backreferences
+// The *only* caveat is that named captures must be referenced using numbered backreferences
 '2012-02-22'.replace(date, '$2/$3/$1'); // -> '02/22/2012'
 
 // If you want, you can extend native methods so you don't have to worry about this
@@ -141,7 +141,7 @@ var time = XRegExp.build('(?x)^ {{hours}} ({{minutes}}) $', {
     hours: XRegExp.build('{{h12}} : | {{h24}}', {
         h12: /1[0-2]|0?[1-9]/,
         h24: /2[0-3]|[01][0-9]/
-    }, 'x'),
+    }),
     minutes: /^[0-5][0-9]$/
 });
 

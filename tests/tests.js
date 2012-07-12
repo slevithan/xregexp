@@ -1,9 +1,6 @@
-// In Node.js, `module` is a predefined object, which makes the QUnit `module` definitions fail
-// unless we redefine it
-module = QUnit.module;
-
+// In Node.js, `module` is a predefined object, so use `QUnit.module`
 //-------------------------------------------------------------------
-module('API');
+QUnit.module('API');
 //-------------------------------------------------------------------
 
 test('Basic availability', function () {
@@ -443,7 +440,7 @@ test('XRegExp.version', function () {
 });
 
 //-------------------------------------------------------------------
-module('Overriden natives');
+QUnit.module('Overriden natives');
 //-------------------------------------------------------------------
 
 test('RegExp.prototype.exec', function () {
@@ -676,7 +673,7 @@ test('String.prototype.split', function () {
 });
 
 //-------------------------------------------------------------------
-module('Overriden natives extensions');
+QUnit.module('Overriden natives extensions');
 //-------------------------------------------------------------------
 
 test('RegExp.prototype.exec', function () {
@@ -740,7 +737,7 @@ test('String.prototype.replace', function () {
 //test('String.prototype.split', function () {});
 
 //-------------------------------------------------------------------
-module('New syntax and flags');
+QUnit.module('New syntax and flags');
 //-------------------------------------------------------------------
 
 test('Named capture and backreferences', function () {
@@ -796,7 +793,7 @@ test('x flag (extended mode)', function () {
 });
 
 //-------------------------------------------------------------------
-module('Cross-browser fixes');
+QUnit.module('Cross-browser fixes');
 //-------------------------------------------------------------------
 
 test('Nonparticipating capture values', function () {
@@ -904,7 +901,7 @@ test('Type conversion', function () {
 });
 
 //-------------------------------------------------------------------
-module('Addons');
+QUnit.module('Addons');
 //-------------------------------------------------------------------
 
 test('Unicode Base', function () {
@@ -1158,6 +1155,17 @@ test('XRegExp.build', function () {
     ok(!XRegExp.build('{{x}}', {x: '^123'}).test('01234'), 'Leading ^ without trailing unescaped $ in subpattern (test 2)');
     ok(XRegExp.build('{{x}}', {x: '123$'}).test('123'), 'Trailing unescaped $ without leading ^ in subpattern (test 1)');
     ok(!XRegExp.build('{{x}}', {x: '123$'}).test('01234'), 'Trailing unescaped $ without leading ^ in subpattern (test 2)');
+
+    // Example from README
+    var time = XRegExp.build('(?x)^ {{hours}} ({{minutes}}) $', {
+        hours: XRegExp.build('{{h12}} : | {{h24}}', {
+            h12: /1[0-2]|0?[1-9]/,
+            h24: /2[0-3]|[01][0-9]/
+        }),
+        minutes: /^[0-5][0-9]$/
+    });
+    ok(time.test('10:59'));
+    equal(XRegExp.exec('10:59', time).minutes, '59');
 
     // TODO: Add tests
 });
