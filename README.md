@@ -108,19 +108,18 @@ XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
 XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
 ~~~
 
-By default, `\p{..}` and `\P{..}` support code points up to `U+FFFF` (i.e., the Basic Multilingual Plane). You can opt-in to full 21-bit Unicode support (with code points up to `U+10FFFF`&mdash;XRegExp calls this *astral mode*) on a per-regex basis by using flag `A`. You can do this implicitly for all regexes by running `XRegExp.install('astral')`. When in astral mode, `\p{..}` and `\P{..}` always match a full code point rather than a code unit, using surrogate pairs for code points above `U+FFFF`. Opting in to astral mode disables the use of `\p{..}` and `\P{..}` within character classes (use, e.g, `(?:\pL|\pM|[0-9])+` instead of `[\pL\pM0-9]+`).
+By default, `\p{…}` and `\P{…}` support the Basic Multilingual Plane (i.e., code points up to `U+FFFF`). You can opt in to full 21-bit Unicode support (with code points up to `U+10FFFF`) on a per-regex basis by using flag `A`. In XRegExp, this is called *astral mode*. You can implicitly apply astral mode for all regexes by running `XRegExp.install('astral')`. When in astral mode, `\p{…}` and `\P{…}` always match a full code point rather than a code unit, using surrogate pairs for code points above `U+FFFF`.
 
 ~~~ js
 // Using flag A. The test string uses a surrogate pair to represent U+1F4A9
 XRegExp('^\\pS$', 'A').test('\uD83D\uDCA9'); // -> true
 
-// Inline flag A
-XRegExp('(?A)^\\pS$').test('\uD83D\uDCA9'); // -> true
-
 // Implicit flag A
 XRegExp.install('astral');
 XRegExp('^\\pS$').test('\uD83D\uDCA9'); // -> true
 ~~~
+
+Opting in to astral mode disables the use of `\p{…}` and `\P{…}` within character classes (use, e.g, `(?:\pL|\pM|[0-9])+` instead of `[\pL\pM0-9]+`).
 
 XRegExp uses Unicode 6.2.0.
 
