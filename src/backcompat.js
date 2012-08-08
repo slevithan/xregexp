@@ -5,15 +5,31 @@
  */
 
 /**
- * Provides backward compatibility with XRegExp 1.x.x.
+ * Provides backward compatibility with XRegExp 1.x-2.x.
  */
 (function(XRegExp) {
     'use strict';
 
-    var REGEX_DATA = 'xregexp';
+    var REGEX_DATA = 'xregexp',
+        install = XRegExp.install,
+        uninstall = XRegExp.uninstall;
 
 /**
- * XRegExp 2.0.0 doesn't override native methods or allow syntax extensions by default.
+ * XRegExp 3.0.0 removed the 'all' shortcut.
+ */
+    XRegExp.install = function(options) {
+        install(options === 'all' ? 'natives' : options);
+    };
+
+/**
+ * XRegExp 3.0.0 removed the 'all' shortcut.
+ */
+    XRegExp.uninstall = function(options) {
+        uninstall(options === 'all' ? 'natives' : options);
+    };
+
+/**
+ * XRegExp 2.0.0 stopped overriding native methods by default.
  */
     XRegExp.install('natives');
 
