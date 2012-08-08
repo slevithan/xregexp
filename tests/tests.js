@@ -51,7 +51,7 @@ test('XRegExp', function () {
     ok(!XRegExp(XRegExp('')).xregexp.isNative, 'Copied XRegExp has isNative false');
     ok(XRegExp(new RegExp('')).xregexp.isNative, 'Copied RegExp has isNative true');
     equal(XRegExp.exec('aa', XRegExp(XRegExp('(?<name>a)\\k<name>'))).name, 'a', 'Copied XRegExp retains named capture properties');
-    raises(function () {XRegExp(/(?:)/, 'g');}, Error, 'Regex copy with flag throws');
+    raises(function () {XRegExp(/(?:)/, 'g');}, TypeError, 'Regex copy with flag throws');
     ok(XRegExp('') instanceof RegExp, 'XRegExp object is instanceof RegExp');
     equal(XRegExp('').constructor, RegExp, 'XRegExp object constructor is RegExp');
     raises(function () {XRegExp('', 'gg');}, SyntaxError, 'Regex with duplicate native flags throws');
@@ -1044,6 +1044,8 @@ test('Unicode Scripts', function () {
     // U+065F moved from Inherited to Arabic script in Unicode 6.2.0
     ok(XRegExp('\\p{Arabic}').test('\u065F'), '\\p{Arabic} matches U+065F (Unicode 6.2.0)');
     ok(!XRegExp('\\p{Inherited}').test('\u065F'), '\\p{Inherited} does not match U+065F (Unicode 6.2.0)');
+    // Turkish Lira Sign U+20BA added in Unicode 6.2.0
+    ok(XRegExp('\\p{Common}').test('\u20BA'), '\\p{Common} matches U+20BA (Unicode 6.2.0)');
 
     // TODO: Add tests
 });
