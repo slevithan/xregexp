@@ -3,7 +3,7 @@
 
 XRegExp provides augmented, extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your client-side grepping simpler and more powerful, while freeing you from worrying about pesky cross-browser inconsistencies and the dubious `lastIndex` property.
 
-XRegExp supports all native ES5 regular expression syntax. It's about 3.6 KB when minified and gzipped. It works with Internet Explorer 5.5+, Firefox 1.5+, Chrome, Safari 3+, and Opera 9.5+. You can also use it on the server with Node.js.
+XRegExp supports all native ES5 regular expression syntax. It's about 3.6 KB when minified and gzipped. It works with Internet Explorer 5.5+, Firefox 1.5+, Chrome, Safari 3+, and Opera 11+. You can also use it on the server with Node.js.
 
 
 ## Performance
@@ -119,7 +119,7 @@ XRegExp.install('astral');
 XRegExp('^\\pS$').test('\uD83D\uDCA9'); // -> true
 ~~~
 
-Opting in to astral mode disables the use of `\p{…}` and `\P{…}` within character classes (use, e.g, `(?:\pL|\pM|[0-9])+` instead of `[\pL\pM0-9]+`).
+Opting in to astral mode disables the use of `\p{…}` and `\P{…}` within character classes. In astral mode, use e.g. `(?:\pL|\pM|[0-9_])+` instead of `[\pL\pM0-9_]+`.
 
 XRegExp uses Unicode 6.2.0.
 
@@ -287,14 +287,14 @@ If XRegExp was not installed using npm, just open `tests/index.html` in your bro
 
 ## About
 
-XRegExp and addons copyright 2007-2012 by [Steven Levithan](http://stevenlevithan.com/).
+XRegExp copyright 2007-2012 by [Steven Levithan](http://stevenlevithan.com/).
 
 Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/), and adapted from his [unicode-data](https://github.com/mathiasbynens/unicode-data) project. Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
 
-Tests: Uses the [QUnit](http://qunitjs.com/) unit testing framework and [node-qunit](https://github.com/kof/node-qunit).
+Tests: Uses the [Jasmine](http://pivotal.github.com/jasmine/) testing framework by Pivotal Labs.
 
 Prior art: `XRegExp.build` inspired by [Lea Verou](http://lea.verou.me/)'s [RegExp.create](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/). `XRegExp.union` inspired by [Ruby](http://www.ruby-lang.org/). XRegExp's syntax extensions and flags come from [Perl](http://www.perl.org/), [.NET](http://www.microsoft.com/net), etc.
 
-All code released under the terms of the [MIT License](http://mit-license.org/).
+All code, including addons, tools, and tests, are released under the terms of the [MIT License](http://mit-license.org/).
 
 Fork me to show support, fix, and extend.

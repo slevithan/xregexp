@@ -4,6 +4,8 @@
 from utils import *
 import sys
 
+# NOTE: As of Unicode 2.1.3, General_Category property values won't be further subdivided
+# See http://www.unicode.org/policies/stability_policy.html
 aliases = {
 	'L': 'Letter',
 	'Ll': 'Lowercase_Letter',

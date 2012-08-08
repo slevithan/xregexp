@@ -299,6 +299,21 @@ var XRegExp = (function (undefined) {
         features.natives = on;
     }
 
+/**
+ * Returns the object, or throws an error if it's `null` or `undefined`. This is used to follow the
+ * ES5 abstract operations `CheckObjectCoercible` and `ToObject`.
+ * @private
+ * @param {Object} obj Object to check and return.
+ * @returns {Object} The provided object.
+ */
+    function toObject(obj) {
+        // This matches both `null` and `undefined`
+        if (obj == null) {
+            throw new TypeError('Cannot convert null or undefined to object');
+        }
+        return obj;
+    }
+
 /*--------------------------------------
  *  Constructor
  *------------------------------------*/
@@ -528,9 +543,15 @@ var XRegExp = (function (undefined) {
  * }
  */
     self.cache = function (pattern, flags) {
+        // The regex object cache is never auto-flushed, even if the user adds new syntax tokens
         var key = pattern + '/' + (flags || '');
         return cache[key] || (cache[key] = self(pattern, flags));
     };
+
+// Intentionally undocumented
+    self.cache.flush = function () {
+        cache = {};
+    }
 
 /**
  * Escapes any regular expression metacharacters, for use when matching literal strings. The result
@@ -544,7 +565,7 @@ var XRegExp = (function (undefined) {
  * // -> 'Escaped\?\ <\.>'
  */
     self.escape = function (str) {
-        return nativ.replace.call(str, /[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+        return nativ.replace.call(toObject(str), /[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
     };
 
 /**
@@ -628,7 +649,9 @@ var XRegExp = (function (undefined) {
             // Because `regex` is provided to `callback`, the function can use the deprecated/
             // nonstandard `RegExp.prototype.compile` to mutate the regex. However, since
             // `XRegExp.exec` doesn't use `lastIndex` to set the search position, this can't lead
-            // to an infinite loop, at least
+            // to an infinite loop, at least. Actually, because of the way `XRegExp.exec` caches
+            // globalized versions of regexes, mutating the regex will not have any effect on the
+            // iteration or matched strings, which is a nice side effect that brings extra safety
             callback.call(context, match, ++i, str, regex);
             pos = match.index + (match[0].length || 1);
         }
@@ -759,9 +782,13 @@ var XRegExp = (function (undefined) {
                 remove: scope === 'one' ? 'g' : ''
             })
         );
-        result = nativ.match.call(str, r2);
+        result = nativ.match.call(toObject(str), r2);
         if (regex.global) {
-            regex.lastIndex = 0;
+            regex.lastIndex = (
+                (scope === 'one' && result) ?
+                    // Can't use `r2.lastIndex` since `r2` is nonglobal in this case
+                    (result.index + result[0].length) : 0
+            );
         }
         return global ? (result || []) : (result && result[0]);
     };
@@ -798,7 +825,20 @@ var XRegExp = (function (undefined) {
             var item = chain[level].regex ? chain[level] : {regex: chain[level]},
                 matches = [],
                 addMatch = function (match) {
-                    matches.push(item.backref ? (match[item.backref] || '') : match[0]);
+                    if (item.backref) {
+                        /* Safari 4.0.5 (but not 5.0.5+) incorrectly uses sparse arrays to hold the
+                         * undefineds for backreferences to nonparticipating capturing groups. In
+                         * such cases, a `hasOwnProperty` or `in` check on its own would
+                         * inappropriately throw the exception, so also check if the backreference
+                         * is a number that is within the bounds of the array.
+                         */
+                        if (!(match.hasOwnProperty(item.backref) || +item.backref < match.length)) {
+                            throw new ReferenceError('Backreference to undefined group: ' + item.backref);
+                        }
+                        matches.push(match[item.backref] || '');
+                    } else {
+                        matches.push(match[0]);
+                    }
                 },
                 i;
             for (i = 0; i < values.length; ++i) {
@@ -876,7 +916,7 @@ var XRegExp = (function (undefined) {
             s2 = new RegExp(self.escape(String(search)), 'g');
         }
         // Fixed `replace` required for named backreferences, etc.
-        result = fixed.replace.call(String(str), s2, replacement);
+        result = fixed.replace.call(toObject(str), s2, replacement);
         if (isRegex && search.global) {
             // Fixes IE, Safari bug (last tested IE 9, Safari 5.1)
             search.lastIndex = 0;
@@ -942,7 +982,7 @@ var XRegExp = (function (undefined) {
  * // -> ['..', 'word', '1', '..']
  */
     self.split = function (str, separator, limit) {
-        return fixed.split.call(str, separator, limit);
+        return fixed.split.call(toObject(str), separator, limit);
     };
 
 /**
@@ -1163,7 +1203,7 @@ var XRegExp = (function (undefined) {
             regex.lastIndex = 0; // Fixes IE bug
             return result;
         }
-        return fixed.exec.call(regex, this);
+        return fixed.exec.call(regex, toObject(this));
     };
 
 /**
@@ -1183,8 +1223,7 @@ var XRegExp = (function (undefined) {
         var isRegex = self.isRegExp(search),
             origLastIndex,
             captureNames,
-            result,
-            str;
+            result;
 
         if (isRegex) {
             if (search[REGEX_DATA]) {
@@ -1198,6 +1237,8 @@ var XRegExp = (function (undefined) {
 
         // Don't use `typeof`; some older browsers return 'function' for regex objects
         if (isType(replacement, 'Function')) {
+            // Stringifying `this` fixes a bug in IE < 9 where the last argument in replacement
+            // functions isn't type-converted to a string
             result = nativ.replace.call(String(this), search, function () {
                 var args = arguments, i;
                 if (captureNames) {
@@ -1216,12 +1257,14 @@ var XRegExp = (function (undefined) {
                 if (isRegex && search.global) {
                     search.lastIndex = args[args.length - 2] + args[0].length;
                 }
+                // Should pass `undefined` as context; see
+                // <https://bugs.ecmascript.org/show_bug.cgi?id=154>
                 return replacement.apply(undefined, args);
             });
         } else {
-            // Ensure `args[args.length - 1]` will be a string when given nonstring `this`
-            str = String(this);
-            result = nativ.replace.call(str, search, function () {
+            // Ensure that the last value of `args` will be a string when given nonstring `this`,
+            // while still throwing on `null` or `undefined` context
+            result = nativ.replace.call(this == null ? this : String(this), search, function () {
                 // Keep this function's `arguments` available through closure
                 var args = arguments;
                 return nativ.replace.call(String(replacement), replacementToken, function ($0, $1, $2) {
@@ -1314,11 +1357,13 @@ var XRegExp = (function (undefined) {
             // Browsers handle nonregex split correctly, so use the faster native method
             return nativ.split.apply(this, arguments);
         }
+
         var str = String(this),
-            origLastIndex = separator.lastIndex,
             output = [],
+            origLastIndex = separator.lastIndex,
             lastLastIndex = 0,
             lastLength;
+
         /* Values for `limit`, per the spec:
          * If undefined: pow(2,32) - 1
          * If 0, Infinity, or NaN: 0
@@ -1326,7 +1371,10 @@ var XRegExp = (function (undefined) {
          * If negative number: pow(2,32) - floor(abs(limit))
          * If other: Type-convert, then use the above rules
          */
+        // This line fails in very strage ways for some values of limit in Opera 10.63, unless
+        // Opera Dragonfly is open (go figure). It works in Opera 11+
         limit = (limit === undefined ? -1 : limit) >>> 0;
+
         self.forEach(str, separator, function (match) {
             // This condition is not the same as `if (match[0].length)`
             if ((match.index + match[0].length) > lastLastIndex) {
@@ -1338,6 +1386,7 @@ var XRegExp = (function (undefined) {
                 lastLastIndex = match.index + lastLength;
             }
         });
+
         if (lastLastIndex === str.length) {
             if (!nativ.test.call(separator, '') || lastLength) {
                 output.push('');
@@ -1345,6 +1394,7 @@ var XRegExp = (function (undefined) {
         } else {
             output.push(str.slice(lastLastIndex));
         }
+
         separator.lastIndex = origLastIndex;
         return output.length > limit ? output.slice(0, limit) : output;
     };
@@ -1461,6 +1511,9 @@ var XRegExp = (function (undefined) {
             // arrays and therefore numeric properties may lead to incorrect lookups
             if (!isNaN(match[1])) {
                 throw new SyntaxError('Cannot use integer as capture name ' + match[0]);
+            }
+            if (match[1] === 'length' || match[1] === '__proto__') {
+                throw new SyntaxError('Cannot use reserved word as capture name ' + match[0]);
             }
             if (indexOf(this.captureNames, match[1]) > -1) {
                 throw new SyntaxError('Cannot use same name for multiple groups ' + match[0]);

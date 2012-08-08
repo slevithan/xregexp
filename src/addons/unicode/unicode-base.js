@@ -54,7 +54,7 @@
             chr.charCodeAt(chr.charAt(0) === '\\' ? 1 : 0);
     }
 
-// Inverts a list of BMP characters and ranges
+// Inverts a list of ordered BMP characters and ranges
     function invertBmp(range) {
         var output = '',
             lastEnd = -1,
@@ -130,7 +130,7 @@
                 ERR_UNKNOWN_REF = 'Unicode token missing data ',
                 ERR_ASTRAL_ONLY = 'Astral mode required for Unicode token ',
                 ERR_ASTRAL_IN_CLASS = 'Astral mode does not support Unicode tokens within character classes',
-                // Negate via \P{..} or \p{^..}
+                // Negated via \P{..} or \p{^..}
                 isNegated = match[1] === 'P' || !!match[2],
                 // Switch from BMP (U+FFFF) to astral (U+10FFFF) mode via flag A or implicit opt-in
                 isAstralMode = this.hasFlag('A') || XRegExp.isInstalled('astral'),
