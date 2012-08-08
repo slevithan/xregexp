@@ -13,11 +13,5 @@
         "regex",
         "regexp"
     ],
-    "main": "./xregexp-all.js",
-    "scripts": {
-        "test": "node tests/node-qunit.js"
-    },
-    "devDependencies": {
-        "qunit": ">= 0.2.x"
-    }
+    "main": "./xregexp-all.js"
 }

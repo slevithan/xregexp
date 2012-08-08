@@ -1,5 +1,4 @@
 build/
 src/
-tests/index.html
-tests/qunit/
+tests/
 tools/
