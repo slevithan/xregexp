@@ -392,6 +392,7 @@ describe('XRegExp()', function() {
 
             it('should separate backreferences from following literal digits', function() {
                 expect(XRegExp('(?<$1>A1)(2)(3)(4)(5)(6)(7)(8)(9)(B10)\\k<$1>0').test('A123456789B10A10')).toBe(true);
+                expect(XRegExp('(?<$1>A)\\k<$1>2').test('AA2')).toBe(true);
             });
 
             it('should throw an exception for backreferences to unknown groups', function() {
@@ -428,6 +429,7 @@ describe('XRegExp()', function() {
 
             it('should separate numbered backreferences from following literal digits', function() {
                 expect(XRegExp('(A1)(2)(3)(4)(5)(6)(7)(8)(9)(B10)\\k<1>0').test('A123456789B10A10')).toBe(true);
+                expect(XRegExp('(A)\\k<1>2').test('AA2')).toBe(true);
             });
 
             it('should throw an exception for backreferences to unknown groups', function() {

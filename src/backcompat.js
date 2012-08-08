@@ -7,7 +7,7 @@
 /**
  * Provides backward compatibility with XRegExp 1.x.x.
  */
-(function (XRegExp) {
+(function(XRegExp) {
     'use strict';
 
     var REGEX_DATA = 'xregexp';
@@ -35,7 +35,7 @@
 /**
  * @deprecated As of XRegExp 2.0.0. No replacement.
  */
-    XRegExp.freezeTokens = function () {
+    XRegExp.freezeTokens = function() {
         XRegExp.uninstall('extensibility');
         delete XRegExp.install;
     };
@@ -43,14 +43,14 @@
 /**
  * @deprecated As of XRegExp 2.0.0. Replaced by {@link #XRegExp.prototype.apply} in addon.
  */
-    RegExp.prototype.apply = function (context, args) {
+    RegExp.prototype.apply = function(context, args) {
         return this.test(args[0]);
     };
 
 /**
  * @deprecated As of XRegExp 2.0.0. Replaced by {@link #XRegExp.prototype.call} in addon.
  */
-    RegExp.prototype.call = function (context, str) {
+    RegExp.prototype.call = function(context, str) {
         return this.test(str);
     };
 
@@ -62,7 +62,7 @@
 /**
  * @deprecated As of XRegExp 1.5.0. No replacement.
  */
-    RegExp.prototype.addFlags = function (flags) {
+    RegExp.prototype.addFlags = function(flags) {
         var regex = XRegExp(
                 this.source,
                 /\/([a-z]*)$/i.exec(String(this))[1] + (flags || '')
@@ -78,14 +78,14 @@
 /**
  * @deprecated As of XRegExp 1.5.0. No replacement.
  */
-    RegExp.prototype.forEachExec = function (str, callback, context) {
+    RegExp.prototype.forEachExec = function(str, callback, context) {
         XRegExp.forEach(str, this, callback, context);
     };
 
 /**
  * @deprecated As of XRegExp 1.5.0. No replacement.
  */
-    RegExp.prototype.validate = function (str) {
+    RegExp.prototype.validate = function(str) {
         var regex = new RegExp(
             '^(?:' + this.source + ')$(?!\\s)',
             /\/([a-z]*)$/i.exec(String(this))[1]
@@ -99,8 +99,8 @@
 /**
  * @deprecated As of XRegExp 1.2.0. No replacement.
  */
-    RegExp.prototype.execAll = function (str) {
-        return XRegExp.forEach(str, this, function (match) {
+    RegExp.prototype.execAll = function(str) {
+        return XRegExp.forEach(str, this, function(match) {
             this.push(match);
         }, []);
     };

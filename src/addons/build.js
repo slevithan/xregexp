@@ -5,7 +5,7 @@
  * Inspired by Lea Verou's RegExp.create <http://lea.verou.me/>
  */
 
-(function (XRegExp) {
+(function(XRegExp) {
     'use strict';
 
     var REGEX_DATA = 'xregexp',
@@ -67,7 +67,7 @@
  * time.test('10:59'); // -> true
  * XRegExp.exec('10:59', time).minutes; // -> '59'
  */
-    XRegExp.build = function (pattern, subs, flags) {
+    XRegExp.build = function(pattern, subs, flags) {
         var inlineFlags = /^\(\?([\w$]+)\)/.exec(pattern),
             data = {},
             numCaps = 0, // 'Caps' is short for captures
@@ -81,7 +81,7 @@
         // Add flags within a leading mode modifier to the overall pattern's flags
         if (inlineFlags) {
             flags = flags || '';
-            inlineFlags[1].replace(/./g, function (flag) {
+            inlineFlags[1].replace(/./g, function(flag) {
                 // Don't add duplicates
                 flags += (flags.indexOf(flag) > -1 ? '' : flag);
             });
@@ -107,7 +107,7 @@
         // helps keep this simple. Named captures will be put back
         pattern = asXRegExp(pattern);
         outerCapNames = pattern[REGEX_DATA].captureNames || [];
-        pattern = pattern.source.replace(parts, function ($0, $1, $2, $3, $4) {
+        pattern = pattern.source.replace(parts, function($0, $1, $2, $3, $4) {
             var subName = $1 || $2, capName, intro;
             // Named subpattern
             if (subName) {
@@ -125,7 +125,7 @@
                     intro = '(?:';
                 }
                 numPriorCaps = numCaps;
-                return intro + data[subName].pattern.replace(subParts, function (match, paren, backref) {
+                return intro + data[subName].pattern.replace(subParts, function(match, paren, backref) {
                     // Capturing group
                     if (paren) {
                         capName = data[subName].names[numCaps - numPriorCaps];

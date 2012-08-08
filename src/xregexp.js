@@ -10,7 +10,7 @@
  * to make your client-side grepping simpler and more powerful, while freeing you from worrying
  * about pesky cross-browser inconsistencies and the dubious `lastIndex` property.
  */
-var XRegExp = (function (undefined) {
+var XRegExp = (function(undefined) {
     'use strict';
 
 /*--------------------------------------
@@ -221,7 +221,7 @@ var XRegExp = (function (undefined) {
     function prepareOptions(value) {
         value = value || {};
         if (isType(value, 'String')) {
-            value = self.forEach(value, /[^\s,]+/, function (match) {
+            value = self.forEach(value, /[^\s,]+/, function(match) {
                 this[match] = true;
             }, {});
         }
@@ -303,15 +303,15 @@ var XRegExp = (function (undefined) {
  * Returns the object, or throws an error if it's `null` or `undefined`. This is used to follow the
  * ES5 abstract operations `CheckObjectCoercible` and `ToObject`.
  * @private
- * @param {Object} obj Object to check and return.
- * @returns {Object} The provided object.
+ * @param {*} value Object to check and return.
+ * @returns {*} The provided object.
  */
-    function toObject(obj) {
+    function toObject(value) {
         // This matches both `null` and `undefined`
-        if (obj == null) {
+        if (value == null) {
             throw new TypeError('Cannot convert null or undefined to object');
         }
-        return obj;
+        return value;
     }
 
 /*--------------------------------------
@@ -350,7 +350,7 @@ var XRegExp = (function (undefined) {
  * // `XRegExp.prototype` methods, and have fresh `lastIndex` properties (set to zero).
  * XRegExp(/regex/);
  */
-    self = function (pattern, flags) {
+    self = function(pattern, flags) {
         var ERR_COPY_WITH_FLAGS = 'Cannot supply flags when copying a RegExp',
             ERR_CONSTRUTOR_RECURSION = 'Cannot build XRegExp objects within token definition functions',
             ERR_DUPLICATE_FLAG = 'Invalid duplicate regex flag ',
@@ -361,7 +361,7 @@ var XRegExp = (function (undefined) {
             context = {
                 hasNamedCapture: false,
                 captureNames: [],
-                hasFlag: function (flag) {
+                hasFlag: function(flag) {
                     return flags.indexOf(flag) > -1;
                 }
             },
@@ -394,7 +394,7 @@ var XRegExp = (function (undefined) {
             throw new SyntaxError(ERR_DUPLICATE_FLAG + flags);
         }
         // Strip/apply leading mode modifier with any combination of flags except g or y
-        pattern = nativ.replace.call(pattern, /^\(\?([\w$]+)\)/, function ($0, $1) {
+        pattern = nativ.replace.call(pattern, /^\(\?([\w$]+)\)/, function($0, $1) {
             if (nativ.test.call(/[gy]/, $1)) {
                 throw new SyntaxError(ERR_BAD_INLINE_FLAG + $0);
             }
@@ -464,7 +464,7 @@ var XRegExp = (function (undefined) {
 
 // Installed and uninstalled states for `XRegExp.addToken`
     addToken = {
-        on: function (regex, handler, options) {
+        on: function(regex, handler, options) {
             options = options || {};
             if (regex && handler) {
                 // Add to the private list of syntax tokens
@@ -486,7 +486,7 @@ var XRegExp = (function (undefined) {
                 );
             }
         },
-        off: function () {
+        off: function() {
             // By making extensibility an optional feature, users are able to delete or override
             // `XRegExp.install` if they want to lock down any further syntax extensions
             throw new Error('Extensibility must be installed before calling addToken');
@@ -522,7 +522,7 @@ var XRegExp = (function (undefined) {
  * // Basic usage: Add \a for the ALERT control code
  * XRegExp.addToken(
  *   /\\a/,
- *   function () {return '\\x07';},
+ *   function() {return '\\x07';},
  *   {scope: 'all'}
  * );
  * XRegExp('\\a[\\a-\\n]+').test('\x07\n\x07'); // -> true
@@ -542,14 +542,14 @@ var XRegExp = (function (undefined) {
  *   // The regex is compiled once only
  * }
  */
-    self.cache = function (pattern, flags) {
+    self.cache = function(pattern, flags) {
         // The regex object cache is never auto-flushed, even if the user adds new syntax tokens
         var key = pattern + '/' + (flags || '');
         return cache[key] || (cache[key] = self(pattern, flags));
     };
 
 // Intentionally undocumented
-    self.cache.flush = function () {
+    self.cache.flush = function() {
         cache = {};
     }
 
@@ -564,7 +564,7 @@ var XRegExp = (function (undefined) {
  * XRegExp.escape('Escaped? <.>');
  * // -> 'Escaped\?\ <\.>'
  */
-    self.escape = function (str) {
+    self.escape = function(str) {
         return nativ.replace.call(toObject(str), /[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
     };
 
@@ -596,7 +596,7 @@ var XRegExp = (function (undefined) {
  * }
  * // result -> ['2', '3', '4']
  */
-    self.exec = function (str, regex, pos, sticky) {
+    self.exec = function(str, regex, pos, sticky) {
         var cacheFlags = 'g', match, r2;
         if (hasNativeY && (sticky || (regex.sticky && sticky !== false))) {
             cacheFlags += 'y';
@@ -636,12 +636,12 @@ var XRegExp = (function (undefined) {
  * @example
  *
  * // Extracts every other digit from a string
- * XRegExp.forEach('1a2345', /\d/, function (match, i) {
+ * XRegExp.forEach('1a2345', /\d/, function(match, i) {
  *   if (i % 2) this.push(+match[0]);
  * }, []);
  * // -> [2, 4]
  */
-    self.forEach = function (str, regex, callback, context) {
+    self.forEach = function(str, regex, callback, context) {
         var pos = 0,
             i = -1,
             match;
@@ -670,7 +670,7 @@ var XRegExp = (function (undefined) {
  * var globalCopy = XRegExp.globalize(/regex/);
  * globalCopy.global; // -> true
  */
-    self.globalize = function (regex) {
+    self.globalize = function(regex) {
         return copy(regex, {add: 'g', addProto: true});
     };
 
@@ -697,7 +697,7 @@ var XRegExp = (function (undefined) {
  * // With an options string
  * XRegExp.install('natives extensibility astral');
  */
-    self.install = function (options) {
+    self.install = function(options) {
         options = prepareOptions(options);
         if (!features.natives && options.natives) {
             setNatives(true);
@@ -722,7 +722,7 @@ var XRegExp = (function (undefined) {
  *
  * XRegExp.isInstalled('natives');
  */
-    self.isInstalled = function (feature) {
+    self.isInstalled = function(feature) {
         return !!(features[feature]);
     };
 
@@ -739,7 +739,7 @@ var XRegExp = (function (undefined) {
  * XRegExp.isRegExp(RegExp('^', 'm')); // -> true
  * XRegExp.isRegExp(XRegExp('(?s).')); // -> true
  */
-    self.isRegExp = function (value) {
+    self.isRegExp = function(value) {
         return isType(value, 'RegExp');
     };
 
@@ -769,7 +769,7 @@ var XRegExp = (function (undefined) {
  * XRegExp.match('abc', /\w/, 'all'); // -> ['a', 'b', 'c']
  * XRegExp.match('abc', /x/, 'all'); // -> []
  */
-    self.match = function (str, regex, scope) {
+    self.match = function(str, regex, scope) {
         var global = (regex.global && scope !== 'one') || scope === 'all',
             cacheFlags = (global ? 'g' : '') + (regex.sticky ? 'y' : ''),
             result,
@@ -820,11 +820,11 @@ var XRegExp = (function (undefined) {
  * ]);
  * // -> ['xregexp.com', 'www.google.com']
  */
-    self.matchChain = function (str, chain) {
+    self.matchChain = function(str, chain) {
         return (function recurseChain(values, level) {
             var item = chain[level].regex ? chain[level] : {regex: chain[level]},
                 matches = [],
-                addMatch = function (match) {
+                addMatch = function(match) {
                     if (item.backref) {
                         /* Safari 4.0.5 (but not 5.0.5+) incorrectly uses sparse arrays to hold the
                          * undefineds for backreferences to nonparticipating capturing groups. In
@@ -887,7 +887,7 @@ var XRegExp = (function (undefined) {
  * // -> 'Smith, John'
  *
  * // Regex search, using named backreferences in replacement function
- * XRegExp.replace('John Smith', name, function (match) {
+ * XRegExp.replace('John Smith', name, function(match) {
  *   return match.last + ', ' + match.first;
  * });
  * // -> 'Smith, John'
@@ -896,7 +896,7 @@ var XRegExp = (function (undefined) {
  * XRegExp.replace('RegExp builds RegExps', 'RegExp', 'XRegExp', 'all');
  * // -> 'XRegExp builds XRegExps'
  */
-    self.replace = function (str, search, replacement, scope) {
+    self.replace = function(str, search, replacement, scope) {
         var isRegex = self.isRegExp(search),
             global = (search.global && scope !== 'one') || scope === 'all',
             cacheFlags = (global ? 'g' : '') + (search.sticky ? 'y' : ''),
@@ -942,12 +942,12 @@ var XRegExp = (function (undefined) {
  *   [/c/g, 'x', 'one'], // scope 'one' overrides /g
  *   [/d/, 'w', 'all'],  // scope 'all' overrides lack of /g
  *   ['e', 'v', 'all'],  // scope 'all' allows replace-all for strings
- *   [/f/g, function ($0) {
+ *   [/f/g, function($0) {
  *     return $0.toUpperCase();
  *   }]
  * ]);
  */
-    self.replaceEach = function (str, replacements) {
+    self.replaceEach = function(str, replacements) {
         var i, r;
         for (i = 0; i < replacements.length; ++i) {
             r = replacements[i];
@@ -981,7 +981,7 @@ var XRegExp = (function (undefined) {
  * XRegExp.split('..word1..', /([a-z]+)(\d+)/i);
  * // -> ['..', 'word', '1', '..']
  */
-    self.split = function (str, separator, limit) {
+    self.split = function(str, separator, limit) {
         return fixed.split.call(toObject(str), separator, limit);
     };
 
@@ -1006,7 +1006,7 @@ var XRegExp = (function (undefined) {
  * // With pos and sticky
  * XRegExp.test('abc', /c/, 0, 'sticky'); // -> false
  */
-    self.test = function (str, regex, pos, sticky) {
+    self.test = function(str, regex, pos, sticky) {
         // Do this the easy way :-)
         return !!self.exec(str, regex, pos, sticky);
     };
@@ -1033,7 +1033,7 @@ var XRegExp = (function (undefined) {
  * // With an options string
  * XRegExp.uninstall('natives extensibility astral');
  */
-    self.uninstall = function (options) {
+    self.uninstall = function(options) {
         options = prepareOptions(options);
         if (features.natives && options.natives) {
             setNatives(false);
@@ -1060,12 +1060,12 @@ var XRegExp = (function (undefined) {
  * XRegExp.union(['a+b*c', /(dogs)\1/, /(cats)\1/], 'i');
  * // -> /a\+b\*c|(dogs)\1|(cats)\2/i
  */
-    self.union = function (patterns, flags) {
+    self.union = function(patterns, flags) {
         var parts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*]/g,
             numCaptures = 0,
             numPriorCaptures,
             captureNames,
-            rewrite = function (match, paren, backref) {
+            rewrite = function(match, paren, backref) {
                 var name = captureNames[numCaptures - numPriorCaptures];
                 // Capturing group
                 if (paren) {
@@ -1125,7 +1125,7 @@ var XRegExp = (function (undefined) {
  * @param {String} str String to search.
  * @returns {Array} Match array with named backreference properties, or `null`.
  */
-    fixed.exec = function (str) {
+    fixed.exec = function(str) {
         var origLastIndex = this.lastIndex,
             match = nativ.exec.apply(this, arguments),
             name,
@@ -1140,7 +1140,7 @@ var XRegExp = (function (undefined) {
                 r2 = copy(this, {remove: 'g'});
                 // Using `str.slice(match.index)` rather than `match[0]` in case lookahead allowed
                 // matching due to characters outside the match
-                nativ.replace.call(String(str).slice(match.index), r2, function () {
+                nativ.replace.call(String(str).slice(match.index), r2, function() {
                     var len = arguments.length, i;
                     // Skip index 0 and the last 2
                     for (i = 1; i < len - 2; ++i) {
@@ -1181,7 +1181,7 @@ var XRegExp = (function (undefined) {
  * @param {String} str String to search.
  * @returns {Boolean} Whether the regex matched the provided value.
  */
-    fixed.test = function (str) {
+    fixed.test = function(str) {
         // Do this the easy way :-)
         return !!fixed.exec.call(this, str);
     };
@@ -1195,7 +1195,7 @@ var XRegExp = (function (undefined) {
  * @returns {Array} If `regex` uses flag g, an array of match strings or `null`. Without flag g,
  *   the result of calling `regex.exec(this)`.
  */
-    fixed.match = function (regex) {
+    fixed.match = function(regex) {
         if (!self.isRegExp(regex)) {
             regex = new RegExp(regex); // Use native `RegExp`
         } else if (regex.global) {
@@ -1219,7 +1219,7 @@ var XRegExp = (function (undefined) {
  * @param {String|Function} replacement Replacement string or a function invoked to create it.
  * @returns {String} New string with one or all matches replaced.
  */
-    fixed.replace = function (search, replacement) {
+    fixed.replace = function(search, replacement) {
         var isRegex = self.isRegExp(search),
             origLastIndex,
             captureNames,
@@ -1239,7 +1239,7 @@ var XRegExp = (function (undefined) {
         if (isType(replacement, 'Function')) {
             // Stringifying `this` fixes a bug in IE < 9 where the last argument in replacement
             // functions isn't type-converted to a string
-            result = nativ.replace.call(String(this), search, function () {
+            result = nativ.replace.call(String(this), search, function() {
                 var args = arguments, i;
                 if (captureNames) {
                     // Change the `arguments[0]` string primitive to a `String` object that can
@@ -1264,10 +1264,10 @@ var XRegExp = (function (undefined) {
         } else {
             // Ensure that the last value of `args` will be a string when given nonstring `this`,
             // while still throwing on `null` or `undefined` context
-            result = nativ.replace.call(this == null ? this : String(this), search, function () {
+            result = nativ.replace.call(this == null ? this : String(this), search, function() {
                 // Keep this function's `arguments` available through closure
                 var args = arguments;
-                return nativ.replace.call(String(replacement), replacementToken, function ($0, $1, $2) {
+                return nativ.replace.call(String(replacement), replacementToken, function($0, $1, $2) {
                     var n;
                     // Named or numbered backreference with curly braces
                     if ($1) {
@@ -1352,7 +1352,7 @@ var XRegExp = (function (undefined) {
  * @param {Number} [limit] Maximum number of items to include in the result array.
  * @returns {Array} Array of substrings.
  */
-    fixed.split = function (separator, limit) {
+    fixed.split = function(separator, limit) {
         if (!self.isRegExp(separator)) {
             // Browsers handle nonregex split correctly, so use the faster native method
             return nativ.split.apply(this, arguments);
@@ -1375,7 +1375,7 @@ var XRegExp = (function (undefined) {
         // unless Opera Dragonfly is open (go figure). It works in at least Opera 9.5-10.1 and 11+
         limit = (limit === undefined ? -1 : limit) >>> 0;
 
-        self.forEach(str, separator, function (match) {
+        self.forEach(str, separator, function(match) {
             // This condition is not the same as `if (match[0].length)`
             if ((match.index + match[0].length) > lastLastIndex) {
                 output.push(str.slice(lastLastIndex, match.index));
@@ -1411,7 +1411,7 @@ var XRegExp = (function (undefined) {
  */
     add(
         /\\([ABCE-RTUVXYZaeg-mopqyz]|c(?![A-Za-z])|u(?![\dA-Fa-f]{4})|x(?![\dA-Fa-f]{2}))/,
-        function (match, scope) {
+        function(match, scope) {
             // \B is allowed in default scope only
             if (match[1] === 'B' && scope === defaultScope) {
                 return match[0];
@@ -1427,7 +1427,7 @@ var XRegExp = (function (undefined) {
  */
     add(
         /\[(\^?)]/,
-        function (match) {
+        function(match) {
             // For cross-browser compatibility with ES3, convert [] to \b\B and [^] to [\s\S].
             // (?!) should work like \b\B, but is unreliable in some versions of Firefox
             return match[1] ? '[\\s\\S]' : '\\b\\B';
@@ -1439,7 +1439,7 @@ var XRegExp = (function (undefined) {
  */
     add(
         /\(\?#[^)]*\)/,
-        function (match) {
+        function(match) {
             // Keep tokens separated unless the following token is a quantifier
             return nativ.test.call(quantifier, match.input.slice(match.index + match[0].length)) ?
                 '' : '(?:)';
@@ -1451,7 +1451,7 @@ var XRegExp = (function (undefined) {
  */
     add(
         /\\k<([\w$]+)>/,
-        function (match) {
+        function(match) {
             // Groups with the same name is an error, else would need `lastIndexOf`
             var index = isNaN(match[1]) ? (indexOf(this.captureNames, match[1]) + 1) : +match[1],
                 endIndex = match.index + match[0].length;
@@ -1470,13 +1470,13 @@ var XRegExp = (function (undefined) {
  */
     add(
         /(?:\s+|#.*)+/,
-        function (match) {
+        function(match) {
             // Keep tokens separated unless the following token is a quantifier
             return nativ.test.call(quantifier, match.input.slice(match.index + match[0].length)) ?
                 '' : '(?:)';
         },
         {
-            trigger: function () {
+            trigger: function() {
                 return this.hasFlag('x');
             },
             customFlags: 'x'
@@ -1487,11 +1487,11 @@ var XRegExp = (function (undefined) {
  */
     add(
         /\./,
-        function () {
+        function() {
             return '[\\s\\S]';
         },
         {
-            trigger: function () {
+            trigger: function() {
                 return this.hasFlag('s');
             },
             customFlags: 's'
@@ -1506,7 +1506,7 @@ var XRegExp = (function (undefined) {
  */
     add(
         /\(\?P?<([\w$]+)>/,
-        function (match) {
+        function(match) {
             // Disallow bare integers as names because named backreferences are added to match
             // arrays and therefore numeric properties may lead to incorrect lookups
             if (!isNaN(match[1])) {
@@ -1530,7 +1530,7 @@ var XRegExp = (function (undefined) {
  */
     add(
         /\\(\d+)/,
-        function (match, scope) {
+        function(match, scope) {
             if (
                 !(
                     scope === defaultScope &&
@@ -1552,7 +1552,7 @@ var XRegExp = (function (undefined) {
  */
     add(
         /\((?!\?)/,
-        function () {
+        function() {
             if (this.hasFlag('n')) {
                 return '(?:';
             }

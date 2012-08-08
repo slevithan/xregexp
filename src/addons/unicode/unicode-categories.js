@@ -11,7 +11,7 @@
  * are case insensitive, and any spaces, hyphens, and underscores are ignored.
  * @requires XRegExp, Unicode Base
  */
-(function (XRegExp) {
+(function(XRegExp) {
     'use strict';
 
     if (!XRegExp.addUnicodeData) {

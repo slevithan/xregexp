@@ -12,7 +12,7 @@
  * XRegExp(/[a-z]/ig).xexec('abc');
  * XRegExp.globalize(/[a-z]/i).xexec('abc');
  */
-(function (XRegExp) {
+(function(XRegExp) {
     'use strict';
 
 // Shortcut
@@ -28,7 +28,7 @@
  *
  * XRegExp('[a-z]').apply(null, ['abc']); // -> true
  */
-    proto.apply = function (context, args) {
+    proto.apply = function(context, args) {
         return this.test(args[0]);
     };
 
@@ -42,7 +42,7 @@
  *
  * XRegExp('[a-z]').call(null, 'abc'); // -> true
  */
-    proto.call = function (context, str) {
+    proto.call = function(context, str) {
         return this.test(str);
     };
 
@@ -51,12 +51,12 @@
  * @memberOf XRegExp.prototype
  * @example
  *
- * XRegExp('\\d').forEach('1a2345', function (match, i) {
+ * XRegExp('\\d').forEach('1a2345', function(match, i) {
  *   if (i % 2) this.push(+match[0]);
  * }, []);
  * // -> [2, 4]
  */
-    proto.forEach = function (str, callback, context) {
+    proto.forEach = function(str, callback, context) {
         return XRegExp.forEach(str, this, callback, context);
     };
 
@@ -68,7 +68,7 @@
  * var globalCopy = XRegExp('regex').globalize();
  * globalCopy.global; // -> true
  */
-    proto.globalize = function () {
+    proto.globalize = function() {
         return XRegExp.globalize(this);
     };
 
@@ -80,7 +80,7 @@
  * XRegExp('\\d').match('1a23', 'all');
  * // -> ['1', '2', '3']
  */
-    proto.match = function (str, scope) {
+    proto.match = function(str, scope) {
         return XRegExp.match(str, this, scope);
     };
 
@@ -92,7 +92,7 @@
  * var match = XRegExp('U\\+(?<hex>[0-9A-F]{4})').xexec('U+2620');
  * match.hex; // -> '2620'
  */
-    proto.xexec = function (str, pos, sticky) {
+    proto.xexec = function(str, pos, sticky) {
         return XRegExp.exec(str, this, pos, sticky);
     };
 
@@ -103,7 +103,7 @@
  *
  * XRegExp('c').xtest('abc'); // -> true
  */
-    proto.xtest = function (str, pos, sticky) {
+    proto.xtest = function(str, pos, sticky) {
         return XRegExp.test(str, this, pos, sticky);
     };
 

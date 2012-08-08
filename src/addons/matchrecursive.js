@@ -4,7 +4,7 @@
  * Steven Levithan © 2009-2012 MIT License
  */
 
-(function (XRegExp) {
+(function(XRegExp) {
     'use strict';
 
 /**
@@ -69,7 +69,7 @@
  * XRegExp.matchRecursive(str, '<', '>', 'gy');
  * // -> ['1', '<<2>>', '3']
  */
-    XRegExp.matchRecursive = function (str, left, right, flags, options) {
+    XRegExp.matchRecursive = function(str, left, right, flags, options) {
         flags = flags || '';
         options = options || {};
         var global = flags.indexOf('g') > -1,

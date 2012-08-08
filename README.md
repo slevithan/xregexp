@@ -32,7 +32,7 @@ while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d+)>/, pos, 'sticky')) {
 
 // XRegExp.replace allows named backreferences in replacements
 XRegExp.replace('2012-02-22', date, '${month}/${day}/${year}'); // -> '02/22/2012'
-XRegExp.replace('2012-02-22', date, function (match) {
+XRegExp.replace('2012-02-22', date, function(match) {
     return match.month + '/' + match.day + '/' + match.year;
 }); // -> '02/22/2012'
 
@@ -46,13 +46,13 @@ date.test('2012-02-22'); // -> true
 // Doing so also fixes numerous browser bugs in the native methods
 XRegExp.install('natives');
 '2012-02-22'.replace(date, '${month}/${day}/${year}'); // -> '02/22/2012'
-'2012-02-22'.replace(date, function (match) {
+'2012-02-22'.replace(date, function(match) {
     return match.month + '/' + match.day + '/' + match.year;
 }); // -> '02/22/2012'
 date.exec('2012-02-22').year; // -> '2012'
 
 // Extract every other digit from a string using XRegExp.forEach
-XRegExp.forEach('1a2345', /\d/, function (match, i) {
+XRegExp.forEach('1a2345', /\d/, function(match, i) {
     if (i % 2) this.push(+match[0]);
 }, []); // -> [2, 4]
 
@@ -219,7 +219,7 @@ New XRegExp regexes then gain a collection of useful methods: `apply`, `call`, `
 // To demonstrate the call method, let's first create the function we'll be using...
 function filter(array, fn) {
     var res = [];
-    array.forEach(function (el) {if (fn.call(null, el)) res.push(el);});
+    array.forEach(function(el) {if (fn.call(null, el)) res.push(el);});
     return res;
 }
 // Now we can filter arrays using functions and regexes
@@ -264,7 +264,7 @@ var XRegExp = require('xregexp');
 In an AMD loader like [RequireJS](http://requirejs.org/):
 
 ~~~ js
-require({paths: {xregexp: 'build/xregexp-all-min'}}, ['xregexp'], function (XRegExp) {
+require({paths: {xregexp: 'build/xregexp-all-min'}}, ['xregexp'], function(XRegExp) {
     console.log(XRegExp.version);
 });
 ~~~

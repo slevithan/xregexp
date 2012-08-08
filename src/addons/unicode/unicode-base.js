@@ -13,7 +13,7 @@
  * and underscores are ignored.
  * @requires XRegExp
  */
-(function (XRegExp) {
+(function(XRegExp) {
     'use strict';
 
 // Storage for Unicode data
@@ -59,7 +59,7 @@
         var output = '',
             lastEnd = -1,
             start;
-        XRegExp.forEach(range, /(\\x..|\\u....|\\?[\s\S])(?:-(\\x..|\\u....|\\?[\s\S]))?/, function (m) {
+        XRegExp.forEach(range, /(\\x..|\\u....|\\?[\s\S])(?:-(\\x..|\\u....|\\?[\s\S]))?/, function(m) {
             start = charCode(m[1]);
             if (start > (lastEnd + 1)) {
                 output += '\\u' + pad4(hex(lastEnd + 1));
@@ -124,7 +124,7 @@
     XRegExp.addToken(
         // Use `*` instead of `+` to avoid capturing `^` as the token name in `\p{^}`
         /\\([pP])(?:{(\^?)([^}]*)}|([A-Za-z]))/,
-        function (match, scope) {
+        function(match, scope) {
             var ERR_DOUBLE_NEG = 'Invalid double negation ',
                 ERR_UNKNOWN_NAME = 'Unknown Unicode token ',
                 ERR_UNKNOWN_REF = 'Unicode token missing data ',
@@ -203,7 +203,7 @@
  * }]);
  * XRegExp('\\p{XDigit}:\\p{Hexadecimal}+').test('0:3D'); // -> true
  */
-    XRegExp.addUnicodeData = function (data) {
+    XRegExp.addUnicodeData = function(data) {
         var ERR_NOT_EXTENSIBLE = 'Extensibility must be installed before adding Unicode data',
             ERR_NO_NAME = 'Unicode token requires name',
             ERR_NO_DATA = 'Unicode token has no character data ',
