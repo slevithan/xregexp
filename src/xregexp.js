@@ -1371,8 +1371,8 @@ var XRegExp = (function (undefined) {
          * If negative number: pow(2,32) - floor(abs(limit))
          * If other: Type-convert, then use the above rules
          */
-        // This line fails in very strage ways for some values of limit in Opera 10.63, unless
-        // Opera Dragonfly is open (go figure). It works in Opera 11+
+        // This line fails in very strange ways for some values of `limit` in Opera 10.5-10.63,
+        // unless Opera Dragonfly is open (go figure). It works in at least Opera 9.5-10.1 and 11+
         limit = (limit === undefined ? -1 : limit) >>> 0;
 
         self.forEach(str, separator, function (match) {
