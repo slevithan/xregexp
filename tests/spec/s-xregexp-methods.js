@@ -1,42 +1,39 @@
 describe('XRegExp.addToken()', function() {
 
-    // Optional features are uninstalled before each spec runs, so hold a copy of the installed
-    // version of XRegExp.addToken, for simplicity
-    XRegExp.install('extensibility');
-    var addToken = XRegExp.addToken;
-
     it('should throw an exception if provided a truthy non-RegExp object as the regex argument', function() {
         expect(function() {
             // Include the `/` delimiters in case of naive string conversion of RegExp objects
-            addToken('/str/', function() {return '';});
+            XRegExp.addToken('/str/', function() {return '';});
         }).toThrow(TypeError);
 
-        expect(function() {addToken(1, function() {return '';});}).toThrow(TypeError);
+        expect(function() {
+            XRegExp.addToken(1, function() {return '';});
+        }).toThrow(TypeError);
     });
 
     it('should support adding dummy flags that do not throw an exception', function() {
         expect(function() {XRegExp('', 'Z');}).toThrow(SyntaxError);
-        expect(function() {addToken(null, null, {customFlags: 'Z'});}).not.toThrow();
+        expect(function() {XRegExp.addToken(null, null, {customFlags: 'Z'});}).not.toThrow();
         expect(function() {XRegExp('', 'Z');}).not.toThrow();
         expect(function() {XRegExp('(?Z)');}).not.toThrow();
         expect(XRegExp('', 'Zi')).toBeEquiv(XRegExp('', 'i'));
     });
 
     it('should handle native multicharacter tokens correctly when they are partially overriden', function() {
-        addToken(/00\$\$/, function() {return 'BOOM';});
+        XRegExp.addToken(/00\$\$/, function() {return 'BOOM';});
 
         expect(XRegExp('^x\\x00$$$').test('x\x00')).toBe(true);
     });
 
     it('should give more recently added tokens precedence', function() {
-        addToken(/\x00/, function() {return 'overridden';});
-        addToken(/\x00/, function() {return '0';});
+        XRegExp.addToken(/\x00/, function() {return 'overridden';});
+        XRegExp.addToken(/\x00/, function() {return '0';});
 
         expect(XRegExp('\x00').test('0')).toBe(true);
     });
 
     // This token is deferred to by later token tests
-    addToken(/\x01/, function() {return '1';});
+    XRegExp.addToken(/\x01/, function() {return '1';});
 
     it('should match implicit "default" scope outside of character classes', function() {
         expect(XRegExp('\x01').test('1')).toBe(true);
@@ -47,7 +44,7 @@ describe('XRegExp.addToken()', function() {
     });
 
     // This token is deferred to by later token tests
-    addToken(/\x02/, function() {return '2';}, {scope: 'class'});
+    XRegExp.addToken(/\x02/, function() {return '2';}, {scope: 'class'});
 
     it('should not match "class" scope outside of character classes', function() {
         expect(XRegExp('\x02').test('2')).toBe(false);
@@ -58,7 +55,7 @@ describe('XRegExp.addToken()', function() {
     });
 
     (function() {
-        addToken(/\x03/, function() {return '3';}, {scope: 'default'});
+        XRegExp.addToken(/\x03/, function() {return '3';}, {scope: 'default'});
 
         it('should match explicit "default" scope outside of character classes', function() {
             expect(XRegExp('\x03').test('3')).toBe(true);
@@ -70,7 +67,7 @@ describe('XRegExp.addToken()', function() {
     }());
 
     (function() {
-        addToken(/\x04/, function() {return '4';}, {scope: 'all'});
+        XRegExp.addToken(/\x04/, function() {return '4';}, {scope: 'all'});
 
         it('should match "all" scope outside of character classes', function() {
             expect(XRegExp('\x04').test('4')).toBe(true);
@@ -82,7 +79,7 @@ describe('XRegExp.addToken()', function() {
     }());
 
     (function() {
-        addToken(/\x05/, function() {return '5';}, {
+        XRegExp.addToken(/\x05/, function() {return '5';}, {
             trigger: function() {return this.hasFlag('5');},
             customFlags: '5'
         });
@@ -97,7 +94,7 @@ describe('XRegExp.addToken()', function() {
     }());
 
     (function() {
-        addToken(/^\x06/, function() {return '6';});
+        XRegExp.addToken(/^\x06/, function() {return '6';});
 
         it('should match an anchored token when found at the start of the pattern', function() {
             expect(XRegExp('\x06').test('6')).toBe(true);
@@ -109,37 +106,37 @@ describe('XRegExp.addToken()', function() {
     }());
 
     it('should not chain tokens when the reparse option is not set', function() {
-        addToken(/\x07/, function() {return '\x01';});
+        XRegExp.addToken(/\x07/, function() {return '\x01';});
 
         expect(XRegExp('\x07').test('\x01')).toBe(true);
     });
 
     it('should chain tokens when the reparse option is true', function() {
-        addToken(/\x07/, function() {return '\x01';}, {reparse: true});
+        XRegExp.addToken(/\x07/, function() {return '\x01';}, {reparse: true});
 
         expect(XRegExp('\x07').test('1')).toBe(true);
     });
 
     it('should not chain tokens when the reparse option is false', function() {
-        addToken(/\x07/, function() {return '\x01';}, {reparse: false});
+        XRegExp.addToken(/\x07/, function() {return '\x01';}, {reparse: false});
 
         expect(XRegExp('\x07').test('\x01')).toBe(true);
     });
 
     it('should be able to defer to multiple tokens when the reparse option is true', function() {
-        addToken(/\x08/, function() {return '\x01.[\x02]';}, {reparse: true});
+        XRegExp.addToken(/\x08/, function() {return '\x01.[\x02]';}, {reparse: true});
 
         expect(XRegExp('\x08').test('1x2')).toBe(true);
     });
 
     it('should support a two-step token reparsing chain', function() {
-        addToken(/\x09/, function() {return '\x08';}, {reparse: true});
+        XRegExp.addToken(/\x09/, function() {return '\x08';}, {reparse: true});
 
         expect(XRegExp('\x09').test('1x2')).toBe(true);
     });
 
     it('should support a three-step token reparsing chain', function() {
-        addToken(/\x0A/, function() {return '\x09';}, {reparse: true});
+        XRegExp.addToken(/\x0A/, function() {return '\x09';}, {reparse: true});
 
         expect(XRegExp('\x0A').test('1x2')).toBe(true);
     });
@@ -619,12 +616,11 @@ describe('XRegExp.install()', function() {
 
     // NOTE: All optional features are uninstalled before each spec runs
 
-    var features = ['natives', 'extensibility', 'astral'];
+    var features = ['natives', 'astral'];
 
     it('should install all features set as true on an options object', function() {
         XRegExp.install({
             natives: true,
-            extensibility: true,
             astral: true
         });
 
@@ -636,7 +632,6 @@ describe('XRegExp.install()', function() {
     it('should not install features set as false on an options object', function() {
         XRegExp.install({
             natives: false,
-            extensibility: false,
             astral: false
         });
 
@@ -646,7 +641,7 @@ describe('XRegExp.install()', function() {
     });
 
     it('should install all features in a space-delimited options string', function() {
-        XRegExp.install('natives extensibility astral');
+        XRegExp.install('natives astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(true);
@@ -654,7 +649,7 @@ describe('XRegExp.install()', function() {
     });
 
     it('should install all features in a comma-delimited options string', function() {
-        XRegExp.install('natives,extensibility,astral');
+        XRegExp.install('natives,astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(true);
@@ -662,7 +657,7 @@ describe('XRegExp.install()', function() {
     });
 
     it('should install all features in a comma+space-delimited options string', function() {
-        XRegExp.install('natives, extensibility, astral');
+        XRegExp.install('natives, astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(true);
@@ -692,21 +687,21 @@ describe('XRegExp.install()', function() {
 describe('XRegExp.isInstalled()', function() {
 
     it('should not check multiple space-delimited features simultaneously', function() {
-        XRegExp.install('natives extensibility');
+        XRegExp.install('natives astral');
 
-        expect(XRegExp.isInstalled('natives extensibility')).toBe(false);
+        expect(XRegExp.isInstalled('natives astral')).toBe(false);
     });
 
     it('should not check multiple comma-delimited features simultaneously', function() {
-        XRegExp.install('natives extensibility');
+        XRegExp.install('natives astral');
 
-        expect(XRegExp.isInstalled('natives,extensibility')).toBe(false);
+        expect(XRegExp.isInstalled('natives,astral')).toBe(false);
     });
 
     it('should not check multiple comma+space-delimited features simultaneously', function() {
-        XRegExp.install('natives extensibility');
+        XRegExp.install('natives astral');
 
-        expect(XRegExp.isInstalled('natives, extensibility')).toBe(false);
+        expect(XRegExp.isInstalled('natives, astral')).toBe(false);
     });
 
     it('should not check features using an options object', function() {
@@ -1489,15 +1484,14 @@ describe('XRegExp.test()', function() {
 describe('XRegExp.uninstall()', function() {
 
     beforeEach(function() {
-        XRegExp.install('natives extensibility astral');
+        XRegExp.install('natives astral');
     });
 
-    var features = ['natives', 'extensibility', 'astral'];
+    var features = ['natives', 'astral'];
 
     it('should uninstall all features set as true on an options object', function() {
         XRegExp.uninstall({
             natives: true,
-            extensibility: true,
             astral: true
         });
 
@@ -1509,7 +1503,6 @@ describe('XRegExp.uninstall()', function() {
     it('should not uninstall features set as false on an options object', function() {
         XRegExp.uninstall({
             natives: false,
-            extensibility: false,
             astral: false
         });
 
@@ -1519,7 +1512,7 @@ describe('XRegExp.uninstall()', function() {
     });
 
     it('should uninstall all features in a space-delimited options string', function() {
-        XRegExp.uninstall('natives extensibility astral');
+        XRegExp.uninstall('natives astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(false);
@@ -1527,7 +1520,7 @@ describe('XRegExp.uninstall()', function() {
     });
 
     it('should uninstall all features in a comma-delimited options string', function() {
-        XRegExp.uninstall('natives,extensibility,astral');
+        XRegExp.uninstall('natives,astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(false);
@@ -1535,7 +1528,7 @@ describe('XRegExp.uninstall()', function() {
     });
 
     it('should uninstall all features in a comma+space-delimited options string', function() {
-        XRegExp.uninstall('natives, extensibility, astral');
+        XRegExp.uninstall('natives, astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(false);

@@ -18,8 +18,6 @@
         throw new ReferenceError('Unicode Base must be loaded before Unicode Blocks');
     }
 
-    XRegExp.install('extensibility');
-
     XRegExp.addUnicodeData([
         {
             name: 'InAegean_Numbers',

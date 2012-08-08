@@ -52,10 +52,9 @@ var XRegExp = (function(undefined) {
 // Internal reference to the `XRegExp` object
     self,
 
-// Optional features, can be installed and uninstalled
+// Optional features that can be installed and uninstalled
     features = {
         natives: false,
-        extensibility: false,
         astral: false
     },
 
@@ -110,10 +109,7 @@ var XRegExp = (function(undefined) {
 // Storage for known flags, including addon flags
     registeredFlags = 'gim' + (hasNativeY ? 'y' : ''),
 
-// Storage for the installed and uninstalled states of `XRegExp.addToken`
-    addToken,
-
-// Shortcut to `addToken.on`
+// Shortcut to `self.addToken`
     add;
 
 /*--------------------------------------
@@ -303,16 +299,6 @@ var XRegExp = (function(undefined) {
     }
 
 /**
- * Enables or disables XRegExp syntax and flag extensibility.
- * @private
- * @param {Boolean} on `true` to enable; `false` to disable.
- */
-    function setExtensibility(on) {
-        self.addToken = addToken[on ? 'on' : 'off'];
-        features.extensibility = on;
-    }
-
-/**
  * Enables or disables native method overrides.
  * @private
  * @param {Boolean} on `true` to enable; `false` to disable.
@@ -489,42 +475,9 @@ var XRegExp = (function(undefined) {
  *  Public methods and properties
  *------------------------------------*/
 
-// Installed and uninstalled states for `XRegExp.addToken`
-    addToken = {
-        on: function(regex, handler, options) {
-            options = options || {};
-            if (regex && handler) {
-                // Add to the private list of syntax tokens
-                tokens.push({
-                    regex: copy(regex, {add: 'g' + (hasNativeY ? 'y' : '')}),
-                    handler: handler,
-                    scope: options.scope || defaultScope,
-                    trigger: options.trigger || null,
-                    reparse: options.reparse || false
-                });
-            }
-            // Assert: By providing `customFlags` with null `regex` and `handler`, you can add
-            // no-op flags that don't throw an error
-            if (options.customFlags) {
-                registeredFlags = nativ.replace.call(
-                    registeredFlags + options.customFlags,
-                    duplicateFlags,
-                    ''
-                );
-            }
-        },
-        off: function() {
-            // By making extensibility an optional feature, users are able to delete or override
-            // `XRegExp.install` if they want to lock down any further syntax extensions
-            throw new Error('Extensibility must be installed before calling addToken');
-        }
-    };
-
 /**
- * Extends or changes XRegExp syntax and allows custom flags. This is used internally and can be
- * used to create XRegExp addons. `XRegExp.install('extensibility')` must be run before calling
- * this function, or an error is thrown. If more than one token can match the same string, the last
- * added wins.
+ * Extends XRegExp syntax and allows custom flags. This is used internally and can be used to
+ * create XRegExp addons. If more than one token can match the same string, the last added wins.
  * @memberOf XRegExp
  * @param {RegExp} regex Regex object that matches the new token.
  * @param {Function} handler Function that returns a new pattern string (using native regex syntax)
@@ -554,7 +507,28 @@ var XRegExp = (function(undefined) {
  * );
  * XRegExp('\\a[\\a-\\n]+').test('\x07\n\x07'); // -> true
  */
-    self.addToken = addToken.off;
+    self.addToken = function(regex, handler, options) {
+        options = options || {};
+        if (regex && handler) {
+            // Add to the private list of syntax tokens
+            tokens.push({
+                regex: copy(regex, {add: 'g' + (hasNativeY ? 'y' : '')}),
+                handler: handler,
+                scope: options.scope || defaultScope,
+                trigger: options.trigger || null,
+                reparse: options.reparse || false
+            });
+        }
+        // Assert: By providing `customFlags` with null `regex` and `handler`, you can add
+        // no-op flags that don't throw an error
+        if (options.customFlags) {
+            registeredFlags = nativ.replace.call(
+                registeredFlags + options.customFlags,
+                duplicateFlags,
+                ''
+            );
+        }
+    };
 
 /**
  * Caches and returns the result of calling `XRegExp(pattern, flags)`. On any subsequent call with
@@ -714,23 +688,17 @@ var XRegExp = (function(undefined) {
  *   // backreferences and fix numerous cross-browser bugs
  *   natives: true,
  *
- *   // Enables extensibility of XRegExp syntax and flags
- *   extensibility: true,
- *
  *   // Enables support for astral code points in Unicode addons (implicitly sets flag A)
  *   astral: true
  * });
  *
  * // With an options string
- * XRegExp.install('natives extensibility astral');
+ * XRegExp.install('natives astral');
  */
     self.install = function(options) {
         options = prepareOptions(options);
         if (!features.natives && options.natives) {
             setNatives(true);
-        }
-        if (!features.extensibility && options.extensibility) {
-            setExtensibility(true);
         }
         if (options.astral) {
             features.astral = true;
@@ -742,7 +710,6 @@ var XRegExp = (function(undefined) {
  * @memberOf XRegExp
  * @param {String} feature Name of the feature to check. One of:
  *   <li>`natives`
- *   <li>`extensibility`
  *   <li>`astral`
  * @returns {Boolean} Whether the feature is installed.
  * @example
@@ -1050,23 +1017,17 @@ var XRegExp = (function(undefined) {
  *   // Restores native regex methods
  *   natives: true,
  *
- *   // Disables additional syntax and flag extensions
- *   extensibility: true,
- *
  *   // Disables support for astral code points in Unicode addons
  *   astral: true
  * });
  *
  * // With an options string
- * XRegExp.uninstall('natives extensibility astral');
+ * XRegExp.uninstall('natives astral');
  */
     self.uninstall = function(options) {
         options = prepareOptions(options);
         if (features.natives && options.natives) {
             setNatives(false);
-        }
-        if (features.extensibility && options.extensibility) {
-            setExtensibility(false);
         }
         if (options.astral) {
             features.astral = false;
@@ -1430,7 +1391,7 @@ var XRegExp = (function(undefined) {
  *  Built-in syntax and flag tokens
  *------------------------------------*/
 
-    add = addToken.on;
+    add = self.addToken;
 
 /* Letter identity escapes that natively match literal characters: `\a`, `\A`, etc. These should be
  * SyntaxErrors but are allowed in web reality. XRegExp makes them errors for cross-browser
@@ -2183,8 +2144,6 @@ var XRegExp = (function(undefined) {
  *  Core functionality
  *------------------------------------*/
 
-    XRegExp.install('extensibility');
-
 /* Add Unicode token syntax: \p{..}, \P{..}, \p{^..}. Also add astral mode (flag A).
  */
     XRegExp.addToken(
@@ -2270,15 +2229,10 @@ var XRegExp = (function(undefined) {
  * XRegExp('\\p{XDigit}:\\p{Hexadecimal}+').test('0:3D'); // -> true
  */
     XRegExp.addUnicodeData = function(data) {
-        var ERR_NOT_EXTENSIBLE = 'Extensibility must be installed before adding Unicode data',
-            ERR_NO_NAME = 'Unicode token requires name',
+        var ERR_NO_NAME = 'Unicode token requires name',
             ERR_NO_DATA = 'Unicode token has no character data ',
             item,
             i;
-
-        if (!XRegExp.isInstalled('extensibility')) {
-            throw new Error(ERR_NOT_EXTENSIBLE);
-        }
 
         for (i = 0; i < data.length; ++i) {
             item = data[i];
@@ -2326,8 +2280,6 @@ var XRegExp = (function(undefined) {
     if (!XRegExp.addUnicodeData) {
         throw new ReferenceError('Unicode Base must be loaded before Unicode Blocks');
     }
-
-    XRegExp.install('extensibility');
 
     XRegExp.addUnicodeData([
         {
@@ -3234,8 +3186,6 @@ var XRegExp = (function(undefined) {
         throw new ReferenceError('Unicode Base must be loaded before Unicode Categories');
     }
 
-    XRegExp.install('extensibility');
-
     XRegExp.addUnicodeData([
         {
             name: 'C',
@@ -3469,8 +3419,6 @@ var XRegExp = (function(undefined) {
         throw new ReferenceError('Unicode Base must be loaded before Unicode Properties');
     }
 
-    XRegExp.install('extensibility');
-
     XRegExp.addUnicodeData([
         {
             name: 'ASCII',
@@ -3540,8 +3488,6 @@ var XRegExp = (function(undefined) {
     if (!XRegExp.addUnicodeData) {
         throw new ReferenceError('Unicode Base must be loaded before Unicode Scripts');
     }
-
-    XRegExp.install('extensibility');
 
     XRegExp.addUnicodeData([
         {

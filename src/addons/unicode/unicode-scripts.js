@@ -18,8 +18,6 @@
         throw new ReferenceError('Unicode Base must be loaded before Unicode Scripts');
     }
 
-    XRegExp.install('extensibility');
-
     XRegExp.addUnicodeData([
         {
             name: 'Arabic',

@@ -286,35 +286,21 @@ describe('Unicode Base addon:', function() {
 
     describe('XRegExp.addUnicodeData()', function() {
 
-        it('should throw an exception when extensibility is not installed', function() {
-            expect(function() {
-                XRegExp.addUnicodeData([{name: 'Fail', bmp: '0'}]);
-            }).toThrow();
-        });
-
-        // Optional features are uninstalled before each spec runs, so create a wrapped version
-        // of XRegExp.addUnicodeData, for simplicity
-        function addUnicodeData() {
-            XRegExp.install('extensibility');
-            XRegExp.addUnicodeData.apply(null, arguments);
-            XRegExp.uninstall('extensibility');
-        };
-
         it('should throw an exception when name is not provided', function() {
             expect(function() {
-                addUnicodeData([{bmp: '0'}]);
+                XRegExp.addUnicodeData([{bmp: '0'}]);
             }).toThrow();
         });
 
         it('should throw an exception when no bmp or astral data is provided', function() {
             expect(function() {
-                addUnicodeData([{name: 'NoData'}]);
+                XRegExp.addUnicodeData([{name: 'NoData'}]);
             }).toThrow();
         });
 
         (function() {
             it('should successfully add token XDigit with alias Hexadecimal', function() {
-                addUnicodeData([{
+                XRegExp.addUnicodeData([{
                     name: 'XDigit',
                     alias: 'Hexadecimal',
                     bmp: '0-9A-Fa-f'
@@ -324,7 +310,7 @@ describe('Unicode Base addon:', function() {
             });
 
             it('should successfully add token NotXDigit as the inverse of XDigit', function() {
-                addUnicodeData([{
+                XRegExp.addUnicodeData([{
                     name: 'NotXDigit',
                     inverseOf: 'XDigit'
                 }]);
@@ -334,7 +320,7 @@ describe('Unicode Base addon:', function() {
         }());
 
         it('should throw an exception on use if the inverseOf target is missing', function() {
-            addUnicodeData([{
+            XRegExp.addUnicodeData([{
                 name: 'MissingRef',
                 inverseOf: 'MissingToken'
             }]);
@@ -343,7 +329,7 @@ describe('Unicode Base addon:', function() {
         });
 
         (function() {
-            addUnicodeData([{name: 'AstralOnly', astral: '0'}]);
+            XRegExp.addUnicodeData([{name: 'AstralOnly', astral: '0'}]);
 
             it('should allow astral-only tokens to match, when in astral mode', function() {
                 expect(XRegExp('\\p{AstralOnly}', 'A').test('0')).toBe(true);
@@ -355,7 +341,7 @@ describe('Unicode Base addon:', function() {
         }());
 
         (function() {
-            addUnicodeData([{name: 'BmpOnly', bmp: '0'}]);
+            XRegExp.addUnicodeData([{name: 'BmpOnly', bmp: '0'}]);
 
             it('should allow BMP-only tokens to match, when not in astral mode', function() {
                 expect(XRegExp('\\p{BmpOnly}').test('0')).toBe(true);
@@ -367,7 +353,7 @@ describe('Unicode Base addon:', function() {
         }());
 
         (function() {
-            addUnicodeData([{name: 'BmpPlusAstral', bmp: '0', astral: '1'}]);
+            XRegExp.addUnicodeData([{name: 'BmpPlusAstral', bmp: '0', astral: '1'}]);
 
             it('should allow BMP+astral tokens to match BMP values, when not in astral mode', function() {
                 expect(XRegExp('\\p{BmpPlusAstral}').test('0')).toBe(true);

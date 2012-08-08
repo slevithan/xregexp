@@ -117,8 +117,6 @@
  *  Core functionality
  *------------------------------------*/
 
-    XRegExp.install('extensibility');
-
 /* Add Unicode token syntax: \p{..}, \P{..}, \p{^..}. Also add astral mode (flag A).
  */
     XRegExp.addToken(
@@ -204,15 +202,10 @@
  * XRegExp('\\p{XDigit}:\\p{Hexadecimal}+').test('0:3D'); // -> true
  */
     XRegExp.addUnicodeData = function(data) {
-        var ERR_NOT_EXTENSIBLE = 'Extensibility must be installed before adding Unicode data',
-            ERR_NO_NAME = 'Unicode token requires name',
+        var ERR_NO_NAME = 'Unicode token requires name',
             ERR_NO_DATA = 'Unicode token has no character data ',
             item,
             i;
-
-        if (!XRegExp.isInstalled('extensibility')) {
-            throw new Error(ERR_NOT_EXTENSIBLE);
-        }
 
         for (i = 0; i < data.length; ++i) {
             item = data[i];

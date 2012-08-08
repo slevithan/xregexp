@@ -15,7 +15,7 @@
 /**
  * XRegExp 2.0.0 doesn't override native methods or allow syntax extensions by default.
  */
-    XRegExp.install('natives extensibility');
+    XRegExp.install('natives');
 
 /**
  * @deprecated As of XRegExp 2.0.0. Replaced by {@link #XRegExp.globalize}.
@@ -36,8 +36,9 @@
  * @deprecated As of XRegExp 2.0.0. No replacement.
  */
     XRegExp.freezeTokens = function() {
-        XRegExp.uninstall('extensibility');
-        delete XRegExp.install;
+        XRegExp.addToken = function() {
+            throw new Error('Cannot run addToken after freezeTokens');
+        };
     };
 
 /**

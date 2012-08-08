@@ -1,6 +1,6 @@
 // Ensure that all opt-in features are disabled when each spec starts
 beforeEach(function() {
-    XRegExp.uninstall('natives extensibility astral');
+    XRegExp.uninstall('natives astral');
 });
 
 // Repeat a string the specified number of times
