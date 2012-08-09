@@ -46,6 +46,9 @@ var XRegExp = (function(undefined) {
 // Storage for regexes cached by `XRegExp.cache`
     cache = {},
 
+// Storage for pattern details cached by the `XRegExp` constructor
+    patternCache = {},
+
 // Storage for syntax tokens added internally or by `XRegExp.addToken`
     tokens = [],
 
@@ -272,6 +275,17 @@ var XRegExp = (function(undefined) {
     }
 
 /**
+ * Enables or disables implicit astral mode opt-in.
+ * @private
+ * @param {Boolean} on `true` to enable; `false` to disable.
+ */
+    function setAstral(on) {
+        features.astral = on;
+        // Reset the pattern cache used by the `XRegExp` constructor
+        patternCache = {};
+    }
+
+/**
  * Enables or disables native method overrides.
  * @private
  * @param {Boolean} on `true` to enable; `false` to disable.
@@ -355,6 +369,7 @@ var XRegExp = (function(undefined) {
             tokenResult,
             match,
             chr,
+            key,
             i;
 
         if (self.isRegExp(pattern)) {
@@ -372,72 +387,80 @@ var XRegExp = (function(undefined) {
         // Copy the argument behavior of `RegExp`
         pattern = pattern === undefined ? '' : String(pattern);
         flags = flags === undefined ? '' : String(flags);
+        key = pattern + '/' + flags;
 
-        // Shared regex uses flag g, so reset `lastIndex`
-        duplicateFlags.lastIndex = 0;
-        // Most browsers throw on duplicate flags, so copy this behavior for nonnative flags
-        if (nativ.test.call(duplicateFlags, flags)) {
-            throw new SyntaxError(ERR_DUPLICATE_FLAG + flags);
-        }
-        // Strip/apply leading mode modifier with any combination of flags except g or y
-        pattern = nativ.replace.call(pattern, /^\(\?([\w$]+)\)/, function($0, $1) {
-            if (nativ.test.call(/[gy]/, $1)) {
-                throw new SyntaxError(ERR_BAD_INLINE_FLAG + $0);
+        // If this pattern/flag pair hasn't been seen since the last run of `XRegExp.addToken`
+        if (!patternCache[key]) {
+            // This is a shared regex that uses flag g, so reset `lastIndex`
+            duplicateFlags.lastIndex = 0;
+            // Most browsers throw on duplicate flags, so copy this behavior for nonnative flags
+            if (nativ.test.call(duplicateFlags, flags)) {
+                throw new SyntaxError(ERR_DUPLICATE_FLAG + flags);
             }
-            flags = nativ.replace.call(flags + $1, duplicateFlags, '');
-            return '';
-        });
-        // Throw on unknown native or nonnative flags
-        for (i = 0; i < flags.length; ++i) {
-            if (registeredFlags.indexOf(flags.charAt(i)) < 0) {
-                throw new SyntaxError(ERR_UNKNOWN_FLAG + flags.charAt(i));
-            }
-        }
-
-        // `pattern.length` may change on each iteration, if tokens use the `reparse` option
-        while (pos < pattern.length) {
-            // Check for custom tokens at the current position
-            do {
-                tokenResult = runTokens(pattern, pos, scope, context);
-                if (tokenResult && tokenResult.reparse) {
-                    pattern = pattern.slice(0, pos) +
-                        tokenResult.replacement +
-                        pattern.slice(pos + tokenResult.len);
+            // Strip/apply leading mode modifier with any combination of flags except g or y
+            pattern = nativ.replace.call(pattern, /^\(\?([\w$]+)\)/, function($0, $1) {
+                if (nativ.test.call(/[gy]/, $1)) {
+                    throw new SyntaxError(ERR_BAD_INLINE_FLAG + $0);
                 }
-            } while (tokenResult && tokenResult.reparse);
+                flags = nativ.replace.call(flags + $1, duplicateFlags, '');
+                return '';
+            });
+            // Throw on unknown native or nonnative flags
+            for (i = 0; i < flags.length; ++i) {
+                if (registeredFlags.indexOf(flags.charAt(i)) < 0) {
+                    throw new SyntaxError(ERR_UNKNOWN_FLAG + flags.charAt(i));
+                }
+            }
 
-            if (tokenResult) {
-                output += tokenResult.replacement;
-                pos += (tokenResult.len || 1);
-            } else {
-                // Check for native multicharacter tokens (not counting character classes) at the
-                // current position. This could use the native `exec`, except that sticky
-                // processing avoids string slicing in browsers that support flag y
-                match = self.exec(pattern, nativeTokens[scope], pos, 'sticky');
-                if (match) {
-                    output += match[0];
-                    pos += match[0].length;
-                } else {
-                    chr = pattern.charAt(pos);
-                    if (chr === '[') {
-                        scope = classScope;
-                    } else if (chr === ']') {
-                        scope = defaultScope;
+            // Use XRegExp's syntax tokens to translate the pattern to a native regex pattern...
+            // `pattern.length` may change on each iteration, if tokens use the `reparse` option
+            while (pos < pattern.length) {
+                // Check for custom tokens at the current position
+                do {
+                    tokenResult = runTokens(pattern, pos, scope, context);
+                    if (tokenResult && tokenResult.reparse) {
+                        pattern = pattern.slice(0, pos) +
+                            tokenResult.replacement +
+                            pattern.slice(pos + tokenResult.len);
                     }
-                    // Advance position by one character
-                    output += chr;
-                    ++pos;
+                } while (tokenResult && tokenResult.reparse);
+
+                if (tokenResult) {
+                    output += tokenResult.replacement;
+                    pos += (tokenResult.len || 1);
+                } else {
+                    // Check for native multicharacter tokens (not counting character classes) at
+                    // the current position. This could use the native `exec`, except that sticky
+                    // processing avoids string slicing in browsers that support flag y
+                    match = self.exec(pattern, nativeTokens[scope], pos, 'sticky');
+                    if (match) {
+                        output += match[0];
+                        pos += match[0].length;
+                    } else {
+                        chr = pattern.charAt(pos);
+                        if (chr === '[') {
+                            scope = classScope;
+                        } else if (chr === ']') {
+                            scope = defaultScope;
+                        }
+                        // Advance position by one character
+                        output += chr;
+                        ++pos;
+                    }
                 }
+            }
+
+            patternCache[key] = {
+                pattern: output,
+                // Strip all but native flags
+                flags: nativ.replace.call(flags, /[^gimy]+/g, ''),
+                // `context.captureNames` has an item for each capturing group, even if unnamed
+                captures: context.hasNamedCapture ? context.captureNames : null
             }
         }
 
-        return augment(
-            // Strip all but native flags
-            new RegExp(output, nativ.replace.call(flags, /[^gimy]+/g, '')),
-            // `context.captureNames` contains an item for each capturing group, even if unnamed
-            context.hasNamedCapture ? context.captureNames : null,
-            true // `addProto`
-        );
+        key = patternCache[key];
+        return augment(new RegExp(key.pattern, key.flags), key.captures, true);
     };
 
 // Add `RegExp.prototype` to the prototype chain for XRegExp instances that have their prototype
@@ -501,6 +524,8 @@ var XRegExp = (function(undefined) {
                 ''
             );
         }
+        // Reset the pattern cache used by the `XRegExp` constructor
+        patternCache = {};
     };
 
 /**
@@ -523,9 +548,13 @@ var XRegExp = (function(undefined) {
     };
 
 // Intentionally undocumented
-    self.cache.flush = function() {
-        cache = {};
-    }
+    self.cache.flush = function(cacheName) {
+        if (cacheName === 'patterns') {
+            patternCache = {};
+        } else {
+            cache = {};
+        }
+    };
 
 /**
  * Escapes any regular expression metacharacters, for use when matching literal strings. The result
@@ -673,8 +702,8 @@ var XRegExp = (function(undefined) {
         if (!features.natives && options.natives) {
             setNatives(true);
         }
-        if (options.astral) {
-            features.astral = true;
+        if (!features.astral && options.astral) {
+            setAstral(true);
         }
     };
 
@@ -1002,8 +1031,8 @@ var XRegExp = (function(undefined) {
         if (features.natives && options.natives) {
             setNatives(false);
         }
-        if (options.astral) {
-            features.astral = false;
+        if (features.astral && options.astral) {
+            setAstral(false);
         }
     };
 
