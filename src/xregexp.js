@@ -82,8 +82,13 @@ var XRegExp = (function(undefined) {
 // Used to kill infinite recursion during XRegExp construction
     isInsideConstructor = false,
 
-// Storage for known flags, including addon flags
-    registeredFlags = 'gim' + (hasNativeY ? 'y' : ''),
+// Tracker for known flags, including addon flags
+    registeredFlags = {
+        g: true,
+        i: true,
+        m: true,
+        y: hasNativeY
+    },
 
 // Shortcut to `XRegExp.addToken`
     add;
@@ -423,7 +428,7 @@ var XRegExp = (function(undefined) {
                 chr = flags.charAt(i);
 
                 // Throw on unknown native or nonnative flags
-                if (registeredFlags.indexOf(chr) < 0) {
+                if (!registeredFlags[chr]) {
                     throw new SyntaxError(ERR_UNKNOWN_FLAG + chr);
                 }
 
@@ -521,7 +526,7 @@ var XRegExp = (function(undefined) {
         }
 
         // Add to the list of flags that don't throw an 'unknown flag' error
-        registeredFlags = clipDuplicates(registeredFlags + flag);
+        registeredFlags[flag] = true;
 
         // `XRegExp.addToken` calls this without an `initializer`; don't override in such cases
         if (initializer !== undefined) {

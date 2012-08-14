@@ -60,7 +60,17 @@ describe('XRegExp.addFlagInitializer()', function() {
         values.forEach(function(value) {
             expect(function() {
                 XRegExp.addFlagInitializer(value);
-            }).toThrow(); // Type is simply `Error`
+            }).toThrow();
+        });
+    });
+
+    it('should throw an exception if given a flag other than A-Za-z0-9_$', function() {
+        var values = ['!', '?', '', true, false, null, undefined];
+
+        values.forEach(function(value) {
+            expect(function() {
+                XRegExp.addFlagInitializer(value);
+            }).toThrow();
         });
     });
 
@@ -155,7 +165,17 @@ describe('XRegExp.addToken()', function() {
         values.forEach(function(value) {
             expect(function() {
                 XRegExp.addToken(/\b\B/, function() {return '';}, {flag: value});
-            }).toThrow(); // Type is simply `Error`
+            }).toThrow();
+        });
+    });
+
+    it('should throw an exception if given a truthy flag other than A-Za-z0-9_$', function() {
+        var values = ['!', '?', true];
+
+        values.forEach(function(value) {
+            expect(function() {
+                XRegExp.addToken(/\b\B/, function() {return '';}, {flag: value});
+            }).toThrow();
         });
     });
 
