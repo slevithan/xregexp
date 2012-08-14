@@ -145,7 +145,6 @@ describe('XRegExp()', function() {
 
     it('should throw an exception if unknown flags are used', function() {
         expect(function() {XRegExp('', 'Z');}).toThrow(SyntaxError);
-        expect(function() {XRegExp('', '$');}).toThrow(SyntaxError);
         expect(function() {XRegExp('', '?');}).toThrow(SyntaxError);
     });
 
@@ -272,7 +271,6 @@ describe('XRegExp()', function() {
 
             it('should throw an exception if unknown flags are used', function() {
                 expect(function() {XRegExp('(?Z)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(?$)');}).toThrow(SyntaxError);
                 expect(function() {XRegExp('(??)');}).toThrow(SyntaxError);
             });
 

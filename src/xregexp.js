@@ -49,9 +49,6 @@ var XRegExp = (function(undefined) {
 // Storage for pattern details cached by the `XRegExp` constructor
     patternCache = {},
 
-// Storage for regex flag initializers added by `XRegExp.addFlagInitializer`
-    flagInitializers = {},
-
 // Storage for regex syntax tokens added internally or by `XRegExp.addToken`
     tokens = [],
 
@@ -243,6 +240,18 @@ var XRegExp = (function(undefined) {
     }
 
 /**
+ * Registers a flag so it doesn't throw an 'unknown flag' error.
+ * @private
+ * @param {String} flag Single-character flag to register.
+ */
+    function registerFlag(flag) {
+        if (!/^[\w$]$/.test(flag)) {
+            throw new Error('Flag must be a single character A-Za-z0-9_$');
+        }
+        registeredFlags[flag] = true;
+    }
+
+/**
  * Runs built-in and custom regex syntax tokens in reverse insertion order at the specified
  * position, until a match is found.
  * @private
@@ -272,7 +281,7 @@ var XRegExp = (function(undefined) {
                     if (match) {
                         result = {
                             len: match[0].length,
-                            replacement: t.handler.call(context, match, scope),
+                            replacement: t.handler.call(context, match, scope, flags),
                             reparse: t.reparse
                         };
                         // Finished with token tests
@@ -430,23 +439,6 @@ var XRegExp = (function(undefined) {
                 }
             }
 
-            // Protect against constructing XRegExp objects within flag initializer functions
-            isInsideConstructor = true;
-            try {
-                for (i = 0; i < flags.length; ++i) {
-                    chr = flags.charAt(i);
-                    // If the flag has an initializer function (which might set properties on the
-                    // `context` object), run it
-                    if (flagInitializers[chr]) {
-                        flagInitializers[chr].call(context);
-                    }
-                }
-            } catch (err) {
-                throw err;
-            } finally {
-                isInsideConstructor = false;
-            }
-
             // Use XRegExp's syntax tokens to translate the pattern to a native regex pattern...
             // `pattern.length` may change on each iteration, if tokens use the `reparse` option
             while (pos < pattern.length) {
@@ -507,59 +499,23 @@ var XRegExp = (function(undefined) {
  *------------------------------------*/
 
 /**
- * Lets you register flags that are only optionally linked with one or more tokens, or no tokens at
- * all (which allows registering no-op flags). Accepts an optional initializer function that runs
- * before constructing a regex with the given flag. This method is needed only in special cases,
- * since the `XRegExp.addToken` method's `flag` option provides a better way to register a flag and
- * use it to trigger a token.
- * @memberOf XRegExp
- * @param {String} flag Single-character flag. Allowed characters are A-Z, a-z, 0-9, _, and $.
- * @param {Function} [initializer] Runs before constructing a regex with the given flag. Properties
- *   of `this` that are set in the initializer function can be read by the handler functions of
- *   syntax tokens. If `XRegExp.addFlagInitializer` is run again for a given flag, the previous
- *   initializer is replaced, unless the new value is `undefined`.
- * @example
- *
- * // Register no-op flag Z
- * XRegExp.addFlagInitializer('Z');
- *
- * // Register flag Z and make it set a property that can be read by syntax token handlers
- * XRegExp.addFlagInitializer('Z', function() {
- *   this.hasFlagZ = true;
- * });
- */
-    self.addFlagInitializer = function(flag, initializer) {
-        if (!/^[\w$]$/.test(flag)) {
-            throw new Error('Flag must be a single character A-Za-z0-9_$');
-        }
-
-        // Add to the list of flags that don't throw an 'unknown flag' error
-        registeredFlags[flag] = true;
-
-        // `XRegExp.addToken` calls this without an `initializer`; don't override in such cases
-        if (initializer !== undefined) {
-            flagInitializers[flag] = initializer;
-
-            // Reset the pattern cache used by the `XRegExp` constructor, since the same pattern
-            // and flags might now produce different results
-            self.cache.flush('patterns');
-        }
-    };
-
-/**
  * Extends XRegExp syntax and allows custom flags. This is used internally and can be used to
  * create XRegExp addons. If more than one token can match the same string, the last added wins.
  * @memberOf XRegExp
  * @param {RegExp} regex Regex object that matches the new token.
  * @param {Function} handler Function that returns a new pattern string (using native regex syntax)
  *   to replace the matched token within all future XRegExp regexes. Has access to persistent
- *   properties of the regex being built, through `this`. Invoked with two arguments:
+ *   properties of the regex being built, through `this`. Invoked with three arguments:
  *   <li>The match array, with named backreference properties.
- *   <li>The regex scope where the match was found.
+ *   <li>The regex scope where the match was found: 'default' or 'class'.
+ *   <li>The flags used by the regex, including any flags in a leading mode modifier.
  * @param {Object} [options] Options object with optional properties:
  *   <li>`scope` {String} Scope where the token applies: 'default', 'class', or 'all'.
  *   <li>`flag` {String} Single-character flag that triggers the token. This also registers the
  *     flag, which prevents XRegExp from throwing an 'unknown flag' error when the flag is used.
+ *   <li>`optionalFlags` {String} Any custom flags checked for within the token `handler` that are
+ *     not required to trigger the token. This registers the flags, to prevent XRegExp from
+ *     throwing an 'unknown flag' error when any of the flags are used.
  *   <li>`reparse` {Boolean} Whether the `handler` function's output should not be treated as
  *     final, and instead be reparseable by other tokens (including the current token). Allows
  *     token chaining or deferring.
@@ -576,9 +532,18 @@ var XRegExp = (function(undefined) {
     self.addToken = function(regex, handler, options) {
         options = options || {};
 
+        var optionalFlags = options.optionalFlags,
+            i;
+
         if (options.flag) {
-            // Register the flag so it doesn't throw an 'unknown flag' error
-            self.addFlagInitializer(options.flag);
+            registerFlag(options.flag);
+        }
+
+        if (optionalFlags) {
+            optionalFlags = nativ.split.call(optionalFlags, '');
+            for (i = 0; i < optionalFlags.length; ++i) {
+                registerFlag(optionalFlags[i]);
+            }
         }
 
         // Add to the private list of syntax tokens
@@ -1636,24 +1601,19 @@ var XRegExp = (function(undefined) {
         }
     );
 
-/* Capturing group; match the opening parenthesis only. Required for named capture support.
+/* Capturing group; match the opening parenthesis only. Required for support of named capturing
+ * groups. Also adds explicit capture mode (flag n).
  */
     add(
         /\((?!\?)/,
-        function() {
+        function(match, scope, flags) {
+            if (flags.indexOf('n') > -1) {
+                return '(?:';
+            }
             this.captureNames.push(null);
             return '(';
-        }
-    );
-
-/* Capturing group, in explicit capture mode (flag n) only. Match the opening parenthesis only.
- */
-    add(
-        /\((?!\?)/,
-        function() {
-            return '(?:';
         },
-        {flag: 'n'}
+        {optionalFlags: 'n'}
     );
 
 /*--------------------------------------

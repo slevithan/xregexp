@@ -117,18 +117,12 @@
  *  Core functionality
  *------------------------------------*/
 
-/* Let tokens track whether flag A was used to enable astral mode.
- */
-    XRegExp.addFlagInitializer('A', function() {
-        this.hasFlagA = true;
-    });
-
 /* Add Unicode token syntax: \p{..}, \P{..}, \p{^..}. Also add astral mode (flag A).
  */
     XRegExp.addToken(
         // Use `*` instead of `+` to avoid capturing `^` as the token name in `\p{^}`
         /\\([pP])(?:{(\^?)([^}]*)}|([A-Za-z]))/,
-        function(match, scope) {
+        function(match, scope, flags) {
             var ERR_DOUBLE_NEG = 'Invalid double negation ',
                 ERR_UNKNOWN_NAME = 'Unknown Unicode token ',
                 ERR_UNKNOWN_REF = 'Unicode token missing data ',
@@ -137,7 +131,7 @@
                 // Negated via \P{..} or \p{^..}
                 isNegated = match[1] === 'P' || !!match[2],
                 // Switch from BMP (U+FFFF) to astral (U+10FFFF) mode via flag A or implicit opt-in
-                isAstralMode = this.hasFlagA || XRegExp.isInstalled('astral'),
+                isAstralMode = flags.indexOf('A') > -1 || XRegExp.isInstalled('astral'),
                 // Token lookup name. Check `[4]` first to avoid passing `undefined` via `\p{}`
                 slug = normalize(match[4] || match[3]),
                 // Token data object
@@ -175,7 +169,10 @@
                 (isNegated ? cacheInvertedBmp(slug) : item.bmp) :
                 (isNegated ? '[^' : '[') + item.bmp + ']';
         },
-        {scope: 'all'}
+        {
+            scope: 'all',
+            optionalFlags: 'A'
+        }
     );
 
 /**
