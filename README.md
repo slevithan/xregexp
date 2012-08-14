@@ -121,7 +121,7 @@ XRegExp('^\\pS$').test('\uD83D\uDCA9'); // -> true
 
 Opting in to astral mode disables the use of `\p{…}` and `\P{…}` within character classes. In astral mode, use e.g. `(?:\pL|\pM|[0-9_])+` instead of `[\pL\pM0-9_]+`.
 
-XRegExp uses Unicode 6.2.0.
+XRegExp uses Unicode 6.2.0. Support for astral code points was added in XRegExp 3.0.0.
 
 
 ### XRegExp.build
@@ -258,7 +258,7 @@ npm install xregexp
 In [Node.js](http://nodejs.org/):
 
 ~~~ js
-var XRegExp = require('xregexp');
+var XRegExp = require('xregexp').XRegExp;
 ~~~
 
 In an AMD loader like [RequireJS](http://requirejs.org/):
