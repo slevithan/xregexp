@@ -5,7 +5,7 @@
  */
 
 // Module systems magic dance
-;(function (definition) {
+;(function(definition) {
     // Don't turn on strict mode for this function, so it can assign to global
     var self;
 
@@ -23,7 +23,7 @@
         // Create global
         XRegExp = definition();
     }
-}(function () {
+}(function() {
 
 /*!
  * XRegExp 3.0.0-pre
