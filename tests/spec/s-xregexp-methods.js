@@ -1,22 +1,22 @@
 describe('XRegExp.addToken()', function() {
 
-    it('should throw an exception if provided a truthy non-RegExp object as the regex argument', function() {
+    it('should throw an exception if provided a non-RegExp object as the regex argument', function() {
         expect(function() {
-            // Include the `/` delimiters in case of naive string conversion of RegExp objects
+            // Include the `/` delimiters in case of naïve string conversion of RegExp objects
             XRegExp.addToken('/str/', function() {return '';});
         }).toThrow(TypeError);
 
         expect(function() {
             XRegExp.addToken(1, function() {return '';});
         }).toThrow(TypeError);
-    });
 
-    it('should support adding dummy flags that do not throw an exception', function() {
-        expect(function() {XRegExp('', 'Z');}).toThrow(SyntaxError);
-        expect(function() {XRegExp.addToken(null, null, {customFlags: 'Z'});}).not.toThrow();
-        expect(function() {XRegExp('', 'Z');}).not.toThrow();
-        expect(function() {XRegExp('(?Z)');}).not.toThrow();
-        expect(XRegExp('', 'Zi')).toBeEquiv(XRegExp('', 'i'));
+        expect(function() {
+            XRegExp.addToken(null, function() {return '';});
+        }).toThrow();
+
+        expect(function() {
+            XRegExp.addToken(null, null, {flag: 'Z'});
+        }).toThrow();
     });
 
     it('should handle native multicharacter tokens correctly when they are partially overriden', function() {
@@ -79,16 +79,13 @@ describe('XRegExp.addToken()', function() {
     }());
 
     (function() {
-        XRegExp.addToken(/\x05/, function() {return '5';}, {
-            trigger: function() {return this.hasFlag('5');},
-            customFlags: '5'
-        });
+        XRegExp.addToken(/\x05/, function() {return '5';}, {flag: '5'});
 
-        it('should skip a token that uses a trigger with hasFlag when the flag is missing', function() {
+        it('should skip a token that uses a flag trigger when the flag is not included', function() {
             expect(XRegExp('\x05').test('5')).toBe(false);
         });
 
-        it('should match a token that uses a trigger with hasFlag when the flag is included', function() {
+        it('should match a token that uses a flag trigger when the flag is included', function() {
             expect(XRegExp('\x05', '5').test('5')).toBe(true);
         });
     }());

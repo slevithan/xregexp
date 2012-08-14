@@ -93,7 +93,7 @@
 
         if (escapeChar) {
             if (escapeChar.length > 1) {
-                throw new SyntaxError('Cannot use more than one escape character');
+                throw new Error('Cannot use more than one escape character');
             }
             escapeChar = XRegExp.escape(escapeChar);
             // Using `XRegExp.union` safely rewrites backreferences in `left` and `right`

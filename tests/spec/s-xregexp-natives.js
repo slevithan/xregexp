@@ -525,7 +525,7 @@ describe('When overridden, String.prototype.replace()', function() {
                     expect('test'.replace(XRegExp('t|(?<test>t)', 'g'), ':${test}:')).toBe('::es::');
                 });
 
-                it('should throw an exception for backreferences to unknown groups', function() {
+                it('should throw an exception for backreferences to unknown group names', function() {
                     expect(function() {'test'.replace(XRegExp('(?<test>t)', 'g'), ':${x}:');}).toThrow(SyntaxError);
                 });
 
@@ -554,7 +554,7 @@ describe('When overridden, String.prototype.replace()', function() {
                     expect('test'.replace(new RegExp('(.).' + repeat('()', 9), 'g'), '${1}0')).toBe('t0s0');
                 });
 
-                it('should throw an exception for backreferences to unknown groups', function() {
+                it('should throw an exception for backreferences to unknown group numbers', function() {
                     expect(function() {'test'.replace(/t/, '${1}');}).toThrow(SyntaxError);
                     expect(function() {'test'.replace(/(t)/, '${2}');}).toThrow(SyntaxError);
                 });
@@ -592,7 +592,7 @@ describe('When overridden, String.prototype.replace()', function() {
 
             describe('strict error handling', function() {
 
-                it('should throw an exception for backreferences to unknown groups', function() {
+                it('should throw an exception for backreferences to unknown group numbers', function() {
                     expect(function() {'xaaa'.replace(/aa/, '$1b');}).toThrow(SyntaxError);
                     expect(function() {'xaaa'.replace(/aa/, '$01b');}).toThrow(SyntaxError);
                     expect(function() {'xaaa'.replace(/a(a)/, '$2b');}).toThrow(SyntaxError);
