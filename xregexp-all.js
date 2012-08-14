@@ -277,7 +277,7 @@ var XRegExp = (function(undefined) {
  * @param {String} flags Flags being used to construct the regex.
  * @param {Number} pos Position to search for tokens within `pattern`.
  * @param {Number} scope Regex scope to apply: 'default' or 'class'.
- * @param {Object} context Context object to use for token `handler` functions.
+ * @param {Object} context Context object to use for token handler functions.
  * @returns {Object} Object with properties `len`, `replacement`, and `reparse`; or `null`.
  */
     function runTokens(pattern, flags, pos, scope, context) {
@@ -285,9 +285,8 @@ var XRegExp = (function(undefined) {
             result = null,
             match,
             t;
-        // Protect against constructing XRegExp objects within token `handler` functions
+        // Protect against constructing XRegExp objects within token handler functions
         isInsideConstructor = true;
-        // Token `handler` functions may throw `SyntaxError`s, etc.
         try {
             // Run in reverse insertion order
             while (i--) {
@@ -311,7 +310,6 @@ var XRegExp = (function(undefined) {
         } catch (err) {
             throw err;
         } finally {
-            // Must reset, even if a token `handler` function throws
             isInsideConstructor = false;
         }
         return result;
@@ -398,7 +396,7 @@ var XRegExp = (function(undefined) {
  */
     self = function(pattern, flags) {
         var ERR_COPY_WITH_FLAGS = 'Cannot supply flags when copying a RegExp',
-            ERR_CONSTRUTOR_RECURSION = 'Cannot build XRegExp objects within token handler functions',
+            ERR_CONSTRUTOR_RECURSION = 'Cannot create XRegExp objects within token definition functions',
             ERR_DUPLICATE_FLAG = 'Invalid duplicate regex flag ',
             ERR_BAD_INLINE_FLAG = 'Cannot use flag g or y in mode modifier ',
             ERR_UNKNOWN_FLAG = 'Unknown regex flag ',
@@ -423,7 +421,7 @@ var XRegExp = (function(undefined) {
         }
 
         // Tokens become part of the regex construction process, so protect against infinite
-        // recursion when an XRegExp is constructed within a token `handler` function
+        // recursion when an XRegExp is constructed within a token definition function
         if (isInsideConstructor) {
             throw new Error(ERR_CONSTRUTOR_RECURSION);
         }
@@ -453,17 +451,27 @@ var XRegExp = (function(undefined) {
 
             for (i = 0; i < flags.length; ++i) {
                 chr = flags.charAt(i);
-
                 // Throw on unknown native or nonnative flags
                 if (!registeredFlags[chr]) {
                     throw new SyntaxError(ERR_UNKNOWN_FLAG + chr);
                 }
+            }
 
-                // If the flag has an initializer function (which might set properties on the
-                // `context` object), run it
-                if (flagInitializers[chr]) {
-                    flagInitializers[chr].call(context);
+            // Protect against constructing XRegExp objects within flag initializer functions
+            isInsideConstructor = true;
+            try {
+                for (i = 0; i < flags.length; ++i) {
+                    chr = flags.charAt(i);
+                    // If the flag has an initializer function (which might set properties on the
+                    // `context` object), run it
+                    if (flagInitializers[chr]) {
+                        flagInitializers[chr].call(context);
+                    }
                 }
+            } catch (err) {
+                throw err;
+            } finally {
+                isInsideConstructor = false;
             }
 
             // Use XRegExp's syntax tokens to translate the pattern to a native regex pattern...

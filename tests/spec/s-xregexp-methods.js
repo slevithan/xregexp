@@ -94,10 +94,11 @@ describe('XRegExp.addToken()', function() {
         expect(XRegExp('^x\\x00$$$').test('x\x00')).toBe(true);
     });
 
-    it('should give more recently added tokens precedence', function() {
+    it('should give more recently added tokens precedence, and cause any pattern caching to be updated', function() {
         XRegExp.addToken(/\x00/, function() {return 'overridden';});
-        XRegExp.addToken(/\x00/, function() {return '0';});
+        expect(XRegExp('\x00').test('overridden')).toBe(true);
 
+        XRegExp.addToken(/\x00/, function() {return '0';});
         expect(XRegExp('\x00').test('0')).toBe(true);
     });
 
