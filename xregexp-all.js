@@ -458,11 +458,10 @@ var XRegExp = (function(undefined) {
                 return '';
             });
 
+            // Throw on unknown native or nonnative flags
             for (i = 0; i < flags.length; ++i) {
-                chr = flags.charAt(i);
-                // Throw on unknown native or nonnative flags
-                if (!registeredFlags[chr]) {
-                    throw new SyntaxError(ERR_UNKNOWN_FLAG + chr);
+                if (!registeredFlags[flags.charAt(i)]) {
+                    throw new SyntaxError(ERR_UNKNOWN_FLAG + flags.charAt(i));
                 }
             }
 
