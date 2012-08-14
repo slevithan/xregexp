@@ -553,11 +553,11 @@ var XRegExp = (function(undefined) {
         // `XRegExp.addToken` calls this without an `initializer`; don't override in such cases
         if (initializer !== undefined) {
             flagInitializers[flag] = initializer;
-        }
 
-        // Reset the pattern cache used by the `XRegExp` constructor, since the same pattern and
-        // flags might now produce different results
-        self.cache.flush('patterns');
+            // Reset the pattern cache used by the `XRegExp` constructor, since the same pattern
+            // and flags might now produce different results
+            self.cache.flush('patterns');
+        }
     };
 
 /**
@@ -590,6 +590,11 @@ var XRegExp = (function(undefined) {
     self.addToken = function(regex, handler, options) {
         options = options || {};
 
+        if (options.flag) {
+            // Register the flag so it doesn't throw an 'unknown flag' error
+            self.addFlagInitializer(options.flag);
+        }
+
         // Add to the private list of syntax tokens
         tokens.push({
             regex: copy(regex, {add: 'g' + (hasNativeY ? 'y' : '')}),
@@ -599,13 +604,9 @@ var XRegExp = (function(undefined) {
             reparse: options.reparse
         });
 
-        if (options.flag) {
-            self.addFlagInitializer(options.flag);
-        } else {
-            // Reset the pattern cache used by the `XRegExp` constructor, since the same pattern
-            // and flags might now produce different results
-            self.cache.flush('patterns');
-        }
+        // Reset the pattern cache used by the `XRegExp` constructor, since the same pattern and
+        // flags might now produce different results
+        self.cache.flush('patterns');
     };
 
 /**

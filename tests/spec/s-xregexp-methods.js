@@ -1,22 +1,81 @@
+describe('XRegExp.addFlagInitializer()', function() {
+
+    beforeEach(function() {
+        // XRegExp.addFlagInitializer should already call this when the initializer is not
+        // undefined, but run it anyway to be safe
+        XRegExp.cache.flush('patterns');
+    });
+
+    it('should allow registering no-op flags that do not throw an exception', function() {
+        expect(function() {XRegExp('', 'Z');}).toThrow(SyntaxError);
+
+        XRegExp.addFlagInitializer('Z');
+
+        expect(function() {XRegExp('', 'Z');}).not.toThrow();
+    });
+
+    it('should allow adding an initializer function specific to a flag', function() {
+        var spy = jasmine.createSpyObj('', ['Z']);
+        XRegExp.addFlagInitializer('Z', spy.Z);
+        XRegExp('', 'Z');
+
+        expect(spy.Z).toHaveBeenCalled();
+        expect(spy.Z.calls.length).toBe(1);
+    });
+
+    it('should not replace flag initializers when given an undefined initializer', function() {
+        var spy = jasmine.createSpyObj('', ['Z']);
+        XRegExp.addFlagInitializer('Z', spy.Z);
+        // Neither implicit nor explicit undefined should replace the initializer
+        XRegExp.addFlagInitializer('Z');
+        XRegExp.addFlagInitializer('Z', undefined);
+        XRegExp('', 'Z');
+
+        expect(spy.Z).toHaveBeenCalled();
+        expect(spy.Z.calls.length).toBe(1);
+    });
+
+    it('should remove a flag initializer (but not unregister the flag) when given a null initializer', function() {
+        var spy = jasmine.createSpyObj('', ['Z']);
+        XRegExp.addFlagInitializer('Z', spy.Z);
+        XRegExp.addFlagInitializer('Z', null);
+        XRegExp('', 'Z');
+
+        expect(spy.Z).not.toHaveBeenCalled();
+    });
+
+    it('should allow overriding a flag initializer with a new function', function() {
+        var spy = jasmine.createSpyObj('', ['Z_1', 'Z_2']);
+        XRegExp.addFlagInitializer('Z', spy.Z_1);
+        XRegExp.addFlagInitializer('Z', spy.Z_2);
+        XRegExp('', 'Z');
+
+        expect(spy.Z_1).not.toHaveBeenCalled();
+        expect(spy.Z_2).toHaveBeenCalled();
+    });
+
+    it('should throw an exception if given a flag with more than one character', function() {
+        var values = ['12', '123', '11'];
+
+        values.forEach(function(value) {
+            expect(function() {
+                XRegExp.addFlagInitializer(value);
+            }).toThrow(); // Type is simply `Error`
+        });
+    });
+
+});
+
 describe('XRegExp.addToken()', function() {
 
     it('should throw an exception if provided a non-RegExp object as the regex argument', function() {
-        expect(function() {
-            // Include the `/` delimiters in case of naïve string conversion of RegExp objects
-            XRegExp.addToken('/str/', function() {return '';});
-        }).toThrow(TypeError);
+        var values = ['/str/', 1, null];
 
-        expect(function() {
-            XRegExp.addToken(1, function() {return '';});
-        }).toThrow(TypeError);
-
-        expect(function() {
-            XRegExp.addToken(null, function() {return '';});
-        }).toThrow();
-
-        expect(function() {
-            XRegExp.addToken(null, null, {flag: 'Z'});
-        }).toThrow();
+        values.forEach(function(value) {
+            expect(function() {
+                XRegExp.addToken(value, function() {return '';});
+            }).toThrow(TypeError);
+        });
     });
 
     it('should handle native multicharacter tokens correctly when they are partially overriden', function() {
@@ -89,6 +148,16 @@ describe('XRegExp.addToken()', function() {
             expect(XRegExp('\x05', '5').test('5')).toBe(true);
         });
     }());
+
+    it('should throw an exception if given a flag with more than one character', function() {
+        var values = ['12', '123', '55'];
+
+        values.forEach(function(value) {
+            expect(function() {
+                XRegExp.addToken(/\b\B/, function() {return '';}, {flag: value});
+            }).toThrow(); // Type is simply `Error`
+        });
+    });
 
     (function() {
         XRegExp.addToken(/^\x06/, function() {return '6';});
