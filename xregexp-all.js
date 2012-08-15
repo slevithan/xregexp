@@ -518,7 +518,7 @@ var XRegExp = (function(undefined) {
 
 // Add `RegExp.prototype` to the prototype chain for XRegExp instances that have their prototype
 // changed to `XRegExp.prototype` via `__proto__`
-    self.prototype = new RegExp();
+    self.prototype = new RegExp;
 
 /*--------------------------------------
  *  Public methods and properties

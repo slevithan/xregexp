@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>XRegExp Perf Tests</title>
+    <style>
+        body {
+            font-family: Calibri, Verdana, Sans-serif;
+            padding: 0 30px 15px 30px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <p id="log"></p>
+
+    <script src="../../src/xregexp.js"></script>
+    <script src="../../src/addons/build.js"></script>
+    <script src="../../src/addons/matchrecursive.js"></script>
+    <script src="../../src/addons/prototypes.js"></script>
+    <script src="../../src/addons/unicode/unicode-base.js"></script>
+    <script src="../../src/addons/unicode/unicode-blocks.js"></script>
+    <script src="../../src/addons/unicode/unicode-categories.js"></script>
+    <script src="../../src/addons/unicode/unicode-properties.js"></script>
+    <script src="../../src/addons/unicode/unicode-scripts.js"></script>
+
+    <script src="lib/benchmark.js"></script>
+    <script src="perf.js"></script>
+</body>
+</html>
