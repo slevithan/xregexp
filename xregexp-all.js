@@ -405,7 +405,7 @@ var XRegExp = (function(undefined) {
  */
     self = function(pattern, flags) {
         var ERR_COPY_WITH_FLAGS = 'Cannot supply flags when copying a RegExp',
-            ERR_CONSTRUTOR_RECURSION = 'Cannot create XRegExp objects within token definition functions',
+            ERR_CONSTRUTOR_RECURSION = 'Cannot create XRegExp objects within token handler functions',
             ERR_DUPLICATE_FLAG = 'Invalid duplicate regex flag ',
             ERR_BAD_INLINE_FLAG = 'Cannot use flag g or y in mode modifier ',
             ERR_UNKNOWN_FLAG = 'Unknown regex flag ',
@@ -430,7 +430,7 @@ var XRegExp = (function(undefined) {
         }
 
         // Tokens become part of the regex construction process, so protect against infinite
-        // recursion when an XRegExp is constructed within a token definition function
+        // recursion when an XRegExp is constructed within a token handler function
         if (isInsideConstructor) {
             throw new Error(ERR_CONSTRUTOR_RECURSION);
         }
