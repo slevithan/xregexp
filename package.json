@@ -7,7 +7,7 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/slevithan/XRegExp.git"
+        "url": "https://github.com/slevithan/xregexp.git"
     },
     "keywords": [
         "regex",
