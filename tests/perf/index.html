@@ -6,8 +6,12 @@
     <style>
         body {
             font-family: Calibri, Verdana, Sans-serif;
-            padding: 0 30px 15px 30px;
+            padding: 10px 30px;
             margin: 0;
+        }
+        applet {
+            position: absolute;
+            left: -9999px;
         }
     </style>
 </head>
@@ -26,5 +30,23 @@
 
     <script src="lib/benchmark.js"></script>
     <script src="perf.js"></script>
+    <script>
+    (function() {
+        var useApplet = !/[?&]nojava=true(?:&|$)/.test(location.search);
+
+        function init() {
+            // Give the applet time to initialize
+            setTimeout(run, useApplet ? 500 : 15);
+        }
+
+        if (useApplet) {
+            var div = document.createElement('div');
+            div.innerHTML = '<applet code="nano" archive="lib/nano.jar">';
+            document.body.insertBefore(div.lastChild, document.body.firstChild);
+        }
+
+        window.onload = init;
+    }());
+    </script>
 </body>
 </html>

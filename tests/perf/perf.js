@@ -8,7 +8,7 @@
         outputEl.innerHTML += msg.replace(/\n/g, '<br>');
     }
 
-    function run() {
+    window.run = function() {
         log('Sit back and relax; this might take a while.\n');
         suites[0].run();
     }
@@ -65,20 +65,36 @@
 
     (function() {
         var regexG = /(\b(?=x).(?=x).()??\2)+/g;
-        var str = Array(50 + 1).join('hello x world') + ' xx!';
-        var strs = [];
-        var pos = 5;
+        var str = Array(25 + 1).join('hello world x ') + 'xx!';
+        var pos = 0;
+        var strs, i, longStr;
 
         XRegExp.install('natives');
         var fixedExec = RegExp.prototype.exec;
         XRegExp.uninstall('natives');
 
-        // Use lots of different strings so Opera can't cheat with its regex/string match cache
-        for (var i = 0; i < 1e5; ++i) {
+        suites.push(Benchmark.Suite('exec')
+            .add('Native exec', function() {
+                regexG.lastIndex = pos;
+                regexG.exec(str);
+            })
+            .add('Shimmed exec', function() {
+                regexG.lastIndex = pos;
+                fixedExec.call(regexG, str);
+            })
+            .add('XRegExp.exec', function() {
+                XRegExp.exec(str, regexG, pos);
+            })
+        );
+
+        strs = [];
+        // Use lots of different strings to remove the benefit of Opera's and XRegExp's
+        // regex/string match cache
+        for (i = 0; i < 2e5; ++i) {
             strs.push(str + i);
         }
 
-        suites.push(Benchmark.Suite('exec')
+        suites.push(Benchmark.Suite('exec with 200,000 different strings')
             .add('Native exec', function() {
                 regexG.lastIndex = pos;
                 regexG.exec(strs[i++] || strs[i=0]);
@@ -92,33 +108,33 @@
             })
         );
 
-        suites.push(Benchmark.Suite('Sticky exec')
-            .add('Sticky native exec', function() {
+        suites.push(Benchmark.Suite('Sticky exec with 200,000 different strings')
+            .add('Native exec', function() {
                 regexG.lastIndex = pos;
                 var match = regexG.exec(strs[i++] || strs[i=0]);
                 if (match && match.index !== pos) {
                     match = null;
                 }
             })
-            .add('Sticky shimmed exec', function() {
+            .add('Shimmed exec', function() {
                 regexG.lastIndex = pos;
                 var match = fixedExec.call(regexG, strs[i++] || strs[i=0]);
                 if (match && match.index !== pos) {
                     match = null;
                 }
             })
-            .add('Sticky XRegExp.exec', function() {
+            .add('XRegExp.exec', function() {
                 var match = XRegExp.exec(strs[i++] || strs[i=0], regexG, pos, 'sticky');
             })
         );
     }());
 
     (function() {
-        var str = Array(50 + 1).join('hello world') + ' http://xregexp.com/path/to/file?q=1';
+        var str = Array(10 + 1).join('hello world') + ' http://xregexp.com/path/to/file?q=1';
         var regexp = new RegExp('\\b([^:/?\\s]+)://([^/?\\s]+)([^?\\s]*)\\??([^\\s]*)');
         var xregexp = XRegExp('\\b([^:/?\\s]+)://([^/?\\s]+)([^?\\s]*)\\??([^\\s]*)');
 
-        suites.push(Benchmark.Suite('Regex matching')
+        suites.push(Benchmark.Suite('Regex object type')
             .add('RegExp object', function() {
                 regexp.exec(str);
             })
@@ -156,8 +172,8 @@
         );
     }());
 
-    suites.push(Benchmark.Suite('Unicode letter construction')
-        .add('Incomplete set: /[A-Z]/i', function() {
+    suites.push(Benchmark.Suite('Unicode letter construction with pattern cache flush')
+        .add('Incomplete set: /(?i)[A-Z]/', function() {
             XRegExp('(?i)[A-Z]');
             XRegExp.cache.flush('patterns');
         })
@@ -165,61 +181,52 @@
             XRegExp('\\pL');
             XRegExp.cache.flush('patterns');
         })
-        .add('Full Unicode: /\\pL/A', function() {
+        .add('Full Unicode: /(?A)\\pL/', function() {
             XRegExp('(?A)\\pL');
             XRegExp.cache.flush('patterns');
         })
     );
 
     (function() {
-        var asciiText = 'Now is the time for all good men to come to the aid of the party - Now is the time for all good men to come to the aid of the party - Now is the time for all good men to come to the aid of the party.';
-        var mixedText = 'Daß dies das Leben sei, war eine Annahme, zu der Rönne, einen Arzt, das von leitender Stelle aus Geregelte seiner Tage, das staatliche Genehmigte, ja Vorgeschriebene seiner Bestimmung wohl berechtigte.';
-        var unicodeText = 'Зоммерфельд получил ряд важных результатов в рамках «старой квантовой теории», предшествовавшей появлению современной квантовой механики: обобщил теорию Бора на случай эллиптических орбит с.';
+        var asciiText = 'Now is the time for all good men to come to the aid of the party - Now is the time for all good men to come to the aid of the party - Now is the time for all good men to come to the aid of the party!';
+        var unicodeText = 'Зоммерфельд получил ряд важных результатов в рамках «старой квантовой теории», предшествовавшей появлению современной квантовой механики: обобщил теорию Бора на случай эллиптических орбит с!';
 
-        var azCaselessChar = XRegExp('(?i)[A-Z]\\.');
-        var bmpLetterChar = XRegExp('\\pL\\.');
-        var astralLetterChar = XRegExp('(?A)\\pL\\.');
+        var azCaselessChar = XRegExp('(?i)[A-Z]!');
+        var bmpLetterChar = XRegExp('\\pL!');
+        var astralLetterChar = XRegExp('(?A)\\pL!');
 
-        suites.push(Benchmark.Suite('Unicode letter matching')
-            .add('/[A-Z]/i', function() {
+        suites.push(Benchmark.Suite('Unicode letter matching at end of string with native test')
+            .add('/(?i)[A-Z]!/', function() {
                 azCaselessChar.test(asciiText);
-                azCaselessChar.test(mixedText);
                 azCaselessChar.test(unicodeText);
             })
-            .add('/\\pL/', function() {
+            .add('/\\pL!/', function() {
                 bmpLetterChar.test(asciiText);
-                bmpLetterChar.test(mixedText);
                 bmpLetterChar.test(unicodeText);
             })
-            .add('/\\pL/A', function() {
+            .add('/(?A)\\pL!/', function() {
                 astralLetterChar.test(asciiText);
-                astralLetterChar.test(mixedText);
                 astralLetterChar.test(unicodeText);
             })
         );
 
-        var azCaselessWord = XRegExp('(?i)[A-Z]+\\.');
-        var bmpLetterWord = XRegExp('\\pL+\\.');
-        var astralLetterWord = XRegExp('(?A)\\pL+\\.');
+        var azCaselessWord = XRegExp('(?i)[A-Z]+!');
+        var bmpLetterWord = XRegExp('\\pL+!');
+        var astralLetterWord = XRegExp('(?A)\\pL+!');
 
-        suites.push(Benchmark.Suite('Unicode word matching')
-            .add('/[A-Z]+/i', function() {
+        suites.push(Benchmark.Suite('Unicode word matching at end of string with native test')
+            .add('/(?i)[A-Z]+!/', function() {
                 azCaselessWord.test(asciiText);
-                azCaselessWord.test(mixedText);
                 azCaselessWord.test(unicodeText);
             })
-            .add('/\\pL+/', function() {
+            .add('/\\pL+!/', function() {
                 bmpLetterWord.test(asciiText);
-                bmpLetterWord.test(mixedText);
                 bmpLetterWord.test(unicodeText);
             })
-            .add('/\\pL+/A', function() {
+            .add('/(?A)\\pL+!/', function() {
                 astralLetterWord.test(asciiText);
-                astralLetterWord.test(mixedText);
                 astralLetterWord.test(unicodeText);
             })
         );
     }());
-
-    run();
 }());
