@@ -66,8 +66,9 @@
     (function() {
         var regexG = /(\b(?=x).(?=x).()??\2)+/g;
         var str = Array(25 + 1).join('hello world x ') + 'xx!';
-        var pos = 0;
-        var strs, i, longStr;
+        var pos = 5;
+        var numStrs = 2e5;
+        var strs, i;
 
         XRegExp.install('natives');
         var fixedExec = RegExp.prototype.exec;
@@ -88,13 +89,12 @@
         );
 
         strs = [];
-        // Use lots of different strings to remove the benefit of Opera's and XRegExp's
-        // regex/string match cache
-        for (i = 0; i < 2e5; ++i) {
+        // Use lots of different strings to remove the benefit of Opera's regex/string match cache
+        for (i = 0; i < numStrs; ++i) {
             strs.push(str + i);
         }
 
-        suites.push(Benchmark.Suite('exec with 200,000 different strings')
+        suites.push(Benchmark.Suite('exec with ' + numStrs + ' different strings')
             .add('Native exec', function() {
                 regexG.lastIndex = pos;
                 regexG.exec(strs[i++] || strs[i=0]);
@@ -108,7 +108,7 @@
             })
         );
 
-        suites.push(Benchmark.Suite('Sticky exec with 200,000 different strings')
+        suites.push(Benchmark.Suite('Sticky exec with ' + numStrs + ' different strings')
             .add('Native exec', function() {
                 regexG.lastIndex = pos;
                 var match = regexG.exec(strs[i++] || strs[i=0]);
