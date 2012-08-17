@@ -11,7 +11,7 @@ XRegExp regexes compile to native `RegExp` regex objects, thus there is no perfo
 
 ## Usage examples
 
-~~~ js
+```js
 // Using named capture and flag x (free-spacing and line comments)
 var date = XRegExp('(?<year>  [0-9]{4} ) -?  # year  \n\
                     (?<month> [0-9]{2} ) -?  # month \n\
@@ -71,7 +71,7 @@ XRegExp.matchChain(html, [
 // XRegExp.union safely merges strings and regexes into a single pattern
 XRegExp.union(['a+b*c', /(dogs)\1/, /(cats)\1/], 'i');
 // -> /a\+b\*c|(dogs)\1|(cats)\2/i
-~~~
+```
 
 These examples should give you the flavor of what's possible, but XRegExp has more syntax, flags, methods, options, and browser fixes that aren't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. See [xregexp.com](http://xregexp.com/) for more details.
 
@@ -83,37 +83,37 @@ In browsers, you can either load addons individually, or bundle all addons toget
 
 In browsers, first include the Unicode Base script:
 
-~~~ html
+```html
 <script src="src/xregexp.js"></script>
 <script src="src/addons/unicode/unicode-base.js"></script>
-~~~
+```
 
 Then you can do this:
 
-~~~ js
+```js
 var unicodeWord = XRegExp('^\\p{L}+$');
 unicodeWord.test('Русский'); // -> true
 unicodeWord.test('日本語'); // -> true
 unicodeWord.test('العربية'); // -> true
-~~~
+```
 
 The base script adds `\p{L}` and its full name `\p{Letter}`, but other Unicode categories, scripts, blocks, and properties require addon packages. Try these next examples after additionally including `unicode-scripts.js`:
 
-~~~ js
+```js
 XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
 XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
-~~~
+```
 
 By default, `\p{…}` and `\P{…}` support the Basic Multilingual Plane (i.e., code points up to `U+FFFF`). You can opt in to full 21-bit Unicode support (with code points up to `U+10FFFF`) on a per-regex basis by using flag `A`. In XRegExp, this is called *astral mode*. You can implicitly apply astral mode for all new regexes by running `XRegExp.install('astral')`. When in astral mode, `\p{…}` and `\P{…}` always match a full code point rather than a code unit, using surrogate pairs for code points above `U+FFFF`.
 
-~~~ js
+```js
 // Using flag A. The test string uses a surrogate pair to represent U+1F4A9
 XRegExp('^\\pS$', 'A').test('\uD83D\uDCA9'); // -> true
 
 // Implicit flag A
 XRegExp.install('astral');
 XRegExp('^\\pS$').test('\uD83D\uDCA9'); // -> true
-~~~
+```
 
 Opting in to astral mode disables the use of `\p{…}` and `\P{…}` within character classes. In astral mode, use e.g. `(?:\pL|\pM|[0-9_])+` instead of `[\pL\pM0-9_]+`.
 
@@ -123,14 +123,14 @@ XRegExp uses Unicode 6.2.0. Support for astral code points is new in XRegExp 3.0
 
 In browsers, first include the script:
 
-~~~ html
+```html
 <script src="src/xregexp.js"></script>
 <script src="src/addons/build.js"></script>
-~~~
+```
 
 You can then build regular expressions using named subpatterns, for readability and pattern reuse:
 
-~~~ js
+```js
 var time = XRegExp.build('(?x)^ {{hours}} ({{minutes}}) $', {
     hours: XRegExp.build('{{h12}} : | {{h24}}', {
         h12: /1[0-2]|0?[1-9]/,
@@ -141,7 +141,7 @@ var time = XRegExp.build('(?x)^ {{hours}} ({{minutes}}) $', {
 
 time.test('10:59'); // -> true
 XRegExp.exec('10:59', time).minutes; // -> '59'
-~~~
+```
 
 Named subpatterns can be provided as strings or regex objects. A leading `^` and trailing unescaped `$` are stripped from subpatterns if both are present, which allows embedding independently-useful anchored patterns. `{{…}}` tokens can be quantified as a single unit. Backreferences in the outer pattern and provided subpatterns are automatically renumbered to work correctly within the larger combined pattern. The syntax `({{name}})` works as shorthand for named capture via `(?<name>{{name}})`. Named subpatterns cannot be embedded within character classes.
 
@@ -151,14 +151,14 @@ See also: *[Creating Grammatical Regexes Using XRegExp.build](http://blog.steven
 
 In browsers, first include the script:
 
-~~~ html
+```html
 <script src="src/xregexp.js"></script>
 <script src="src/addons/matchrecursive.js"></script>
-~~~
+```
 
 You can then match recursive constructs using XRegExp pattern strings as left and right delimiters:
 
-~~~ js
+```js
 var str = '(t((e))s)t()(ing)';
 XRegExp.matchRecursive(str, '\\(', '\\)', 'g');
 // -> ['t((e))s', '', 'ing']
@@ -193,7 +193,7 @@ XRegExp.matchRecursive(str, '{', '}', 'g', {
 str = '<1><<<2>>><3>4<5>';
 XRegExp.matchRecursive(str, '<', '>', 'gy');
 // -> ['1', '<<2>>', '3']
-~~~
+```
 
 `XRegExp.matchRecursive` throws an error if it sees an unbalanced delimiter in the target string.
 
@@ -201,14 +201,14 @@ XRegExp.matchRecursive(str, '<', '>', 'gy');
 
 In browsers, first include the script:
 
-~~~ html
+```html
 <script src="src/xregexp.js"></script>
 <script src="src/addons/prototypes.js"></script>
-~~~
+```
 
 New XRegExp regexes then gain a collection of useful methods: `apply`, `call`, `forEach`, `globalize`, `match`, `xexec`, and `xtest`.
 
-~~~ js
+```js
 // To demonstrate the call method, let's first create the function we'll be using...
 function filter(array, fn) {
     var res = [];
@@ -217,56 +217,56 @@ function filter(array, fn) {
 }
 // Now we can filter arrays using functions and regexes
 filter(['a', 'ba', 'ab', 'b'], XRegExp('^a')); // -> ['a', 'ab']
-~~~
+```
 
 Native `RegExp` objects copied by `XRegExp` are augmented with any `XRegExp.prototype` methods. The following lines therefore work equivalently:
 
-~~~ js
+```js
 XRegExp('[a-z]', 'ig').xexec('abc');
 XRegExp(/[a-z]/ig).xexec('abc');
 XRegExp.globalize(/[a-z]/i).xexec('abc');
-~~~
+```
 
 ## Installation and usage
 
 In browsers:
 
-~~~ html
+```html
 <script src="build/xregexp-min.js"></script>
-~~~
+```
 
 Or, to bundle XRegExp with all of its addons:
 
-~~~ html
+```html
 <script src="build/xregexp-all-min.js"></script>
-~~~
+```
 
 Using [npm](http://npmjs.org/):
 
-~~~ bash
+```bash
 npm install xregexp
-~~~
+```
 
 In [Node.js](http://nodejs.org/):
 
-~~~ js
+```js
 var XRegExp = require('xregexp').XRegExp;
-~~~
+```
 
 In an AMD loader like [RequireJS](http://requirejs.org/):
 
-~~~ js
+```js
 require({paths: {xregexp: 'build/xregexp-all-min'}}, ['xregexp'], function(XRegExp) {
     console.log(XRegExp.version);
 });
-~~~
+```
 
 Running tests on the server with npm:
 
-~~~ bash
+```bash
 npm install -g qunit  # needed to run the tests
 npm test  # in the xregexp root
-~~~
+```
 
 If XRegExp was not installed using npm, just open `tests/index.html` in your browser.
 
