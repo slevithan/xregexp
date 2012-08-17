@@ -76,9 +76,6 @@ var XRegExp = (function(undefined) {
 // Storage for pattern details cached by the `XRegExp` constructor
     patternCache = {},
 
-// Storage for match result details cached by `XRegExp.exec`
-    matchCache = {},
-
 // Storage for regex syntax tokens added internally or by `XRegExp.addToken`
     tokens = [],
 
@@ -128,13 +125,12 @@ var XRegExp = (function(undefined) {
  * Attaches named capture data and `XRegExp.prototype` properties to a regex object.
  * @private
  * @param {RegExp} regex Regex to augment.
- * @param {String} cacheKey Unique identifier for the regex.
  * @param {Array} captureNames Array with capture names, or `null`.
  * @param {Boolean} [addProto=false] Whether to attach `XRegExp.prototype` properties.
  * @param {Boolean} [isNative=false] Whether the regex was created by `RegExp`; not `XRegExp`.
  * @returns {RegExp} Augmented regex.
  */
-    function augment(regex, cacheKey, captureNames, addProto, isNative) {
+    function augment(regex, captureNames, addProto, isNative) {
         var p;
         if (addProto) {
             // Can't auto-inherit these since the XRegExp constructor returns a nonprimitive value
@@ -151,7 +147,6 @@ var XRegExp = (function(undefined) {
         }
         regex[REGEX_DATA] = {
             captureNames: captureNames,
-            key: cacheKey,
             // Ensure that `undefined` is type-converted to `false`
             isNative: !!isNative
         };
@@ -197,8 +192,6 @@ var XRegExp = (function(undefined) {
             // nonnative source flags
             regex = augment(
                 self(regex.source, flags),
-                // Cannot use the previous key unless `options.add`/`remove` are accounted for
-                null, // regex[REGEX_DATA].key,
                 // Create a new copy of the array
                 regex[REGEX_DATA].captureNames ? regex[REGEX_DATA].captureNames.slice(0) : null,
                 options.addProto
@@ -208,8 +201,6 @@ var XRegExp = (function(undefined) {
             // for special tokens)
             regex = augment(
                 new RegExp(regex.source, flags),
-                // Distinguish native patterns with 'N::'
-                regex.source + '/native&&' + flags,
                 null, // captureNames
                 options.addProto,
                 true // isNative
@@ -429,7 +420,6 @@ var XRegExp = (function(undefined) {
             pos = 0,
             tokenResult,
             match,
-            cache,
             key,
             chr,
             i;
@@ -524,8 +514,8 @@ var XRegExp = (function(undefined) {
             }
         }
 
-        cache = patternCache[key];
-        return augment(new RegExp(cache.pattern, cache.flags), key, cache.captures, true);
+        key = patternCache[key];
+        return augment(new RegExp(key.pattern, key.flags), key.captures, true);
     };
 
 // Add `RegExp.prototype` to the prototype chain for XRegExp instances that have their prototype
@@ -621,8 +611,6 @@ var XRegExp = (function(undefined) {
     self.cache.flush = function(cacheName) {
         if (cacheName === 'patterns') {
             patternCache = {};
-        } else if (cacheName === 'matches') {
-            matchCache = {};
         } else {
             cache = {};
         }
@@ -672,58 +660,13 @@ var XRegExp = (function(undefined) {
  * // result -> ['2', '3', '4']
  */
     self.exec = function(str, regex, pos, sticky) {
-        var MAX_CACHE_STR_LENGTH = 400,
-            cacheFlags = 'g',
-            cacheThisMatch = false,
-            cacheObj,
-            match,
-            key,
-            r2,
-            execPos,
-            execEndPos;
-
-        pos = pos || 0;
-        regex[REGEX_DATA] = regex[REGEX_DATA] || getBaseProps();
-
-        if (!(sticky || String(str).length > MAX_CACHE_STR_LENGTH)) {
-            if (matchCache[str]) {
-                key = regex[REGEX_DATA].key;
-
-                if (!key && regex[REGEX_DATA].isNative) {
-                    key = regex[REGEX_DATA].key = regex.source + '/native&&' +
-                        // Get native flags
-                        nativ.exec.call(/\/([a-z]*)$/i, String(regex))[1];
-                }
-
-                if (key) {
-                    cacheObj = matchCache[str][key];
-                    // It's faster to not concatenate, in the common case of `pos` 0
-                    execPos = pos ? 'exec' + pos : 'exec0';
-                    execEndPos = pos ? 'end' + pos : 'end0';
-
-                    // If we've already cached the result, set `lastIndex` and return early
-                    if (cacheObj && cacheObj[execPos]) {
-                        if (cacheObj[execEndPos] !== undefined) {
-                            regex.lastIndex = cacheObj[execEndPos];
-                        }
-                        return cacheObj[execPos];
-                    }
-
-                    cacheThisMatch = true;
-                    if (!matchCache[str][key]) {
-                        matchCache[str][key] = {};
-                    }
-                }
-            } else {
-                // Match details for the string will not be cached until at least the second time
-                // the string is encountered
-                matchCache[str] = {};
-            }
-        }
+        var cacheFlags = 'g', match, r2;
 
         if (hasNativeY && (sticky || (regex.sticky && sticky !== false))) {
             cacheFlags += 'y';
         }
+
+        regex[REGEX_DATA] = regex[REGEX_DATA] || getBaseProps();
 
         // Shares cached copies with `XRegExp.match`/`replace`
         r2 = regex[REGEX_DATA][cacheFlags] || (
@@ -733,7 +676,7 @@ var XRegExp = (function(undefined) {
             })
         );
 
-        r2.lastIndex = pos;
+        r2.lastIndex = pos = pos || 0;
 
         // Fixed `exec` required for `lastIndex` fix, named backreferences, etc.
         match = fixed.exec.call(r2, str);
@@ -742,15 +685,8 @@ var XRegExp = (function(undefined) {
             match = null;
         }
 
-        if (cacheThisMatch) {
-            matchCache[str][key][execPos] = match;
-        }
-
         if (regex.global) {
             regex.lastIndex = match ? r2.lastIndex : 0;
-            if (cacheThisMatch) {
-                matchCache[str][key][execEndPos] = regex.lastIndex;
-            }
         }
 
         return match;

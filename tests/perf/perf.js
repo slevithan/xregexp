@@ -195,7 +195,7 @@
         var bmpLetterChar = XRegExp('\\pL!');
         var astralLetterChar = XRegExp('(?A)\\pL!');
 
-        suites.push(Benchmark.Suite('Unicode letter matching at end of string with native test')
+        suites.push(Benchmark.Suite('Unicode letter matching at end of string')
             .add('/(?i)[A-Z]!/', function() {
                 azCaselessChar.test(asciiText);
                 azCaselessChar.test(unicodeText);
@@ -214,7 +214,7 @@
         var bmpLetterWord = XRegExp('\\pL+!');
         var astralLetterWord = XRegExp('(?A)\\pL+!');
 
-        suites.push(Benchmark.Suite('Unicode word matching at end of string with native test')
+        suites.push(Benchmark.Suite('Unicode word matching at end of string')
             .add('/(?i)[A-Z]+!/', function() {
                 azCaselessWord.test(asciiText);
                 azCaselessWord.test(unicodeText);
