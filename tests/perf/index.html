@@ -30,7 +30,9 @@
 
     <script src="lib/benchmark.js"></script>
     <script src="perf.js"></script>
+
     <script>
+    // Initialization code adapted from Lo-Dash <http://lodash.com/> performance tests...
     (function() {
         if (/[?&]nojava=true(?:&|$)/.test(location.search)) {
             return;
@@ -47,7 +49,6 @@
             document.write('<applet code="nano" archive="lib/nano.jar"></applet>');
         }
     }());
-
     onload = function() {
         // Give the applet time to initialize
         setTimeout(run, 15);
