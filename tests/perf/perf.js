@@ -133,6 +133,58 @@
     }());
 
     (function() {
+        var str = Array(30 + 1).join('hello xx world ');
+
+        suites.push(Benchmark.Suite('Iteration with nonglobal regex')
+            .add('replace callback', function() {
+                var r = /^|(((?=x).)\2)+/;
+                var matches = [];
+                if (!r.global) {
+                    //r = XRegExp.globalize(r);
+                    r = new RegExp(r.source, 'g' + (r.ignoreCase ? 'i' : '') + (r.multiline ? 'm' : ''));
+                }
+                str.replace(r, function(match) {
+                    matches.push(match);
+                });
+            })
+            .add('while/exec', function() {
+                var r = /^|(((?=x).)\2)+/;
+                var matches = [];
+                var match;
+                if (!r.global) {
+                    //r = XRegExp.globalize(r);
+                    r = new RegExp(r.source, 'g' + (r.ignoreCase ? 'i' : '') + (r.multiline ? 'm' : ''));
+                } else {
+                    r.lastIndex = 0;
+                }
+                while (match = r.exec(str)) {
+                    matches.push(match[0]);
+                    if (r.lastIndex === match.index) {
+                        ++r.lastIndex;
+                    }
+                }
+            })
+            .add('while/XRegExp.exec', function() {
+                var r = /^|(((?=x).)\2)+/;
+                var matches = [];
+                var match;
+                var pos = 0;
+                while (match = XRegExp.exec(str, r, pos)) {
+                    matches.push(match[0]);
+                    pos = match.index + (match[0].length || 1);
+                }
+            })
+            .add('XRegExp.forEach', function() {
+                var r = /^|(((?=x).)\2)+/;
+                var matches = [];
+                XRegExp.forEach(str, r, function(match) {
+                    matches.push(match[0]);
+                });
+            })
+        );
+    }());
+
+    (function() {
         var str = Array(30 + 1).join('hello world ') + 'http://xregexp.com/path/to/file?q=1';
         var regexp = new RegExp('\\b([^:/?\\s]+)://([^/?\\s]+)([^?\\s]*)\\??([^\\s]*)');
         var xregexp   = XRegExp('\\b([^:/?\\s]+)://([^/?\\s]+)([^?\\s]*)\\??([^\\s]*)');
