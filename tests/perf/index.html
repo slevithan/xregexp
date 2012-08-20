@@ -32,21 +32,26 @@
     <script src="perf.js"></script>
     <script>
     (function() {
-        var useApplet = !/[?&]nojava=true(?:&|$)/.test(location.search);
-
-        function init() {
-            // Give the applet time to initialize
-            setTimeout(run, useApplet ? 500 : 15);
+        if (/[?&]nojava=true(?:&|$)/.test(location.search)) {
+            return;
         }
-
-        if (useApplet) {
-            var div = document.createElement('div');
-            div.innerHTML = '<applet code="nano" archive="lib/nano.jar">';
-            document.body.insertBefore(div.lastChild, document.body.firstChild);
+        var perf = window.performance,
+            begin = new Date,
+            measured;
+        // Check whether the applet is needed
+        while (!(measured = new Date - begin)) {
+            // No-op
         }
-
-        window.onload = init;
+        if (measured !== 1 && !(perf && typeof (perf.now || perf.webkitNow) === 'function')) {
+            // Load the applet
+            document.write('<applet code="nano" archive="lib/nano.jar"></applet>');
+        }
     }());
+
+    onload = function() {
+        // Give the applet time to initialize
+        setTimeout(run, 15);
+    };
     </script>
 </body>
 </html>
