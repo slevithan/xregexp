@@ -566,7 +566,7 @@ var XRegExp = (function(undefined) {
 
 /**
  * Caches and returns the result of calling `XRegExp(pattern, flags)`. On any subsequent call with
- * the same pattern and flag combination, the cached copy is returned.
+ * the same pattern and flag combination, the cached copy of the regex is returned.
  * @memberOf XRegExp
  * @param {String} pattern Regex pattern string.
  * @param {String} [flags] Any combination of XRegExp flags.
@@ -578,7 +578,6 @@ var XRegExp = (function(undefined) {
  * }
  */
     self.cache = function(pattern, flags) {
-        // The regex object cache is never auto-flushed, even if the user adds new syntax tokens
         var key = pattern + '/' + (flags || '');
         return cache[key] || (cache[key] = self(pattern, flags));
     };
@@ -586,8 +585,10 @@ var XRegExp = (function(undefined) {
 // Intentionally undocumented
     self.cache.flush = function(cacheName) {
         if (cacheName === 'patterns') {
+            // Flush the pattern cache used by the `XRegExp` constructor
             patternCache = {};
         } else {
+            // Flush the regex object cache populated by `XRegExp.cache`
             cache = {};
         }
     };
