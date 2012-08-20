@@ -289,7 +289,7 @@ var XRegExp = (function(undefined) {
  * @param {Number} pos Position to search for tokens within `pattern`.
  * @param {Number} scope Regex scope to apply: 'default' or 'class'.
  * @param {Object} context Context object to use for token handler functions.
- * @returns {Object} Object with properties `len`, `replacement`, and `reparse`; or `null`.
+ * @returns {Object} Object with properties `matchLength`, `output`, and `reparse`; or `null`.
  */
     function runTokens(pattern, flags, pos, scope, context) {
         var i = tokens.length,
@@ -309,8 +309,8 @@ var XRegExp = (function(undefined) {
                     match = self.exec(pattern, t.regex, pos, 'sticky');
                     if (match) {
                         result = {
-                            len: match[0].length,
-                            replacement: t.handler.call(context, match, scope, flags),
+                            matchLength: match[0].length,
+                            output: t.handler.call(context, match, scope, flags),
                             reparse: t.reparse
                         };
                         // Finished with token tests
@@ -441,21 +441,22 @@ var XRegExp = (function(undefined) {
         pattern = pattern === undefined ? '' : String(pattern);
         flags = flags === undefined ? '' : String(flags);
 
-        // Cache lookup key
+        // Cache-lookup key
         key = pattern + '/' + flags;
 
         // If this pattern and flag combination hasn't been used since the last pattern cache reset
         if (!patternCache[key]) {
-            // Most browsers throw on duplicate flags, so copy this behavior for nonnative flags
+            // Recent browsers throw on duplicate flags, so copy this behavior for nonnative flags
             if (clipDuplicates(flags) !== flags) {
                 throw new SyntaxError(ERR_DUPLICATE_FLAG + flags);
             }
 
-            // Strip/apply leading mode modifier with any combination of flags except g or y
+            // Strip and apply a leading mode modifier with any combination of flags except g or y
             pattern = nativ.replace.call(pattern, /^\(\?([\w$]+)\)/, function($0, $1) {
                 if (nativ.test.call(/[gy]/, $1)) {
                     throw new SyntaxError(ERR_BAD_INLINE_FLAG + $0);
                 }
+                // Allow duplicate flags within the mode modifier
                 flags = clipDuplicates(flags + $1);
                 return '';
             });
@@ -470,19 +471,21 @@ var XRegExp = (function(undefined) {
             // Use XRegExp's syntax tokens to translate the pattern to a native regex pattern...
             // `pattern.length` may change on each iteration, if tokens use the `reparse` option
             while (pos < pattern.length) {
-                // Check for custom tokens at the current position
                 do {
+                    // Check for custom tokens at the current position
                     tokenResult = runTokens(pattern, flags, pos, scope, context);
+                    // If the matched token used the `reparse` option, splice its result into the
+                    // pattern before running tokens again at the same position
                     if (tokenResult && tokenResult.reparse) {
                         pattern = pattern.slice(0, pos) +
-                            tokenResult.replacement +
-                            pattern.slice(pos + tokenResult.len);
+                            tokenResult.output +
+                            pattern.slice(pos + tokenResult.matchLength);
                     }
                 } while (tokenResult && tokenResult.reparse);
 
                 if (tokenResult) {
-                    output += tokenResult.replacement;
-                    pos += (tokenResult.len || 1);
+                    output += tokenResult.output;
+                    pos += (tokenResult.matchLength || 1);
                 } else {
                     // Check for native multicharacter tokens (not counting character classes) at
                     // the current position. This could use the native `exec`, except that sticky
