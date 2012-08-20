@@ -41,7 +41,9 @@
         scrollToEnd();
     };
 
-    // Start of perf suites...
+/*--------------------------------------
+ *  Start of perf suites
+ *------------------------------------*/
 
     (function() {
         var pattern = '^([.])\\1+$';
@@ -64,11 +66,9 @@
     }());
 
     (function() {
-        var regexG = /(\b(?=x).(?=x).()??\2)+/g;
-        var str = Array(25 + 1).join('hello world x ') + 'xx!';
+        var regexG = /(((?=x).)\2)+/g;
+        var str = Array(30 + 1).join('hello world x ') + 'xx!';
         var pos = 5;
-        var numStrs = 2e5;
-        var strs, i;
 
         XRegExp.install('natives');
         var fixedExec = RegExp.prototype.exec;
@@ -88,7 +88,10 @@
             })
         );
 
-        strs = [];
+        var numStrs = 2e5;
+        var strs = [];
+        var i;
+
         // Use lots of different strings to remove the benefit of Opera's regex/string match cache
         for (i = 0; i < numStrs; ++i) {
             strs.push(str + i);
@@ -130,9 +133,9 @@
     }());
 
     (function() {
-        var str = Array(10 + 1).join('hello world') + ' http://xregexp.com/path/to/file?q=1';
+        var str = Array(30 + 1).join('hello world ') + 'http://xregexp.com/path/to/file?q=1';
         var regexp = new RegExp('\\b([^:/?\\s]+)://([^/?\\s]+)([^?\\s]*)\\??([^\\s]*)');
-        var xregexp = XRegExp('\\b([^:/?\\s]+)://([^/?\\s]+)([^?\\s]*)\\??([^\\s]*)');
+        var xregexp   = XRegExp('\\b([^:/?\\s]+)://([^/?\\s]+)([^?\\s]*)\\??([^\\s]*)');
 
         suites.push(Benchmark.Suite('Regex object type')
             .add('RegExp object', function() {
@@ -154,10 +157,10 @@
                     '   (          [^?\\s]*   ) \\??  # optional path  \n' +
                     '   (          [^\\s]*    )       # optional query', 'x');
         var xregexpNumbered =
-            XRegExp('\\b( [^:/?\\s]+ ) ://   # aka protocol   \n' +
-                    '   ( [^/?\\s]+  )       # domain name/IP \n' +
-                    '   ( [^?\\s]*   ) \\??  # optional path  \n' +
-                    '   ( [^\\s]*    )       # optional query', 'x');
+            XRegExp('\\b(          [^:/?\\s]+ ) ://   # aka protocol   \n' +
+                    '   (          [^/?\\s]+  )       # domain name/IP \n' +
+                    '   (          [^?\\s]*   ) \\??  # optional path  \n' +
+                    '   (          [^\\s]*    )       # optional query', 'x');
 
         suites.push(Benchmark.Suite('Capturing')
             .add('Numbered capture', function() {
@@ -172,60 +175,63 @@
         );
     }());
 
-    suites.push(Benchmark.Suite('Unicode letter construction with pattern cache flush')
-        .add('Incomplete set: /(?i)[A-Z]/', function() {
-            XRegExp('(?i)[A-Z]');
+    suites.push(Benchmark.Suite('Unicode letter construction')
+        .add('Incomplete set: /[a-z]/i', function() {
+            XRegExp('(?i)[a-z]');
             XRegExp.cache.flush('patterns');
         })
         .add('BMP only: /\\pL/', function() {
             XRegExp('\\pL');
             XRegExp.cache.flush('patterns');
         })
-        .add('Full Unicode: /(?A)\\pL/', function() {
+        .add('Full Unicode: /\\pL/A', function() {
             XRegExp('(?A)\\pL');
             XRegExp.cache.flush('patterns');
         })
     );
 
     (function() {
-        var asciiText = 'Now is the time for all good men to come to the aid of the party - Now is the time for all good men to come to the aid of the party - Now is the time for all good men to come to the aid of the party!';
-        var unicodeText = 'Зоммерфельд получил ряд важных результатов в рамках «старой квантовой теории», предшествовавшей появлению современной квантовой механики: обобщил теорию Бора на случай эллиптических орбит с!';
+        var asciiText = 'Now is the time for all good men to come to the aid of the party!';
+        var mixedText = 'We are looking for a letter/word followed by an exclamation mark, ☃ ☃ ☃ ☃ ☃ and δοκεῖ δέ μοι καὶ Καρχηδόνα μὴ εἶναι!';
+        var unicodeText = 'Зоммерфельд получил ряд важных результатов в рамках «старой квантовой теории», предшествовавшей появлению современной квантовой механики!';
+        var unicodeText2 = 'როგორც სამედიცინო ფაკულტეტის ახალგაზრდა სტუდენტი, გევარა მთელს ლათინურ ამერიკაში მოგზაურობდა და იგი სწრაფად!';
 
-        var azCaselessChar = XRegExp('(?i)[A-Z]!');
+        function test(regex) {
+            regex.test(asciiText);
+            regex.test(mixedText);
+            regex.test(unicodeText);
+            regex.test(unicodeText2);
+        }
+
+        var azCaselessChar = XRegExp('(?i)[a-z]!');
         var bmpLetterChar = XRegExp('\\pL!');
         var astralLetterChar = XRegExp('(?A)\\pL!');
 
-        suites.push(Benchmark.Suite('Unicode letter matching at end of string')
-            .add('/(?i)[A-Z]!/', function() {
-                azCaselessChar.test(asciiText);
-                azCaselessChar.test(unicodeText);
+        suites.push(Benchmark.Suite('Unicode letter matching')
+            .add('a-z caseless', function() {
+                test(azCaselessChar);
             })
-            .add('/\\pL!/', function() {
-                bmpLetterChar.test(asciiText);
-                bmpLetterChar.test(unicodeText);
+            .add('\\pL', function() {
+                test(bmpLetterChar);
             })
-            .add('/(?A)\\pL!/', function() {
-                astralLetterChar.test(asciiText);
-                astralLetterChar.test(unicodeText);
+            .add('\\pL astral', function() {
+                test(astralLetterChar);
             })
         );
 
-        var azCaselessWord = XRegExp('(?i)[A-Z]+!');
+        var azCaselessWord = XRegExp('(?i)[a-z]+!');
         var bmpLetterWord = XRegExp('\\pL+!');
         var astralLetterWord = XRegExp('(?A)\\pL+!');
 
-        suites.push(Benchmark.Suite('Unicode word matching at end of string')
-            .add('/(?i)[A-Z]+!/', function() {
-                azCaselessWord.test(asciiText);
-                azCaselessWord.test(unicodeText);
+        suites.push(Benchmark.Suite('Unicode word matching')
+            .add('a-z caseless', function() {
+                test(azCaselessWord);
             })
-            .add('/\\pL+!/', function() {
-                bmpLetterWord.test(asciiText);
-                bmpLetterWord.test(unicodeText);
+            .add('\\pL', function() {
+                test(bmpLetterWord);
             })
-            .add('/(?A)\\pL+!/', function() {
-                astralLetterWord.test(asciiText);
-                astralLetterWord.test(unicodeText);
+            .add('\\pL astral', function() {
+                test(astralLetterWord);
             })
         );
     }());
