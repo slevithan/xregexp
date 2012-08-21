@@ -56,9 +56,17 @@
  * @deprecated As of XRegExp 2.0.0. No replacement.
  */
     XRegExp.freezeTokens = function() {
-        XRegExp.addToken = XRegExp.addUnicodeData = function() {
+        var errorFn = function() {
             throw new Error('Cannot change XRegExp syntax after running freezeTokens');
         };
+
+        XRegExp.addToken = errorFn;
+
+        // Don't replace `addUnicodeData` unless it exists, since it might be used to check whether
+        // XRegExp's Unicode Base addon is available
+        if (XRegExp.addUnicodeData) {
+            XRegExp.addUnicodeData = errorFn;
+        }
     };
 
 /**

@@ -220,6 +220,10 @@
                 unicode[normalize(item.alias)] = item;
             }
         }
+
+        // Reset the pattern cache used by the `XRegExp` constructor, since the same pattern and
+        // flags might now produce different results
+        XRegExp.cache.flush('patterns');
     };
 
 /* Add data for the Unicode `L` or `Letter` category. Separate addons are available that add other
