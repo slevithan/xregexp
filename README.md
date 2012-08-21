@@ -264,7 +264,7 @@ require({paths: {xregexp: 'build/xregexp-all-min'}}, ['xregexp'], function(XRegE
 ## Changelog
 
 * Releases: [Version history](http://xregexp.com/history/).
-* Upcoming: [Issue tracker](https://github.com/slevithan/XRegExp/issues), [Roadmap](https://github.com/slevithan/XRegExp/wiki/Roadmap).
+* Upcoming: [Issue tracker](https://github.com/slevithan/xregexp/issues), [Roadmap](https://github.com/slevithan/xregexp/wiki/Roadmap).
 
 ## About
 
