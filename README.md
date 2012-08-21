@@ -261,15 +261,6 @@ require({paths: {xregexp: 'build/xregexp-all-min'}}, ['xregexp'], function(XRegE
 });
 ```
 
-Running tests on the server with npm:
-
-```bash
-npm install -g qunit  # needed to run the tests
-npm test  # in the xregexp root
-```
-
-If XRegExp was not installed using npm, just open `tests/index.html` in your browser.
-
 ## Changelog
 
 * Releases: [Version history](http://xregexp.com/history/).
