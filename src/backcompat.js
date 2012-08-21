@@ -14,6 +14,10 @@
         install = XRegExp.install,
         uninstall = XRegExp.uninstall;
 
+    function getNativeFlags(regex) {
+        return /\/([a-z]*)$/i.exec(String(regex))[1];
+    }
+
 /**
  * XRegExp 3.0.0 removed the 'all' shortcut.
  */
@@ -52,8 +56,8 @@
  * @deprecated As of XRegExp 2.0.0. No replacement.
  */
     XRegExp.freezeTokens = function() {
-        XRegExp.addToken = function() {
-            throw new Error('Cannot run addToken after freezeTokens');
+        XRegExp.addToken = XRegExp.addUnicodeData = function() {
+            throw new Error('Cannot change XRegExp syntax after running freezeTokens');
         };
     };
 
@@ -80,15 +84,15 @@
  * @deprecated As of XRegExp 1.5.0. No replacement.
  */
     RegExp.prototype.addFlags = function(flags) {
-        var regex = XRegExp(
-                this.source,
-                /\/([a-z]*)$/i.exec(String(this))[1] + (flags || '')
-            ),
+        var regex = XRegExp(this.source, getNativeFlags(this) + (flags || '')),
             captureNames = this[REGEX_DATA] ? this[REGEX_DATA].captureNames : null;
+
         regex[REGEX_DATA] = {
             captureNames: captureNames ? captureNames.slice(0) : null,
-            isNative: false // Always passed through `XRegExp`
+            // Always passed through `XRegExp`
+            isNative: false
         };
+
         return regex;
     };
 
@@ -103,13 +107,12 @@
  * @deprecated As of XRegExp 1.5.0. No replacement.
  */
     RegExp.prototype.validate = function(str) {
-        var regex = new RegExp(
-            '^(?:' + this.source + ')$(?!\\s)',
-            /\/([a-z]*)$/i.exec(String(this))[1]
-        );
+        var regex = new RegExp('^(?:' + this.source + ')$(?!\\s)', getNativeFlags(this));
+
         if (this.global) {
             this.lastIndex = 0;
         }
+
         return str.search(regex) === 0;
     };
 
