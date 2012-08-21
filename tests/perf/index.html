@@ -30,8 +30,10 @@
 
     <script src="lib/benchmark.js"></script>
     <script src="perf.js"></script>
+
     <script>
-    // Benchmark initialization adapted from Lo-Dash <http://lodash.com/> performance tests...
+    // Load an applet for higher-precision timing if needed and not manually disabled.
+    // Adapted from Lo-Dash <http://lodash.com/> performance tests...
     (function() {
         if (/[?&]nojava=true(?:&|$)/.test(location.search)) {
             return;
@@ -43,12 +45,12 @@
         while (!(measured = new Date - begin)) {
             // No-op
         }
-        if (measured !== 1 && !(perf && typeof (perf.now || perf.webkitNow) === 'function')) {
-            // Load the Java applet for higher-precision timing
+        if (measured !== 1 && !(perf && (perf.now || perf.webkitNow))) {
             document.write('<applet code="nano" archive="lib/nano.jar"></applet>');
         }
-        onload = run;
     }());
+
+    onload = run;
     </script>
 </body>
 </html>
