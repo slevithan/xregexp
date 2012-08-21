@@ -41,7 +41,7 @@ var XRegExp = (function(undefined) {
     'use strict';
 
 /*--------------------------------------
- *  Private variables
+ * Private variables
  *------------------------------------*/
 
     var // ...
@@ -118,7 +118,7 @@ var XRegExp = (function(undefined) {
     add;
 
 /*--------------------------------------
- *  Private helper functions
+ * Private functions
  *------------------------------------*/
 
 /**
@@ -370,7 +370,7 @@ var XRegExp = (function(undefined) {
     }
 
 /*--------------------------------------
- *  Constructor
+ * Constructor
  *------------------------------------*/
 
 /**
@@ -526,7 +526,19 @@ var XRegExp = (function(undefined) {
     self.prototype = new RegExp;
 
 /*--------------------------------------
- *  Public methods and properties
+ * Public properties
+ *------------------------------------*/
+
+/**
+ * The XRegExp version number.
+ * @static
+ * @memberOf XRegExp
+ * @type String
+ */
+    self.version = '3.0.0-pre';
+
+/*--------------------------------------
+ * Public methods
  *------------------------------------*/
 
 /**
@@ -904,9 +916,9 @@ var XRegExp = (function(undefined) {
                 matches = [],
                 addMatch = function(match) {
                     if (item.backref) {
-                        /* Safari 4.0.5 (but not 5.0.5+) incorrectly uses sparse arrays to hold the
-                         * undefineds for backreferences to nonparticipating capturing groups. In
-                         * such cases, a `hasOwnProperty` or `in` check on its own would
+                        /* Safari 4.0.5 (but not 5.0.5+) inappropriately uses sparse arrays to hold
+                         * the `undefined`s for backreferences to nonparticipating capturing
+                         * groups. In such cases, a `hasOwnProperty` or `in` check on its own would
                          * inappropriately throw the exception, so also check if the backreference
                          * is a number that is within the bounds of the array.
                          */
@@ -1193,16 +1205,8 @@ var XRegExp = (function(undefined) {
         return self(output.join('|'), flags);
     };
 
-/**
- * The XRegExp version number.
- * @static
- * @memberOf XRegExp
- * @type String
- */
-    self.version = '3.0.0-pre';
-
 /*--------------------------------------
- *  Fixed/extended native methods
+ * Fixed and extended native methods
  *------------------------------------*/
 
 /**
@@ -1496,7 +1500,7 @@ var XRegExp = (function(undefined) {
     };
 
 /*--------------------------------------
- *  Built-in syntax and flag tokens
+ * Built-in syntax and flag tokens
  *------------------------------------*/
 
     add = self.addToken;
@@ -1649,7 +1653,7 @@ var XRegExp = (function(undefined) {
     );
 
 /*--------------------------------------
- *  Expose XRegExp
+ * Expose XRegExp
  *------------------------------------*/
 
     return self;
@@ -2145,7 +2149,7 @@ var XRegExp = (function(undefined) {
     var unicode = {};
 
 /*--------------------------------------
- *  Private helper functions
+ * Private functions
  *------------------------------------*/
 
 // Generates a token lookup name: lowercase, with hyphens, spaces, and underscores removed
@@ -2239,7 +2243,7 @@ var XRegExp = (function(undefined) {
     }
 
 /*--------------------------------------
- *  Core functionality
+ * Core functionality
  *------------------------------------*/
 
 /* Add Unicode token syntax: \p{..}, \P{..}, \p{^..}. Also add astral mode (flag A).

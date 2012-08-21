@@ -20,7 +20,7 @@
     var unicode = {};
 
 /*--------------------------------------
- *  Private helper functions
+ * Private functions
  *------------------------------------*/
 
 // Generates a token lookup name: lowercase, with hyphens, spaces, and underscores removed
@@ -114,7 +114,7 @@
     }
 
 /*--------------------------------------
- *  Core functionality
+ * Core functionality
  *------------------------------------*/
 
 /* Add Unicode token syntax: \p{..}, \P{..}, \p{^..}. Also add astral mode (flag A).
