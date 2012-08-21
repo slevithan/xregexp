@@ -28,7 +28,7 @@
     <script src="../../src/addons/unicode/unicode-properties.js"></script>
     <script src="../../src/addons/unicode/unicode-scripts.js"></script>
 
-    <script src="lib/benchmark.js"></script>
+    <script src="../vendor/benchmark.js/benchmark.js"></script>
     <script src="perf.js"></script>
 
     <script>
@@ -46,7 +46,7 @@
             // No-op
         }
         if (measured !== 1 && !(perf && (perf.now || perf.webkitNow))) {
-            document.write('<applet code="nano" archive="lib/nano.jar"></applet>');
+            document.write('<applet code="nano" archive="../vendor/benchmark.js/nano.jar"></applet>');
         }
     }());
 
