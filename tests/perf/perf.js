@@ -136,7 +136,7 @@
         var str = Array(30 + 1).join('hello xx world ');
 
         suites.push(Benchmark.Suite('Iteration with nonglobal regex')
-            .add('replace callback', function() {
+            .add('replace with callback', function() {
                 var r = /^|(((?=x).)\2)+/;
                 var matches = [];
                 if (!r.global) {
