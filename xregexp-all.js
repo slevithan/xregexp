@@ -83,12 +83,12 @@ var XRegExp = (function(undefined) {
     defaultScope = 'default',
     classScope = 'class',
 
-// Regexes that match native regex syntax
+// Regexes that match native regex syntax, including octals
     nativeTokens = {
-        // Any native multicharacter token in default scope (includes octals, excludes character classes)
-        'default': /\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S])|\(\?[:=!]|[?*+]\?|{\d+(?:,\d*)?}\??/,
-        // Any native multicharacter token in character class scope (includes octals)
-        'class': /\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S])/
+        // Any native multicharacter token in default scope, or any single character
+        'default': /\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S])|\(\?[:=!]|[?*+]\?|{\d+(?:,\d*)?}\??|[\s\S]/,
+        // Any native multicharacter token in character class scope, or any single character
+        'class': /\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S])|[\s\S]/
     },
 
 // Any backreference or dollar-prefixed character in replacement strings
@@ -421,7 +421,6 @@ var XRegExp = (function(undefined) {
             tokenResult,
             match,
             key,
-            chr,
             i;
 
         if (self.isRegExp(pattern)) {
@@ -487,23 +486,16 @@ var XRegExp = (function(undefined) {
                     output += tokenResult.output;
                     pos += (tokenResult.matchLength || 1);
                 } else {
-                    // Check for native multicharacter tokens (not counting character classes) at
-                    // the current position. This could use the native `exec`, except that sticky
-                    // processing avoids string slicing in browsers that support flag y
-                    match = self.exec(pattern, nativeTokens[scope], pos, 'sticky');
-                    if (match) {
-                        output += match[0];
-                        pos += match[0].length;
-                    } else {
-                        chr = pattern.charAt(pos);
-                        if (chr === '[') {
-                            scope = classScope;
-                        } else if (chr === ']') {
-                            scope = defaultScope;
-                        }
-                        // Advance position by one character
-                        output += chr;
-                        ++pos;
+                    // Check for native tokens at the current position. This could use the native
+                    // `exec`, except that sticky processing avoids string slicing in browsers that
+                    // support flag y
+                    match = self.exec(pattern, nativeTokens[scope], pos, 'sticky')[0];
+                    output += match;
+                    pos += match.length;
+                    if (match === '[' && scope === defaultScope) {
+                        scope = classScope;
+                    } else if (match === ']' && scope === classScope) {
+                        scope = defaultScope;
                     }
                 }
             }
@@ -1343,7 +1335,7 @@ var XRegExp = (function(undefined) {
                 var args = arguments, i;
                 if (captureNames) {
                     // Change the `arguments[0]` string primitive to a `String` object that can
-                    // store properties. Yes, this really does need to use the `String` constructor
+                    // store properties. This really does need to use `String` as a constructor
                     args[0] = new String(args[0]);
                     // Store named backreferences on the first argument
                     for (i = 0; i < captureNames.length; ++i) {
