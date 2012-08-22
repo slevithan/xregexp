@@ -501,7 +501,8 @@ var XRegExp = (function(undefined) {
             }
 
             patternCache[key] = {
-                pattern: output,
+                // Cleanup token cruft: repeated `(?:)(?:)` and leading/trailing `(?:)`
+                pattern: nativ.replace.call(output, /\(\?:\)(?=\(\?:\))|^\(\?:\)|\(\?:\)$/g, ''),
                 // Strip all but native flags
                 flags: nativ.replace.call(flags, /[^gimy]+/g, ''),
                 // `context.captureNames` has an item for each capturing group, even if unnamed
@@ -1548,7 +1549,7 @@ var XRegExp = (function(undefined) {
 /* Whitespace and line comments, in free-spacing mode (aka extended mode, flag x) only.
  */
     add(
-        /(?:\s+|#.*)+/,
+        /\s+|#.*/,
         function(match) {
             // Keep tokens separated unless the following token is a quantifier
             return nativ.test.call(quantifier, match.input.slice(match.index + match[0].length)) ?
@@ -1680,12 +1681,14 @@ var XRegExp = (function(undefined) {
  * @returns {String} Pattern with edge anchors removed.
  */
     function deanchor(pattern) {
-        var startAnchor = /^(?:\(\?:\))*\^/, // Leading `^` or `(?:)^` (handles token cruft)
-            endAnchor = /\$(?:\(\?:\))*$/; // Trailing `$` or `$(?:)` (handles token cruft)
+        var leadingAnchor = /^\^/,
+            trailingAnchor = /\$$/;
+
         // Ensure that the trailing `$` isn't escaped
-        if (startAnchor.test(pattern) && endAnchor.test(pattern.replace(/\\[\s\S]/g, ''))) {
-            return pattern.replace(startAnchor, '').replace(endAnchor, '');
+        if (leadingAnchor.test(pattern) && trailingAnchor.test(pattern.replace(/\\[\s\S]/g, ''))) {
+            return pattern.replace(leadingAnchor, '').replace(trailingAnchor, '');
         }
+
         return pattern;
     }
 

@@ -19,12 +19,14 @@
  * @returns {String} Pattern with edge anchors removed.
  */
     function deanchor(pattern) {
-        var startAnchor = /^(?:\(\?:\))*\^/, // Leading `^` or `(?:)^` (handles token cruft)
-            endAnchor = /\$(?:\(\?:\))*$/; // Trailing `$` or `$(?:)` (handles token cruft)
+        var leadingAnchor = /^\^/,
+            trailingAnchor = /\$$/;
+
         // Ensure that the trailing `$` isn't escaped
-        if (startAnchor.test(pattern) && endAnchor.test(pattern.replace(/\\[\s\S]/g, ''))) {
-            return pattern.replace(startAnchor, '').replace(endAnchor, '');
+        if (leadingAnchor.test(pattern) && trailingAnchor.test(pattern.replace(/\\[\s\S]/g, ''))) {
+            return pattern.replace(leadingAnchor, '').replace(trailingAnchor, '');
         }
+
         return pattern;
     }
 

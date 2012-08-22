@@ -474,7 +474,8 @@ var XRegExp = (function(undefined) {
             }
 
             patternCache[key] = {
-                pattern: output,
+                // Cleanup token cruft: repeated `(?:)(?:)` and leading/trailing `(?:)`
+                pattern: nativ.replace.call(output, /\(\?:\)(?=\(\?:\))|^\(\?:\)|\(\?:\)$/g, ''),
                 // Strip all but native flags
                 flags: nativ.replace.call(flags, /[^gimy]+/g, ''),
                 // `context.captureNames` has an item for each capturing group, even if unnamed
@@ -1521,7 +1522,7 @@ var XRegExp = (function(undefined) {
 /* Whitespace and line comments, in free-spacing mode (aka extended mode, flag x) only.
  */
     add(
-        /(?:\s+|#.*)+/,
+        /\s+|#.*/,
         function(match) {
             // Keep tokens separated unless the following token is a quantifier
             return nativ.test.call(quantifier, match.input.slice(match.index + match[0].length)) ?
