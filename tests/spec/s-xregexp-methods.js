@@ -162,26 +162,26 @@ describe('XRegExp.addToken()', function() {
     });
 
     it('should be able to defer to multiple tokens when the reparse option is true', function() {
-        XRegExp.addToken(/\x08/, function() {return '\x01.[\x02]';}, {reparse: true});
+        XRegExp.addToken(/\u2000/, function() {return '\x01.[\x02]';}, {reparse: true});
 
-        expect(XRegExp('\x08').test('1x2')).toBe(true);
+        expect(XRegExp('^\u2000$').test('1x2')).toBe(true);
     });
 
     it('should support a two-step token reparsing chain', function() {
-        XRegExp.addToken(/\x09/, function() {return '\x08';}, {reparse: true});
+        XRegExp.addToken(/\u2001/, function() {return '\u2000';}, {reparse: true});
 
-        expect(XRegExp('\x09').test('1x2')).toBe(true);
+        expect(XRegExp('^\u2001$').test('1x2')).toBe(true);
     });
 
     it('should support a three-step token reparsing chain', function() {
-        XRegExp.addToken(/\x0A/, function() {return '\x09';}, {reparse: true});
+        XRegExp.addToken(/\u2002/, function() {return '\u2001';}, {reparse: true});
 
-        expect(XRegExp('\x0A').test('1x2')).toBe(true);
+        expect(XRegExp('^\u2002$').test('1x2')).toBe(true);
     });
 
     it('should allow XRegExp regexes to be used as the token search pattern', function() {
-        expect(function() {XRegExp.addToken(XRegExp('(?<n>\\x0B)'), function() {return 'B';});}).not.toThrow();
-        expect(XRegExp('\x0B').test('B')).toBe(true);
+        expect(function() {XRegExp.addToken(XRegExp('(?<n>\\u2003)'), function() {return '2003';});}).not.toThrow();
+        expect(XRegExp('^\u2003$').test('2003')).toBe(true);
     });
 });
 
