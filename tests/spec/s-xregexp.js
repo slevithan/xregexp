@@ -151,7 +151,6 @@ describe('XRegExp()', function() {
     it('should store extended data on regex instances', function() {
         expect(XRegExp('')[REGEX_DATA]).toEqual(jasmine.any(Object));
         expect(XRegExp('')[REGEX_DATA].captureNames).toBe(null);
-        expect(XRegExp('')[REGEX_DATA].isNative).toBe(false);
     });
 
     it('should copy provided RegExp objects', function() {
@@ -172,12 +171,6 @@ describe('XRegExp()', function() {
 
         expect(regex.lastIndex).toBe(2);
         expect(XRegExp(regex).lastIndex).toBe(0);
-    });
-
-    it('should track whether a copied regex was originally built by RegExp', function() {
-        expect(XRegExp(/x/)[REGEX_DATA].isNative).toBe(true);
-        expect(XRegExp(new RegExp(''))[REGEX_DATA].isNative).toBe(true);
-        expect(XRegExp(XRegExp(''))[REGEX_DATA].isNative).toBe(false);
     });
 
     it('should not use XRegExp syntax when copying a regex originally built by RegExp', function() {

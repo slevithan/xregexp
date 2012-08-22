@@ -126,11 +126,11 @@ var XRegExp = (function(undefined) {
  * @private
  * @param {RegExp} regex Regex to augment.
  * @param {Array} captureNames Array with capture names, or `null`.
- * @param {Boolean} [addProto=false] Whether to attach `XRegExp.prototype` properties.
- * @param {Boolean} [isNative=false] Whether the regex was created by `RegExp`; not `XRegExp`.
+ * @param {Boolean} [addProto=false] Whether to attach `XRegExp.prototype` properties. Not
+ *   attaching properties avoids a minor performance penalty.
  * @returns {RegExp} Augmented regex.
  */
-    function augment(regex, captureNames, addProto, isNative) {
+    function augment(regex, captureNames, addProto) {
         var p;
         if (addProto) {
             // Can't auto-inherit these since the XRegExp constructor returns a nonprimitive value
@@ -145,11 +145,7 @@ var XRegExp = (function(undefined) {
                 }
             }
         }
-        regex[REGEX_DATA] = {
-            captureNames: captureNames,
-            // Ensure that `undefined` is type-converted to `false`
-            isNative: !!isNative
-        };
+        regex[REGEX_DATA] = {captureNames: captureNames};
         return regex;
     }
 
@@ -166,20 +162,22 @@ var XRegExp = (function(undefined) {
 /**
  * Copies a regex object while preserving special properties for named capture and augmenting with
  * `XRegExp.prototype` methods. The copy has a fresh `lastIndex` property (set to zero). Allows
- * adding and removing flags while copying the regex.
+ * adding and removing native flags while copying the regex.
  * @private
  * @param {RegExp} regex Regex to copy.
- * @param {Object} [options] Allows specifying flags to add or remove while copying the regex, and
- *   whether to attach `XRegExp.prototype` properties.
+ * @param {Object} [options] Allows specifying native flags to add or remove while copying the
+ *   regex, and whether to attach `XRegExp.prototype` properties.
  * @returns {RegExp} Copy of the provided regex, possibly with modified flags.
  */
     function copy(regex, options) {
         if (!self.isRegExp(regex)) {
             throw new TypeError('Type RegExp expected');
         }
-        // Get native flags
+
+        // Get native flags in use
         var flags = nativ.exec.call(/\/([a-z]*)$/i, String(regex))[1];
         options = options || {};
+
         if (options.add) {
             flags = clipDuplicates(flags + options.add);
         }
@@ -187,25 +185,17 @@ var XRegExp = (function(undefined) {
             // Would need to escape `options.remove` if this was public
             flags = nativ.replace.call(flags, new RegExp('[' + options.remove + ']+', 'g'), '');
         }
-        if (regex[REGEX_DATA] && !regex[REGEX_DATA].isNative) {
-            // Compiling the current (rather than precompilation) source preserves the effects of
-            // nonnative source flags
-            regex = augment(
-                self(regex.source, flags),
-                // Create a new copy of the array
-                regex[REGEX_DATA].captureNames ? regex[REGEX_DATA].captureNames.slice(0) : null,
-                options.addProto
-            );
-        } else {
-            // Augment with `XRegExp.prototype` methods, but use native `RegExp` (avoid searching
-            // for special tokens)
-            regex = augment(
-                new RegExp(regex.source, flags),
-                null, // captureNames
-                options.addProto,
-                true // isNative
-            );
-        }
+
+        // Augment with `XRegExp.prototype` methods, but use the native `RegExp` constructor and
+        // avoid searching for special tokens. That would be wrong for regexes constructed by
+        // `RegExp`, and unnecessary for regexes constructed by `XRegExp` because the regex has
+        // already undergone the translation to native regex syntax
+        regex = augment(
+            new RegExp(regex.source, flags),
+            hasNamedCapture(regex) ? regex[REGEX_DATA].captureNames.slice(0) : null,
+            options.addProto
+        );
+
         return regex;
     }
 
@@ -213,10 +203,20 @@ var XRegExp = (function(undefined) {
  * Returns a new copy of the object used to hold extended regex instance data, tailored for a
  * native nonaugmented regex.
  * @private
- * @returns {Object} Object with `captureNames` and `isNative` properties.
+ * @returns {Object} Object with base regex instance data.
  */
     function getBaseProps() {
-        return {captureNames: null, isNative: true};
+        return {captureNames: null};
+    }
+
+/**
+ * Determines whether a regex has extended instance data used to track capture names.
+ * @private
+ * @param {RegExp} regex Regex to check.
+ * @returns {Boolean} Whether the regex uses named capture.
+ */
+    function hasNamedCapture(regex) {
+        return !!(regex[REGEX_DATA] && regex[REGEX_DATA].captureNames);
     }
 
 /**
@@ -510,7 +510,7 @@ var XRegExp = (function(undefined) {
         }
 
         key = patternCache[key];
-        return augment(new RegExp(key.pattern, key.flags), key.captures, true);
+        return augment(new RegExp(key.pattern, key.flags), key.captures, /*addProto*/ true);
     };
 
 // Add `RegExp.prototype` to the prototype chain for XRegExp instances that have their prototype
@@ -576,13 +576,6 @@ var XRegExp = (function(undefined) {
     self.addToken = function(regex, handler, options) {
         options = options || {};
         var optionalFlags = options.optionalFlags, i;
-
-        // Cannot use XRegExp regexes because the XRegExp construction process (in `runTokens`)
-        // uses `XRegExp.exec`, which copies regexes the first time they're used. The copying thus
-        // triggers an infinite loop, since it is building a new XRegExp
-        if (regex[REGEX_DATA] && !regex[REGEX_DATA].isNative) {
-            throw new Error('Cannot use XRegExp regexes with addToken');
-        }
 
         if (options.flag) {
             registerFlag(options.flag);
@@ -1704,11 +1697,14 @@ var XRegExp = (function(undefined) {
  */
     function asXRegExp(value) {
         return XRegExp.isRegExp(value) ?
-            (value[REGEX_DATA] && !value[REGEX_DATA].isNative ?
-                value : // No need to recompile
-                XRegExp(value.source) // Recompile native RegExp as XRegExp
+            (value[REGEX_DATA] && value[REGEX_DATA].captureNames ?
+                // Don't recompile, to preserve capture names
+                value :
+                // Recompile as XRegExp
+                XRegExp(value.source)
             ) :
-            XRegExp(value); // Compile string as XRegExp
+            // Compile string as XRegExp
+            XRegExp(value);
     }
 
 /**

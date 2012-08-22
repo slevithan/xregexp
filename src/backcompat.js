@@ -96,9 +96,7 @@
             captureNames = this[REGEX_DATA] ? this[REGEX_DATA].captureNames : null;
 
         regex[REGEX_DATA] = {
-            captureNames: captureNames ? captureNames.slice(0) : null,
-            // Always passed through `XRegExp`
-            isNative: false
+            captureNames: captureNames ? captureNames.slice(0) : null
         };
 
         return regex;

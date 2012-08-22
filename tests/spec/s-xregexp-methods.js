@@ -179,10 +179,9 @@ describe('XRegExp.addToken()', function() {
         expect(XRegExp('\x0A').test('1x2')).toBe(true);
     });
 
-    // This test is merely tracking current behavior. The current behavior is not ideal, though.
-    // Change this if the error is no longer necessary in future versions
-    it('should throw an exception when given an XRegExp as the search pattern', function() {
-        expect(function() {XRegExp.addToken(XRegExp('\\x0B'), function() {return 'B';});}).toThrow();
+    it('should allow XRegExp regexes to be used as the token search pattern', function() {
+        expect(function() {XRegExp.addToken(XRegExp('(?<n>\\x0B)'), function() {return 'B';});}).not.toThrow();
+        expect(XRegExp('\x0B').test('B')).toBe(true);
     });
 });
 
@@ -641,12 +640,6 @@ describe('XRegExp.globalize()', function() {
         regex.lastIndex = 2;
 
         expect(XRegExp.globalize(regex).lastIndex).toBe(0);
-    });
-
-    it('should track whether a copied regex was originally built by RegExp', function() {
-        expect(XRegExp.globalize(/x/)[REGEX_DATA].isNative).toBe(true);
-        expect(XRegExp.globalize(new RegExp(''))[REGEX_DATA].isNative).toBe(true);
-        expect(XRegExp.globalize(XRegExp(''))[REGEX_DATA].isNative).toBe(false);
     });
 
     it('should not use XRegExp syntax when copying a regex originally built by RegExp', function() {

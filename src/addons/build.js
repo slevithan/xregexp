@@ -36,11 +36,14 @@
  */
     function asXRegExp(value) {
         return XRegExp.isRegExp(value) ?
-            (value[REGEX_DATA] && !value[REGEX_DATA].isNative ?
-                value : // No need to recompile
-                XRegExp(value.source) // Recompile native RegExp as XRegExp
+            (value[REGEX_DATA] && value[REGEX_DATA].captureNames ?
+                // Don't recompile, to preserve capture names
+                value :
+                // Recompile as XRegExp
+                XRegExp(value.source)
             ) :
-            XRegExp(value); // Compile string as XRegExp
+            // Compile string as XRegExp
+            XRegExp(value);
     }
 
 /**
