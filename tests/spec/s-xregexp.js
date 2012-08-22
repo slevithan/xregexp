@@ -277,6 +277,7 @@ describe('XRegExp()', function() {
 
             it('should apply a following quantifier to the preceding atom', function() {
                 expect(XRegExp('^a(?#)+$').test('aaa')).toBe(true);
+                expect(XRegExp('^a(?#)(?#)+$').test('aaa')).toBe(true);
             });
 
             it('should separate atoms', function() {
@@ -631,6 +632,7 @@ describe('XRegExp()', function() {
                 expect(XRegExp('^a +$', 'x').test('aaa')).toBe(true);
                 expect(XRegExp('^a#comment\n+$', 'x').test('aaa')).toBe(true);
                 expect(XRegExp('^a  #comment\n +$', 'x').test('aaa')).toBe(true);
+                expect(XRegExp('^a  (?#comment) #comment\n +$', 'x').test('aaa')).toBe(true);
             });
 
             it('should separate atoms', function() {

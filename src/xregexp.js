@@ -67,9 +67,6 @@ var XRegExp = (function(undefined) {
 // Any backreference or dollar-prefixed character in replacement strings
     replacementToken = /\$(?:{([\w$]+)}|(\d\d?|[\s\S]))/g,
 
-// Any greedy or lazy quantifier
-    quantifier = /^(?:[?*+]|{\d+(?:,\d*)?})\??/,
-
 // Check for correct `exec` handling of nonparticipating capturing groups
     correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined,
 
@@ -223,6 +220,25 @@ var XRegExp = (function(undefined) {
  */
     function isType(value, type) {
         return Object.prototype.toString.call(value) === '[object ' + type + ']';
+    }
+
+/**
+ * Checks whether the next nonignorable token after the specified position is a quantifier.
+ * @private
+ * @param {String} pattern Pattern to search within.
+ * @param {Number} pos Index in `pattern` to search at.
+ * @param {String} flags Flags used by the pattern.
+ * @returns {Boolean} Whether the next token is a quantifier.
+ */
+    function isQuantifierNext(pattern, pos, flags) {
+        return nativ.test.call(
+            flags.indexOf('x') > -1 ?
+                // Ignore any leading whitespace, line-comments, and inline-comments
+                /^(?:\s+|#.*|\(\?#[^)]*\))*(?:[?*+]|{\d+(?:,\d*)?})/ :
+                // Ignore any leading inline-comments
+                /^(?:\(\?#[^)]*\))*(?:[?*+]|{\d+(?:,\d*)?})/,
+            pattern.slice(pos)
+        );
     }
 
 /**
@@ -1512,9 +1528,9 @@ var XRegExp = (function(undefined) {
  */
     add(
         /\(\?#[^)]*\)/,
-        function(match) {
+        function(match, scope, flags) {
             // Keep tokens separated unless the following token is a quantifier
-            return nativ.test.call(quantifier, match.input.slice(match.index + match[0].length)) ?
+            return isQuantifierNext(match.input, match.index + match[0].length, flags) ?
                 '' : '(?:)';
         }
     );
@@ -1523,9 +1539,9 @@ var XRegExp = (function(undefined) {
  */
     add(
         /\s+|#.*/,
-        function(match) {
+        function(match, scope, flags) {
             // Keep tokens separated unless the following token is a quantifier
-            return nativ.test.call(quantifier, match.input.slice(match.index + match[0].length)) ?
+            return isQuantifierNext(match.input, match.index + match[0].length, flags) ?
                 '' : '(?:)';
         },
         {flag: 'x'}
