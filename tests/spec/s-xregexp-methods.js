@@ -179,6 +179,11 @@ describe('XRegExp.addToken()', function() {
         expect(XRegExp('\x0A').test('1x2')).toBe(true);
     });
 
+    // This test is merely tracking current behavior. The current behavior is not ideal, though.
+    // Change this if the error is no longer necessary in future versions
+    it('should throw an exception when given an XRegExp as the search pattern', function() {
+        expect(function() {XRegExp.addToken(XRegExp('\\x0B'), function() {return 'B';});}).toThrow();
+    });
 });
 
 describe('XRegExp.cache()', function() {

@@ -446,7 +446,7 @@ var XRegExp = (function(undefined) {
                 do {
                     // Check for custom tokens at the current position
                     tokenResult = runTokens(pattern, flags, pos, scope, context);
-                    // If the matched token used the `reparse` option, splice its result into the
+                    // If the matched token used the `reparse` option, splice its output into the
                     // pattern before running tokens again at the same position
                     if (tokenResult && tokenResult.reparse) {
                         pattern = pattern.slice(0, pos) +
@@ -459,7 +459,7 @@ var XRegExp = (function(undefined) {
                     output += tokenResult.output;
                     pos += (tokenResult.matchLength || 1);
                 } else {
-                    // Check for native tokens at the current position. This could use the native
+                    // Get the native token at the current position. This could use the native
                     // `exec`, except that sticky processing avoids string slicing in browsers that
                     // support flag y
                     match = self.exec(pattern, nativeTokens[scope], pos, 'sticky')[0];
@@ -536,12 +536,26 @@ var XRegExp = (function(undefined) {
  *   {scope: 'all'}
  * );
  * XRegExp('\\a[\\a-\\n]+').test('\x07\n\x07'); // -> true
+ *
+ * // Add the U (ungreedy) flag from PCRE and RE2, which reverses greedy and lazy quantifiers
+ * XRegExp.addToken(
+ *   /([?*+]|{\d+(?:,\d*)?})(\??)/,
+ *   function(match) {return match[1] + (match[2] ? '' : '?');},
+ *   {flag: 'U'}
+ * );
+ * XRegExp('a+', 'U').exec('aaa')[0]; // -> 'a'
+ * XRegExp('a+?', 'U').exec('aaa')[0]; // -> 'aaa'
  */
     self.addToken = function(regex, handler, options) {
         options = options || {};
+        var optionalFlags = options.optionalFlags, i;
 
-        var optionalFlags = options.optionalFlags,
-            i;
+        // Cannot use XRegExp regexes because the XRegExp construction process (in `runTokens`)
+        // uses `XRegExp.exec`, which copies regexes the first time they're used. The copying thus
+        // triggers an infinite loop, since it is building a new XRegExp
+        if (regex[REGEX_DATA] && !regex[REGEX_DATA].isNative) {
+            throw new Error('Cannot use XRegExp regexes with addToken');
+        }
 
         if (options.flag) {
             registerFlag(options.flag);
