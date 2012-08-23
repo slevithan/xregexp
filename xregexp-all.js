@@ -100,9 +100,6 @@ var XRegExp = (function(undefined) {
 // Check for flag y support
     hasNativeY = RegExp.prototype.sticky !== undefined,
 
-// Used to kill infinite recursion during XRegExp construction
-    isInsideConstructor = false,
-
 // Tracker for known flags, including addon flags
     registeredFlags = {
         g: true,
@@ -129,6 +126,7 @@ var XRegExp = (function(undefined) {
  */
     function augment(regex, captureNames, addProto) {
         var p;
+
         if (addProto) {
             // Can't auto-inherit these since the XRegExp constructor returns a nonprimitive value
             if (regex.__proto__) {
@@ -142,7 +140,9 @@ var XRegExp = (function(undefined) {
                 }
             }
         }
+
         regex[REGEX_DATA] = {captureNames: captureNames};
+
         return regex;
     }
 
@@ -178,6 +178,7 @@ var XRegExp = (function(undefined) {
         if (options.add) {
             flags = clipDuplicates(flags + options.add);
         }
+
         if (options.remove) {
             // Would need to escape `options.remove` if this was public
             flags = nativ.replace.call(flags, new RegExp('[' + options.remove + ']+', 'g'), '');
@@ -228,13 +229,16 @@ var XRegExp = (function(undefined) {
         if (Array.prototype.indexOf) {
             return array.indexOf(value);
         }
+
         var len = array.length, i;
+
         // Not a very good shim, but good enough for XRegExp's use of it
         for (i = 0; i < len; ++i) {
             if (array[i] === value) {
                 return i;
             }
         }
+
         return -1;
     }
 
@@ -260,9 +264,9 @@ var XRegExp = (function(undefined) {
     function isQuantifierNext(pattern, pos, flags) {
         return nativ.test.call(
             flags.indexOf('x') > -1 ?
-                // Ignore any leading whitespace, line-comments, and inline-comments
+                // Ignore any leading whitespace, line comments, and inline comments
                 /^(?:\s+|#.*|\(\?#[^)]*\))*(?:[?*+]|{\d+(?:,\d*)?})/ :
-                // Ignore any leading inline-comments
+                // Ignore any leading inline comments
                 /^(?:\(\?#[^)]*\))*(?:[?*+]|{\d+(?:,\d*)?})/,
             pattern.slice(pos)
         );
@@ -276,11 +280,13 @@ var XRegExp = (function(undefined) {
  */
     function prepareOptions(value) {
         value = value || {};
+
         if (isType(value, 'String')) {
             value = self.forEach(value, /[^\s,]+/, function(match) {
                 this[match] = true;
             }, {});
         }
+
         return value;
     }
 
@@ -293,6 +299,7 @@ var XRegExp = (function(undefined) {
         if (!/^[\w$]$/.test(flag)) {
             throw new Error('Flag must be a single character A-Za-z0-9_$');
         }
+
         registeredFlags[flag] = true;
     }
 
@@ -312,33 +319,27 @@ var XRegExp = (function(undefined) {
             result = null,
             match,
             t;
-        // Protect against constructing XRegExp objects within token handler functions
-        isInsideConstructor = true;
-        try {
-            // Run in reverse insertion order
-            while (i--) {
-                t = tokens[i];
-                if (
-                    (t.scope === scope || t.scope === 'all') &&
-                    (!t.flag || flags.indexOf(t.flag) > -1)
-                ) {
-                    match = self.exec(pattern, t.regex, pos, 'sticky');
-                    if (match) {
-                        result = {
-                            matchLength: match[0].length,
-                            output: t.handler.call(context, match, scope, flags),
-                            reparse: t.reparse
-                        };
-                        // Finished with token tests
-                        break;
-                    }
+
+        // Run in reverse insertion order
+        while (i--) {
+            t = tokens[i];
+            if (
+                (t.scope === scope || t.scope === 'all') &&
+                (!t.flag || flags.indexOf(t.flag) > -1)
+            ) {
+                match = self.exec(pattern, t.regex, pos, 'sticky');
+                if (match) {
+                    result = {
+                        matchLength: match[0].length,
+                        output: t.handler.call(context, match, scope, flags),
+                        reparse: t.reparse
+                    };
+                    // Finished with token tests
+                    break;
                 }
             }
-        } catch (err) {
-            throw err;
-        } finally {
-            isInsideConstructor = false;
         }
+
         return result;
     }
 
@@ -348,12 +349,13 @@ var XRegExp = (function(undefined) {
  * @param {Boolean} on `true` to enable; `false` to disable.
  */
     function setAstral(on) {
-        features.astral = on;
         if (on) {
             // Reset the pattern cache used by the `XRegExp` constructor, since the same pattern
             // and flags might now produce different results
             self.cache.flush('patterns');
         }
+
+        features.astral = on;
     }
 
 /**
@@ -367,6 +369,7 @@ var XRegExp = (function(undefined) {
         String.prototype.match = (on ? fixed : nativ).match;
         String.prototype.replace = (on ? fixed : nativ).replace;
         String.prototype.split = (on ? fixed : nativ).split;
+
         features.natives = on;
     }
 
@@ -382,6 +385,7 @@ var XRegExp = (function(undefined) {
         if (value == null) {
             throw new TypeError('Cannot convert null or undefined to object');
         }
+
         return value;
     }
 
@@ -423,7 +427,6 @@ var XRegExp = (function(undefined) {
  */
     self = function(pattern, flags) {
         var ERR_COPY_WITH_FLAGS = 'Cannot supply flags when copying a RegExp',
-            ERR_CONSTRUTOR_RECURSION = 'Cannot create XRegExp objects within token handler functions',
             ERR_DUPLICATE_FLAG = 'Invalid duplicate regex flag ',
             ERR_BAD_INLINE_FLAG = 'Cannot use flag g or y in mode modifier ',
             ERR_UNKNOWN_FLAG = 'Unknown regex flag ',
@@ -444,12 +447,6 @@ var XRegExp = (function(undefined) {
                 throw new TypeError(ERR_COPY_WITH_FLAGS);
             }
             return copy(pattern, {addProto: true});
-        }
-
-        // Tokens become part of the regex construction process, so protect against infinite
-        // recursion when an XRegExp is constructed within a token handler function
-        if (isInsideConstructor) {
-            throw new Error(ERR_CONSTRUTOR_RECURSION);
         }
 
         // Copy the argument behavior of `RegExp`
@@ -560,6 +557,8 @@ var XRegExp = (function(undefined) {
  *   <li>The match array, with named backreference properties.
  *   <li>The regex scope where the match was found: 'default' or 'class'.
  *   <li>The flags used by the regex, including any flags in a leading mode modifier.
+ *   The handler function becomes part of the XRegExp construction process, so be careful not to
+ *   construct XRegExps within the function or you will trigger infinite recursion.
  * @param {Object} [options] Options object with optional properties:
  *   <li>`scope` {String} Scope where the token applies: 'default', 'class', or 'all'.
  *   <li>`flag` {String} Single-character flag that triggers the token. This also registers the
