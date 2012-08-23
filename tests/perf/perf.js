@@ -1,11 +1,11 @@
 (function() {
-    var outputEl = document.getElementById('log');
+    var outputBox = document.getElementById('log');
     var suites = [];
     var bo = Benchmark.options;
     var bso = Benchmark.Suite.options;
 
     function log(msg) {
-        outputEl.innerHTML += msg.replace(/\n/g, '<br>');
+        outputBox.insertAdjacentHTML('beforeend', msg.replace(/\n/g, '<br>'));
     }
 
     window.run = function() {
