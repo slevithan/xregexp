@@ -108,6 +108,9 @@ var XRegExp = (function(undefined) {
         y: hasNativeY
     },
 
+// Shortcut to `Object.prototype.toString`
+    toString = {}.toString,
+
 // Shortcut to `XRegExp.addToken`
     add;
 
@@ -250,7 +253,7 @@ var XRegExp = (function(undefined) {
  * @returns {Boolean} Whether the object matches the type.
  */
     function isType(value, type) {
-        return Object.prototype.toString.call(value) === '[object ' + type + ']';
+        return toString.call(value) === '[object ' + type + ']';
     }
 
 /**
@@ -839,7 +842,8 @@ var XRegExp = (function(undefined) {
  * XRegExp.isRegExp(XRegExp('(?s).')); // -> true
  */
     self.isRegExp = function(value) {
-        return isType(value, 'RegExp');
+        return toString.call(value) === '[object RegExp]';
+        //return isType(value, 'RegExp');
     };
 
 /**
