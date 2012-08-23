@@ -8,9 +8,9 @@
 
 /**
  * Adds support for the `\p{L}` or `\p{Letter}` Unicode category. Addon packages for other Unicode
- * categories, scripts, blocks, and properties are available separately. All Unicode tokens can be
- * inverted using `\P{..}` or `\p{^..}`. Token names are case insensitive, and any spaces, hyphens,
- * and underscores are ignored.
+ * categories, scripts, blocks, and properties are available separately. Also adds flag A (astral),
+ * which enables 21-bit Unicode support. All Unicode tokens can be inverted using `\P{..}` or
+ * `\p{^..}`. Token names ignore case, spaces, hyphens, and underscores.
  * @requires XRegExp
  */
 (function(XRegExp) {
@@ -19,9 +19,9 @@
 // Storage for Unicode data
     var unicode = {};
 
-/*--------------------------------------
+/* ==============================
  * Private functions
- *------------------------------------*/
+ * ============================== */
 
 // Generates a token lookup name: lowercase, with hyphens, spaces, and underscores removed
     function normalize(name) {
@@ -113,9 +113,9 @@
         );
     }
 
-/*--------------------------------------
+/* ==============================
  * Core functionality
- *------------------------------------*/
+ * ============================== */
 
 /* Add Unicode token syntax: \p{..}, \P{..}, \p{^..}. Also add astral mode (flag A).
  */

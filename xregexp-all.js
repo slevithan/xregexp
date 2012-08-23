@@ -40,9 +40,9 @@
 var XRegExp = (function(undefined) {
     'use strict';
 
-/*--------------------------------------
+/* ==============================
  * Private variables
- *------------------------------------*/
+ * ============================== */
 
     var // ...
 
@@ -114,9 +114,9 @@ var XRegExp = (function(undefined) {
 // Shortcut to `XRegExp.addToken`
     add;
 
-/*--------------------------------------
+/* ==============================
  * Private functions
- *------------------------------------*/
+ * ============================== */
 
 /**
  * Attaches named capture data and `XRegExp.prototype` properties to a regex object.
@@ -385,9 +385,9 @@ var XRegExp = (function(undefined) {
         return value;
     }
 
-/*--------------------------------------
+/* ==============================
  * Constructor
- *------------------------------------*/
+ * ============================== */
 
 /**
  * Creates an extended regular expression object for matching text with a pattern. Differs from a
@@ -534,9 +534,9 @@ var XRegExp = (function(undefined) {
 // changed to `XRegExp.prototype` via `__proto__`
     self.prototype = new RegExp;
 
-/*--------------------------------------
+/* ==============================
  * Public properties
- *------------------------------------*/
+ * ============================== */
 
 /**
  * The XRegExp version number.
@@ -546,9 +546,9 @@ var XRegExp = (function(undefined) {
  */
     self.version = '3.0.0-pre';
 
-/*--------------------------------------
+/* ==============================
  * Public methods
- *------------------------------------*/
+ * ============================== */
 
 /**
  * Extends XRegExp syntax and allows custom flags. This is used internally and can be used to
@@ -1221,9 +1221,9 @@ var XRegExp = (function(undefined) {
         return self(output.join('|'), flags);
     };
 
-/*--------------------------------------
- * Fixed and extended native methods
- *------------------------------------*/
+/* ==============================
+ * Fixed/extended native methods
+ * ============================== */
 
 /**
  * Adds named capture support (with backreferences returned as `result.name`), and fixes browser
@@ -1515,9 +1515,9 @@ var XRegExp = (function(undefined) {
         return output.length > limit ? output.slice(0, limit) : output;
     };
 
-/*--------------------------------------
- * Built-in syntax and flag tokens
- *------------------------------------*/
+/* ==============================
+ * Built-in syntax/flag tokens
+ * ============================== */
 
     add = self.addToken;
 
@@ -1668,9 +1668,9 @@ var XRegExp = (function(undefined) {
         {optionalFlags: 'n'}
     );
 
-/*--------------------------------------
+/* ==============================
  * Expose XRegExp
- *------------------------------------*/
+ * ============================== */
 
     return self;
 
@@ -2158,9 +2158,9 @@ var XRegExp = (function(undefined) {
 
 /**
  * Adds support for the `\p{L}` or `\p{Letter}` Unicode category. Addon packages for other Unicode
- * categories, scripts, blocks, and properties are available separately. All Unicode tokens can be
- * inverted using `\P{..}` or `\p{^..}`. Token names are case insensitive, and any spaces, hyphens,
- * and underscores are ignored.
+ * categories, scripts, blocks, and properties are available separately. Also adds flag A (astral),
+ * which enables 21-bit Unicode support. All Unicode tokens can be inverted using `\P{..}` or
+ * `\p{^..}`. Token names ignore case, spaces, hyphens, and underscores.
  * @requires XRegExp
  */
 (function(XRegExp) {
@@ -2169,9 +2169,9 @@ var XRegExp = (function(undefined) {
 // Storage for Unicode data
     var unicode = {};
 
-/*--------------------------------------
+/* ==============================
  * Private functions
- *------------------------------------*/
+ * ============================== */
 
 // Generates a token lookup name: lowercase, with hyphens, spaces, and underscores removed
     function normalize(name) {
@@ -2263,9 +2263,9 @@ var XRegExp = (function(undefined) {
         );
     }
 
-/*--------------------------------------
+/* ==============================
  * Core functionality
- *------------------------------------*/
+ * ============================== */
 
 /* Add Unicode token syntax: \p{..}, \P{..}, \p{^..}. Also add astral mode (flag A).
  */
