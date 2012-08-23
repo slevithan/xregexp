@@ -276,6 +276,45 @@ var XRegExp = (function(undefined) {
     }
 
 /**
+ * Checks for flag-related errors, and strips/applies flags in a leading mode modifier. Offloads
+ * the flag preparation logic from the `XRegExp` constructor.
+ * @private
+ * @param {String} pattern Regex pattern, possibly with a leading mode modifier.
+ * @param {String} flags Any combination of flags.
+ * @returns {Object} Object with properties `pattern` and `flags`.
+ */
+    function prepareFlags(pattern, flags) {
+        var i;
+
+        // Recent browsers throw on duplicate flags, so copy this behavior for nonnative flags
+        if (clipDuplicates(flags) !== flags) {
+            throw new SyntaxError('Invalid duplicate regex flag ' + flags);
+        }
+
+        // Strip and apply a leading mode modifier with any combination of flags except g or y
+        pattern = nativ.replace.call(pattern, /^\(\?([\w$]+)\)/, function($0, $1) {
+            if (nativ.test.call(/[gy]/, $1)) {
+                throw new SyntaxError('Cannot use flag g or y in mode modifier ' + $0);
+            }
+            // Allow duplicate flags within the mode modifier
+            flags = clipDuplicates(flags + $1);
+            return '';
+        });
+
+        // Throw on unknown native or nonnative flags
+        for (i = 0; i < flags.length; ++i) {
+            if (!registeredFlags[flags.charAt(i)]) {
+                throw new SyntaxError('Unknown regex flag ' + flags.charAt(i));
+            }
+        }
+
+        return {
+            pattern: pattern,
+            flags: flags
+        };
+    }
+
+/**
  * Prepares an options object from the given value.
  * @private
  * @param {String|Object} value Value to convert to an options object.
@@ -429,17 +468,16 @@ var XRegExp = (function(undefined) {
  * XRegExp(/regex/);
  */
     self = function(pattern, flags) {
-        var output = '',
-            scope = defaultScope,
-            context = {
+        var context = {
                 hasNamedCapture: false,
                 captureNames: []
             },
+            scope = defaultScope,
+            output = '',
             pos = 0,
-            tokenResult,
-            match,
-            key,
-            i;
+            result,
+            token,
+            key;
 
         if (self.isRegExp(pattern)) {
             if (flags !== undefined) {
@@ -455,58 +493,38 @@ var XRegExp = (function(undefined) {
         // Cache-lookup key
         key = pattern + '/' + flags;
 
-        // If this pattern and flag combination hasn't been used since the last pattern cache reset
         if (!patternCache[key]) {
-            // Recent browsers throw on duplicate flags, so copy this behavior for nonnative flags
-            if (clipDuplicates(flags) !== flags) {
-                throw new SyntaxError('Invalid duplicate regex flag ' + flags);
-            }
-
-            // Strip and apply a leading mode modifier with any combination of flags except g or y
-            pattern = nativ.replace.call(pattern, /^\(\?([\w$]+)\)/, function($0, $1) {
-                if (nativ.test.call(/[gy]/, $1)) {
-                    throw new SyntaxError('Cannot use flag g or y in mode modifier ' + $0);
-                }
-                // Allow duplicate flags within the mode modifier
-                flags = clipDuplicates(flags + $1);
-                return '';
-            });
-
-            // Throw on unknown native or nonnative flags
-            for (i = 0; i < flags.length; ++i) {
-                if (!registeredFlags[flags.charAt(i)]) {
-                    throw new SyntaxError('Unknown regex flag ' + flags.charAt(i));
-                }
-            }
+            // Check for flag-related errors, and strip/apply flags in a leading mode modifier
+            result = prepareFlags(pattern, flags);
+            pattern = result.pattern;
+            flags = result.flags;
 
             // Use XRegExp's syntax tokens to translate the pattern to a native regex pattern...
             // `pattern.length` may change on each iteration, if tokens use the `reparse` option
             while (pos < pattern.length) {
                 do {
                     // Check for custom tokens at the current position
-                    tokenResult = runTokens(pattern, flags, pos, scope, context);
+                    result = runTokens(pattern, flags, pos, scope, context);
                     // If the matched token used the `reparse` option, splice its output into the
                     // pattern before running tokens again at the same position
-                    if (tokenResult && tokenResult.reparse) {
+                    if (result && result.reparse) {
                         pattern = pattern.slice(0, pos) +
-                            tokenResult.output +
-                            pattern.slice(pos + tokenResult.matchLength);
+                            result.output +
+                            pattern.slice(pos + result.matchLength);
                     }
-                } while (tokenResult && tokenResult.reparse);
+                } while (result && result.reparse);
 
-                if (tokenResult) {
-                    output += tokenResult.output;
-                    pos += (tokenResult.matchLength || 1);
+                if (result) {
+                    output += result.output;
+                    pos += (result.matchLength || 1);
                 } else {
-                    // Get the native token at the current position. This could use the native
-                    // `exec`, except that sticky processing avoids string slicing in browsers that
-                    // support flag y
-                    match = self.exec(pattern, nativeTokens[scope], pos, 'sticky')[0];
-                    output += match;
-                    pos += match.length;
-                    if (match === '[' && scope === defaultScope) {
+                    // Get the native token at the current position
+                    token = self.exec(pattern, nativeTokens[scope], pos, 'sticky')[0];
+                    output += token;
+                    pos += token.length;
+                    if (token === '[' && scope === defaultScope) {
                         scope = classScope;
-                    } else if (match === ']' && scope === classScope) {
+                    } else if (token === ']' && scope === classScope) {
                         scope = defaultScope;
                     }
                 }
