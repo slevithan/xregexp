@@ -429,11 +429,7 @@ var XRegExp = (function(undefined) {
  * XRegExp(/regex/);
  */
     self = function(pattern, flags) {
-        var ERR_COPY_WITH_FLAGS = 'Cannot supply flags when copying a RegExp',
-            ERR_DUPLICATE_FLAG = 'Invalid duplicate regex flag ',
-            ERR_BAD_INLINE_FLAG = 'Cannot use flag g or y in mode modifier ',
-            ERR_UNKNOWN_FLAG = 'Unknown regex flag ',
-            output = '',
+        var output = '',
             scope = defaultScope,
             context = {
                 hasNamedCapture: false,
@@ -447,7 +443,7 @@ var XRegExp = (function(undefined) {
 
         if (self.isRegExp(pattern)) {
             if (flags !== undefined) {
-                throw new TypeError(ERR_COPY_WITH_FLAGS);
+                throw new TypeError('Cannot supply flags when copying a RegExp');
             }
             return copy(pattern, {addProto: true});
         }
@@ -463,13 +459,13 @@ var XRegExp = (function(undefined) {
         if (!patternCache[key]) {
             // Recent browsers throw on duplicate flags, so copy this behavior for nonnative flags
             if (clipDuplicates(flags) !== flags) {
-                throw new SyntaxError(ERR_DUPLICATE_FLAG + flags);
+                throw new SyntaxError('Invalid duplicate regex flag ' + flags);
             }
 
             // Strip and apply a leading mode modifier with any combination of flags except g or y
             pattern = nativ.replace.call(pattern, /^\(\?([\w$]+)\)/, function($0, $1) {
                 if (nativ.test.call(/[gy]/, $1)) {
-                    throw new SyntaxError(ERR_BAD_INLINE_FLAG + $0);
+                    throw new SyntaxError('Cannot use flag g or y in mode modifier ' + $0);
                 }
                 // Allow duplicate flags within the mode modifier
                 flags = clipDuplicates(flags + $1);
@@ -479,7 +475,7 @@ var XRegExp = (function(undefined) {
             // Throw on unknown native or nonnative flags
             for (i = 0; i < flags.length; ++i) {
                 if (!registeredFlags[flags.charAt(i)]) {
-                    throw new SyntaxError(ERR_UNKNOWN_FLAG + flags.charAt(i));
+                    throw new SyntaxError('Unknown regex flag ' + flags.charAt(i));
                 }
             }
 
