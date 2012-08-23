@@ -438,12 +438,12 @@ describe('Unicode Categories addon:', function() {
          * doesn't let ᾀ match ᾈ, and Firefox 14 doesn't let ǉ match the titlecase ǈ), so just test
          * common code points.
          */
-        expect(XRegExp('\\p{Ll}',    'gi').match('AaИи!')).toBeEquiv(['A', 'a', 'И', 'и']);
-        expect(XRegExp('[\\p{Ll}]',  'gi').match('AaИи!')).toBeEquiv(['A', 'a', 'И', 'и']);
-        expect(XRegExp('[^\\P{Ll}]', 'gi').match('AaИи!')).toBeEquiv([]);
-        expect(XRegExp('\\P{Ll}',    'gi').match('AaИи!')).toBeEquiv(['!']);
-        expect(XRegExp('[^\\p{Ll}]', 'gi').match('AaИи!')).toBeEquiv(['!']);
-        expect(XRegExp('[\\P{Ll}]',  'gi').match('AaИи!')).toBeEquiv(['A', 'a', 'И', 'и', '!']);
+        expect(XRegExp.match('AaИи!', XRegExp('\\p{Ll}',    'gi'))).toBeEquiv(['A', 'a', 'И', 'и']);
+        expect(XRegExp.match('AaИи!', XRegExp('[\\p{Ll}]',  'gi'))).toBeEquiv(['A', 'a', 'И', 'и']);
+        expect(XRegExp.match('AaИи!', XRegExp('[^\\P{Ll}]', 'gi'))).toBeEquiv([]);
+        expect(XRegExp.match('AaИи!', XRegExp('\\P{Ll}',    'gi'))).toBeEquiv(['!']);
+        expect(XRegExp.match('AaИи!', XRegExp('[^\\p{Ll}]', 'gi'))).toBeEquiv(['!']);
+        expect(XRegExp.match('AaИи!', XRegExp('[\\P{Ll}]',  'gi'))).toBeEquiv(['A', 'a', 'И', 'и', '!']);
     });
 
     it('should handle \\p{P}', function() {

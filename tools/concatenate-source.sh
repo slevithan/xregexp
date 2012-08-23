@@ -3,13 +3,12 @@
 # Allow running this script from another directory
 cd "$(dirname "$0")"
 
-# Ordered list of all source files except backcompat.js
+# Ordered list of all source files
 source_files='
     ./intro.js
     ../src/xregexp.js
     ../src/addons/build.js
     ../src/addons/matchrecursive.js
-    ../src/addons/prototypes.js
     ../src/addons/unicode/unicode-base.js
     ../src/addons/unicode/unicode-blocks.js
     ../src/addons/unicode/unicode-categories.js

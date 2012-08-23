@@ -661,6 +661,33 @@ describe('XRegExp()', function() {
 
     });
 
+    describe('allows XRegExp.prototype extensions:', function() {
+
+        XRegExp.prototype.call = function(context, str) {
+            return this.test(str);
+        };
+
+        it('should be available for XRegExp instances', function() {
+            expect(typeof new XRegExp('').call).toBe('function');
+            expect(typeof XRegExp('').call).toBe('function');
+            expect(typeof XRegExp(XRegExp('')).call).toBe('function');
+            expect(typeof XRegExp.globalize(XRegExp('')).call).toBe('function');
+        });
+
+        it('should be available for copied RegExp instances', function() {
+            expect(typeof /x/.call).toBe('undefined');
+            expect(typeof XRegExp(/x/).call).toBe('function');
+            expect(typeof XRegExp.globalize(/x/).call).toBe('function');
+        });
+
+        it('should handle context correctly', function() {
+            var regex = XRegExp('x');
+            expect(regex.call(null, 'x')).toBe(regex.test('x'));
+            expect(regex.call(null, 'y')).toBe(regex.test('y'));
+        });
+
+    });
+
 });
 
 describe('XRegExp.version', function() {

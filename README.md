@@ -197,36 +197,6 @@ XRegExp.matchRecursive(str, '<', '>', 'gy');
 
 `XRegExp.matchRecursive` throws an error if it sees an unbalanced delimiter in the target string.
 
-### Prototypes
-
-In browsers, first include the script:
-
-```html
-<script src="src/xregexp.js"></script>
-<script src="src/addons/prototypes.js"></script>
-```
-
-New XRegExp regexes then gain a collection of useful methods: `apply`, `call`, `forEach`, `globalize`, `match`, `xexec`, and `xtest`.
-
-```js
-// To demonstrate the call method, let's first create the function we'll be using...
-function filter(array, fn) {
-    var res = [];
-    array.forEach(function(el) {if (fn.call(null, el)) res.push(el);});
-    return res;
-}
-// Now we can filter arrays using functions and regexes
-filter(['a', 'ba', 'ab', 'b'], XRegExp('^a')); // -> ['a', 'ab']
-```
-
-Native `RegExp` objects copied by `XRegExp` are augmented with any `XRegExp.prototype` methods. The following lines therefore work equivalently:
-
-```js
-XRegExp('[a-z]', 'ig').xexec('abc');
-XRegExp(/[a-z]/ig).xexec('abc');
-XRegExp.globalize(/[a-z]/i).xexec('abc');
-```
-
 ## Installation and usage
 
 In browsers:

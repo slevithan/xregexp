@@ -503,8 +503,7 @@ var XRegExp = (function(undefined) {
         return augment(new RegExp(key.pattern, key.flags), key.captures, /*addProto*/ true);
     };
 
-// Add `RegExp.prototype` to the prototype chain for XRegExp instances that have their prototype
-// changed to `XRegExp.prototype` via `__proto__`
+// Add `RegExp.prototype` to the prototype chain
     self.prototype = new RegExp;
 
 /* ==============================
