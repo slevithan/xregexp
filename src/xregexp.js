@@ -364,11 +364,9 @@ var XRegExp = (function(undefined) {
  * @param {Boolean} on `true` to enable; `false` to disable.
  */
     function setAstral(on) {
-        if (on) {
-            // Reset the pattern cache used by the `XRegExp` constructor, since the same pattern
-            // and flags might now produce different results
-            self.cache.flush('patterns');
-        }
+        // Reset the pattern cache used by the `XRegExp` constructor, since the same pattern and
+        // flags might now produce different results
+        self.cache.flush('patterns');
 
         features.astral = on;
     }
