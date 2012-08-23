@@ -1,5 +1,5 @@
-﻿[XRegExp](http://xregexp.com/)
-==============================
+﻿[XRegExp](http://xregexp.com/) 3.0.0-pre
+========================================
 
 XRegExp provides augmented, extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your client-side grepping simpler and more powerful, while freeing you from worrying about pesky cross-browser inconsistencies and the dubious `lastIndex` property.
 
@@ -7,7 +7,7 @@ XRegExp supports all native ES5 regular expression syntax. It works with Interne
 
 ## Performance
 
-XRegExp regexes compile to native `RegExp` regex objects, thus there is no performance difference between the two. There is a small extra cost the first time you compile a particular pattern and flags.
+XRegExp regexes compile to native `RegExp` objects, and therefore perform just as fast as native regular expressions. There is a small extra cost when compiling XRegExps, but even that is automatically cached so it's even faster the next time you compile the same pattern and flags.
 
 ## Usage examples
 
@@ -34,13 +34,13 @@ XRegExp.replace('2012-02-22', date, function(match) {
     return match.month + '/' + match.day + '/' + match.year;
 }); // -> '02/22/2012'
 
-// In fact, all XRegExps are RegExps and work perfectly with native methods
+// In fact, XRegExps compile to RegExps and work perfectly with native methods
 date.test('2012-02-22'); // -> true
 
 // The *only* caveat is that named captures must be referenced using numbered backreferences
 '2012-02-22'.replace(date, '$2/$3/$1'); // -> '02/22/2012'
 
-// If you want, you can extend native methods so you don't have to worry about this
+// If you want, you can extend native methods so you don't have to worry about this.
 // Doing so also fixes numerous browser bugs in the native methods
 XRegExp.install('natives');
 '2012-02-22'.replace(date, '${month}/${day}/${year}'); // -> '02/22/2012'
@@ -61,14 +61,14 @@ XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [
 ]); // -> ['2', '4', '56']
 
 // You can also pass forward and return specific backreferences
-var html = '<a href="http://xregexp.com/">XRegExp</a>\
-            <a href="http://www.google.com/">Google</a>';
+var html = '<a href="http://xregexp.com/">XRegExp</a>' +
+           '<a href="http://www.google.com/">Google</a>';
 XRegExp.matchChain(html, [
     {regex: /<a href="([^"]+)">/i, backref: 1},
     {regex: XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
 ]); // -> ['xregexp.com', 'www.google.com']
 
-// XRegExp.union safely merges strings and regexes into a single pattern
+// Merge strings and regexes into a single pattern, safely rewriting backreferences
 XRegExp.union(['a+b*c', /(dogs)\1/, /(cats)\1/], 'i');
 // -> /a\+b\*c|(dogs)\1|(cats)\2/i
 ```
