@@ -100,34 +100,34 @@
         suites.push(Benchmark.Suite('exec with ' + numStrs + ' different strings')
             .add('Native exec', function() {
                 regexG.lastIndex = pos;
-                regexG.exec(strs[i++] || strs[i=0]);
+                regexG.exec(strs[++i] || strs[i=0]);
             })
             .add('Shimmed exec', function() {
                 regexG.lastIndex = pos;
-                fixedExec.call(regexG, strs[i++] || strs[i=0]);
+                fixedExec.call(regexG, strs[++i] || strs[i=0]);
             })
             .add('XRegExp.exec', function() {
-                XRegExp.exec(strs[i++] || strs[i=0], regexG, pos);
+                XRegExp.exec(strs[++i] || strs[i=0], regexG, pos);
             })
         );
 
         suites.push(Benchmark.Suite('Sticky exec with ' + numStrs + ' different strings')
             .add('Native exec', function() {
                 regexG.lastIndex = pos;
-                var match = regexG.exec(strs[i++] || strs[i=0]);
+                var match = regexG.exec(strs[++i] || strs[i=0]);
                 if (match && match.index !== pos) {
                     match = null;
                 }
             })
             .add('Shimmed exec', function() {
                 regexG.lastIndex = pos;
-                var match = fixedExec.call(regexG, strs[i++] || strs[i=0]);
+                var match = fixedExec.call(regexG, strs[++i] || strs[i=0]);
                 if (match && match.index !== pos) {
                     match = null;
                 }
             })
             .add('XRegExp.exec', function() {
-                var match = XRegExp.exec(strs[i++] || strs[i=0], regexG, pos, 'sticky');
+                var match = XRegExp.exec(strs[++i] || strs[i=0], regexG, pos, 'sticky');
             })
         );
     }());

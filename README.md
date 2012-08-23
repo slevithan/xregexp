@@ -7,7 +7,7 @@ XRegExp supports all native ES5 regular expression syntax. It works with Interne
 
 ## Performance
 
-XRegExp regexes compile to native `RegExp` objects, and therefore perform just as fast as native regular expressions. There is a small extra cost when compiling XRegExps, but even that is automatically cached so it's even faster the next time you compile the same pattern and flags.
+XRegExp regexes compile to native `RegExp` objects, and therefore perform just as fast as native regular expressions. There is a small extra cost when compiling a pattern for the first time.
 
 ## Usage examples
 
