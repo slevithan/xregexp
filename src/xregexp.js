@@ -1199,7 +1199,7 @@ var XRegExp = (function(undefined) {
 
                 // Rewrite backreferences. Passing to XRegExp dies on octals and ensures patterns
                 // are independently valid; helps keep this simple. Named captures are put back
-                output.push(self(pattern.source).source.replace(parts, rewrite));
+                output.push(nativ.replace.call(self(pattern.source).source, parts, rewrite));
             } else {
                 output.push(self.escape(pattern));
             }
