@@ -429,6 +429,66 @@ var XRegExp = (function(undefined) {
         return value;
     }
 
+
+/**
+ * Returns an Array that is the list of given patterns to be joined. Patterns can be provided as
+ * regex objects or strings. Metacharacters are escaped in patterns provided as strings.
+ * Backreferences in provided regex objects are automatically renumbered to work correctly. Native
+ * flags used by provided regexes are ignored in favor of the `flags` argument.
+ * @memberOf XRegExp
+ * @param {Array} patterns Regexes and strings to combine.
+ * @returns {Array} modified patterns RegExps and Strings to be combined.
+ */
+    function prepareJoin(patterns) {
+        var parts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*]/g,
+            output = [],
+            numCaptures = 0,
+            numPriorCaptures,
+            captureNames,
+            pattern,
+            rewrite = function(match, paren, backref) {
+                var name = captureNames[numCaptures - numPriorCaptures];
+
+                // Capturing group
+                if (paren) {
+                    ++numCaptures;
+                    // If the current capture has a name, preserve the name
+                    if (name) {
+                        return '(?<' + name + '>';
+                    }
+                // Backreference
+                } else if (backref) {
+                    // Rewrite the backreference
+                    return '\\' + (+backref + numPriorCaptures);
+                }
+
+                return match;
+            },
+            i;
+
+        if (!(isType(patterns, 'Array') && patterns.length)) {
+            throw new TypeError('Must provide a nonempty array of patterns to merge');
+        }
+
+        for (i = 0; i < patterns.length; ++i) {
+            pattern = patterns[i];
+
+            if (self.isRegExp(pattern)) {
+                numPriorCaptures = numCaptures;
+                captureNames = (pattern[REGEX_DATA] && pattern[REGEX_DATA].captureNames) || [];
+
+                // Rewrite backreferences. Passing to XRegExp dies on octals and ensures patterns
+                // are independently valid; helps keep this simple. Named captures are put back
+                output.push(nativ.replace.call(self(pattern.source).source, parts, rewrite));
+            } else {
+                output.push(self.escape(pattern));
+            }
+        }
+
+        return output;
+    }
+
+
 /* ==============================
  * Constructor
  * ============================== */
@@ -1173,6 +1233,28 @@ var XRegExp = (function(undefined) {
     };
 
 /**
+ * Returns an XRegExp object that is the concatenation of the given patterns. Patterns can be provided as
+ * regex objects or strings. Metacharacters are escaped in patterns provided as strings.
+ * Backreferences in provided regex objects are automatically renumbered to work correctly. Native
+ * flags used by provided regexes are ignored in favor of the `flags` argument.
+ * @memberOf XRegExp
+ * @param {Array} patterns Regexes and strings to combine.
+ * @param {String|RegExp} separator Regex or string to use as the joining separator.
+ * @param {String} [flags] Any combination of XRegExp flags.
+ * @returns {RegExp} Union of the provided regexes and strings.
+ * @example
+ *
+ * XRegExp.join(['a+b*c', /(dogs)\1/, /(cats)\1/], 'i');
+ * // -> /a\+b\*c(dogs)\1(cats)\2/i
+ */
+    self.join = function(patterns, separator, flags) {
+        separator = separator || "";
+        var separatorStr = self.isRegExp(separator) ? separator.source : self.escape(separator),
+             output = prepareJoin(patterns);
+        return self(output.join(separatorStr), flags);
+    };
+
+/**
  * Returns an XRegExp object that is the union of the given patterns. Patterns can be provided as
  * regex objects or strings. Metacharacters are escaped in patterns provided as strings.
  * Backreferences in provided regex objects are automatically renumbered to work correctly. Native
@@ -1187,52 +1269,7 @@ var XRegExp = (function(undefined) {
  * // -> /a\+b\*c|(dogs)\1|(cats)\2/i
  */
     self.union = function(patterns, flags) {
-        var parts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*]/g,
-            output = [],
-            numCaptures = 0,
-            numPriorCaptures,
-            captureNames,
-            pattern,
-            rewrite = function(match, paren, backref) {
-                var name = captureNames[numCaptures - numPriorCaptures];
-
-                // Capturing group
-                if (paren) {
-                    ++numCaptures;
-                    // If the current capture has a name, preserve the name
-                    if (name) {
-                        return '(?<' + name + '>';
-                    }
-                // Backreference
-                } else if (backref) {
-                    // Rewrite the backreference
-                    return '\\' + (+backref + numPriorCaptures);
-                }
-
-                return match;
-            },
-            i;
-
-        if (!(isType(patterns, 'Array') && patterns.length)) {
-            throw new TypeError('Must provide a nonempty array of patterns to merge');
-        }
-
-        for (i = 0; i < patterns.length; ++i) {
-            pattern = patterns[i];
-
-            if (self.isRegExp(pattern)) {
-                numPriorCaptures = numCaptures;
-                captureNames = (pattern[REGEX_DATA] && pattern[REGEX_DATA].captureNames) || [];
-
-                // Rewrite backreferences. Passing to XRegExp dies on octals and ensures patterns
-                // are independently valid; helps keep this simple. Named captures are put back
-                output.push(nativ.replace.call(self(pattern.source).source, parts, rewrite));
-            } else {
-                output.push(self.escape(pattern));
-            }
-        }
-
-        return self(output.join('|'), flags);
+        return self.join(patterns, /|/, flags);
     };
 
 /* ==============================
