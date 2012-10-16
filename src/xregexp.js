@@ -1148,8 +1148,9 @@ var XRegExp = (function(undefined) {
 /**
  * Returns an XRegExp object that is the union of the given patterns. Patterns can be provided as
  * regex objects or strings. Metacharacters are escaped in patterns provided as strings.
- * Backreferences in provided regex objects are automatically renumbered to work correctly. Native
- * flags used by provided regexes are ignored in favor of the `flags` argument.
+ * Backreferences in provided regex objects are automatically renumbered to work correctly within
+ * the larger combined pattern. Native flags used by provided regexes are ignored in favor of the
+ * `flags` argument.
  * @memberOf XRegExp
  * @param {Array} patterns Regexes and strings to combine.
  * @param {String} [flags] Any combination of XRegExp flags.
