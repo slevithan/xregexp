@@ -21,14 +21,10 @@ function download() {
 # Download Unicode database for each version
 mkdir -p "data"
 echo "Fetching Unicode data..."
-#download "http://unicode.org/Public/${version}/ucd/UnicodeData.txt" "data/${version}-database.txt"
-download "http://unicode.org/Public/${version}/ucd/UnicodeData-${version}d1.txt" "data/${version}-database.txt"
-#download "http://unicode.org/Public/${version}/ucd/Scripts.txt" "data/${version}-scripts.txt"
-download "http://unicode.org/Public/${version}/ucd/Scripts-${version}d4.txt" "data/${version}-scripts.txt"
-#download "http://unicode.org/Public/${version}/ucd/Blocks.txt" "data/${version}-blocks.txt"
-download "http://unicode.org/Public/${version}/ucd/Blocks-${version}d1.txt" "data/${version}-blocks.txt"
-#download "http://unicode.org/Public/${version}/ucd/PropList.txt" "data/${version}-proplist.txt"
-download "http://unicode.org/Public/${version}/ucd/PropList-${version}d3.txt" "data/${version}-proplist.txt"
+download "http://unicode.org/Public/${version}/ucd/UnicodeData.txt" "data/${version}-database.txt"
+download "http://unicode.org/Public/${version}/ucd/Scripts.txt" "data/${version}-scripts.txt"
+download "http://unicode.org/Public/${version}/ucd/Blocks.txt" "data/${version}-blocks.txt"
+download "http://unicode.org/Public/${version}/ucd/PropList.txt" "data/${version}-proplist.txt"
 
 # Generate the category output data
 echo "Parsing Unicode v${version} categories..."
