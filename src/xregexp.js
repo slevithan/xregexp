@@ -461,8 +461,8 @@ var XRegExp = (function(undefined) {
         pattern = pattern === undefined ? '' : String(pattern);
         flags = flags === undefined ? '' : String(flags);
 
-        // Cache-lookup key
-        key = pattern + '/' + flags;
+        // Cache-lookup key; intentionally using an invalid regex sequence as the separator
+        key = pattern + '***' + flags;
 
         if (!patternCache[key]) {
             // Check for flag-related errors, and strip/apply flags in a leading mode modifier
@@ -619,7 +619,7 @@ var XRegExp = (function(undefined) {
  * }
  */
     self.cache = function(pattern, flags) {
-        var key = pattern + '/' + (flags || '');
+        var key = pattern + '***' + (flags || '');
         return cache[key] || (cache[key] = self(pattern, flags));
     };
 
