@@ -828,6 +828,9 @@ describe('XRegExp.isRegExp()', function() {
 
             // Cleanup
             iframe.parentNode.removeChild(iframe);
+        } else {
+            // Keep the assertion count consistent cross-environment
+            expect(typeof document).toBe('undefined');
         }
     });
 
@@ -1069,7 +1072,7 @@ describe('XRegExp.matchChain()', function() {
 describe('XRegExp.replace()', function() {
 
     /*
-     * NOTE: These specs should mirror those for RegExp.prototype.replace as closely as possible.
+     * NOTE: These specs should mirror those for String.prototype.replace as closely as possible.
      */
 
     /*
@@ -1170,7 +1173,7 @@ describe('XRegExp.replaceEach()', function() {
 describe('XRegExp.split()', function() {
 
     /*
-     * NOTE: These specs should mirror those for RegExp.prototype.split as closely as possible.
+     * NOTE: These specs should mirror those for String.prototype.split as closely as possible.
      */
 
     it('should pass tests with a variety of subjects, separators, and limits', function() {
