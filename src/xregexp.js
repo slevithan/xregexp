@@ -1573,7 +1573,7 @@ var XRegExp = (function(undefined) {
     );
 
 /* Named backreference: `\k<name>`. Backreference names can use the characters A-Z, a-z, 0-9, _,
- * and $ only.
+ * and $ only. Also allows numbered backreferences as `\k<n>`.
  */
     add(
         /\\k<([\w$]+)>/,
