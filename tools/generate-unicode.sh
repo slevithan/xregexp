@@ -5,7 +5,7 @@
 cd "$(dirname "$0")"
 
 # Unicode version
-version="6.2.0"
+version="6.3.0"
 
 function download() {
 	url="$1"
