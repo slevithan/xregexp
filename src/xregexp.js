@@ -201,15 +201,10 @@ var XRegExp = (function(undefined) {
  * @returns {Number} Zero-based index at which the item is found, or -1.
  */
     function indexOf(array, value) {
-        // Use the native array method, if available
-        if (Array.prototype.indexOf) {
-            return array.indexOf(value);
-        }
-
-        var len = array.length, i;
+        var len = array.length, i = -1;
 
         // Not a very good shim, but good enough for XRegExp's use of it
-        for (i = 0; i < len; ++i) {
+        while (++i < len) {
             if (array[i] === value) {
                 return i;
             }
@@ -257,7 +252,7 @@ var XRegExp = (function(undefined) {
  * @returns {Object} Object with properties `pattern` and `flags`.
  */
     function prepareFlags(pattern, flags) {
-        var i;
+        var i = -1;
 
         // Recent browsers throw on duplicate flags, so copy this behavior for nonnative flags
         if (clipDuplicates(flags) !== flags) {
@@ -275,7 +270,7 @@ var XRegExp = (function(undefined) {
         });
 
         // Throw on unknown native or nonnative flags
-        for (i = 0; i < flags.length; ++i) {
+        while (++i < flags.length) {
             if (!registeredFlags[flags.charAt(i)]) {
                 throw new SyntaxError('Unknown regex flag ' + flags.charAt(i));
             }
@@ -377,11 +372,12 @@ var XRegExp = (function(undefined) {
  * @param {Boolean} on `true` to enable; `false` to disable.
  */
     function setNatives(on) {
-        RegExp.prototype.exec = (on ? fixed : nativ).exec;
-        RegExp.prototype.test = (on ? fixed : nativ).test;
-        String.prototype.match = (on ? fixed : nativ).match;
-        String.prototype.replace = (on ? fixed : nativ).replace;
-        String.prototype.split = (on ? fixed : nativ).split;
+        var object = on ? fixed : nativ;
+        RegExp.prototype.exec = object.exec;
+        RegExp.prototype.test = object.test;
+        String.prototype.match = object.match;
+        String.prototype.replace = object.replace;
+        String.prototype.split = object.split;
 
         features.natives = on;
     }
@@ -578,16 +574,15 @@ var XRegExp = (function(undefined) {
  */
     self.addToken = function(regex, handler, options) {
         options = options || {};
-        var optionalFlags = options.optionalFlags, i;
+        var optionalFlags = options.optionalFlags, i = -1;
 
         if (options.flag) {
             registerFlag(options.flag);
         }
 
         if (optionalFlags) {
-            optionalFlags = nativ.split.call(optionalFlags, '');
-            for (i = 0; i < optionalFlags.length; ++i) {
-                registerFlag(optionalFlags[i]);
+            while (++i < optionalFlags.length) {
+                registerFlag(optionalFlags.charAt(i));
             }
         }
 
@@ -934,9 +929,9 @@ var XRegExp = (function(undefined) {
                         matches.push(match[0]);
                     }
                 },
-                i;
+                i = -1;
 
-            for (i = 0; i < values.length; ++i) {
+            while (++i < values.length) {
                 self.forEach(values[i], item.regex, addMatch);
             }
 
@@ -1049,9 +1044,9 @@ var XRegExp = (function(undefined) {
  * ]);
  */
     self.replaceEach = function(str, replacements) {
-        var i, r;
+        var i = -1, length = replacements.length, r;
 
-        for (i = 0; i < replacements.length; ++i) {
+        while (++i < length) {
             r = replacements[i];
             str = self.replace(str, r[0], r[1], r[2]);
         }
@@ -1185,13 +1180,14 @@ var XRegExp = (function(undefined) {
 
                 return match;
             },
-            i;
+            i = -1,
+            length = patterns.length;
 
         if (!(isType(patterns, 'Array') && patterns.length)) {
             throw new TypeError('Must provide a nonempty array of patterns to merge');
         }
 
-        for (i = 0; i < patterns.length; ++i) {
+        while (++i < length) {
             pattern = patterns[i];
 
             if (self.isRegExp(pattern)) {
@@ -1226,7 +1222,8 @@ var XRegExp = (function(undefined) {
             match = nativ.exec.apply(this, arguments),
             name,
             r2,
-            i;
+            i = 0,
+            length = match && match.length;
 
         if (match) {
             // Fix browsers whose `exec` methods don't return `undefined` for nonparticipating
@@ -1237,9 +1234,9 @@ var XRegExp = (function(undefined) {
                 // Using `str.slice(match.index)` rather than `match[0]` in case lookahead allowed
                 // matching due to characters outside the match
                 nativ.replace.call(String(str).slice(match.index), r2, function() {
-                    var len = arguments.length, i;
                     // Skip index 0 and the last 2
-                    for (i = 1; i < len - 2; ++i) {
+                    var len = arguments.length - 2, i = 0;
+                    while (++i < len) {
                         if (arguments[i] === undefined) {
                             match[i] = undefined;
                         }
@@ -1250,7 +1247,7 @@ var XRegExp = (function(undefined) {
             // Attach named capture properties
             if (this[REGEX_DATA] && this[REGEX_DATA].captureNames) {
                 // Skip index 0
-                for (i = 1; i < match.length; ++i) {
+                while (++i < length) {
                     name = this[REGEX_DATA].captureNames[i - 1];
                     if (name) {
                         match[name] = match[i];
@@ -1344,13 +1341,14 @@ var XRegExp = (function(undefined) {
             // Stringifying `this` fixes a bug in IE < 9 where the last argument in replacement
             // functions isn't type-converted to a string
             result = nativ.replace.call(String(this), search, function() {
-                var args = arguments, i;
+                var args = arguments, i = -1;
                 if (captureNames) {
+                    var length = captureNames.length;
                     // Change the `arguments[0]` string primitive to a `String` object that can
                     // store properties. This really does need to use `String` as a constructor
                     args[0] = new String(args[0]);
                     // Store named backreferences on the first argument
-                    for (i = 0; i < captureNames.length; ++i) {
+                    while (++i < length) {
                         if (captureNames[i]) {
                             args[0][captureNames[i]] = args[i + 1];
                         }
