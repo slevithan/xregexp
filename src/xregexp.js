@@ -1430,7 +1430,9 @@ var XRegExp = (function(undefined) {
                         }
                         return args[$2] || '';
                     }
-                    throw new SyntaxError('Invalid token ' + $0);
+                    // From ECMA-262 § 15.5.4.11:
+                    // "A $ in newstring that does not match any of the forms [above] is left as is."
+                    return $0;
                 });
             });
         }
