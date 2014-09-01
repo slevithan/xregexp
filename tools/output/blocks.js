@@ -76,6 +76,10 @@
             bmp: '\0-\x7F'
         },
         {
+            name: 'InBassa_Vah',
+            astral: '\uD81A[\uDED0-\uDEFF]'
+        },
+        {
             name: 'InBatak',
             bmp: '\u1BC0-\u1BFF'
         },
@@ -172,6 +176,10 @@
             astral: '\uD800[\uDEA0-\uDEDF]'
         },
         {
+            name: 'InCaucasian_Albanian',
+            astral: '\uD801[\uDD30-\uDD6F]'
+        },
+        {
             name: 'InChakma',
             astral: '\uD804[\uDD00-\uDD4F]'
         },
@@ -186,6 +194,10 @@
         {
             name: 'InCombining_Diacritical_Marks',
             bmp: '\u0300-\u036F'
+        },
+        {
+            name: 'InCombining_Diacritical_Marks_Extended',
+            bmp: '\u1AB0-\u1AFF'
         },
         {
             name: 'InCombining_Diacritical_Marks_Supplement',
@@ -210,6 +222,10 @@
         {
             name: 'InCoptic',
             bmp: '\u2C80-\u2CFF'
+        },
+        {
+            name: 'InCoptic_Epact_Numbers',
+            astral: '\uD800[\uDEE0-\uDEFF]'
         },
         {
             name: 'InCounting_Rod_Numerals',
@@ -268,8 +284,16 @@
             astral: '\uD83C[\uDC30-\uDC9F]'
         },
         {
+            name: 'InDuployan',
+            astral: '\uD82F[\uDC00-\uDC9F]'
+        },
+        {
             name: 'InEgyptian_Hieroglyphs',
             astral: '\uD80C[\uDC00-\uDFFF]|\uD80D[\uDC00-\uDC2F]'
+        },
+        {
+            name: 'InElbasan',
+            astral: '\uD801[\uDD00-\uDD2F]'
         },
         {
             name: 'InEmoticons',
@@ -316,6 +340,10 @@
             bmp: '\u25A0-\u25FF'
         },
         {
+            name: 'InGeometric_Shapes_Extended',
+            astral: '\uD83D[\uDF80-\uDFFF]'
+        },
+        {
             name: 'InGeorgian',
             bmp: '\u10A0-\u10FF'
         },
@@ -330,6 +358,10 @@
         {
             name: 'InGothic',
             astral: '\uD800[\uDF30-\uDF4F]'
+        },
+        {
+            name: 'InGrantha',
+            astral: '\uD804[\uDF00-\uDF7F]'
         },
         {
             name: 'InGreek_Extended',
@@ -460,6 +492,14 @@
             bmp: '\u19E0-\u19FF'
         },
         {
+            name: 'InKhojki',
+            astral: '\uD804[\uDE00-\uDE4F]'
+        },
+        {
+            name: 'InKhudawadi',
+            astral: '\uD804[\uDEB0-\uDEFF]'
+        },
+        {
             name: 'InLao',
             bmp: '\u0E80-\u0EFF'
         },
@@ -484,6 +524,10 @@
             bmp: '\uA720-\uA7FF'
         },
         {
+            name: 'InLatin_Extended_E',
+            bmp: '\uAB30-\uAB6F'
+        },
+        {
             name: 'InLatin_1_Supplement',
             bmp: '\x80-\xFF'
         },
@@ -498,6 +542,10 @@
         {
             name: 'InLimbu',
             bmp: '\u1900-\u194F'
+        },
+        {
+            name: 'InLinear_A',
+            astral: '\uD801[\uDE00-\uDF7F]'
         },
         {
             name: 'InLinear_B_Ideograms',
@@ -524,6 +572,10 @@
             astral: '\uD802[\uDD20-\uDD3F]'
         },
         {
+            name: 'InMahajani',
+            astral: '\uD804[\uDD50-\uDD7F]'
+        },
+        {
             name: 'InMahjong_Tiles',
             astral: '\uD83C[\uDC00-\uDC2F]'
         },
@@ -534,6 +586,10 @@
         {
             name: 'InMandaic',
             bmp: '\u0840-\u085F'
+        },
+        {
+            name: 'InManichaean',
+            astral: '\uD802[\uDEC0-\uDEFF]'
         },
         {
             name: 'InMathematical_Alphanumeric_Symbols',
@@ -550,6 +606,10 @@
         {
             name: 'InMeetei_Mayek_Extensions',
             bmp: '\uAAE0-\uAAFF'
+        },
+        {
+            name: 'InMende_Kikakui',
+            astral: '\uD83A[\uDC00-\uDCDF]'
         },
         {
             name: 'InMeroitic_Cursive',
@@ -576,16 +636,20 @@
             bmp: '\u2600-\u26FF'
         },
         {
-            name: 'InMiscellaneous_Symbols_And_Pictographs',
-            astral: '\uD83D[\uDC00-\uDDFF]|\uD83C[\uDF00-\uDFFF]'
-        },
-        {
             name: 'InMiscellaneous_Symbols_and_Arrows',
             bmp: '\u2B00-\u2BFF'
         },
         {
+            name: 'InMiscellaneous_Symbols_and_Pictographs',
+            astral: '\uD83D[\uDC00-\uDDFF]|\uD83C[\uDF00-\uDFFF]'
+        },
+        {
             name: 'InMiscellaneous_Technical',
             bmp: '\u2300-\u23FF'
+        },
+        {
+            name: 'InModi',
+            astral: '\uD805[\uDE00-\uDE5F]'
         },
         {
             name: 'InModifier_Tone_Letters',
@@ -594,6 +658,10 @@
         {
             name: 'InMongolian',
             bmp: '\u1800-\u18AF'
+        },
+        {
+            name: 'InMro',
+            astral: '\uD81A[\uDE40-\uDE6F]'
         },
         {
             name: 'InMusical_Symbols',
@@ -608,8 +676,16 @@
             bmp: '\uAA60-\uAA7F'
         },
         {
+            name: 'InMyanmar_Extended_B',
+            bmp: '\uA9E0-\uA9FF'
+        },
+        {
             name: 'InNKo',
             bmp: '\u07C0-\u07FF'
+        },
+        {
+            name: 'InNabataean',
+            astral: '\uD802[\uDC80-\uDCAF]'
         },
         {
             name: 'InNew_Tai_Lue',
@@ -632,6 +708,14 @@
             astral: '\uD800[\uDF00-\uDF2F]'
         },
         {
+            name: 'InOld_North_Arabian',
+            astral: '\uD802[\uDE80-\uDE9F]'
+        },
+        {
+            name: 'InOld_Permic',
+            astral: '\uD800[\uDF50-\uDF7F]'
+        },
+        {
             name: 'InOld_Persian',
             astral: '\uD800[\uDFA0-\uDFDF]'
         },
@@ -652,8 +736,24 @@
             bmp: '\u0B00-\u0B7F'
         },
         {
+            name: 'InOrnamental_Dingbats',
+            astral: '\uD83D[\uDE50-\uDE7F]'
+        },
+        {
             name: 'InOsmanya',
             astral: '\uD801[\uDC80-\uDCAF]'
+        },
+        {
+            name: 'InPahawh_Hmong',
+            astral: '\uD81A[\uDF00-\uDF8F]'
+        },
+        {
+            name: 'InPalmyrene',
+            astral: '\uD802[\uDC60-\uDC7F]'
+        },
+        {
+            name: 'InPau_Cin_Hau',
+            astral: '\uD806[\uDEC0-\uDEFF]'
         },
         {
             name: 'InPhags_pa',
@@ -684,6 +784,10 @@
             bmp: '\uE000-\uF8FF'
         },
         {
+            name: 'InPsalter_Pahlavi',
+            astral: '\uD802[\uDF80-\uDFAF]'
+        },
+        {
             name: 'InRejang',
             bmp: '\uA930-\uA95F'
         },
@@ -712,8 +816,20 @@
             astral: '\uD801[\uDC50-\uDC7F]'
         },
         {
+            name: 'InShorthand_Format_Controls',
+            astral: '\uD82F[\uDCA0-\uDCAF]'
+        },
+        {
+            name: 'InSiddham',
+            astral: '\uD805[\uDD80-\uDDFF]'
+        },
+        {
             name: 'InSinhala',
             bmp: '\u0D80-\u0DFF'
+        },
+        {
+            name: 'InSinhala_Archaic_Numbers',
+            astral: '\uD804[\uDDE0-\uDDFF]'
         },
         {
             name: 'InSmall_Form_Variants',
@@ -750,6 +866,10 @@
         {
             name: 'InSupplemental_Arrows_B',
             bmp: '\u2900-\u297F'
+        },
+        {
+            name: 'InSupplemental_Arrows_C',
+            astral: '\uD83E[\uDC00-\uDCFF]'
         },
         {
             name: 'InSupplemental_Mathematical_Operators',
@@ -832,7 +952,11 @@
             bmp: '\u2D30-\u2D7F'
         },
         {
-            name: 'InTransport_And_Map_Symbols',
+            name: 'InTirhuta',
+            astral: '\uD805[\uDC80-\uDCDF]'
+        },
+        {
+            name: 'InTransport_and_Map_Symbols',
             astral: '\uD83D[\uDE80-\uDEFF]'
         },
         {
@@ -866,6 +990,10 @@
         {
             name: 'InVertical_Forms',
             bmp: '\uFE10-\uFE1F'
+        },
+        {
+            name: 'InWarang_Citi',
+            astral: '\uD806[\uDCA0-\uDCFF]'
         },
         {
             name: 'InYi_Radicals',
