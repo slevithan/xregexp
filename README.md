@@ -79,29 +79,29 @@ These examples should give you the flavor of what's possible, but XRegExp has mo
 
 ## Addons
 
-In browsers, you can either load addons individually, or bundle all addons together with XRegExp by loading `xregexp-all.js`. XRegExp's [npm](http://npmjs.org/) package uses `xregexp-all.js`, which means that the addons are always available when XRegExp is installed on the server using npm.
+In browsers, you can either load addons individually, or bundle all addons together with XRegExp by loading `xregexp-all.js`. XRegExp's [npm](http://npmjs.org/) package uses `xregexp-all.js`, so addons are always available when XRegExp is installed using npm.
 
 ### Unicode
 
-In browsers, first include the Unicode Base script:
+In browsers, first include the Unicode Base script and then one or more of the addons for Unicode blocks, categories, properties, or scripts.
 
 ```html
 <script src="src/xregexp.js"></script>
 <script src="src/addons/unicode/unicode-base.js"></script>
+<script src="src/addons/unicode/unicode-categories.js"></script>
+<script src="src/addons/unicode/unicode-scripts.js"></script>
 ```
 
 Then you can do this:
 
 ```js
-var unicodeWord = XRegExp('^\\p{L}+$');
+// Test the Unicode category L (Letter)
+var unicodeWord = XRegExp('^\\pL+$');
 unicodeWord.test('Русский'); // -> true
 unicodeWord.test('日本語'); // -> true
 unicodeWord.test('العربية'); // -> true
-```
 
-The base script adds `\p{L}` and its full name `\p{Letter}`, but other Unicode categories, scripts, blocks, and properties require addon packages. Try these next examples after additionally including `unicode-scripts.js`:
-
-```js
+// Test some Unicode scripts
 XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
 XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
 ```
@@ -119,7 +119,7 @@ XRegExp('^\\pS$').test('\uD83D\uDCA9'); // -> true
 
 Opting in to astral mode disables the use of `\p{…}` and `\P{…}` within character classes. In astral mode, use e.g. `(\pL|[0-9_])+` instead of `[\pL0-9_]+`.
 
-XRegExp uses Unicode 6.2.0.
+XRegExp uses Unicode 7.0.0.
 
 ### XRegExp.build
 

@@ -34,9 +34,10 @@
             bmp: '\0-\uFFFF',
             astral: '[\uD800-\uDBFF][\uDC00-\uDFFF]'
         },
-        // Defined as the inverse of Unicode category Cn (Unassigned)
         {
             name: 'Assigned',
+            // Since this is defined as the inverse of Unicode category Cn (Unassigned), the Unicode
+            // Categories addon is required to use this property
             inverseOf: 'Cn'
         },
         {
