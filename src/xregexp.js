@@ -1,7 +1,7 @@
 /*!
  * XRegExp 3.0.0-pre
  * <http://xregexp.com/>
- * Steven Levithan © 2007-2012 MIT License
+ * Steven Levithan (c) 2007-2014 MIT License
  */
 
 /**

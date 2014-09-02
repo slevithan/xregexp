@@ -20,8 +20,8 @@ var date = XRegExp('(?<year>  [0-9]{4} ) -?  # year  \n\
                     (?<day>   [0-9]{2} )     # day   ', 'x');
 
 // XRegExp.exec gives you named backreferences on the match result
-var match = XRegExp.exec('2012-02-22', date);
-match.year; // -> '2012'
+var match = XRegExp.exec('2014-02-22', date);
+match.year; // -> '2014'
 
 // It also includes optional pos and sticky arguments
 var pos = 3, result = [];
@@ -31,25 +31,25 @@ while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d+)>/, pos, 'sticky')) {
 } // result -> ['2', '3', '4']
 
 // XRegExp.replace allows named backreferences in replacements
-XRegExp.replace('2012-02-22', date, '${month}/${day}/${year}'); // -> '02/22/2012'
-XRegExp.replace('2012-02-22', date, function(match) {
+XRegExp.replace('2014-02-22', date, '${month}/${day}/${year}'); // -> '02/22/2014'
+XRegExp.replace('2014-02-22', date, function(match) {
     return match.month + '/' + match.day + '/' + match.year;
-}); // -> '02/22/2012'
+}); // -> '02/22/2014'
 
 // In fact, XRegExps compile to RegExps and work perfectly with native methods
-date.test('2012-02-22'); // -> true
+date.test('2014-02-22'); // -> true
 
 // The *only* caveat is that named captures must be referenced using numbered backreferences
-'2012-02-22'.replace(date, '$2/$3/$1'); // -> '02/22/2012'
+'2014-02-22'.replace(date, '$2/$3/$1'); // -> '02/22/2014'
 
 // If you want, you can extend native methods so you don't have to worry about this.
 // Doing so also fixes numerous browser bugs in the native methods
 XRegExp.install('natives');
-'2012-02-22'.replace(date, '${month}/${day}/${year}'); // -> '02/22/2012'
-'2012-02-22'.replace(date, function(match) {
+'2014-02-22'.replace(date, '${month}/${day}/${year}'); // -> '02/22/2014'
+'2014-02-22'.replace(date, function(match) {
     return match.month + '/' + match.day + '/' + match.year;
-}); // -> '02/22/2012'
-date.exec('2012-02-22').year; // -> '2012'
+}); // -> '02/22/2014'
+date.exec('2014-02-22').year; // -> '2014'
 
 // Extract every other digit from a string using XRegExp.forEach
 XRegExp.forEach('1a2345', /\d/, function(match, i) {
@@ -241,7 +241,7 @@ require({paths: {xregexp: 'xregexp-all'}}, ['xregexp'], function(XRegExp) {
 
 ## About
 
-XRegExp copyright 2007-present by [Steven Levithan](http://stevenlevithan.com/).
+XRegExp copyright 2007-2014 by [Steven Levithan](http://stevenlevithan.com/).
 
 Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/), and adapted from his [unicode-data](https://github.com/mathiasbynens/unicode-data) project. Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
 
