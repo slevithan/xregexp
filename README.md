@@ -79,7 +79,7 @@ These examples should give you the flavor of what's possible, but XRegExp has mo
 
 ## Addons
 
-In browsers, you can either load addons individually, or bundle all addons together with XRegExp by loading `xregexp-all.js`. XRegExp's [npm](http://npmjs.org/) package uses `xregexp-all.js`, so addons are always available when XRegExp is installed using npm.
+You can either load addons individually, or bundle all addons together with XRegExp by loading `xregexp-all.js`. XRegExp's [npm](http://npmjs.org/) package uses `xregexp-all.js`, so addons are always available when XRegExp is installed using npm.
 
 ### Unicode
 
@@ -204,13 +204,13 @@ XRegExp.matchRecursive(str, '<', '>', 'gy');
 In browsers:
 
 ```html
-<script src="build/xregexp-min.js"></script>
+<script src="src/xregexp.js"></script>
 ```
 
 Or, to bundle XRegExp with all of its addons:
 
 ```html
-<script src="build/xregexp-all-min.js"></script>
+<script src="xregexp-all.js"></script>
 ```
 
 Using [npm](http://npmjs.org/):
@@ -229,7 +229,7 @@ The [CommonJS](http://wiki.commonjs.org/wiki/Modules)-style `require('xregexp').
 In an AMD loader like [RequireJS](http://requirejs.org/):
 
 ```js
-require({paths: {xregexp: 'build/xregexp-all-min'}}, ['xregexp'], function(XRegExp) {
+require({paths: {xregexp: 'xregexp-all'}}, ['xregexp'], function(XRegExp) {
     console.log(XRegExp.version);
 });
 ```
