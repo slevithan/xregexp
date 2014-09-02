@@ -9,6 +9,7 @@
 /**
  * Adds support for all Unicode categories. E.g., `\p{Lu}` or `\p{Uppercase Letter}`. Token names
  * are case insensitive, and any spaces, hyphens, and underscores are ignored.
+ *
  * @requires XRegExp, Unicode Base
  */
 (function(XRegExp) {

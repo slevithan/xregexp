@@ -121,7 +121,8 @@
  * Core functionality
  * ============================== */
 
-/* Add Unicode token syntax: \p{..}, \P{..}, \p{^..}. Also add astral mode (flag A).
+/*
+ * Add Unicode token syntax: \p{..}, \P{..}, \p{^..}. Also add astral mode (flag A).
  */
     XRegExp.addToken(
         // Use `*` instead of `+` to avoid capturing `^` as the token name in `\p{^}`
@@ -181,6 +182,7 @@
 
 /**
  * Adds to the list of Unicode tokens that XRegExp regexes can match via `\p` or `\P`.
+ *
  * @memberOf XRegExp
  * @param {Array} data Objects with named character ranges. Each object may have properties `name`,
  *   `alias`, `isBmpLast`, `inverseOf`, `bmp`, and `astral`. All but `name` are optional, although

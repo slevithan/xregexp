@@ -9,6 +9,7 @@
 /**
  * Adds Level 1 Unicode properties (detailed in UTS #18 RL1.2). Token names are case insensitive,
  * and any spaces, hyphens, and underscores are ignored.
+ *
  * @requires XRegExp, Unicode Base
  */
 (function(XRegExp) {

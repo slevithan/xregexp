@@ -9,6 +9,7 @@
 /**
  * Adds support for all Unicode blocks. Block names use the prefix 'In'. E.g., `\p{InBasicLatin}`.
  * Token names are case insensitive, and any spaces, hyphens, and underscores are ignored.
+ *
  * @requires XRegExp, Unicode Base
  */
 (function(XRegExp) {

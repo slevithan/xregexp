@@ -93,6 +93,7 @@ var XRegExp = (function(undefined) {
 
 /**
  * Attaches named capture data and `XRegExp.prototype` properties to a regex object.
+ *
  * @private
  * @param {RegExp} regex Regex to augment.
  * @param {Array} captureNames Array with capture names, or `null`.
@@ -124,6 +125,7 @@ var XRegExp = (function(undefined) {
 
 /**
  * Removes any duplicate characters from the provided string.
+ *
  * @private
  * @param {String} str String to remove duplicate characters from.
  * @returns {String} String with any duplicate characters removed.
@@ -136,6 +138,7 @@ var XRegExp = (function(undefined) {
  * Copies a regex object while preserving special properties for named capture and augmenting with
  * `XRegExp.prototype` methods. The copy has a fresh `lastIndex` property (set to zero). Allows
  * adding and removing native flags while copying the regex.
+ *
  * @private
  * @param {RegExp} regex Regex to copy.
  * @param {Object} [options] Allows specifying native flags to add or remove while copying the
@@ -176,6 +179,7 @@ var XRegExp = (function(undefined) {
 /**
  * Returns a new copy of the object used to hold extended regex instance data, tailored for a
  * native nonaugmented regex.
+ *
  * @private
  * @returns {Object} Object with base regex instance data.
  */
@@ -185,6 +189,7 @@ var XRegExp = (function(undefined) {
 
 /**
  * Determines whether a regex has extended instance data used to track capture names.
+ *
  * @private
  * @param {RegExp} regex Regex to check.
  * @returns {Boolean} Whether the regex uses named capture.
@@ -195,6 +200,7 @@ var XRegExp = (function(undefined) {
 
 /**
  * Returns the first index at which a given value can be found in an array.
+ *
  * @private
  * @param {Array} array Array to search.
  * @param {*} value Value to locate in the array.
@@ -220,6 +226,7 @@ var XRegExp = (function(undefined) {
 
 /**
  * Determines whether a value is of the specified type, by resolving its internal [[Class]].
+ *
  * @private
  * @param {*} value Object to check.
  * @param {String} type Type to check for, in TitleCase.
@@ -231,6 +238,7 @@ var XRegExp = (function(undefined) {
 
 /**
  * Checks whether the next nonignorable token after the specified position is a quantifier.
+ *
  * @private
  * @param {String} pattern Pattern to search within.
  * @param {Number} pos Index in `pattern` to search at.
@@ -251,6 +259,7 @@ var XRegExp = (function(undefined) {
 /**
  * Checks for flag-related errors, and strips/applies flags in a leading mode modifier. Offloads
  * the flag preparation logic from the `XRegExp` constructor.
+ *
  * @private
  * @param {String} pattern Regex pattern, possibly with a leading mode modifier.
  * @param {String} flags Any combination of flags.
@@ -289,6 +298,7 @@ var XRegExp = (function(undefined) {
 
 /**
  * Prepares an options object from the given value.
+ *
  * @private
  * @param {String|Object} value Value to convert to an options object.
  * @returns {Object} Options object.
@@ -307,6 +317,7 @@ var XRegExp = (function(undefined) {
 
 /**
  * Registers a flag so it doesn't throw an 'unknown flag' error.
+ *
  * @private
  * @param {String} flag Single-character flag to register.
  */
@@ -321,6 +332,7 @@ var XRegExp = (function(undefined) {
 /**
  * Runs built-in and custom regex syntax tokens in reverse insertion order at the specified
  * position, until a match is found.
+ *
  * @private
  * @param {String} pattern Original pattern from which an XRegExp object is being built.
  * @param {String} flags Flags being used to construct the regex.
@@ -360,6 +372,7 @@ var XRegExp = (function(undefined) {
 
 /**
  * Enables or disables implicit astral mode opt-in.
+ *
  * @private
  * @param {Boolean} on `true` to enable; `false` to disable.
  */
@@ -373,6 +386,7 @@ var XRegExp = (function(undefined) {
 
 /**
  * Enables or disables native method overrides.
+ *
  * @private
  * @param {Boolean} on `true` to enable; `false` to disable.
  */
@@ -389,6 +403,7 @@ var XRegExp = (function(undefined) {
 /**
  * Returns the object, or throws an error if it is `null` or `undefined`. This is used to follow
  * the ES5 abstract operation `ToObject`.
+ *
  * @private
  * @param {*} value Object to check and return.
  * @returns {*} The provided object.
@@ -410,6 +425,7 @@ var XRegExp = (function(undefined) {
  * Creates an extended regular expression object for matching text with a pattern. Differs from a
  * native regular expression in that additional syntax and flags are supported. The returned object
  * is in fact a native `RegExp` and works with all native methods.
+ *
  * @class XRegExp
  * @constructor
  * @param {String|RegExp} pattern Regex pattern string, or an existing regex object to copy.
@@ -524,6 +540,7 @@ var XRegExp = (function(undefined) {
 
 /**
  * The XRegExp version number.
+ *
  * @static
  * @memberOf XRegExp
  * @type String
@@ -537,6 +554,7 @@ var XRegExp = (function(undefined) {
 /**
  * Extends XRegExp syntax and allows custom flags. This is used internally and can be used to
  * create XRegExp addons. If more than one token can match the same string, the last added wins.
+ *
  * @memberOf XRegExp
  * @param {RegExp} regex Regex object that matches the new token.
  * @param {Function} handler Function that returns a new pattern string (using native regex syntax)
@@ -608,6 +626,7 @@ var XRegExp = (function(undefined) {
 /**
  * Caches and returns the result of calling `XRegExp(pattern, flags)`. On any subsequent call with
  * the same pattern and flag combination, the cached copy of the regex is returned.
+ *
  * @memberOf XRegExp
  * @param {String} pattern Regex pattern string.
  * @param {String} [flags] Any combination of XRegExp flags.
@@ -637,6 +656,7 @@ var XRegExp = (function(undefined) {
 /**
  * Escapes any regular expression metacharacters, for use when matching literal strings. The result
  * can safely be used at any point within a regex that uses any flags.
+ *
  * @memberOf XRegExp
  * @param {String} str String to escape.
  * @returns {String} String with regex metacharacters escaped.
@@ -656,6 +676,7 @@ var XRegExp = (function(undefined) {
  * must start at the specified position only. The `lastIndex` property of the provided regex is not
  * used, but is updated for compatibility. Also fixes browser bugs compared to the native
  * `RegExp.prototype.exec` and can be used reliably cross-browser.
+ *
  * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp} regex Regex to search with.
@@ -712,6 +733,7 @@ var XRegExp = (function(undefined) {
 
 /**
  * Executes a provided function once per regex match.
+ *
  * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp} regex Regex to search with.
@@ -754,6 +776,7 @@ var XRegExp = (function(undefined) {
  * Copies a regex object and adds flag `g`. The copy maintains special properties for named
  * capture, is augmented with `XRegExp.prototype` methods, and has a fresh `lastIndex` property
  * (set to zero). Native regexes are not recompiled using XRegExp syntax.
+ *
  * @memberOf XRegExp
  * @param {RegExp} regex Regex to globalize.
  * @returns {RegExp} Copy of the provided regex with flag `g` added.
@@ -769,6 +792,7 @@ var XRegExp = (function(undefined) {
 /**
  * Installs optional features according to the specified options. Can be undone using
  * {@link #XRegExp.uninstall}.
+ *
  * @memberOf XRegExp
  * @param {Object|String} options Options object or string.
  * @example
@@ -800,6 +824,7 @@ var XRegExp = (function(undefined) {
 
 /**
  * Checks whether an individual optional feature is installed.
+ *
  * @memberOf XRegExp
  * @param {String} feature Name of the feature to check. One of:
  *   <li>`natives`
@@ -816,6 +841,7 @@ var XRegExp = (function(undefined) {
 /**
  * Returns `true` if an object is a regex; `false` if it isn't. This works correctly for regexes
  * created in another frame, when `instanceof` and `constructor` checks would fail.
+ *
  * @memberOf XRegExp
  * @param {*} value Object to check.
  * @returns {Boolean} Whether the object is a `RegExp` object.
@@ -837,6 +863,7 @@ var XRegExp = (function(undefined) {
  * the result types you actually want (string instead of `exec`-style array in match-first mode,
  * and an empty array instead of `null` when no matches are found in match-all mode). It also lets
  * you override flag g and ignore `lastIndex`, and fixes browser bugs.
+ *
  * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp} regex Regex to search with.
@@ -891,6 +918,7 @@ var XRegExp = (function(undefined) {
  * within previous matches. The provided `chain` array can contain regexes and objects with `regex`
  * and `backref` properties. When a backreference is specified, the named or numbered backreference
  * is passed forward to the next regex or returned.
+ *
  * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {Array} chain Regexes that each search for matches within preceding results.
@@ -953,6 +981,7 @@ var XRegExp = (function(undefined) {
  * using a regex. Replacement strings can use `${n}` for named and numbered backreferences.
  * Replacement functions can use named backreferences via `arguments[0].name`. Also fixes browser
  * bugs compared to the native `String.prototype.replace` and can be used reliably cross-browser.
+ *
  * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp|String} search Search pattern to be replaced.
@@ -1031,6 +1060,7 @@ var XRegExp = (function(undefined) {
  * replacements. Replacement details are accepted as an array with a regex or string to search for,
  * the replacement string or function, and an optional scope of 'one' or 'all'. Uses the XRegExp
  * replacement text syntax, which supports named backreference properties via `${name}`.
+ *
  * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {Array} replacements Array of replacement detail arrays.
@@ -1065,6 +1095,7 @@ var XRegExp = (function(undefined) {
  * capturing groups, backreferences are spliced into the result each time `separator` is matched.
  * Fixes browser bugs compared to the native `String.prototype.split` and can be used reliably
  * cross-browser.
+ *
  * @memberOf XRegExp
  * @param {String} str String to split.
  * @param {RegExp|String} separator Regex or string to use for separating the string.
@@ -1094,6 +1125,7 @@ var XRegExp = (function(undefined) {
  * specified position only. The `lastIndex` property of the provided regex is not used, but is
  * updated for compatibility. Also fixes browser bugs compared to the native
  * `RegExp.prototype.test` and can be used reliably cross-browser.
+ *
  * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp} regex Regex to search with.
@@ -1117,6 +1149,7 @@ var XRegExp = (function(undefined) {
 /**
  * Uninstalls optional features according to the specified options. All optional features start out
  * uninstalled, so this is used to undo the actions of {@link #XRegExp.install}.
+ *
  * @memberOf XRegExp
  * @param {Object|String} options Options object or string.
  * @example
@@ -1151,6 +1184,7 @@ var XRegExp = (function(undefined) {
  * Backreferences in provided regex objects are automatically renumbered to work correctly within
  * the larger combined pattern. Native flags used by provided regexes are ignored in favor of the
  * `flags` argument.
+ *
  * @memberOf XRegExp
  * @param {Array} patterns Regexes and strings to combine.
  * @param {String} [flags] Any combination of XRegExp flags.
@@ -1217,6 +1251,7 @@ var XRegExp = (function(undefined) {
  * Adds named capture support (with backreferences returned as `result.name`), and fixes browser
  * bugs in the native `RegExp.prototype.exec`. Calling `XRegExp.install('natives')` uses this to
  * override the native method. Use via `XRegExp.exec` without overriding natives.
+ *
  * @private
  * @param {String} str String to search.
  * @returns {Array} Match array with named backreference properties, or `null`.
@@ -1275,6 +1310,7 @@ var XRegExp = (function(undefined) {
 /**
  * Fixes browser bugs in the native `RegExp.prototype.test`. Calling `XRegExp.install('natives')`
  * uses this to override the native method.
+ *
  * @private
  * @param {String} str String to search.
  * @returns {Boolean} Whether the regex matched the provided value.
@@ -1288,6 +1324,7 @@ var XRegExp = (function(undefined) {
  * Adds named capture support (with backreferences returned as `result.name`), and fixes browser
  * bugs in the native `String.prototype.match`. Calling `XRegExp.install('natives')` uses this to
  * override the native method.
+ *
  * @private
  * @param {RegExp|*} regex Regex to search with. If not a regex object, it is passed to `RegExp`.
  * @returns {Array} If `regex` uses flag g, an array of match strings or `null`. Without flag g,
@@ -1318,6 +1355,7 @@ var XRegExp = (function(undefined) {
  * and upon completion. Note that this doesn't support SpiderMonkey's proprietary third (`flags`)
  * argument. Calling `XRegExp.install('natives')` uses this to override the native method. Use via
  * `XRegExp.replace` without overriding natives.
+ *
  * @private
  * @param {RegExp|String} search Search pattern to be replaced.
  * @param {String|Function} replacement Replacement string or a function invoked to create it.
@@ -1375,16 +1413,15 @@ var XRegExp = (function(undefined) {
                     var n;
                     // Named or numbered backreference with curly braces
                     if ($1) {
-                        /* XRegExp behavior for `${n}`:
-                         * 1. Backreference to numbered capture, if `n` is an integer. Use `0` for
-                         *    for the entire match. Any number of leading zeros may be used.
-                         * 2. Backreference to named capture `n`, if it exists and is not an
-                         *    integer overridden by numbered capture. In practice, this does not
-                         *    overlap with numbered capture since XRegExp does not allow named
-                         *    capture to use a bare integer as the name.
-                         * 3. If the name or number does not refer to an existing capturing group,
-                         *    it's an error.
-                         */
+                        // XRegExp behavior for `${n}`:
+                        // 1. Backreference to numbered capture, if `n` is an integer. Use `0` for
+                        //    for the entire match. Any number of leading zeros may be used.
+                        // 2. Backreference to named capture `n`, if it exists and is not an
+                        //    integer overridden by numbered capture. In practice, this does not
+                        //    overlap with numbered capture since XRegExp does not allow named
+                        //    capture to use a bare integer as the name.
+                        // 3. If the name or number does not refer to an existing capturing group,
+                        //    it's an error.
                         n = +$1; // Type-convert; drop leading zeros
                         if (n <= args.length - 3) {
                             return args[n] || '';
@@ -1411,19 +1448,18 @@ var XRegExp = (function(undefined) {
                     }
                     // Else, numbered backreference without curly braces
                     $2 = +$2; // Type-convert; drop leading zero
-                    /* XRegExp behavior for `$n` and `$nn`:
-                     * - Backrefs end after 1 or 2 digits. Use `${..}` for more digits.
-                     * - `$1` is an error if no capturing groups.
-                     * - `$10` is an error if less than 10 capturing groups. Use `${1}0` instead.
-                     * - `$01` is `$1` if at least one capturing group, else it's an error.
-                     * - `$0` (not followed by 1-9) and `$00` are the entire match.
-                     * Native behavior, for comparison:
-                     * - Backrefs end after 1 or 2 digits. Cannot reference capturing group 100+.
-                     * - `$1` is a literal `$1` if no capturing groups.
-                     * - `$10` is `$1` followed by a literal `0` if less than 10 capturing groups.
-                     * - `$01` is `$1` if at least one capturing group, else it's a literal `$01`.
-                     * - `$0` is a literal `$0`.
-                     */
+                    // XRegExp behavior for `$n` and `$nn`:
+                    // - Backrefs end after 1 or 2 digits. Use `${..}` for more digits.
+                    // - `$1` is an error if no capturing groups.
+                    // - `$10` is an error if less than 10 capturing groups. Use `${1}0` instead.
+                    // - `$01` is `$1` if at least one capturing group, else it's an error.
+                    // - `$0` (not followed by 1-9) and `$00` are the entire match.
+                    // Native behavior, for comparison:
+                    // - Backrefs end after 1 or 2 digits. Cannot reference capturing group 100+.
+                    // - `$1` is a literal `$1` if no capturing groups.
+                    // - `$10` is `$1` followed by a literal `0` if less than 10 capturing groups.
+                    // - `$01` is `$1` if at least one capturing group, else it's a literal `$01`.
+                    // - `$0` is a literal `$0`.
                     if (!isNaN($2)) {
                         if ($2 > args.length - 3) {
                             throw new SyntaxError('Backreference to undefined group ' + $0);
@@ -1451,6 +1487,7 @@ var XRegExp = (function(undefined) {
 /**
  * Fixes browser bugs in the native `String.prototype.split`. Calling `XRegExp.install('natives')`
  * uses this to override the native method. Use via `XRegExp.split` without overriding natives.
+ *
  * @private
  * @param {RegExp|String} separator Regex or string to use for separating the string.
  * @param {Number} [limit] Maximum number of items to include in the result array.
@@ -1468,13 +1505,12 @@ var XRegExp = (function(undefined) {
             lastLastIndex = 0,
             lastLength;
 
-        /* Values for `limit`, per the spec:
-         * If undefined: pow(2,32) - 1
-         * If 0, Infinity, or NaN: 0
-         * If positive number: limit = floor(limit); if (limit >= pow(2,32)) limit -= pow(2,32);
-         * If negative number: pow(2,32) - floor(abs(limit))
-         * If other: Type-convert, then use the above rules
-         */
+        // Values for `limit`, per the spec:
+        // If undefined: pow(2,32) - 1
+        // If 0, Infinity, or NaN: 0
+        // If positive number: limit = floor(limit); if (limit >= pow(2,32)) limit -= pow(2,32);
+        // If negative number: pow(2,32) - floor(abs(limit))
+        // If other: Type-convert, then use the above rules
         // This line fails in very strange ways for some values of `limit` in Opera 10.5-10.63,
         // unless Opera Dragonfly is open (go figure). It works in at least Opera 9.5-10.1 and 11+
         limit = (limit === undefined ? -1 : limit) >>> 0;
@@ -1509,7 +1545,8 @@ var XRegExp = (function(undefined) {
 
     add = self.addToken;
 
-/* Letter identity escapes that natively match literal characters: `\a`, `\A`, etc. These should be
+/*
+ * Letter identity escapes that natively match literal characters: `\a`, `\A`, etc. These should be
  * SyntaxErrors but are allowed in web reality. XRegExp makes them errors for cross-browser
  * consistency and to reserve their syntax, but lets them be superseded by addons.
  */
@@ -1525,7 +1562,8 @@ var XRegExp = (function(undefined) {
         {scope: 'all'}
     );
 
-/* Empty character class: `[]` or `[^]`. This fixes a critical cross-browser syntax inconsistency.
+/*
+ * Empty character class: `[]` or `[^]`. This fixes a critical cross-browser syntax inconsistency.
  * Unless this is standardized (per the ES spec), regex syntax can't be accurately parsed because
  * character class endings can't be determined.
  */
@@ -1538,7 +1576,8 @@ var XRegExp = (function(undefined) {
         }
     );
 
-/* Comment pattern: `(?# )`. Inline comments are an alternative to the line comments allowed in
+/*
+ * Comment pattern: `(?# )`. Inline comments are an alternative to the line comments allowed in
  * free-spacing mode (flag x).
  */
     add(
@@ -1550,7 +1589,8 @@ var XRegExp = (function(undefined) {
         }
     );
 
-/* Whitespace and line comments, in free-spacing mode (aka extended mode, flag x) only.
+/*
+ * Whitespace and line comments, in free-spacing mode (aka extended mode, flag x) only.
  */
     add(
         /\s+|#.*/,
@@ -1562,7 +1602,8 @@ var XRegExp = (function(undefined) {
         {flag: 'x'}
     );
 
-/* Dot, in dotall mode (aka singleline mode, flag s) only.
+/*
+ * Dot, in dotall mode (aka singleline mode, flag s) only.
  */
     add(
         /\./,
@@ -1572,7 +1613,8 @@ var XRegExp = (function(undefined) {
         {flag: 's'}
     );
 
-/* Named backreference: `\k<name>`. Backreference names can use the characters A-Z, a-z, 0-9, _,
+/*
+ * Named backreference: `\k<name>`. Backreference names can use the characters A-Z, a-z, 0-9, _,
  * and $ only. Also allows numbered backreferences as `\k<n>`.
  */
     add(
@@ -1592,7 +1634,8 @@ var XRegExp = (function(undefined) {
         }
     );
 
-/* Numbered backreference or octal, plus any following digits: `\0`, `\11`, etc. Octals except `\0`
+/*
+ * Numbered backreference or octal, plus any following digits: `\0`, `\11`, etc. Octals except `\0`
  * not followed by 0-9 and backreferences to unopened capture groups throw an error. Other matches
  * are returned unaltered. IE < 9 doesn't support backreferences above `\99` in regex syntax.
  */
@@ -1615,7 +1658,8 @@ var XRegExp = (function(undefined) {
         {scope: 'all'}
     );
 
-/* Named capturing group; match the opening delimiter only: `(?<name>`. Capture names can use the
+/*
+ * Named capturing group; match the opening delimiter only: `(?<name>`. Capture names can use the
  * characters A-Z, a-z, 0-9, _, and $ only. Names can't be integers. Supports Python-style
  * `(?P<name>` as an alternate syntax to avoid issues in recent Opera (which natively supports the
  * Python-style syntax). Otherwise, XRegExp might treat numbered backreferences to Python-style
@@ -1641,7 +1685,8 @@ var XRegExp = (function(undefined) {
         }
     );
 
-/* Capturing group; match the opening parenthesis only. Required for support of named capturing
+/*
+ * Capturing group; match the opening parenthesis only. Required for support of named capturing
  * groups. Also adds explicit capture mode (flag n).
  */
     add(
