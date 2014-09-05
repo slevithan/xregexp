@@ -207,11 +207,6 @@ var XRegExp = (function(undefined) {
  * @returns {Number} Zero-based index at which the item is found, or -1.
  */
     function indexOf(array, value) {
-        // Use the native array method, if available
-        if (Array.prototype.indexOf) {
-            return array.indexOf(value);
-        }
-
         var len = array.length, i;
 
         // Not a very good shim, but good enough for XRegExp's use of it
