@@ -4,9 +4,8 @@
  * Steven Levithan (c) 2012-2014 MIT License
  */
 
-// Module systems magic dance
+// Module systems magic dance. Don't use strict mode for this function, so it can assign to global.
 ;(function(root, definition) {
-    // Don't turn on strict mode for this function, so it can assign to global
     var self;
 
     // RequireJS

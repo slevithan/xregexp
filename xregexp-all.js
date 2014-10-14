@@ -4,9 +4,8 @@
  * Steven Levithan (c) 2012-2014 MIT License
  */
 
-// Module systems magic dance
+// Module systems magic dance. Don't use strict mode for this function, so it can assign to global.
 ;(function(root, definition) {
-    // Don't turn on strict mode for this function, so it can assign to global
     var self;
 
     // RequireJS
@@ -44,75 +43,58 @@ var XRegExp = (function(undefined) {
  * Private variables
  * ============================== */
 
-    var // ...
-
-// Property name used for extended regex instance data
-    REGEX_DATA = 'xregexp',
-
-// Internal reference to the `XRegExp` object
-    self,
-
-// Optional features that can be installed and uninstalled
-    features = {
-        astral: false,
-        natives: false
-    },
-
-// Store native methods to use and restore ('native' is an ES3 reserved keyword)
-    nativ = {
-        exec: RegExp.prototype.exec,
-        test: RegExp.prototype.test,
-        match: String.prototype.match,
-        replace: String.prototype.replace,
-        split: String.prototype.split
-    },
-
-// Storage for fixed/extended native methods
-    fixed = {},
-
-// Storage for regexes cached by `XRegExp.cache`
-    cache = {},
-
-// Storage for pattern details cached by the `XRegExp` constructor
-    patternCache = {},
-
-// Storage for regex syntax tokens added internally or by `XRegExp.addToken`
-    tokens = [],
-
-// Token scopes
-    defaultScope = 'default',
-    classScope = 'class',
-
-// Regexes that match native regex syntax, including octals
-    nativeTokens = {
-        // Any native multicharacter token in default scope, or any single character
-        'default': /\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S])|\(\?[:=!]|[?*+]\?|{\d+(?:,\d*)?}\??|[\s\S]/,
-        // Any native multicharacter token in character class scope, or any single character
-        'class': /\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S])|[\s\S]/
-    },
-
-// Any backreference or dollar-prefixed character in replacement strings
-    replacementToken = /\$(?:{([\w$]+)}|(\d\d?|[\s\S]))/g,
-
-// Check for correct `exec` handling of nonparticipating capturing groups
-    correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined,
-
-// Check for flag y support
-    hasNativeY = RegExp.prototype.sticky !== undefined,
-
-// Tracker for known flags, including addon flags
-    registeredFlags = {
-        g: true,
-        i: true,
-        m: true,
-        y: hasNativeY
-    },
-
-// Shortcut to `Object.prototype.toString`
-    toString = {}.toString,
-
-// Shortcut to `XRegExp.addToken`
-    add;
+    var // Internal reference to the `XRegExp` object
+        self,
+        // Property name used for extended regex instance data
+        REGEX_DATA = 'xregexp',
+        // Optional features that can be installed and uninstalled
+        features = {
+            astral: false,
+            natives: false
+        },
+        // Native methods to use and restore ('native' is an ES3 reserved keyword)
+        nativ = {
+            exec: RegExp.prototype.exec,
+            test: RegExp.prototype.test,
+            match: String.prototype.match,
+            replace: String.prototype.replace,
+            split: String.prototype.split
+        },
+        // Storage for fixed/extended native methods
+        fixed = {},
+        // Storage for regexes cached by `XRegExp.cache`
+        cache = {},
+        // Storage for pattern details cached by the `XRegExp` constructor
+        patternCache = {},
+        // Storage for regex syntax tokens added internally or by `XRegExp.addToken`
+        tokens = [],
+        // Token scopes
+        defaultScope = 'default',
+        classScope = 'class',
+        // Regexes that match native regex syntax, including octals
+        nativeTokens = {
+            // Any native multicharacter token in default scope, or any single character
+            'default': /\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S])|\(\?[:=!]|[?*+]\?|{\d+(?:,\d*)?}\??|[\s\S]/,
+            // Any native multicharacter token in character class scope, or any single character
+            'class': /\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S])|[\s\S]/
+        },
+        // Any backreference or dollar-prefixed character in replacement strings
+        replacementToken = /\$(?:{([\w$]+)}|(\d\d?|[\s\S]))/g,
+        // Check for correct `exec` handling of nonparticipating capturing groups
+        correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined,
+        // Check for flag y support
+        hasNativeY = RegExp.prototype.sticky !== undefined,
+        // Tracker for known flags, including addon flags
+        registeredFlags = {
+            g: true,
+            i: true,
+            m: true,
+            y: hasNativeY
+        },
+        // Shortcut to `Object.prototype.toString`
+        toString = {}.toString,
+        // Shortcut to `XRegExp.addToken`
+        add;
 
 /* ==============================
  * Private functions
