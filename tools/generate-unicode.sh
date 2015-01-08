@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Based on http://git.io/unicode by @mathias
 
 # Allow running this script from another directory
 cd "$(dirname "$0")"
 
 # Unicode version
-version="6.2.0"
+version="7.0.0"
 
 function download() {
 	url="$1"

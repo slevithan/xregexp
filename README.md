@@ -1,4 +1,4 @@
-﻿[XRegExp](http://xregexp.com/) 3.0.0-pre
+[XRegExp](http://xregexp.com/) 3.0.0-pre
 ========================================
 
 XRegExp provides augmented and extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your client-side grepping simpler and more powerful, while freeing you from worrying about pesky cross-browser inconsistencies and the dubious `lastIndex` property.
@@ -20,8 +20,8 @@ var date = XRegExp('(?<year>  [0-9]{4} ) -?  # year  \n\
                     (?<day>   [0-9]{2} )     # day   ', 'x');
 
 // XRegExp.exec gives you named backreferences on the match result
-var match = XRegExp.exec('2012-02-22', date);
-match.year; // -> '2012'
+var match = XRegExp.exec('2014-02-22', date);
+match.year; // -> '2014'
 
 // It also includes optional pos and sticky arguments
 var pos = 3, result = [];
@@ -31,25 +31,25 @@ while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d+)>/, pos, 'sticky')) {
 } // result -> ['2', '3', '4']
 
 // XRegExp.replace allows named backreferences in replacements
-XRegExp.replace('2012-02-22', date, '${month}/${day}/${year}'); // -> '02/22/2012'
-XRegExp.replace('2012-02-22', date, function(match) {
+XRegExp.replace('2014-02-22', date, '${month}/${day}/${year}'); // -> '02/22/2014'
+XRegExp.replace('2014-02-22', date, function(match) {
     return match.month + '/' + match.day + '/' + match.year;
-}); // -> '02/22/2012'
+}); // -> '02/22/2014'
 
 // In fact, XRegExps compile to RegExps and work perfectly with native methods
-date.test('2012-02-22'); // -> true
+date.test('2014-02-22'); // -> true
 
 // The *only* caveat is that named captures must be referenced using numbered backreferences
-'2012-02-22'.replace(date, '$2/$3/$1'); // -> '02/22/2012'
+'2014-02-22'.replace(date, '$2/$3/$1'); // -> '02/22/2014'
 
 // If you want, you can extend native methods so you don't have to worry about this.
 // Doing so also fixes numerous browser bugs in the native methods
 XRegExp.install('natives');
-'2012-02-22'.replace(date, '${month}/${day}/${year}'); // -> '02/22/2012'
-'2012-02-22'.replace(date, function(match) {
+'2014-02-22'.replace(date, '${month}/${day}/${year}'); // -> '02/22/2014'
+'2014-02-22'.replace(date, function(match) {
     return match.month + '/' + match.day + '/' + match.year;
-}); // -> '02/22/2012'
-date.exec('2012-02-22').year; // -> '2012'
+}); // -> '02/22/2014'
+date.exec('2014-02-22').year; // -> '2014'
 
 // Extract every other digit from a string using XRegExp.forEach
 XRegExp.forEach('1a2345', /\d/, function(match, i) {
@@ -79,29 +79,29 @@ These examples should give you the flavor of what's possible, but XRegExp has mo
 
 ## Addons
 
-In browsers, you can either load addons individually, or bundle all addons together with XRegExp by loading `xregexp-all.js`. XRegExp's [npm](http://npmjs.org/) package uses `xregexp-all.js`, which means that the addons are always available when XRegExp is installed on the server using npm.
+You can either load addons individually, or bundle all addons together with XRegExp by loading `xregexp-all.js`. XRegExp's [npm](http://npmjs.org/) package uses `xregexp-all.js`, so addons are always available when XRegExp is installed using npm.
 
 ### Unicode
 
-In browsers, first include the Unicode Base script:
+In browsers, first include the Unicode Base script and then one or more of the addons for Unicode blocks, categories, properties, or scripts.
 
 ```html
 <script src="src/xregexp.js"></script>
 <script src="src/addons/unicode/unicode-base.js"></script>
+<script src="src/addons/unicode/unicode-categories.js"></script>
+<script src="src/addons/unicode/unicode-scripts.js"></script>
 ```
 
 Then you can do this:
 
 ```js
-var unicodeWord = XRegExp('^\\p{L}+$');
+// Test the Unicode category L (Letter)
+var unicodeWord = XRegExp('^\\pL+$');
 unicodeWord.test('Русский'); // -> true
 unicodeWord.test('日本語'); // -> true
 unicodeWord.test('العربية'); // -> true
-```
 
-The base script adds `\p{L}` and its full name `\p{Letter}`, but other Unicode categories, scripts, blocks, and properties require addon packages. Try these next examples after additionally including `unicode-scripts.js`:
-
-```js
+// Test some Unicode scripts
 XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
 XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
 ```
@@ -119,7 +119,7 @@ XRegExp('^\\pS$').test('\uD83D\uDCA9'); // -> true
 
 Opting in to astral mode disables the use of `\p{…}` and `\P{…}` within character classes. In astral mode, use e.g. `(\pL|[0-9_])+` instead of `[\pL0-9_]+`.
 
-XRegExp uses Unicode 6.2.0.
+XRegExp uses Unicode 7.0.0.
 
 ### XRegExp.build
 
@@ -204,13 +204,13 @@ XRegExp.matchRecursive(str, '<', '>', 'gy');
 In browsers:
 
 ```html
-<script src="build/xregexp-min.js"></script>
+<script src="src/xregexp.js"></script>
 ```
 
 Or, to bundle XRegExp with all of its addons:
 
 ```html
-<script src="build/xregexp-all-min.js"></script>
+<script src="xregexp-all.js"></script>
 ```
 
 Using [npm](http://npmjs.org/):
@@ -229,7 +229,7 @@ The [CommonJS](http://wiki.commonjs.org/wiki/Modules)-style `require('xregexp').
 In an AMD loader like [RequireJS](http://requirejs.org/):
 
 ```js
-require({paths: {xregexp: 'build/xregexp-all-min'}}, ['xregexp'], function(XRegExp) {
+require({paths: {xregexp: 'xregexp-all'}}, ['xregexp'], function(XRegExp) {
     console.log(XRegExp.version);
 });
 ```
@@ -241,7 +241,7 @@ require({paths: {xregexp: 'build/xregexp-all-min'}}, ['xregexp'], function(XRegE
 
 ## About
 
-XRegExp copyright 2007-present by [Steven Levithan](http://stevenlevithan.com/).
+XRegExp copyright 2007-2014 by [Steven Levithan](http://stevenlevithan.com/).
 
 Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/), and adapted from his [unicode-data](https://github.com/mathiasbynens/unicode-data) project. Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
 

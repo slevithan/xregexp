@@ -1,7 +1,7 @@
 /*!
  * XRegExp.matchRecursive 3.0.0-pre
  * <http://xregexp.com/>
- * Steven Levithan © 2009-2012 MIT License
+ * Steven Levithan (c) 2009-2014 MIT License
  */
 
 (function(XRegExp) {
@@ -9,6 +9,7 @@
 
 /**
  * Returns a match detail object composed of the provided values.
+ *
  * @private
  */
     function row(name, value, start, end) {
@@ -24,6 +25,7 @@
  * Returns an array of match strings between outermost left and right delimiters, or an array of
  * objects with detailed match parts and position data. An error is thrown if delimiters are
  * unbalanced within the data.
+ *
  * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {String} left Left delimiter as an XRegExp pattern.
@@ -122,17 +124,16 @@
                     leftMatch = null;
                 }
             }
-            /* Paths (LM: leftMatch, RM: rightMatch, OT: openTokens):
-             * LM | RM | OT | Result
-             * 1  | 0  | 1  | loop
-             * 1  | 0  | 0  | loop
-             * 0  | 1  | 1  | loop
-             * 0  | 1  | 0  | throw
-             * 0  | 0  | 1  | throw
-             * 0  | 0  | 0  | break
-             * Doesn't include the sticky mode special case. The loop ends after the first
-             * completed match if not `global`.
-             */
+            // Paths (LM: leftMatch, RM: rightMatch, OT: openTokens):
+            // LM | RM | OT | Result
+            // 1  | 0  | 1  | loop
+            // 1  | 0  | 0  | loop
+            // 0  | 1  | 1  | loop
+            // 0  | 1  | 0  | throw
+            // 0  | 0  | 1  | throw
+            // 0  | 0  | 0  | break
+            // The paths above don't include the sticky mode special case. The loop ends after the
+            // first completed match if not `global`.
             if (leftMatch || rightMatch) {
                 delimStart = (leftMatch || rightMatch).index;
                 delimEnd = delimStart + (leftMatch || rightMatch)[0].length;

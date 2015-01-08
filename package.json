@@ -13,5 +13,9 @@
         "regex",
         "regexp"
     ],
-    "main": "./xregexp-all.js"
+    "main": "xregexp-all.js",
+    "files": [
+        "LICENSE.txt",
+        "xregexp-all.js"
+    ]
 }

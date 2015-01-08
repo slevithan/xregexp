@@ -1,12 +1,11 @@
 /*!
  * XRegExp-All 3.0.0-pre
  * <http://xregexp.com/>
- * Steven Levithan © 2012 MIT License
+ * Steven Levithan (c) 2012-2014 MIT License
  */
 
-// Module systems magic dance
-;(function(definition) {
-    // Don't turn on strict mode for this function, so it can assign to global
+// Module systems magic dance. Don't use strict mode for this function, so it can assign to global.
+;(function(root, definition) {
     var self;
 
     // RequireJS
@@ -21,6 +20,6 @@
     // <script>
     } else {
         // Create global
-        XRegExp = definition();
+        root.XRegExp = definition();
     }
-}(function() {
+}(this, function() {

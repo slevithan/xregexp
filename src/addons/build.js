@@ -1,7 +1,7 @@
 /*!
  * XRegExp.build 3.0.0-pre
  * <http://xregexp.com/>
- * Steven Levithan © 2012 MIT License
+ * Steven Levithan (c) 2012-2014 MIT License
  * Inspired by Lea Verou's RegExp.create <http://lea.verou.me/>
  */
 
@@ -14,6 +14,7 @@
 
 /**
  * Strips a leading `^` and trailing unescaped `$`, if both are present.
+ *
  * @private
  * @param {String} pattern Pattern to process.
  * @returns {String} Pattern with edge anchors removed.
@@ -32,6 +33,7 @@
 
 /**
  * Converts the provided value to an XRegExp. Native RegExp flags are not preserved.
+ *
  * @private
  * @param {String|RegExp} value Value to convert.
  * @returns {RegExp} XRegExp object with XRegExp syntax applied.
@@ -52,6 +54,7 @@
  * Builds regexes using named subpatterns, for readability and pattern reuse. Backreferences in the
  * outer pattern and provided subpatterns are automatically renumbered to work correctly. Native
  * flags used by provided subpatterns are ignored in favor of the `flags` argument.
+ *
  * @memberOf XRegExp
  * @param {String} pattern XRegExp pattern using `{{name}}` for embedded subpatterns. Allows
  *   `({{name}})` as shorthand for `(?<name>{{name}})`. Patterns cannot be embedded within

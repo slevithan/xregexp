@@ -1,6 +1,107 @@
 describe('Unicode Base addon:', function() {
 
+    /*
+     * Many of the Unicode Base tests rely on \p{L} and its alias \p{Letter} which have character
+     * data provided by the Unicode Categories addon. This allows more easily checking core
+     * functionality from Unicode Base including handling of negation, astral vs default mode, and
+     * syntax edge cases. However, it also provides coverage for the \p{L} class, which is
+     * technically the responsibility if the Unicode Categories addon.
+     */
+
     describe('adds new regex syntax:', function() {
+
+        describe('\\p{...}, \\P{...}, \\p{^...}, and single-letter-name forms', function() {
+
+            it('should be directly quantifiable', function() {
+                expect(XRegExp('^\\p{L}+$').test('Café')).toBe(true);
+                expect(XRegExp('^\\pL+$').test('Café')).toBe(true);
+            });
+
+            it('should throw an exception for double negation \\P{^...}', function() {
+                expect(function() {XRegExp('\\P{^L}');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('[\\P{^L}]');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('[^\\P{^L}]');}).toThrow(SyntaxError);
+            });
+
+            it('should throw an exception for \\p^ with a single-letter name', function() {
+                expect(function() {XRegExp('\\p^L');}).toThrow(SyntaxError);
+            });
+
+            it('should use the first letter only as the name if not wrapped with {...}', function() {
+                expect(XRegExp('^\\pLetter+$').test('Café')).toBe(false);
+                expect(XRegExp('^\\pLetter+$').test('Aetterrrrr')).toBe(true);
+            });
+
+            it('should work within character classes', function() {
+                expect(XRegExp('^[\\p{L}]+$').test('Café')).toBe(true);
+                expect(XRegExp('^[\\pL]+$').test('Café')).toBe(true);
+            });
+
+            it('should work in negated form within character classes', function() {
+                expect(XRegExp('^[\\P{L}]+$').test('Café')).toBe(false);
+                expect(XRegExp('^[\\PL]+$').test('Café')).toBe(false);
+                expect(XRegExp('^[\\p{^L}]+$').test('Café')).toBe(false);
+            });
+
+            it('should work within negated character classes', function() {
+                expect(XRegExp('^[^\\p{L}]+$').test('Café')).toBe(false);
+                expect(XRegExp('^[^\\pL]+$').test('Café')).toBe(false);
+            });
+
+            it('should work in negated form within negated character classes', function() {
+                expect(XRegExp('^[^\\P{L}]+$').test('Café')).toBe(true);
+                expect(XRegExp('^[^\\PL]+$').test('Café')).toBe(true);
+                expect(XRegExp('^[^\\p{^L}]+$').test('Café')).toBe(true);
+            });
+
+            it('should throw an exception within character classes, in astral mode', function() {
+                XRegExp.install('astral');
+
+                expect(function() {XRegExp('[\\p{L}]');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('[\\P{L}]');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('[\\pL]');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('[\\PL]');}).toThrow(SyntaxError);
+            });
+
+            it('should throw an exception for unrecognized names', function() {
+                var unrecognizedNames = ['X', 'Unrecognized_Name'];
+
+                unrecognizedNames.forEach(function(name) {
+                    expect(function() {XRegExp('\\p{' + name + '}');}).toThrow(SyntaxError);
+                    expect(function() {XRegExp('\\P{' + name + '}');}).toThrow(SyntaxError);
+                    expect(function() {XRegExp('\\p{^' + name + '}');}).toThrow(SyntaxError);
+
+                    if (name.length === 1) {
+                        expect(function() {XRegExp('\\p' + name);}).toThrow(SyntaxError);
+                        expect(function() {XRegExp('\\P' + name);}).toThrow(SyntaxError);
+                    }
+                });
+            });
+
+            it('should throw an exception if a name is not specified', function() {
+                expect(function() {XRegExp('\\p{}');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('\\P{}');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('\\p{^}');}).toThrow(SyntaxError);
+
+                // Erroring on bare \p and \P is actually handled by xregexp.js, not Unicode Base
+                expect(function() {XRegExp('\\p');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('\\P');}).toThrow(SyntaxError);
+            });
+
+            it('should ignore spaces, underscores, hyphens, and casing in names', function() {
+                expect(XRegExp('^\\p{ _-l --}+$').test('Café')).toBe(true);
+            });
+
+            it('should not ignore characters other than spaces, underscores, and hyphens in names', function() {
+                expect(function() {XRegExp('\\p{L+}');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('\\p{.L}');}).toThrow(SyntaxError);
+            });
+
+            it('should require a negating caret to be the first character', function() {
+                expect(function() {XRegExp('\\p{ ^L}');}).toThrow(SyntaxError);
+            });
+
+        });
 
         (function() {
             var letters = (
@@ -147,99 +248,6 @@ describe('Unicode Base addon:', function() {
             });
         }());
 
-        describe('\\p{...}, \\P{...}, \\p{^...}, and single-letter-name forms', function() {
-
-            it('should be directly quantifiable', function() {
-                expect(XRegExp('^\\p{L}+$').test('Café')).toBe(true);
-                expect(XRegExp('^\\pL+$').test('Café')).toBe(true);
-            });
-
-            it('should throw an exception for double negation \\P{^...}', function() {
-                expect(function() {XRegExp('\\P{^L}');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('[\\P{^L}]');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('[^\\P{^L}]');}).toThrow(SyntaxError);
-            });
-
-            it('should throw an exception for \\p^ with a single-letter name', function() {
-                expect(function() {XRegExp('\\p^L');}).toThrow(SyntaxError);
-            });
-
-            it('should use the first letter only as the name if not wrapped with {...}', function() {
-                expect(XRegExp('^\\pLetter+$').test('Café')).toBe(false);
-                expect(XRegExp('^\\pLetter+$').test('Aetterrrrr')).toBe(true);
-            });
-
-            it('should work within character classes', function() {
-                expect(XRegExp('^[\\p{L}]+$').test('Café')).toBe(true);
-                expect(XRegExp('^[\\pL]+$').test('Café')).toBe(true);
-            });
-
-            it('should work in negated form work within character classes', function() {
-                expect(XRegExp('^[\\P{L}]+$').test('Café')).toBe(false);
-                expect(XRegExp('^[\\PL]+$').test('Café')).toBe(false);
-                expect(XRegExp('^[\\p{^L}]+$').test('Café')).toBe(false);
-            });
-
-            it('should work within negated character classes', function() {
-                expect(XRegExp('^[^\\p{L}]+$').test('Café')).toBe(false);
-                expect(XRegExp('^[^\\pL]+$').test('Café')).toBe(false);
-            });
-
-            it('should work in negated form within negated character classes', function() {
-                expect(XRegExp('^[^\\P{L}]+$').test('Café')).toBe(true);
-                expect(XRegExp('^[^\\PL]+$').test('Café')).toBe(true);
-                expect(XRegExp('^[^\\p{^L}]+$').test('Café')).toBe(true);
-            });
-
-            it('should throw an exception within character classes, in astral mode', function() {
-                XRegExp.install('astral');
-
-                expect(function() {XRegExp('[\\p{L}]');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('[\\P{L}]');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('[\\pL]');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('[\\PL]');}).toThrow(SyntaxError);
-            });
-
-            it('should throw an exception for unrecognized names', function() {
-                var unrecognizedNames = ['X', 'Unrecognized_Name'];
-
-                unrecognizedNames.forEach(function(name) {
-                    expect(function() {XRegExp('\\p{' + name + '}');}).toThrow(SyntaxError);
-                    expect(function() {XRegExp('\\P{' + name + '}');}).toThrow(SyntaxError);
-                    expect(function() {XRegExp('\\p{^' + name + '}');}).toThrow(SyntaxError);
-
-                    if (name.length === 1) {
-                        expect(function() {XRegExp('\\p' + name);}).toThrow(SyntaxError);
-                        expect(function() {XRegExp('\\P' + name);}).toThrow(SyntaxError);
-                    }
-                });
-            });
-
-            it('should throw an exception if a name is not specified', function() {
-                expect(function() {XRegExp('\\p{}');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('\\P{}');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('\\p{^}');}).toThrow(SyntaxError);
-
-                // Erroring on bare \p and \P is actually handled by xregexp.js, not Unicode Base
-                expect(function() {XRegExp('\\p');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('\\P');}).toThrow(SyntaxError);
-            });
-
-            it('should ignore spaces, underscores, hyphens, and casing in names', function() {
-                expect(XRegExp('^\\p{ _-l --}+$').test('Café')).toBe(true);
-            });
-
-            it('should not ignore characters other than spaces, underscores, and hyphens in names', function() {
-                expect(function() {XRegExp('\\p{L+}');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('\\p{.L}');}).toThrow(SyntaxError);
-            });
-
-            it('should require a negating caret to be the first character', function() {
-                expect(function() {XRegExp('\\p{ ^L}');}).toThrow(SyntaxError);
-            });
-
-        });
-
     });
 
     describe('adds new regex flag A:', function() {
@@ -292,7 +300,7 @@ describe('Unicode Base addon:', function() {
             }).toThrow();
         });
 
-        it('should throw an exception when no bmp or astral data is provided', function() {
+        it('should throw an exception when no BMP or astral data is provided', function() {
             expect(function() {
                 XRegExp.addUnicodeData([{name: 'NoData'}]);
             }).toThrow();
@@ -405,7 +413,6 @@ describe('Unicode Blocks addon:', function() {
 });
 
 describe('Unicode Categories addon:', function() {
-    // Tests for category L/Letter are included in the Unicode Base specs
 
     it('should not allow the "In" prefix for category names', function() {
         expect(function() {XRegExp('\\p{InP}');}).toThrow(SyntaxError);
@@ -417,7 +424,7 @@ describe('Unicode Categories addon:', function() {
 
     it('should handle \\p{Cn}', function() {
         testUnicodeToken('Cn', {
-            invalid: [/* Unicode 6.2.0 */ '\u20BA']
+            invalid: ['\u20BA']
         });
     });
 
@@ -428,15 +435,14 @@ describe('Unicode Categories addon:', function() {
         });
 
         /*
-         * Special case: Category Ll (and Lu) is handled differently depending on whether negation
+         * Special case: Categories Ll and Lu are handled differently depending on whether negation
          * is performed before or after case folding. No attempt is made to adjust this, so these
          * tests simply track the current (inconsistent and weird) handling. It's hard to say what
          * is correct because behavior for these cases is highly inconsistent across regex flavors.
          * The key point is that, with flag i, [\P{Ll}] is different than \P{Ll} and [^\p{Ll}].
-         * This does not apply to Unicode tokens other than Ll and Lu. Browsers are also
-         * inconsistent about how flag i works with some uncommon code points (e.g., Chrome 21
-         * doesn't let ᾀ match ᾈ, and Firefox 14 doesn't let ǉ match the titlecase ǈ), so just test
-         * common code points.
+         * Browsers are also inconsistent about how flag i works with some uncommon code points
+         * (e.g., Chrome 21 doesn't let ᾀ match ᾈ, and Firefox 14 doesn't let ǉ match the titlecase
+         * ǈ), so just test common code points.
          */
         expect(XRegExp.match('AaИи!', XRegExp('\\p{Ll}',    'gi'))).toBeEquiv(['A', 'a', 'И', 'и']);
         expect(XRegExp.match('AaИи!', XRegExp('[\\p{Ll}]',  'gi'))).toBeEquiv(['A', 'a', 'И', 'и']);
@@ -462,19 +468,19 @@ describe('Unicode Categories addon:', function() {
 
     it('should handle \\p{S}', function() {
         testUnicodeToken('S', {
-            valid: ['$', '\u20B9', /* Unicode 6.2.0 */ '\u20BA', String.fromCodePoint(0x1F4A9)],
+            valid: ['$', '\u20B9', '\u20BA', String.fromCodePoint(0x1F4A9)],
             invalid: ['0']
         });
     });
 
     it('should handle \\p{Sc}', function() {
         testUnicodeToken('Sc', {
-            valid: ['$', '\u20B9', /* Unicode 6.2.0 */ '\u20BA'],
+            valid: ['$', '\u20B9', '\u20BA'],
             invalid: ['0']
         });
     });
 
-    // TODO: Add complete specs
+    // TODO: Add complete specs (tests for category L/Letter are included in the Unicode Base specs)
 
 });
 
@@ -510,7 +516,7 @@ describe('Unicode Properties addon:', function() {
 
     it('should handle \\p{Assigned}', function() {
         testUnicodeToken('Assigned', {
-            valid: [String.fromCodePoint(0x10000), '\uD800', '\uDC00', 'A', /* Unicode 6.2.0 */ '\u20BA']
+            valid: [String.fromCodePoint(0x10000), '\uD800', '\uDC00', 'A', '\u20BA']
         });
     });
 
@@ -537,19 +543,19 @@ describe('Unicode Scripts addon:', function() {
 
     it('should handle \\p{Arabic}', function() {
         testUnicodeToken('Arabic', {
-            valid: [/* Unicode 6.2.0 */ '\u065F']
+            valid: ['\u065F']
         });
     });
 
     it('should handle \\p{Inherited}', function() {
         testUnicodeToken('Inherited', {
-            invalid: [/* Unicode 6.2.0 */ '\u065F']
+            invalid: ['\u065F']
         });
     });
 
     it('should handle \\p{Common}', function() {
         testUnicodeToken('Common', {
-            valid: [/* Unicode 6.2.0 */ '\u20BA']
+            valid: ['\u20BA']
         });
     });
 

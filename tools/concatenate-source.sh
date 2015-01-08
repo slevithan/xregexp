@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Allow running this script from another directory
 cd "$(dirname "$0")"
@@ -26,8 +26,8 @@ rm -f $output_file
 # Concatenate all source files
 for file in $source_files
 do
-    cat $file >> $output_file
-    echo ''   >> $output_file
+    cat "${file}" >> "${output_file}"
+    echo '' >> "${output_file}"
 done
 
 echo "Successfully created $(basename $output_file)"
