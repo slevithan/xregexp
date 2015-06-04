@@ -347,6 +347,7 @@ var XRegExp = (function(undefined) {
  */
     function runTokens(pattern, flags, pos, scope, context) {
         var i = tokens.length,
+            leadChar = pattern.charAt(pos),
             result = null,
             match,
             t;
@@ -355,7 +356,7 @@ var XRegExp = (function(undefined) {
         while (i--) {
             t = tokens[i];
             if (
-                (t.leadChar && t.leadChar !== pattern.charAt(pos)) ||
+                (t.leadChar && t.leadChar !== leadChar) ||
                 (t.scope !== scope && t.scope !== 'all') ||
                 (t.flag && flags.indexOf(t.flag) === -1)
             ) {
