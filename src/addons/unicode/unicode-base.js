@@ -1,7 +1,7 @@
 /*!
  * XRegExp Unicode Base 3.0.0-pre
  * <http://xregexp.com/>
- * Steven Levithan (c) 2008-2014 MIT License
+ * Steven Levithan (c) 2008-2015 MIT License
  */
 
 /**
@@ -176,7 +176,8 @@
         },
         {
             scope: 'all',
-            optionalFlags: 'A'
+            optionalFlags: 'A',
+            leadChar: '\\'
         }
     );
 

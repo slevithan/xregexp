@@ -27,7 +27,7 @@
 /*!
  * XRegExp 3.0.0-pre
  * <http://xregexp.com/>
- * Steven Levithan (c) 2007-2014 MIT License
+ * Steven Levithan (c) 2007-2015 MIT License
  */
 
 /**
@@ -355,19 +355,22 @@ var XRegExp = (function(undefined) {
         while (i--) {
             t = tokens[i];
             if (
-                (t.scope === scope || t.scope === 'all') &&
-                (!t.flag || flags.indexOf(t.flag) > -1)
+                (t.leadChar && t.leadChar !== pattern.charAt(pos)) ||
+                (t.scope !== scope && t.scope !== 'all') ||
+                (t.flag && flags.indexOf(t.flag) === -1)
             ) {
-                match = self.exec(pattern, t.regex, pos, 'sticky');
-                if (match) {
-                    result = {
-                        matchLength: match[0].length,
-                        output: t.handler.call(context, match, scope, flags),
-                        reparse: t.reparse
-                    };
-                    // Finished with token tests
-                    break;
-                }
+                continue;
+            }
+
+            match = self.exec(pattern, t.regex, pos, 'sticky');
+            if (match) {
+                result = {
+                    matchLength: match[0].length,
+                    output: t.handler.call(context, match, scope, flags),
+                    reparse: t.reparse
+                };
+                // Finished with token tests
+                break;
             }
         }
 
@@ -579,6 +582,9 @@ var XRegExp = (function(undefined) {
  *   <li>`reparse` {Boolean} Whether the `handler` function's output should not be treated as
  *     final, and instead be reparseable by other tokens (including the current token). Allows
  *     token chaining or deferring.
+ *   <li>`leadChar` {String} Single character that occurs at the beginning of any successful match
+ *     of the token (not always applicable). This does not change the behavior of the token (unless
+ *     you provide an erroneous value). It is provided only to enable a performance optimization.
  * @example
  *
  * // Basic usage: Add \a for the ALERT control code
@@ -619,7 +625,8 @@ var XRegExp = (function(undefined) {
             handler: handler,
             scope: options.scope || defaultScope,
             flag: options.flag,
-            reparse: options.reparse
+            reparse: options.reparse,
+            leadChar: options.leadChar
         });
 
         // Reset the pattern cache used by the `XRegExp` constructor, since the same pattern and
@@ -642,8 +649,12 @@ var XRegExp = (function(undefined) {
  * }
  */
     self.cache = function(pattern, flags) {
-        var key = pattern + '***' + (flags || '');
-        return cache[key] || (cache[key] = self(pattern, flags));
+        if (!cache[pattern]) {
+            cache[pattern] = {};
+        }
+        return cache[pattern][flags] || (
+            cache[pattern][flags] = self(pattern, flags)
+        );
     };
 
 // Intentionally undocumented
@@ -1563,7 +1574,10 @@ var XRegExp = (function(undefined) {
             }
             throw new SyntaxError('Invalid escape ' + match[0]);
         },
-        {scope: 'all'}
+        {
+            scope: 'all',
+            leadChar: '\\'
+        }
     );
 
 /*
@@ -1577,7 +1591,8 @@ var XRegExp = (function(undefined) {
             // For cross-browser compatibility with ES3, convert [] to \b\B and [^] to [\s\S].
             // (?!) should work like \b\B, but is unreliable in some versions of Firefox
             return match[1] ? '[\\s\\S]' : '\\b\\B';
-        }
+        },
+        {leadChar: '['}
     );
 
 /*
@@ -1590,7 +1605,8 @@ var XRegExp = (function(undefined) {
             // Keep tokens separated unless the following token is a quantifier
             return isQuantifierNext(match.input, match.index + match[0].length, flags) ?
                 '' : '(?:)';
-        }
+        },
+        {leadChar: '('}
     );
 
 /*
@@ -1614,7 +1630,10 @@ var XRegExp = (function(undefined) {
         function() {
             return '[\\s\\S]';
         },
-        {flag: 's'}
+        {
+            flag: 's',
+            leadChar: '.'
+        }
     );
 
 /*
@@ -1635,7 +1654,8 @@ var XRegExp = (function(undefined) {
                 endIndex === match.input.length || isNaN(match.input.charAt(endIndex)) ?
                     '' : '(?:)'
             );
-        }
+        },
+        {leadChar: '\\'}
     );
 
 /*
@@ -1659,7 +1679,10 @@ var XRegExp = (function(undefined) {
             }
             return match[0];
         },
-        {scope: 'all'}
+        {
+            scope: 'all',
+            leadChar: '\\'
+        }
     );
 
 /*
@@ -1686,7 +1709,8 @@ var XRegExp = (function(undefined) {
             this.captureNames.push(match[1]);
             this.hasNamedCapture = true;
             return '(';
-        }
+        },
+        {leadChar: '('}
     );
 
 /*
@@ -1702,7 +1726,10 @@ var XRegExp = (function(undefined) {
             this.captureNames.push(null);
             return '(';
         },
-        {optionalFlags: 'n'}
+        {
+            optionalFlags: 'n',
+            leadChar: '('
+        }
     );
 
 /* ==============================
@@ -2081,7 +2108,7 @@ var XRegExp = (function(undefined) {
 /*!
  * XRegExp Unicode Base 3.0.0-pre
  * <http://xregexp.com/>
- * Steven Levithan (c) 2008-2014 MIT License
+ * Steven Levithan (c) 2008-2015 MIT License
  */
 
 /**
@@ -2256,7 +2283,8 @@ var XRegExp = (function(undefined) {
         },
         {
             scope: 'all',
-            optionalFlags: 'A'
+            optionalFlags: 'A',
+            leadChar: '\\'
         }
     );
 

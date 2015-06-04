@@ -48,7 +48,47 @@
     (function() {
         var pattern = '^([.])\\1+$';
 
-        suites.push(Benchmark.Suite('Constructor')
+        suites.push(Benchmark.Suite('Constructor with short pattern')
+            .add('XRegExp with pattern cache flush', function() {
+                XRegExp(pattern, 'g');
+                XRegExp.cache.flush('patterns');
+            })
+            .add('XRegExp', function() {
+                XRegExp(pattern, 'g');
+            })
+            .add('XRegExp.cache', function() {
+                XRegExp.cache(pattern, 'g');
+            })
+            .add('RegExp', function() {
+                new RegExp(pattern, 'g');
+            })
+        );
+    }());
+
+    (function() {
+        var pattern = '^([.])\\1+$ this is a test of a somewhat longer pattern';
+
+        suites.push(Benchmark.Suite('Constructor with medium pattern')
+            .add('XRegExp with pattern cache flush', function() {
+                XRegExp(pattern, 'g');
+                XRegExp.cache.flush('patterns');
+            })
+            .add('XRegExp', function() {
+                XRegExp(pattern, 'g');
+            })
+            .add('XRegExp.cache', function() {
+                XRegExp.cache(pattern, 'g');
+            })
+            .add('RegExp', function() {
+                new RegExp(pattern, 'g');
+            })
+        );
+    }());
+
+    (function() {
+        var pattern = XRegExp('\\pL').source;
+
+        suites.push(Benchmark.Suite('Constructor with long pattern')
             .add('XRegExp with pattern cache flush', function() {
                 XRegExp(pattern, 'g');
                 XRegExp.cache.flush('patterns');
