@@ -583,8 +583,8 @@ var XRegExp = (function(undefined) {
  *     final, and instead be reparseable by other tokens (including the current token). Allows
  *     token chaining or deferring.
  *   <li>`leadChar` {String} Single character that occurs at the beginning of any successful match
- *     of the token (not always applicable). This does not change the behavior of the token (unless
- *     you provide an erroneous value). It is provided only to enable a performance optimization.
+ *     of the token (not always applicable). This doesn't change the behavior of the token unless
+ *     you provide an erroneous value. However, providing it can increase the token's performance.
  * @example
  *
  * // Basic usage: Add \a for the ALERT control code

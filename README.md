@@ -241,7 +241,7 @@ require({paths: {xregexp: 'xregexp-all'}}, ['xregexp'], function(XRegExp) {
 
 ## About
 
-XRegExp copyright 2007-2014 by [Steven Levithan](http://stevenlevithan.com/).
+XRegExp copyright 2007-2015 by [Steven Levithan](http://stevenlevithan.com/).
 
 Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/), and adapted from his [unicode-data](https://github.com/mathiasbynens/unicode-data) project. Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
 
