@@ -1,34 +1,27 @@
 (function() {
     var outputBox = document.getElementById('log');
     var suites = [];
-    var bo = Benchmark.options;
-    var bso = Benchmark.Suite.options;
+
+    // For compatibility with older XRegExp versions
+    var hasAstralSupport = parseInt(XRegExp.version) >= 3;
+    XRegExp.cache.flush = XRegExp.cache.flush || function() {};
 
     function log(msg) {
         outputBox.insertAdjacentHTML('beforeend', msg.replace(/\n/g, '<br>'));
     }
-
-    window.run = function() {
-        log('Sit back and relax; this might take a while.\n');
-        suites[0].run();
-    }
-
     function scrollToEnd() {
         window.scroll(0, document.body.scrollHeight);
     }
 
-    bo.async = true;
-
-    bso.onStart = function() {
+    Benchmark.options.async = true;
+    Benchmark.Suite.options.onStart = function() {
         log('\n' + this.name + ':');
     };
-
-    bso.onCycle = function(event) {
+    Benchmark.Suite.options.onCycle = function(event) {
         log('\n' + String(event.target));
         scrollToEnd();
     };
-
-    bso.onComplete = function() {
+    Benchmark.Suite.options.onComplete = function() {
         log('\nFastest is ' + this.filter('fastest').pluck('name') + '\n');
         // Remove current suite from queue
         suites.shift();
@@ -39,6 +32,13 @@
             log('\nFinished. &#x263A;');
         }
         scrollToEnd();
+    };
+
+    // Expose as global
+    window.run = function() {
+        log('Testing XRegExp ' + XRegExp.version + '.\n');
+        log('Sit back and relax; this might take a while.\n');
+        suites[0].run();
     };
 
 /*--------------------------------------
@@ -56,8 +56,8 @@
                 pattern: '^([.])\\1+$ this is a test of a somewhat longer pattern'
             },
             {
-                name: 'Constructor with very long pattern',
-                pattern: XRegExp('(?A)\\pL').source
+                name: 'Constructor with long pattern',
+                pattern: XRegExp('\\p{L}').source
             }
         ];
 
@@ -253,14 +253,19 @@
             XRegExp('(?i)[a-z]');
             XRegExp.cache.flush('patterns');
         })
-        .add('BMP only: /\\pL/', function() {
-            XRegExp('\\pL');
+        .add('BMP only: /\\p{L}/', function() {
+            XRegExp('\\p{L}');
             XRegExp.cache.flush('patterns');
         })
-        .add('Full Unicode: /\\pL/A', function() {
-            XRegExp('(?A)\\pL');
-            XRegExp.cache.flush('patterns');
-        })
+        .add('Full Unicode: /\\p{L}/A', hasAstralSupport ?
+            function() {
+                XRegExp('(?A)\\p{L}');
+                XRegExp.cache.flush('patterns');
+            } :
+            function() {
+                throw new Error('Astral mode unsupported');
+            }
+        )
     );
 
     (function() {
@@ -277,35 +282,45 @@
         }
 
         var azCaselessChar = XRegExp('(?i)[a-z]!');
-        var bmpLetterChar = XRegExp('\\pL!');
-        var astralLetterChar = XRegExp('(?A)\\pL!');
+        var bmpLetterChar = XRegExp('\\p{L}!');
+        var astralLetterChar = hasAstralSupport ? XRegExp('(?A)\\p{L}!') : null;
 
         suites.push(Benchmark.Suite('Unicode letter matching')
             .add('a-z caseless', function() {
                 test(azCaselessChar);
             })
-            .add('\\pL', function() {
+            .add('\\p{L}', function() {
                 test(bmpLetterChar);
             })
-            .add('\\pL astral', function() {
-                test(astralLetterChar);
-            })
+            .add('\\p{L} astral', hasAstralSupport ?
+                function() {
+                    test(astralLetterChar);
+                } :
+                function() {
+                    throw new Error('Astral mode unsupported');
+                }
+            )
         );
 
         var azCaselessWord = XRegExp('(?i)[a-z]+!');
-        var bmpLetterWord = XRegExp('\\pL+!');
-        var astralLetterWord = XRegExp('(?A)\\pL+!');
+        var bmpLetterWord = XRegExp('\\p{L}+!');
+        var astralLetterWord = hasAstralSupport ? XRegExp('(?A)\\p{L}+!') : null;
 
         suites.push(Benchmark.Suite('Unicode word matching')
             .add('a-z caseless', function() {
                 test(azCaselessWord);
             })
-            .add('\\pL', function() {
+            .add('\\p{L}', function() {
                 test(bmpLetterWord);
             })
-            .add('\\pL astral', function() {
-                test(astralLetterWord);
-            })
+            .add('\\p{L} astral', hasAstralSupport ?
+                function() {
+                    test(astralLetterWord);
+                } :
+                function() {
+                    throw new Error('Astral mode unsupported');
+                }
+            )
         );
     }());
 }());

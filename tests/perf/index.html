@@ -2,11 +2,11 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>XRegExp Perf Tests</title>
+    <title>XRegExp Performance Tests</title>
     <style>
         body {
             font-family: Calibri, Verdana, Sans-serif;
-            padding: 10px 30px;
+            padding: 30px;
             margin: 0;
         }
         applet {
@@ -16,40 +16,45 @@
     </style>
 </head>
 <body>
-    <p id="log"></p>
+    <div id="log"></div>
 
-    <script src="../../src/xregexp.js"></script>
-    <script src="../../src/addons/build.js"></script>
-    <script src="../../src/addons/matchrecursive.js"></script>
-    <script src="../../src/addons/unicode/unicode-base.js"></script>
-    <script src="../../src/addons/unicode/unicode-blocks.js"></script>
-    <script src="../../src/addons/unicode/unicode-categories.js"></script>
-    <script src="../../src/addons/unicode/unicode-properties.js"></script>
-    <script src="../../src/addons/unicode/unicode-scripts.js"></script>
+    <script>
+        // Load latest XRegExp script unless version provided in query param
+        (function() {
+            var match = /[?&]version=([^&]+)/.exec(location.search);
+            var version = match ? match[1] : null;
+
+            document.write(version ?
+                '<script src="old_versions/xregexp-all-v' + version + '.js"><\/script>' :
+                '<script src="../../xregexp-all.js"><\/script>'
+            );
+        }());
+    </script>
 
     <script src="../vendor/benchmark.js/benchmark.js"></script>
     <script src="perf.js"></script>
 
     <script>
-    // Load an applet for higher-precision timing if needed and not manually disabled.
-    // Adapted from Lo-Dash <http://lodash.com/> performance tests...
-    (function() {
-        if (/[?&]nojava=true(?:&|$)/.test(location.search)) {
-            return;
-        }
-        var perf = window.performance,
-            begin = new Date,
-            measured;
-        // Check whether the applet is needed
-        while (!(measured = new Date - begin)) {
-            // No-op
-        }
-        if (measured !== 1 && !(perf && (perf.now || perf.webkitNow))) {
-            document.write('<applet code="nano" archive="../vendor/benchmark.js/nano.jar"></applet>');
-        }
-    }());
+        // Load an applet for higher-precision timing if needed and not manually disabled.
+        // Adapted from Lo-Dash <http://lodash.com/> performance tests.
+        (function() {
+            if (/[?&]nojava=true(?:&|$)/.test(location.search)) {
+                return;
+            }
+            var perf = window.performance,
+                begin = new Date,
+                measured;
+            // Check whether the applet is needed
+            while (!(measured = new Date - begin)) {
+                // No-op
+            }
+            if (measured !== 1 && !(perf && (perf.now || perf.webkitNow))) {
+                document.write('<applet code="nano" archive="../vendor/benchmark.js/nano.jar"></applet>');
+            }
+        }());
 
-    onload = run;
+        // Global run function provided by perf script
+        onload = run;
     </script>
 </body>
 </html>
