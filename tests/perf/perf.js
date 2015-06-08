@@ -2,8 +2,9 @@
     var outputBox = document.getElementById('log');
     var suites = [];
 
-    // For compatibility with older XRegExp versions
-    var hasAstralSupport = parseInt(XRegExp.version) >= 3;
+    // Used to skip 21-bit Unicode tests when running older XRegExp versions
+    var hasAstralSupport = parseInt(XRegExp.version, 10) >= 3;
+    // The `flush` method used in these tests was added in V3
     XRegExp.cache.flush = XRegExp.cache.flush || function() {};
 
     function log(msg) {
