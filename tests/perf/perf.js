@@ -4,8 +4,13 @@
 
     // Used to skip 21-bit Unicode tests when running older XRegExp versions
     var hasAstralSupport = parseInt(XRegExp.version, 10) >= 3;
-    // The `flush` method used in these tests was added in V3
+    // The `cache.flush` method was added in v3
     XRegExp.cache.flush = XRegExp.cache.flush || function() {};
+    // The `install` and `uninstall` methods were added in v2
+    XRegExp.install = XRegExp.install || function() {};
+    XRegExp.uninstall = XRegExp.uninstall || function() {};
+    // The `exec` method was renamed from `execAt` in v2
+    XRegExp.exec = XRegExp.exec || XRegExp.execAt;
 
     function log(msg) {
         outputBox.insertAdjacentHTML('beforeend', msg.replace(/\n/g, '<br>'));

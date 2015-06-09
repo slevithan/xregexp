@@ -19,15 +19,22 @@
     <div id="log"></div>
 
     <script>
-        // Load latest XRegExp script unless version provided in query param
+        // Load latest XRegExp script unless known old version provided in query param
         (function() {
             var match = /[?&]version=([^&]+)/.exec(location.search);
             var version = match ? match[1] : null;
+            var knownVersion = {
+                '2.0.0': true,
+                '1.5.1': true
+            };
 
-            document.write(version ?
-                '<script src="old_versions/xregexp-all-v' + version + '.js"><\/script>' :
-                '<script src="../../xregexp-all.js"><\/script>'
-            );
+            if (version === null || version === 'latest') {
+                document.write('<script src="../../xregexp-all.js"><\/script>');
+            } else if (knownVersion[version]) {
+                document.write('<script src="old_versions/xregexp-all-v'+version+'.js"><\/script>');
+            } else {
+                document.getElementById('log').innerHTML = 'Unrecognized version provided in query';
+            }
         }());
     </script>
 
