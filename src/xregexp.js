@@ -5,10 +5,10 @@
  */
 
 /**
- * XRegExp provides augmented, extensible regular expressions. You get new syntax, flags, and
- * methods beyond what browsers support natively. XRegExp is also a regex utility belt with tools
- * to make your client-side grepping simpler and more powerful, while freeing you from worrying
- * about pesky cross-browser inconsistencies and the dubious `lastIndex` property.
+ * XRegExp provides augmented, extensible regular expressions. You get additional regex syntax and
+ * flags, beyond what browsers support natively. XRegExp is also a regex utility belt with tools
+ * to make your client-side grepping simpler and more powerful, and free you from related
+ * cross-browser inconsistencies.
  */
 var XRegExp = (function(undefined) {
     'use strict';

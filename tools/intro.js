@@ -1,7 +1,7 @@
 /*!
  * XRegExp-All 3.0.0-pre
  * <http://xregexp.com/>
- * Steven Levithan (c) 2012-2014 MIT License
+ * Steven Levithan (c) 2012-2015 MIT License
  */
 
 // Module systems magic dance. Don't use strict mode for this function, so it can assign to global.
