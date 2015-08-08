@@ -52,9 +52,11 @@ XRegExp.install('natives');
 date.exec('2015-02-22').year; // -> '2015'
 
 // Extract every other digit from a string using XRegExp.forEach
+var evens = [];
 XRegExp.forEach('1a2345', /\d/, function(match, i) {
-    if (i % 2) this.push(+match[0]);
-}, []); // -> [2, 4]
+    if (i % 2) evens.push(+match[0]);
+});
+// evens -> [2, 4]
 
 // Get numbers within <b> tags using XRegExp.matchChain
 XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [

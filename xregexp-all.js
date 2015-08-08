@@ -308,12 +308,14 @@ var XRegExp = (function(undefined) {
  * @returns {Object} Options object.
  */
     function prepareOptions(value) {
-        value = value || {};
+        var options = {};
 
         if (isType(value, 'String')) {
-            value = self.forEach(value, /[^\s,]+/, function(match) {
-                this[match] = true;
-            }, {});
+            self.forEach(value, /[^\s,]+/, function(match) {
+                options[match] = true;
+            });
+
+            return options;
         }
 
         return value;
@@ -758,8 +760,6 @@ var XRegExp = (function(undefined) {
  *   <li>The zero-based match index.
  *   <li>The string being traversed.
  *   <li>The regex object being used to traverse the string.
- * @param {*} [context] Object to use as `this` when executing `callback`.
- * @returns {*} Provided `context` object.
  * @example
  *
  * // Extracts every other digit from a string
@@ -768,24 +768,22 @@ var XRegExp = (function(undefined) {
  * }, []);
  * // -> [2, 4]
  */
-    self.forEach = function(str, regex, callback, context) {
+    self.forEach = function(str, regex, callback) {
         var pos = 0,
             i = -1,
             match;
 
         while ((match = self.exec(str, regex, pos))) {
-            // Because `regex` is provided to `callback`, the function can use the deprecated/
+            // Because `regex` is provided to `callback`, the function could use the deprecated/
             // nonstandard `RegExp.prototype.compile` to mutate the regex. However, since
             // `XRegExp.exec` doesn't use `lastIndex` to set the search position, this can't lead
             // to an infinite loop, at least. Actually, because of the way `XRegExp.exec` caches
             // globalized versions of regexes, mutating the regex will not have any effect on the
-            // iteration or matched strings, which is a nice side effect that brings extra safety
-            callback.call(context, match, ++i, str, regex);
+            // iteration or matched strings, which is a nice side effect that brings extra safety.
+            callback(match, ++i, str, regex);
 
             pos = match.index + (match[0].length || 1);
         }
-
-        return context;
     };
 
 /**
@@ -1415,8 +1413,7 @@ var XRegExp = (function(undefined) {
                 if (isRegex && search.global) {
                     search.lastIndex = args[args.length - 2] + args[0].length;
                 }
-                // Should pass `undefined` as context; see
-                // <https://bugs.ecmascript.org/show_bug.cgi?id=154>
+                // ES6 specs the context for replacement functions as `undefined`
                 return replacement.apply(undefined, args);
             });
         } else {

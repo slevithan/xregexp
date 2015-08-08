@@ -468,73 +468,96 @@ describe('XRegExp.forEach()', function() {
 
     it('should match all, for both global and nonglobal regexes', function() {
         [/\w+/, /\w+/g].forEach(function(regex) {
-            expect(XRegExp.forEach('abc 123 def', regex, function(m) {
-                this.push(m[0]);
-            }, [])).toEqual(['abc', '123', 'def']);
+            var result = [];
+            XRegExp.forEach('abc 123 def', regex, function(m) {
+                result.push(m[0]);
+            });
+
+            expect(result).toEqual(['abc', '123', 'def']);
         });
     });
 
     it('should provide named backreferences on the match array', function() {
-        expect(XRegExp.forEach('abc 123 def', XRegExp('(?<first>\\w)\\w*'), function(m) {
-            this.push(m.first);
-        }, [])).toEqual(['a', '1', 'd']);
+        var result = [];
+        XRegExp.forEach('abc 123 def', XRegExp('(?<first>\\w)\\w*'), function(m) {
+            result.push(m.first);
+        });
+
+        expect(result).toEqual(['a', '1', 'd']);
     });
 
     it('should provide match start indexes on the match array', function() {
-        expect(XRegExp.forEach('abc 123 def', /\w+/, function(m) {
-            this.push(m.index);
-        }, [])).toEqual([0, 4, 8]);
+        var result = [];
+        XRegExp.forEach('abc 123 def', /\w+/, function(m) {
+            result.push(m.index);
+        });
+
+        expect(result).toEqual([0, 4, 8]);
     });
 
     it('should provide match numbers to callback functions', function() {
-        expect(XRegExp.forEach('abc 123 def', /\w+/, function(m, i) {
-            this.push(i);
-        }, [])).toEqual([0, 1, 2]);
+        var result = [];
+        XRegExp.forEach('abc 123 def', /\w+/, function(m, i) {
+            result.push(i);
+        });
+
+        expect(result).toEqual([0, 1, 2]);
     });
 
     it('should provide source strings to callback functions', function() {
         var str = 'abc 123 def';
+        var result = [];
+        XRegExp.forEach(str, /\w+/, function(m, i, s) {
+            result.push(s);
+        });
 
-        expect(XRegExp.forEach(str, /\w+/, function(m, i, s) {
-            this.push(s);
-        }, [])).toEqual([str, str, str]);
+        expect(result).toEqual([str, str, str]);
     });
 
     it('should provide source regexes to callback functions', function() {
         var regex = /\w+/;
+        var result = [];
+        XRegExp.forEach('abc 123 def', regex, function(m, i, s, r) {
+            result.push(r);
+        });
 
-        expect(XRegExp.forEach('abc 123 def', regex, function(m, i, s, r) {
-            this.push(r);
-        }, [])).toEqual([regex, regex, regex]);
+        expect(result).toEqual([regex, regex, regex]);
     });
 
     it('should not let iteration be affected by source string manipulation in the callback function', function() {
         var str1 = 'abc 123 def';
         var str2 = 'abc 123 def';
-
-        expect(XRegExp.forEach(str2, /\w+/, function(m, i, s) {
-            this.push(s);
+        var result = [];
+        XRegExp.forEach(str2, /\w+/, function(m, i, s) {
+            result.push(s);
             s += s;
             str2 += str2;
-        }, [])).toEqual([str1, str1, str1]);
+        });
+
+        expect(result).toEqual([str1, str1, str1]);
     });
 
     it('should not let iteration be affected by regex manipulation in the callback function', function() {
-        expect(XRegExp.forEach('abc 123 def', /\w+/, function(m, i, s, r) {
-            this.push(m[0]);
+        var result = [];
+        XRegExp.forEach('abc 123 def', /\w+/, function(m, i, s, r) {
+            result.push(m[0]);
             r.compile('x'); // Mutates the regex in place
-        }, [])).toEqual(['abc', '123', 'def']);
+        });
+
+        expect(result).toEqual(['abc', '123', 'def']);
 
         // NOTE: `compile` in Opera 11 has a bug which makes `r.compile('.').source === '/./'`
     });
 
     it('should start iteration at position 0, ignoring lastIndex', function() {
         var regex = /\w+/g;
+        var result = [];
         regex.lastIndex = 4;
+        XRegExp.forEach('abc 123 def', regex, function(m) {
+            result.push(m[0]);
+        });
 
-        expect(XRegExp.forEach('abc 123 def', regex, function(m) {
-            this.push(m[0]);
-        }, [])).toEqual(['abc', '123', 'def']);
+        expect(result).toEqual(['abc', '123', 'def']);
     });
 
     it('should reset the lastIndex of a global regex to 0, upon completion', function() {
@@ -580,11 +603,8 @@ describe('XRegExp.forEach()', function() {
         expect(interimLastIndex2).toBe(1);
     });
 
-    it('should return the provided context object, if any', function() {
+    it('should not return a value', function() {
         expect(XRegExp.forEach('', /x/, function() {})).toBe(undefined);
-
-        var obj = {};
-        expect(XRegExp.forEach('', /x/, function() {}, obj)).toBe(obj);
     });
 
 });
