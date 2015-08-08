@@ -181,7 +181,7 @@ describe('When overridden, String.prototype.match()', function() {
                 // method will be called with the global object (window) as its context, rather
                 // than null or undefined
                 if (hasStrictMode) {
-                    expect(function() {String.prototype.match.call(value, /x/g);}).toThrow(TypeError);
+                    expect(function() {String.prototype.match.call(value, /x/g);}).toThrowError(TypeError);
                 } else {
                     // Keep the assertion count consistent cross-browser
                     expect(hasStrictMode).toBe(false);
@@ -234,7 +234,7 @@ describe('When overridden, String.prototype.match()', function() {
                 // method will be called with the global object (window) as its context, rather
                 // than null or undefined
                 if (hasStrictMode) {
-                    expect(function() {String.prototype.match.call(value, /x/);}).toThrow(TypeError);
+                    expect(function() {String.prototype.match.call(value, /x/);}).toThrowError(TypeError);
                 } else {
                     // Keep the assertion count consistent cross-browser
                     expect(hasStrictMode).toBe(false);
@@ -480,7 +480,7 @@ describe('When overridden, String.prototype.replace()', function() {
             // method will be called with the global object (window) as its context, rather
             // than null or undefined
             if (hasStrictMode) {
-                expect(function() {String.prototype.replace.call(value, /^/, '');}).toThrow(TypeError);
+                expect(function() {String.prototype.replace.call(value, /^/, '');}).toThrowError(TypeError);
             } else {
                 // Keep the assertion count consistent cross-browser
                 expect(hasStrictMode).toBe(false);
@@ -526,7 +526,7 @@ describe('When overridden, String.prototype.replace()', function() {
                 });
 
                 it('should throw an exception for backreferences to unknown group names', function() {
-                    expect(function() {'test'.replace(XRegExp('(?<test>t)', 'g'), ':${x}:');}).toThrow(SyntaxError);
+                    expect(function() {'test'.replace(XRegExp('(?<test>t)', 'g'), ':${x}:');}).toThrowError(SyntaxError);
                 });
 
             });
@@ -555,8 +555,8 @@ describe('When overridden, String.prototype.replace()', function() {
                 });
 
                 it('should throw an exception for backreferences to unknown group numbers', function() {
-                    expect(function() {'test'.replace(/t/, '${1}');}).toThrow(SyntaxError);
-                    expect(function() {'test'.replace(/(t)/, '${2}');}).toThrow(SyntaxError);
+                    expect(function() {'test'.replace(/t/, '${1}');}).toThrowError(SyntaxError);
+                    expect(function() {'test'.replace(/(t)/, '${2}');}).toThrowError(SyntaxError);
                 });
 
                 it('should allow ${0} to refer to the entire match', function() {
@@ -593,10 +593,10 @@ describe('When overridden, String.prototype.replace()', function() {
             describe('strict error handling', function() {
 
                 it('should throw an exception for backreferences to unknown group numbers', function() {
-                    expect(function() {'xaaa'.replace(/aa/, '$1b');}).toThrow(SyntaxError);
-                    expect(function() {'xaaa'.replace(/aa/, '$01b');}).toThrow(SyntaxError);
-                    expect(function() {'xaaa'.replace(/a(a)/, '$2b');}).toThrow(SyntaxError);
-                    expect(function() {'xa(a)a'.replace('a(a)', '$1b');}).toThrow(SyntaxError);
+                    expect(function() {'xaaa'.replace(/aa/, '$1b');}).toThrowError(SyntaxError);
+                    expect(function() {'xaaa'.replace(/aa/, '$01b');}).toThrowError(SyntaxError);
+                    expect(function() {'xaaa'.replace(/a(a)/, '$2b');}).toThrowError(SyntaxError);
+                    expect(function() {'xa(a)a'.replace('a(a)', '$1b');}).toThrowError(SyntaxError);
                 });
 
             });

@@ -11,10 +11,10 @@ describe('XRegExp()', function() {
     it('should create a new instance, whether the "new" operator is used or not', function() {
         var regex = XRegExp('');
 
-        expect(regex).toBeEquiv(XRegExp(''));
-        expect(regex).toBeEquiv(XRegExp(regex));
-        expect(regex).toBeEquiv(new XRegExp(''));
-        expect(regex).toBeEquiv(new XRegExp(regex));
+        expect(regex).toEqual(XRegExp(''));
+        expect(regex).toEqual(XRegExp(regex));
+        expect(regex).toEqual(new XRegExp(''));
+        expect(regex).toEqual(new XRegExp(regex));
 
         expect(regex).not.toBe(XRegExp(''));
         expect(regex).not.toBe(XRegExp(regex));
@@ -77,7 +77,7 @@ describe('XRegExp()', function() {
 
         it('should generate the same regex as RegExp when given a nonstring nonempty pattern', function() {
             nonemptyTypes.forEach(function(item) {
-                expect(XRegExp(item.value)).toBeEquiv(new RegExp(item.value));
+                expect(XRegExp(item.value)).toEqual(new RegExp(item.value));
             });
         });
 
@@ -99,7 +99,7 @@ describe('XRegExp()', function() {
         if (hasNativeY) {
             expect(XRegExp('', 'y').sticky).toBe(true);
         } else {
-            expect(function() {XRegExp('', 'y');}).toThrow(SyntaxError);
+            expect(function() {XRegExp('', 'y');}).toThrowError(SyntaxError);
         }
 
         var regexGIM = XRegExp('', 'gim');
@@ -128,24 +128,24 @@ describe('XRegExp()', function() {
     });
 
     it('should throw an exception if duplicate native flags are used', function() {
-        expect(function() {XRegExp('', 'gg');}).toThrow(SyntaxError);
-        expect(function() {XRegExp('', 'ii');}).toThrow(SyntaxError);
-        expect(function() {XRegExp('', 'mm');}).toThrow(SyntaxError);
-        expect(function() {XRegExp('', 'mim');}).toThrow(SyntaxError);
+        expect(function() {XRegExp('', 'gg');}).toThrowError(SyntaxError);
+        expect(function() {XRegExp('', 'ii');}).toThrowError(SyntaxError);
+        expect(function() {XRegExp('', 'mm');}).toThrowError(SyntaxError);
+        expect(function() {XRegExp('', 'mim');}).toThrowError(SyntaxError);
     });
 
     it('should throw an exception if duplicate nonnative flags are used', function() {
-        expect(function() {XRegExp('', 'nn');}).toThrow(SyntaxError);
-        expect(function() {XRegExp('', 'ss');}).toThrow(SyntaxError);
-        expect(function() {XRegExp('', 'xx');}).toThrow(SyntaxError);
-        expect(function() {XRegExp('', 'xsx');}).toThrow(SyntaxError);
+        expect(function() {XRegExp('', 'nn');}).toThrowError(SyntaxError);
+        expect(function() {XRegExp('', 'ss');}).toThrowError(SyntaxError);
+        expect(function() {XRegExp('', 'xx');}).toThrowError(SyntaxError);
+        expect(function() {XRegExp('', 'xsx');}).toThrowError(SyntaxError);
         // Flag A is added by Unicode Base
-        //expect(function() {XRegExp('', 'AA');}).toThrow(SyntaxError);
+        //expect(function() {XRegExp('', 'AA');}).toThrowError(SyntaxError);
     });
 
     it('should throw an exception if unknown flags are used', function() {
-        expect(function() {XRegExp('', 'Z');}).toThrow(SyntaxError);
-        expect(function() {XRegExp('', '?');}).toThrow(SyntaxError);
+        expect(function() {XRegExp('', 'Z');}).toThrowError(SyntaxError);
+        expect(function() {XRegExp('', '?');}).toThrowError(SyntaxError);
     });
 
     it('should store extended data on regex instances', function() {
@@ -157,12 +157,12 @@ describe('XRegExp()', function() {
         var regex = /x/g;
         var copy = XRegExp(regex);
 
-        expect(copy).toBeEquiv(regex);
+        expect(copy).toEqual(regex);
         expect(copy).not.toBe(regex);
     });
 
     it('should throw an exception if providing flags when copying a regex', function() {
-        expect(function() {XRegExp(/x/, 'g');}).toThrow(TypeError);
+        expect(function() {XRegExp(/x/, 'g');}).toThrowError(TypeError);
     });
 
     it('should reset lastIndex when copying a regex', function() {
@@ -229,15 +229,15 @@ describe('XRegExp()', function() {
             });
 
             it('should throw an exception if flag g or y is included', function() {
-                expect(function() {XRegExp('(?g)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(?y)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(?gi)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(?mg)');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('(?g)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?y)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?gi)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?mg)');}).toThrowError(SyntaxError);
             });
 
             it('should throw an exception if a nonleading mode modifier is used', function() {
-                expect(function() {XRegExp('.(?i)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('^(?i)');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('.(?i)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('^(?i)');}).toThrowError(SyntaxError);
             });
 
             it('should not throw an exception if duplicate flags are used', function() {
@@ -263,8 +263,8 @@ describe('XRegExp()', function() {
             });
 
             it('should throw an exception if unknown flags are used', function() {
-                expect(function() {XRegExp('(?Z)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(??)');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('(?Z)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(??)');}).toThrowError(SyntaxError);
             });
 
         });
@@ -286,7 +286,7 @@ describe('XRegExp()', function() {
 
             it('should end after the first ")"', function() {
                 expect(XRegExp('a(?# \r(?#)b').test('ab')).toBe(true);
-                expect(function() {XRegExp('a(?# \r(?#))b');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('a(?# \r(?#))b');}).toThrowError(SyntaxError);
             });
 
         });
@@ -302,14 +302,14 @@ describe('XRegExp()', function() {
             });
 
             it('should throw an exception if characters other than A-Z, a-z, 0-9, $, and _ are used in capture names', function() {
-                expect(function() {XRegExp('(?<!>)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(?<?>)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(?<.>)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(?<<>)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(?<->)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(?<naïve>)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(?<Русский>)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(?<日本語>)');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('(?<!>)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?<?>)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?<.>)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?<<>)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?<->)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?<naïve>)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?<Русский>)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?<日本語>)');}).toThrowError(SyntaxError);
             });
 
             it('should allow capture names to start with digits', function() {
@@ -319,15 +319,15 @@ describe('XRegExp()', function() {
             });
 
             it('should throw an exception if bare integers are used as capture names', function() {
-                expect(function() {XRegExp('(?<0>)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(?<1>)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(?<234>)');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('(?<0>)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?<1>)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?<234>)');}).toThrowError(SyntaxError);
             });
 
             it('should throw an exception if reserved words are used as capture names', function() {
                 // Only these names are reserved
                 ['length', '__proto__'].forEach(function(name) {
-                    expect(function() {XRegExp('(?<' + name + '>)');}).toThrow(SyntaxError);
+                    expect(function() {XRegExp('(?<' + name + '>)');}).toThrowError(SyntaxError);
                 });
             });
 
@@ -338,10 +338,10 @@ describe('XRegExp()', function() {
             });
 
             it('should throw an exception if the same name is used for mutiple groups', function() {
-                expect(function() {XRegExp('(?<A>)(?<A>)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(?<n1>)(?<n2>)(?<n1>)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(?<n1>(?<n1>))');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('.(?<$1>a).(.).(?<$1>b).');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('(?<A>)(?<A>)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?<n1>)(?<n2>)(?<n1>)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?<n1>(?<n1>))');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('.(?<$1>a).(.).(?<$1>b).');}).toThrowError(SyntaxError);
             });
 
             it('should allow nested groups', function() {
@@ -377,9 +377,9 @@ describe('XRegExp()', function() {
             });
 
             it('should not allow characters other than A-Z, a-z, 0-9, $, and _ in backreference names', function() {
-                expect(function() {XRegExp('\\k<&>');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('\\k<\'>');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('\\k<`>');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('\\k<&>');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('\\k<\'>');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('\\k<`>');}).toThrowError(SyntaxError);
             });
 
             it('should separate backreferences from following literal digits', function() {
@@ -388,13 +388,13 @@ describe('XRegExp()', function() {
             });
 
             it('should throw an exception for backreferences to unknown groups', function() {
-                expect(function() {XRegExp('\\k<name>');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(?<n1>)\\k<n2>');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('\\k<name>');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?<n1>)\\k<n2>');}).toThrowError(SyntaxError);
             });
 
             it('should throw an exception for backreferences to capturing groups not opened to the left', function() {
-                expect(function() {XRegExp('\\k<n>(?<n>)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(?<n1>)\\k<n2>(?<n2>)');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('\\k<n>(?<n>)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?<n1>)\\k<n2>(?<n2>)');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp('(?<n>\\k<n>)');}).not.toThrow();
             });
 
@@ -425,20 +425,20 @@ describe('XRegExp()', function() {
             });
 
             it('should throw an exception for backreferences to unknown groups', function() {
-                expect(function() {XRegExp('\\k<1>');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('()\\k<2>');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('\\k<1>');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('()\\k<2>');}).toThrowError(SyntaxError);
             });
 
             it('should throw an exception for backreferences to capturing groups not opened to the left', function() {
-                expect(function() {XRegExp('\\k<1>()');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('()\\k<2>()');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)\\k<11>(11)');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('\\k<1>()');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('()\\k<2>()');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)\\k<11>(11)');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp('(\\k<1>)');}).not.toThrow();
             });
 
             it('should not allow \\k<0> to refer to the entire match', function() {
-                expect(function() {XRegExp('\\k<0>');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('\\k<00>');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('\\k<0>');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('\\k<00>');}).toThrowError(SyntaxError);
             });
 
         });
@@ -453,7 +453,7 @@ describe('XRegExp()', function() {
                 ];
 
                 octalPatterns.forEach(function(pattern) {
-                    expect(function() {XRegExp(pattern);}).toThrow(SyntaxError);
+                    expect(function() {XRegExp(pattern);}).toThrowError(SyntaxError);
                 });
 
                 expect(function() {XRegExp('\\0');}).not.toThrow();
@@ -461,19 +461,19 @@ describe('XRegExp()', function() {
             });
 
             it('should throw an exception for escaped literal numbers', function() {
-                expect(function() {XRegExp('[\\8]');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('[\\8]');}).toThrowError(SyntaxError);
             });
 
             it('should throw an exception for \\n-style backreferences followed by literal numbers', function() {
-                expect(function() {XRegExp('(1)\\10');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)\\11');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)\\100');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('(1)\\10');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)\\11');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)\\100');}).toThrowError(SyntaxError);
             });
 
             it('should throw an exception for backreferences to capturing groups not opened to the left', function() {
-                expect(function() {XRegExp('\\1(1)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(1)\\2(2)');}).toThrow(SyntaxError);
-                expect(function() {XRegExp('(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)\\11(11)');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('\\1(1)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(1)\\2(2)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)\\11(11)');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp('(\\1)');}).not.toThrow();
             });
 
@@ -488,14 +488,14 @@ describe('XRegExp()', function() {
                 };
 
                 unknown.inDefault.forEach(function(letter) {
-                    expect(function() {XRegExp('\\' + letter);}).toThrow(SyntaxError);
+                    expect(function() {XRegExp('\\' + letter);}).toThrowError(SyntaxError);
                 });
                 knownSingleChar.inDefault.forEach(function(letter) {
                     expect(function() {XRegExp('\\' + letter);}).not.toThrow();
                 });
 
                 unknown.inClass.forEach(function(letter) {
-                    expect(function() {XRegExp('[\\' + letter + ']');}).toThrow(SyntaxError);
+                    expect(function() {XRegExp('[\\' + letter + ']');}).toThrowError(SyntaxError);
                 });
                 knownSingleChar.inClass.forEach(function(letter) {
                     expect(function() {XRegExp('[\\' + letter + ']');}).not.toThrow();
@@ -508,8 +508,8 @@ describe('XRegExp()', function() {
                 var goodValues = ['\\cZ', '\\cz', '\\xFF', '\\xff', '\\uFFFF', '\\uffff'];
 
                 badValues.forEach(function(value) {
-                    expect(function() {XRegExp(value);}).toThrow(SyntaxError);
-                    expect(function() {XRegExp('[' + value + ']');}).toThrow(SyntaxError);
+                    expect(function() {XRegExp(value);}).toThrowError(SyntaxError);
+                    expect(function() {XRegExp('[' + value + ']');}).toThrowError(SyntaxError);
                 });
                 goodValues.forEach(function(value) {
                     expect(function() {XRegExp(value);}).not.toThrow();
@@ -547,7 +547,7 @@ describe('XRegExp()', function() {
 
             it('should not count () toward backreference numbers', function() {
                 expect(XRegExp('^(a)(?<n>b)\\1$', 'n').test('abb')).toBe(true);
-                expect(function() {XRegExp('(a)\\1', 'n');}).toThrow(SyntaxError);
+                expect(function() {XRegExp('(a)\\1', 'n');}).toThrowError(SyntaxError);
             });
 
             it('should not apply within character classes', function() {
@@ -556,7 +556,7 @@ describe('XRegExp()', function() {
             });
 
             it('should be activated by a leading mode modifier with flag n', function() {
-                expect(XRegExp('(?n)()')).toBeEquiv(XRegExp('()', 'n'));
+                expect(XRegExp('(?n)()')).toEqual(XRegExp('()', 'n'));
                 expect(XRegExp('(?n)()').exec('')[1]).toBeUndefined();
             });
 
@@ -577,7 +577,7 @@ describe('XRegExp()', function() {
             });
 
             it('should be activated by a leading mode modifier with flag s', function() {
-                expect(XRegExp('(?s).')).toBeEquiv(XRegExp('.', 's'));
+                expect(XRegExp('(?s).')).toEqual(XRegExp('.', 's'));
                 expect(XRegExp('(?s)^.$').test('\n')).toBe(true);
             });
 
@@ -645,7 +645,7 @@ describe('XRegExp()', function() {
             });
 
             it('should be activated by a leading mode modifier with flag x', function() {
-                expect(XRegExp('(?x)a b')).toBeEquiv(XRegExp('a b', 'x'));
+                expect(XRegExp('(?x)a b')).toEqual(XRegExp('a b', 'x'));
                 expect(XRegExp('(?x)^a b$').test('ab')).toBe(true);
             });
 

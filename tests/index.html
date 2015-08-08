@@ -5,13 +5,12 @@
     <title>XRegExp Specs</title>
 
     <!-- Jasmine -->
-    <link href="vendor/jasmine/jasmine.css" rel="stylesheet">
+    <link rel="stylesheet" href="vendor/jasmine/jasmine.css">
     <script src="vendor/jasmine/jasmine.js"></script>
     <script src="vendor/jasmine/jasmine-html.js"></script>
+    <script src="vendor/jasmine/boot.js"></script>
 
     <!-- XRegExp -->
-    <!--<script src="../build/xregexp-all-min.js"></script>-->
-    <!--<script src="../build/xregexp-min.js"></script>-->
     <script src="../src/xregexp.js"></script>
     <script src="../src/addons/build.js"></script>
     <script src="../src/addons/matchrecursive.js"></script>
@@ -34,82 +33,15 @@
     <script src="spec/s-addons-matchrecursive.js"></script>
     <script src="spec/s-addons-unicode.js"></script>
 
-    <script>
-    (function() {
-
-        var jasmineEnv = jasmine.getEnv();
-        var htmlReporter = new jasmine.HtmlReporter();
-        var reportRunnerResults = htmlReporter.reportRunnerResults;
-
-        htmlReporter.reportRunnerResults = function(runner) {
-            // Call the original, overriden method
-            reportRunnerResults(runner);
-            logAssertionCount(getAssertionCount(runner, this.specFilter));
-        };
-
-        jasmineEnv.addReporter(htmlReporter);
-        jasmineEnv.specFilter = function(spec) {
-            return htmlReporter.specFilter(spec);
-        };
-
-        window.onload = function() {
-            jasmineEnv.execute();
-        };
-
-        // Helpers...
-
-        function logAssertionCount(assertionCount) {
-            var alertBanner = getByClass('alert')[0];
-            var banner = document.createElement('div');
-            banner.className = 'banner';
-            banner.innerHTML =
-                'Total assertions: <b>' + assertionCount.total + '</b>. ' +
-                'Passed: ' + assertionCount.passed + '. ' +
-                'Failed: ' + assertionCount.failed + '.';
-            alertBanner.parentNode.insertBefore(banner, alertBanner.nextSibling);
-        }
-
-        function getAssertionCount(runner, specFilter) {
-            var specs = runner.specs();
-            var specResults;
-            var assertionCount = {total: 0, passed: 0, failed: 0};
-            for (var i = 0; i < specs.length; ++i) {
-                if (specFilter(specs[i])) {
-                    specResults = specs[i].results();
-                    assertionCount.total += specResults.totalCount;
-                    assertionCount.passed += specResults.passedCount;
-                    assertionCount.failed += specResults.failedCount;
-                }
-            }
-            return assertionCount;
-        }
-
-        function getByClass(klass) {
-            if (document.getElementsByClassName) {
-                return document.getElementsByClassName(klass);
-            }
-            // Not a very good shim...
-            var els = document.getElementsByTagName('*');
-            var results = [];
-            var regex = new RegExp('(?:^|\\s)' + klass + '(?:\\s|$)');
-            for (var i = 0, len = els.length; i < len; ++i) {
-                if (regex.test(els[i].className)) {
-                    results.push(els[i]);
-                }
-            }
-            return results;
-        }
-
-    })();
-    </script>
-
     <style>
-        body, #HTMLReporter {margin: 0; font-family: Monaco, Consolas, "Lucida Console", monospace;}
-        body {padding-bottom: 15px; border-bottom: 20px solid #CCC;}
-        #header {margin-left: 9px; font-size: 11px;}
+        #header {
+            font-family: Monaco, "Lucida Console", monospace;
+            font-size: 11px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
-    <p id="header">Note: This is not an ideal place to test XRegExp via the console, because a variety of syntax extensions are added by the specs on this page.</p>
+    <p id="header">Note: A variety of syntax extensions are added by the specs on this page, so this isn't an ideal place to test XRegExp via the console.</p>
 </body>
 </html>

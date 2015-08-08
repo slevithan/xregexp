@@ -14,9 +14,9 @@ describe('XRegExp.build addon:', function() {
         });
 
         it('should throw an exception when a mode modifier with g or y is used in the outer pattern', function() {
-            expect(function() {XRegExp.build('(?g){{a}}', {a: /a/});}).toThrow(SyntaxError);
-            expect(function() {XRegExp.build('(?y){{a}}', {a: /a/});}).toThrow(SyntaxError);
-            expect(function() {XRegExp.build('(?migs){{a}}', {a: /a/});}).toThrow(SyntaxError);
+            expect(function() {XRegExp.build('(?g){{a}}', {a: /a/});}).toThrowError(SyntaxError);
+            expect(function() {XRegExp.build('(?y){{a}}', {a: /a/});}).toThrowError(SyntaxError);
+            expect(function() {XRegExp.build('(?migs){{a}}', {a: /a/});}).toThrowError(SyntaxError);
         });
 
         it('should not interpolate named subpatterns within character classes', function() {

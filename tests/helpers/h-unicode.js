@@ -12,8 +12,8 @@ function testUnicodeToken(name, options) {
     var isBmpChar;
 
     if (options.isAstralOnly) {
-        expect(function() {XRegExp(pattern);}).toThrow(SyntaxError);
-        expect(function() {XRegExp(negated);}).toThrow(SyntaxError);
+        expect(function() {XRegExp(pattern);}).toThrowError(SyntaxError);
+        expect(function() {XRegExp(negated);}).toThrowError(SyntaxError);
     } else {
         bmpRegex = XRegExp(pattern);
         negatedBmpRegex = XRegExp(negated);
@@ -44,9 +44,10 @@ function testUnicodeToken(name, options) {
     }
 }
 
+
 /*!
  * ES6 Unicode Shims 0.1
- * Steven Levithan © 2012 MIT License
+ * Steven Levithan (c) 2012 MIT License
  */
 
 /**

@@ -3,6 +3,7 @@ beforeEach(function() {
     XRegExp.uninstall('natives astral');
 });
 
+
 // Repeat a string the specified number of times
 function repeat(str, num) {
     return Array(num + 1).join(str);
@@ -16,6 +17,7 @@ var hasNativeY = RegExp.prototype.sticky !== undefined;
 
 // Check for strict mode support
 var hasStrictMode = (function() {'use strict'; return !this;}());
+
 
 // Add the complete ES5 Array.prototype.forEach shim from <https://github.com/kriskowal/es5-shim>.
 // Commented out the `if (i in self)` sparse array check because it causes this to skip keys with
