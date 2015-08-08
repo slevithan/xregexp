@@ -1,8 +1,8 @@
 beforeEach(function() {
     jasmine.addMatchers({
-        // Compared to toEqual, ignores custom properties of arrays. Useful when comparing regex
-        // match results with arrays.
-        toBeEquiv: function() {
+        // Similar to toEqual with arrays, but ignores custom properties of arrays. Useful when
+        // comparing regex matches with array literals.
+        toEqualMatch: function() {
             return {
                 compare: function(actual, expected) {
                     var isA = jasmine.isA_;

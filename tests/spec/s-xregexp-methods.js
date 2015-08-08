@@ -256,8 +256,8 @@ describe('XRegExp.exec()', function() {
     });
 
     it('should return a match array with backreferences if a match is found', function() {
-        expect(XRegExp.exec('abcxdef', /a/)).toBeEquiv(['a']);
-        expect(XRegExp.exec('abcxdef', /(a)/)).toBeEquiv(['a', 'a']);
+        expect(XRegExp.exec('abcxdef', /a/)).toEqualMatch(['a']);
+        expect(XRegExp.exec('abcxdef', /(a)/)).toEqualMatch(['a', 'a']);
     });
 
     it('should not modify the lastIndex of a nonglobal regex', function() {
@@ -413,8 +413,8 @@ describe('XRegExp.exec()', function() {
      */
 
     it('should return backreferences to nonparticipating capturing groups as undefined', function() {
-        expect(XRegExp.exec('a', /()??/)).toBeEquiv(['', undefined]);
-        expect(XRegExp.exec('a', /()/)).toBeEquiv(['', '']);
+        expect(XRegExp.exec('a', /()??/)).toEqualMatch(['', undefined]);
+        expect(XRegExp.exec('a', /()/)).toEqualMatch(['', '']);
     });
 
     it('should avoid regression on edge cases', function() {
@@ -424,7 +424,7 @@ describe('XRegExp.exec()', function() {
          * provided a nonstring argument and called on a regex with a capturing group that matches
          * an empty string.
          */
-        expect(XRegExp.exec(1, /1()/)).toBeEquiv(['1', '']);
+        expect(XRegExp.exec(1, /1()/)).toEqualMatch(['1', '']);
     });
 
     it('should include the index property on the match array, with the match start position', function() {
@@ -854,9 +854,9 @@ describe('XRegExp.match()', function() {
         // NOTE: Old IE adds input, index, and lastIndex properties to global match arrays,
         // preventing toEqual from working as desired
 
-        expect(XRegExp.match('a bc', /(\w)/g)).toBeEquiv(['a', 'b', 'c']);
-        expect(XRegExp.match('a bc', /(\w)/g, 'all')).toBeEquiv(['a', 'b', 'c']);
-        expect(XRegExp.match('a bc', /(\w)/, 'all')).toBeEquiv(['a', 'b', 'c']);
+        expect(XRegExp.match('a bc', /(\w)/g)).toEqualMatch(['a', 'b', 'c']);
+        expect(XRegExp.match('a bc', /(\w)/g, 'all')).toEqualMatch(['a', 'b', 'c']);
+        expect(XRegExp.match('a bc', /(\w)/, 'all')).toEqualMatch(['a', 'b', 'c']);
     });
 
     it('should return an empty array upon failure for scope "all" or with a global regex when scope is unspecified', function() {
@@ -874,14 +874,14 @@ describe('XRegExp.match()', function() {
         expect(XRegExp.match(str, nonglobal)).toBe('1');
 
         global.lastIndex = 2;
-        expect(XRegExp.match(str, global)).toBeEquiv(['1', '2', '3']);
+        expect(XRegExp.match(str, global)).toEqualMatch(['1', '2', '3']);
 
         [nonglobal, global].forEach(function(regex) {
             regex.lastIndex = 2;
             expect(XRegExp.match(str, regex, 'one')).toBe('1');
 
             regex.lastIndex = 2;
-            expect(XRegExp.match(str, regex, 'all')).toBeEquiv(['1', '2', '3']);
+            expect(XRegExp.match(str, regex, 'all')).toEqualMatch(['1', '2', '3']);
         });
     });
 
@@ -1608,7 +1608,7 @@ describe('XRegExp.union()', function() {
         expect(XRegExp.union(['a+b*c']).test('a+b*c')).toBe(true);
 
         expect('a+b*c (?!\\.)'.match(XRegExp.union(['a+b*c', '(?!\\.)'], 'g'))).
-            toBeEquiv(['a+b*c', '(?!\\.)']);
+            toEqualMatch(['a+b*c', '(?!\\.)']);
     });
 
     it('should rewrite backreferences in regexes', function() {
@@ -1616,7 +1616,7 @@ describe('XRegExp.union()', function() {
             /(dogs)\1/,
             XRegExp('(?<pet>fish)\\k<pet>'),
             /(cats)\1/
-        ], 'g'))).toBeEquiv([
+        ], 'g'))).toEqualMatch([
             'fishfish',
             'dogsdogs',
             'catscats'
@@ -1628,7 +1628,7 @@ describe('XRegExp.union()', function() {
             'a+b*c',
             /(dogs)\1/,
             /(cats)\1/
-        ], 'g'))).toBeEquiv([
+        ], 'g'))).toEqualMatch([
             'a+b*c',
             'dogsdogs',
             'catscats'
