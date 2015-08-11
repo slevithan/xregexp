@@ -63,7 +63,7 @@ var XRegExp = (function(undefined) {
         // Storage for fixed/extended native methods
         fixed = {},
         // Storage for regexes cached by `XRegExp.cache`
-        cache = {},
+        regexCache = {},
         // Storage for pattern details cached by the `XRegExp` constructor
         patternCache = {},
         // Storage for regex syntax tokens added internally or by `XRegExp.addToken`
@@ -652,11 +652,11 @@ var XRegExp = (function(undefined) {
  * }
  */
     self.cache = function(pattern, flags) {
-        if (!cache[pattern]) {
-            cache[pattern] = {};
+        if (!regexCache[pattern]) {
+            regexCache[pattern] = {};
         }
-        return cache[pattern][flags] || (
-            cache[pattern][flags] = self(pattern, flags)
+        return regexCache[pattern][flags] || (
+            regexCache[pattern][flags] = self(pattern, flags)
         );
     };
 
@@ -666,8 +666,8 @@ var XRegExp = (function(undefined) {
             // Flush the pattern cache used by the `XRegExp` constructor
             patternCache = {};
         } else {
-            // Flush the regex object cache populated by `XRegExp.cache`
-            cache = {};
+            // Flush the regex cache populated by `XRegExp.cache`
+            regexCache = {};
         }
     };
 
