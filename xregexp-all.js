@@ -444,7 +444,7 @@ var XRegExp = (function(undefined) {
  *     <li>`g` - global
  *     <li>`i` - ignore case
  *     <li>`m` - multiline anchors
- *     <li>`y` - sticky (Firefox 3+)
+ *     <li>`y` - sticky (Firefox 3+, ES6)
  *   Additional XRegExp flags:
  *     <li>`n` - explicit capture
  *     <li>`s` - dot matches all (aka singleline)
@@ -474,7 +474,9 @@ var XRegExp = (function(undefined) {
             pos = 0,
             result,
             token,
-            key;
+            generated,
+            appliedPattern,
+            appliedFlags;
 
         if (self.isRegExp(pattern)) {
             if (flags !== undefined) {
@@ -487,27 +489,28 @@ var XRegExp = (function(undefined) {
         pattern = pattern === undefined ? '' : String(pattern);
         flags = flags === undefined ? '' : String(flags);
 
-        // Cache-lookup key; intentionally using an invalid regex sequence as the separator
-        key = pattern + '***' + flags;
+        if (!patternCache[pattern]) {
+            patternCache[pattern] = {};
+        }
 
-        if (!patternCache[key]) {
+        if (!patternCache[pattern][flags]) {
             // Check for flag-related errors, and strip/apply flags in a leading mode modifier
             result = prepareFlags(pattern, flags);
-            pattern = result.pattern;
-            flags = result.flags;
+            appliedPattern = result.pattern;
+            appliedFlags = result.flags;
 
-            // Use XRegExp's syntax tokens to translate the pattern to a native regex pattern...
-            // `pattern.length` may change on each iteration, if tokens use the `reparse` option
-            while (pos < pattern.length) {
+            // Use XRegExp's tokens to translate the pattern to a native regex pattern.
+            // `appliedPattern.length` may change on each iteration if tokens use `reparse`
+            while (pos < appliedPattern.length) {
                 do {
                     // Check for custom tokens at the current position
-                    result = runTokens(pattern, flags, pos, scope, context);
+                    result = runTokens(appliedPattern, appliedFlags, pos, scope, context);
                     // If the matched token used the `reparse` option, splice its output into the
                     // pattern before running tokens again at the same position
                     if (result && result.reparse) {
-                        pattern = pattern.slice(0, pos) +
+                        appliedPattern = appliedPattern.slice(0, pos) +
                             result.output +
-                            pattern.slice(pos + result.matchLength);
+                            appliedPattern.slice(pos + result.matchLength);
                     }
                 } while (result && result.reparse);
 
@@ -516,7 +519,7 @@ var XRegExp = (function(undefined) {
                     pos += (result.matchLength || 1);
                 } else {
                     // Get the native token at the current position
-                    token = self.exec(pattern, nativeTokens[scope], pos, 'sticky')[0];
+                    token = self.exec(appliedPattern, nativeTokens[scope], pos, 'sticky')[0];
                     output += token;
                     pos += token.length;
                     if (token === '[' && scope === defaultScope) {
@@ -527,18 +530,22 @@ var XRegExp = (function(undefined) {
                 }
             }
 
-            patternCache[key] = {
+            patternCache[pattern][flags] = {
                 // Cleanup token cruft: repeated `(?:)(?:)` and leading/trailing `(?:)`
                 pattern: nativ.replace.call(output, /\(\?:\)(?=\(\?:\))|^\(\?:\)|\(\?:\)$/g, ''),
                 // Strip all but native flags
-                flags: nativ.replace.call(flags, /[^gimy]+/g, ''),
+                flags: nativ.replace.call(appliedFlags, /[^gimy]+/g, ''),
                 // `context.captureNames` has an item for each capturing group, even if unnamed
                 captures: context.hasNamedCapture ? context.captureNames : null
             }
         }
 
-        key = patternCache[key];
-        return augment(new RegExp(key.pattern, key.flags), key.captures, /*addProto*/ true);
+        generated = patternCache[pattern][flags];
+        return augment(
+            new RegExp(generated.pattern, generated.flags),
+            generated.captures,
+            /*addProto*/ true
+        );
     };
 
 // Add `RegExp.prototype` to the prototype chain
