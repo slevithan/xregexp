@@ -32,8 +32,8 @@
 
 /**
  * XRegExp provides augmented, extensible regular expressions. You get additional regex syntax and
- * flags, beyond what browsers support natively. XRegExp is also a regex utility belt with tools
- * to make your client-side grepping simpler and more powerful, while freeing you from related
+ * flags, beyond what browsers support natively. XRegExp is also a regex utility belt with tools to
+ * make your client-side grepping simpler and more powerful, while freeing you from related
  * cross-browser inconsistencies.
  */
 var XRegExp = (function(undefined) {
@@ -82,8 +82,10 @@ var XRegExp = (function(undefined) {
         replacementToken = /\$(?:{([\w$]+)}|(\d\d?|[\s\S]))/g,
         // Check for correct `exec` handling of nonparticipating capturing groups
         correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined,
-        // Check for flag y support
+        // Check for ES6 (and Firefox 3+) flag y support
         hasNativeY = RegExp.prototype.sticky !== undefined,
+        // Check for ES6 `flags` prop support
+        hasFlagsProp = RegExp.prototype.flags !== undefined,
         // Tracker for known flags, including addon flags
         registeredFlags = {
             g: true,
@@ -101,33 +103,44 @@ var XRegExp = (function(undefined) {
  * ============================== */
 
 /**
- * Attaches named capture data and `XRegExp.prototype` properties to a regex object.
+ * Attaches extended data and `XRegExp.prototype` properties to a regex object.
  *
  * @private
  * @param {RegExp} regex Regex to augment.
  * @param {Array} captureNames Array with capture names, or `null`.
- * @param {Boolean} [addProto=false] Whether to attach `XRegExp.prototype` properties. Not
- *   attaching properties avoids a minor performance penalty.
+ * @param {String} xSource XRegExp pattern used to generate `regex`, or `null` if N/A.
+ * @param {String} xFlags XRegExp flags used to generate `regex`, or `null` if N/A.
+ * @param {Boolean} [isInternalOnly=false] Whether the regex will be used only for internal
+ *   operations, and never exposed to users. For internal-only regexes, we can improve perf by
+ *   skipping some operations like attaching `XRegExp.prototype` properties.
  * @returns {RegExp} Augmented regex.
  */
-    function augment(regex, captureNames, addProto) {
+    function augment(regex, captureNames, xSource, xFlags, isInternalOnly) {
         var p;
 
-        if (addProto) {
-            // Can't auto-inherit these since the XRegExp constructor returns a nonprimitive value
-            if (regex.__proto__) {
-                regex.__proto__ = self.prototype;
-            } else {
-                for (p in self.prototype) {
-                    // A `self.prototype.hasOwnProperty(p)` check wouldn't be worth it here, since
-                    // this is performance sensitive, and enumerable `Object.prototype` or
-                    // `RegExp.prototype` extensions exist on `regex.prototype` anyway
-                    regex[p] = self.prototype[p];
-                }
+        regex[REGEX_DATA] = {
+            captureNames: captureNames
+        };
+
+        if (isInternalOnly) {
+            return regex;
+        }
+
+        // Can't auto-inherit these since the XRegExp constructor returns a nonprimitive value
+        if (regex.__proto__) {
+            regex.__proto__ = self.prototype;
+        } else {
+            for (p in self.prototype) {
+                // A `self.prototype.hasOwnProperty(p)` check wouldn't be worth it here, since this
+                // is performance sensitive, and enumerable `Object.prototype` or `RegExp.prototype`
+                // extensions exist on `regex.prototype` anyway
+                regex[p] = self.prototype[p];
             }
         }
 
-        regex[REGEX_DATA] = {captureNames: captureNames};
+        regex[REGEX_DATA].source = xSource;
+        // Emulate the ES6 `flags` prop by ensuring flags are in alphabetical order
+        regex[REGEX_DATA].flags = xFlags ? xFlags.split('').sort().join('') : xFlags;
 
         return regex;
     }
@@ -144,56 +157,88 @@ var XRegExp = (function(undefined) {
     }
 
 /**
- * Copies a regex object while preserving special properties for named capture and augmenting with
- * `XRegExp.prototype` methods. The copy has a fresh `lastIndex` property (set to zero). Allows
- * adding and removing native flags while copying the regex.
+ * Copies a regex object while preserving extended data and augmenting with `XRegExp.prototype`
+ * properties. The copy has a fresh `lastIndex` property (set to zero). Allows adding and removing
+ * flags g and y while copying the regex.
  *
  * @private
  * @param {RegExp} regex Regex to copy.
- * @param {Object} [options] Allows specifying native flags to add or remove while copying the
- *   regex, and whether to attach `XRegExp.prototype` properties.
+ * @param {Object} [options] Options object with optional properties:
+ *   <li>`addG` {Boolean} Add flag g while copying the regex.
+ *   <li>`addY` {Boolean} Add flag y while copying the regex.
+ *   <li>`removeG` {Boolean} Remove flag g while copying the regex.
+ *   <li>`removeY` {Boolean} Remove flag y while copying the regex.
+ *   <li>`isInternalOnly` {Boolean} Whether the copied regex will be used only for internal
+ *     operations, and never exposed to users. For internal-only regexes, we can improve perf by
+ *     skipping some operations like attaching `XRegExp.prototype` properties.
  * @returns {RegExp} Copy of the provided regex, possibly with modified flags.
  */
-    function copy(regex, options) {
+    function copyRegex(regex, options) {
         if (!self.isRegExp(regex)) {
             throw new TypeError('Type RegExp expected');
         }
 
-        // Get native flags in use
-        var flags = nativ.exec.call(/\/([a-z]*)$/i, String(regex))[1];
+        var xData = regex[REGEX_DATA] || {},
+            flags = getNativeFlags(regex),
+            flagsToAdd = '',
+            flagsToRemove = '',
+            xregexpSource = null,
+            xregexpFlags = null;
+
         options = options || {};
 
-        if (options.add) {
-            flags = clipDuplicates(flags + options.add);
+        if (options.removeG) {flagsToRemove += 'g';}
+        if (options.removeY) {flagsToRemove += 'y';}
+        if (flagsToRemove) {
+            flags = nativ.replace.call(flags, new RegExp('[' + flagsToRemove + ']+', 'g'), '');
         }
 
-        if (options.remove) {
-            // Would need to escape `options.remove` if this was public
-            flags = nativ.replace.call(flags, new RegExp('[' + options.remove + ']+', 'g'), '');
+        if (options.addG) {flagsToAdd += 'g';}
+        if (options.addY) {flagsToAdd += 'y';}
+        if (flagsToAdd) {
+            flags = clipDuplicates(flags + flagsToAdd);
         }
 
-        // Augment with `XRegExp.prototype` methods, but use the native `RegExp` constructor and
+        if (!options.isInternalOnly) {
+            if (xData.source != null) {
+                xregexpSource = xData.source;
+            }
+            if (xData.flags != null) {
+                // Flags are only added for non-internal regexes by `XRegExp.globalize`, so we can
+                // skip handling `flagsToRemove` for perf reasons
+                xregexpFlags = flagsToAdd ? clipDuplicates(xData.flags + flagsToAdd) : xData.flags;
+            }
+        }
+
+        // Augment with `XRegExp.prototype` properties, but use the native `RegExp` constructor to
         // avoid searching for special tokens. That would be wrong for regexes constructed by
         // `RegExp`, and unnecessary for regexes constructed by `XRegExp` because the regex has
         // already undergone the translation to native regex syntax
         regex = augment(
             new RegExp(regex.source, flags),
-            hasNamedCapture(regex) ? regex[REGEX_DATA].captureNames.slice(0) : null,
-            options.addProto
+            hasNamedCapture(regex) ? xData.captureNames.slice(0) : null,
+            xregexpSource,
+            xregexpFlags,
+            options.isInternalOnly
         );
 
         return regex;
     }
 
 /**
- * Returns a new copy of the object used to hold extended regex instance data, tailored for a
- * native nonaugmented regex.
+ * Returns native flags for the provided regex, not including special XRegExp flags.
  *
  * @private
- * @returns {Object} Object with base regex instance data.
+ * @param {RegExp} regex Regex to check.
+ * @returns {String} Native flags.
  */
-    function getBaseProps() {
-        return {captureNames: null};
+    function getNativeFlags(regex) {
+        return hasFlagsProp ?
+            regex.flags :
+            // Explicitly using `RegExp.prototype.toString` (rather than e.g. `String` or
+            // concatenation with an empty string) allows this to continue working predictably when
+            // `XRegExp.proptotype.toString` is overriden
+            nativ.exec.call(/\/([a-z]*)$/i, RegExp.prototype.toString.call(regex))[1];
     }
 
 /**
@@ -218,7 +263,6 @@ var XRegExp = (function(undefined) {
     function indexOf(array, value) {
         var len = array.length, i;
 
-        // Not a very good shim, but good enough for XRegExp's use of it
         for (i = 0; i < len; ++i) {
             if (array[i] === value) {
                 return i;
@@ -381,16 +425,14 @@ var XRegExp = (function(undefined) {
     }
 
 /**
- * Enables or disables implicit astral mode opt-in.
+ * Enables or disables implicit astral mode opt-in. When enabled, flag A is automatically added to
+ * all new regexes created by XRegExp. This causes an error to be thrown when creating regexes if
+ * the Unicode Base addon is not available, since flag A is registered by that addon.
  *
  * @private
  * @param {Boolean} on `true` to enable; `false` to disable.
  */
     function setAstral(on) {
-        // Reset the pattern cache used by the `XRegExp` constructor, since the same pattern and
-        // flags might now produce different results
-        self.cache.flush('patterns');
-
         features.astral = on;
     }
 
@@ -460,8 +502,8 @@ var XRegExp = (function(undefined) {
  *          (?<day>   [0-9]{2} )     # day   ', 'x');
  *
  * // Providing a regex object copies it. Native regexes are recompiled using native (not XRegExp)
- * // syntax. Copies maintain special properties for named capture, are augmented with
- * // `XRegExp.prototype` methods, and have fresh `lastIndex` properties (set to zero).
+ * // syntax. Copies maintain extended data, are augmented with `XRegExp.prototype` properties, and
+ * // have fresh `lastIndex` properties (set to zero).
  * XRegExp(/regex/);
  */
     self = function(pattern, flags) {
@@ -482,12 +524,17 @@ var XRegExp = (function(undefined) {
             if (flags !== undefined) {
                 throw new TypeError('Cannot supply flags when copying a RegExp');
             }
-            return copy(pattern, {addProto: true});
+            return copyRegex(pattern);
         }
 
         // Copy the argument behavior of `RegExp`
         pattern = pattern === undefined ? '' : String(pattern);
         flags = flags === undefined ? '' : String(flags);
+
+        if (self.isInstalled('astral') && flags.indexOf('A') === -1) {
+            // This causes an error to be thrown if the Unicode Base addon is not available
+            flags += 'A';
+        }
 
         if (!patternCache[pattern]) {
             patternCache[pattern] = {};
@@ -544,7 +591,8 @@ var XRegExp = (function(undefined) {
         return augment(
             new RegExp(generated.pattern, generated.flags),
             generated.captures,
-            /*addProto*/ true
+            pattern,
+            flags
         );
     };
 
@@ -631,7 +679,11 @@ var XRegExp = (function(undefined) {
 
         // Add to the private list of syntax tokens
         tokens.push({
-            regex: copy(regex, {add: 'g' + (hasNativeY ? 'y' : '')}),
+            regex: copyRegex(regex, {
+                addG: true,
+                addY: hasNativeY,
+                isInternalOnly: true
+            }),
             handler: handler,
             scope: options.scope || defaultScope,
             flag: options.flag,
@@ -724,19 +776,25 @@ var XRegExp = (function(undefined) {
  * // result -> ['2', '3', '4']
  */
     self.exec = function(str, regex, pos, sticky) {
-        var cacheFlags = 'g', match, r2;
+        var cacheKey = 'g',
+            addY = false,
+            match,
+            r2;
 
-        if (hasNativeY && (sticky || (regex.sticky && sticky !== false))) {
-            cacheFlags += 'y';
+        addY = hasNativeY && !!(sticky || (regex.sticky && sticky !== false));
+        if (addY) {
+            cacheKey += 'y';
         }
 
-        regex[REGEX_DATA] = regex[REGEX_DATA] || getBaseProps();
+        regex[REGEX_DATA] = regex[REGEX_DATA] || {};
 
         // Shares cached copies with `XRegExp.match`/`replace`
-        r2 = regex[REGEX_DATA][cacheFlags] || (
-            regex[REGEX_DATA][cacheFlags] = copy(regex, {
-                add: cacheFlags,
-                remove: sticky === false ? 'y' : ''
+        r2 = regex[REGEX_DATA][cacheKey] || (
+            regex[REGEX_DATA][cacheKey] = copyRegex(regex, {
+                addG: true,
+                addY: addY,
+                removeY: sticky === false,
+                isInternalOnly: true
             })
         );
 
@@ -794,9 +852,9 @@ var XRegExp = (function(undefined) {
     };
 
 /**
- * Copies a regex object and adds flag `g`. The copy maintains special properties for named
- * capture, is augmented with `XRegExp.prototype` methods, and has a fresh `lastIndex` property
- * (set to zero). Native regexes are not recompiled using XRegExp syntax.
+ * Copies a regex object and adds flag `g`. The copy maintains extended data, is augmented with
+ * `XRegExp.prototype` properties, and has a fresh `lastIndex` property (set to zero). Native
+ * regexes are not recompiled using XRegExp syntax.
  *
  * @memberOf XRegExp
  * @param {RegExp} regex Regex to globalize.
@@ -807,7 +865,7 @@ var XRegExp = (function(undefined) {
  * globalCopy.global; // -> true
  */
     self.globalize = function(regex) {
-        return copy(regex, {add: 'g', addProto: true});
+        return copyRegex(regex, {addG: true});
     };
 
 /**
@@ -908,16 +966,19 @@ var XRegExp = (function(undefined) {
     self.match = function(str, regex, scope) {
         var global = (regex.global && scope !== 'one') || scope === 'all',
             cacheFlags = (global ? 'g' : '') + (regex.sticky ? 'y' : ''),
+            cacheKey = cacheFlags || 'noGY',
             result,
             r2;
 
-        regex[REGEX_DATA] = regex[REGEX_DATA] || getBaseProps();
+        regex[REGEX_DATA] = regex[REGEX_DATA] || {};
 
         // Shares cached copies with `XRegExp.exec`/`replace`
-        r2 = regex[REGEX_DATA][cacheFlags || 'noGY'] || (
-            regex[REGEX_DATA][cacheFlags || 'noGY'] = copy(regex, {
-                add: cacheFlags,
-                remove: scope === 'one' ? 'g' : ''
+        r2 = regex[REGEX_DATA][cacheKey] || (
+            regex[REGEX_DATA][cacheKey] = copyRegex(regex, {
+                addG: !!global,
+                addY: !!regex.sticky,
+                removeG: scope === 'one',
+                isInternalOnly: true
             })
         );
 
@@ -998,10 +1059,10 @@ var XRegExp = (function(undefined) {
 /**
  * Returns a new string with one or all matches of a pattern replaced. The pattern can be a string
  * or regex, and the replacement can be a string or a function to be called for each match. To
- * perform a global search and replace, use the optional `scope` argument or include flag g if
- * using a regex. Replacement strings can use `${n}` for named and numbered backreferences.
- * Replacement functions can use named backreferences via `arguments[0].name`. Also fixes browser
- * bugs compared to the native `String.prototype.replace` and can be used reliably cross-browser.
+ * perform a global search and replace, use the optional `scope` argument or include flag g if using
+ * a regex. Replacement strings can use `${n}` for named and numbered backreferences. Replacement
+ * functions can use named backreferences via `arguments[0].name`. Also fixes browser bugs compared
+ * to the native `String.prototype.replace` and can be used reliably cross-browser.
  *
  * @memberOf XRegExp
  * @param {String} str String to search.
@@ -1046,18 +1107,21 @@ var XRegExp = (function(undefined) {
         var isRegex = self.isRegExp(search),
             global = (search.global && scope !== 'one') || scope === 'all',
             cacheFlags = (global ? 'g' : '') + (search.sticky ? 'y' : ''),
+            cacheKey = cacheFlags || 'noGY',
             s2 = search,
             result;
 
         if (isRegex) {
-            search[REGEX_DATA] = search[REGEX_DATA] || getBaseProps();
+            search[REGEX_DATA] = search[REGEX_DATA] || {};
 
-            // Shares cached copies with `XRegExp.exec`/`match`. Since a copy is used,
-            // `search`'s `lastIndex` isn't updated *during* replacement iterations
-            s2 = search[REGEX_DATA][cacheFlags || 'noGY'] || (
-                search[REGEX_DATA][cacheFlags || 'noGY'] = copy(search, {
-                    add: cacheFlags,
-                    remove: scope === 'one' ? 'g' : ''
+            // Shares cached copies with `XRegExp.exec`/`match`. Since a copy is used, `search`'s
+            // `lastIndex` isn't updated *during* replacement iterations
+            s2 = search[REGEX_DATA][cacheKey] || (
+                search[REGEX_DATA][cacheKey] = copyRegex(search, {
+                    addG: !!global,
+                    addY: !!search.sticky,
+                    removeG: scope === 'one',
+                    isInternalOnly: true
                 })
             );
         } else if (global) {
@@ -1289,7 +1353,10 @@ var XRegExp = (function(undefined) {
             // capturing groups. This fixes IE 5.5-8, but not IE 9's quirks mode or emulation of
             // older IEs. IE 9 in standards mode follows the spec
             if (!correctExecNpcg && match.length > 1 && indexOf(match, '') > -1) {
-                r2 = copy(this, {remove: 'g'});
+                r2 = copyRegex(this, {
+                    removeG: true,
+                    isInternalOnly: true
+                });
                 // Using `str.slice(match.index)` rather than `match[0]` in case lookahead allowed
                 // matching due to characters outside the match
                 nativ.replace.call(String(str).slice(match.index), r2, function() {
@@ -1693,9 +1760,9 @@ var XRegExp = (function(undefined) {
 /*
  * Named capturing group; match the opening delimiter only: `(?<name>`. Capture names can use the
  * characters A-Z, a-z, 0-9, _, and $ only. Names can't be integers. Supports Python-style
- * `(?P<name>` as an alternate syntax to avoid issues in recent Opera (which natively supports the
- * Python-style syntax). Otherwise, XRegExp might treat numbered backreferences to Python-style
- * named capture as octals.
+ * `(?P<name>` as an alternate syntax to avoid issues in some older versions of Opera which natively
+ * supported the Python-style syntax. Otherwise, XRegExp might treat numbered backreferences to
+ * Python-style named capture as octals.
  */
     add(
         /\(\?P?<([\w$]+)>/,
@@ -2247,8 +2314,8 @@ var XRegExp = (function(undefined) {
                 ERR_ASTRAL_IN_CLASS = 'Astral mode does not support Unicode tokens within character classes',
                 // Negated via \P{..} or \p{^..}
                 isNegated = match[1] === 'P' || !!match[2],
-                // Switch from BMP (U+FFFF) to astral (U+10FFFF) mode via flag A or implicit opt-in
-                isAstralMode = flags.indexOf('A') > -1 || XRegExp.isInstalled('astral'),
+                // Switch from BMP (0-FFFF) to astral (0-10FFFF) mode via flag A
+                isAstralMode = flags.indexOf('A') > -1,
                 // Token lookup name. Check `[4]` first to avoid passing `undefined` via `\p{}`
                 slug = normalize(match[4] || match[3]),
                 // Token data object
