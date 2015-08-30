@@ -177,7 +177,9 @@ var XRegExp = (function(undefined) {
             if (xData.source !== undefined) {
                 xregexpSource = xData.source;
             }
-            if (xData.flags !== undefined) {
+            // null or undefined; don't want to add to `flags` if the previous value was null, since
+            // that indicates we're not tracking original precompilation flags
+            if (xData.flags != null) {
                 // Flags are only added for non-internal regexes by `XRegExp.globalize`. Flags are
                 // never removed for non-internal regexes, so don't need to handle it
                 xregexpFlags = flagsToAdd ? clipDuplicates(xData.flags + flagsToAdd) : xData.flags;
@@ -435,7 +437,7 @@ var XRegExp = (function(undefined) {
  * @returns {*} The provided object.
  */
     function toObject(value) {
-        // This matches both `null` and `undefined`
+        // null or undefined
         if (value == null) {
             throw new TypeError('Cannot convert null or undefined to object');
         }
@@ -1464,7 +1466,7 @@ var XRegExp = (function(undefined) {
             });
         } else {
             // Ensure that the last value of `args` will be a string when given nonstring `this`,
-            // while still throwing on `null` or `undefined` context
+            // while still throwing on null or undefined context
             result = nativ.replace.call(this == null ? this : String(this), search, function() {
                 // Keep this function's `arguments` available through closure
                 var args = arguments;

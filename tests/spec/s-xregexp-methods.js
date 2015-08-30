@@ -628,6 +628,7 @@ describe('XRegExp.globalize()', function() {
 
     it('should retain the original source and flags (except /g)', function() {
         var regexes = [
+            XRegExp('(?i)(?<n>x)', 'm' + (hasNativeY ? 'y' : '')),
             XRegExp('(?<n>x)', 'im' + (hasNativeY ? 'y' : '')),
             /(x)/im
         ];
@@ -640,6 +641,46 @@ describe('XRegExp.globalize()', function() {
             expect(globalCopy.multiline).toBe(regex.multiline);
             expect(globalCopy.sticky).toBe(regex.sticky);
         });
+    });
+
+    it('should retain the original precompilation source and flags with added /g', function() {
+        var regexes = [
+            XRegExp('(?i)(?<n>x)', 'mx'),
+            XRegExp('(?<n>x)', 'imx'),
+            XRegExp('', 'g')
+        ];
+
+        regexes.forEach(function(regex) {
+            var regexXSource = regex[REGEX_DATA].source;
+            var regexXFlags = regex[REGEX_DATA].flags;
+            var globalCopy = XRegExp.globalize(regex);
+            var globalCopyXSource = globalCopy[REGEX_DATA].source;
+            var globalCopyXFlags = globalCopy[REGEX_DATA].flags;
+
+            expect(globalCopyXSource).toBe(regexXSource);
+            expect(globalCopyXFlags.indexOf('g')).toBeGreaterThan(-1);
+            if (regex.global) {
+                expect(globalCopyXFlags).toBe(regexXFlags);
+            } else {
+                expect(globalCopyXFlags.replace('g', '')).toBe(regexXFlags);
+            }
+        });
+    });
+
+    it('should set null precompilation source and flags for non-XRegExp regexes', function() {
+        expect(XRegExp.globalize(/./im)[REGEX_DATA]).toEqual(jasmine.any(Object));
+        expect(XRegExp.globalize(/./im)[REGEX_DATA].source).toBeNull();
+        expect(XRegExp.globalize(/./im)[REGEX_DATA].flags).toBeNull();
+
+        expect(XRegExp.globalize(XRegExp(/./im))[REGEX_DATA]).toEqual(jasmine.any(Object));
+        expect(XRegExp.globalize(XRegExp(/./im))[REGEX_DATA].source).toBeNull();
+        expect(XRegExp.globalize(XRegExp(/./im))[REGEX_DATA].flags).toBeNull();
+    });
+
+    it('should add /g to precompilation flags in alphabetical order', function() {
+        expect(XRegExp.globalize(XRegExp('', 'ix'))[REGEX_DATA].flags).toBe('gix');
+        // Flag A is registered by the Unicode Base addon
+        expect(XRegExp.globalize(XRegExp('', 'Aix'))[REGEX_DATA].flags).toBe('Agix');
     });
 
     it('should retain named capture capabilities', function() {

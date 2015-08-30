@@ -148,9 +148,43 @@ describe('XRegExp()', function() {
         expect(function() {XRegExp('', '?');}).toThrowError(SyntaxError);
     });
 
-    it('should store extended data on regex instances', function() {
-        expect(XRegExp('')[REGEX_DATA]).toEqual(jasmine.any(Object));
-        expect(XRegExp('')[REGEX_DATA].captureNames).toBe(null);
+    it('should store named capture data on regex instances', function() {
+        // The `captureNames` property is undocumented, so this is technically just testing
+        // implementation details. However, any changes to this need to be very intentional
+        var tests = [
+            {regex: XRegExp(''), captureNames: null},
+            {regex: XRegExp('()'), captureNames: null},
+            {regex: XRegExp('(?<a>)'), captureNames: ['a']},
+            {regex: XRegExp('(?<a>)()(?<b>)'), captureNames: ['a', null, 'b']},
+            {regex: XRegExp('(?<a>((?<b>)))'), captureNames: ['a', null, 'b']},
+            {regex: XRegExp('(?n)()'), captureNames: null},
+            {regex: XRegExp('(?n)(?<a>)()(?<b>)'), captureNames: ['a', 'b']},
+        ];
+        tests.forEach(function(test) {
+            expect(test.regex[REGEX_DATA].captureNames).toEqual(test.captureNames);
+        });
+    });
+
+    it('should store precompilation source on regex instances', function() {
+        expect(XRegExp('')[REGEX_DATA].source).toBe('');
+        expect(XRegExp('(?<a>)\n', 'x')[REGEX_DATA].source).toBe('(?<a>)\n');
+        expect(XRegExp('(?s).')[REGEX_DATA].source).toBe('(?s).');
+    });
+
+    it('should store precompilation flags on regex instances', function() {
+        expect(XRegExp('')[REGEX_DATA].flags).toBe('');
+        expect(XRegExp('', '')[REGEX_DATA].flags).toBe('');
+        expect(XRegExp('.', 'gsx')[REGEX_DATA].flags).toBe('gsx');
+        expect(XRegExp('(?s).')[REGEX_DATA].flags).toBe('');
+        expect(XRegExp('(?s).', 's')[REGEX_DATA].flags).toBe('s');
+        expect(XRegExp('(?s).', 'g')[REGEX_DATA].flags).toBe('g');
+    });
+
+    // The ES6 spec for `RegExp.prototype.flags` doesn't mention alphabetical order, but it
+    // explicitly orders flags alphabetically as `gimuy`
+    it('should store precompilation flags in alphabetical order', function() {
+        // Flag A is registered by the Unicode Base addon
+        expect(XRegExp('', 'gAsminx')[REGEX_DATA].flags).toBe('Agimnsx');
     });
 
     it('should copy provided RegExp objects', function() {
@@ -177,8 +211,26 @@ describe('XRegExp()', function() {
         expect(function() {XRegExp(/\00/);}).not.toThrow();
     });
 
-    it('should preserve named capture properties when copying a regex', function() {
+    it('should preserve named capture data when copying a regex', function() {
         expect(XRegExp(XRegExp('(?<name>a)'))[REGEX_DATA].captureNames).toContain('name');
+    });
+
+    it('should preserve precompilation source and flags when copying a regex', function() {
+        var pattern = '(?i)(?<name>a)';
+        var flags = 'gnx';
+        expect(XRegExp(XRegExp(pattern, flags))[REGEX_DATA].source).toBe(pattern);
+        expect(XRegExp(XRegExp(pattern, flags))[REGEX_DATA].flags).toBe(flags);
+        expect(XRegExp(XRegExp(pattern))[REGEX_DATA].flags).toBe('');
+    });
+
+    it('should set null precompilation source and flags when copying a non-XRegExp regex', function() {
+        expect(XRegExp(/./im)[REGEX_DATA]).toEqual(jasmine.any(Object));
+        expect(XRegExp(/./im)[REGEX_DATA].source).toBeNull();
+        expect(XRegExp(/./im)[REGEX_DATA].flags).toBeNull();
+
+        expect(XRegExp(XRegExp(/./im))[REGEX_DATA]).toEqual(jasmine.any(Object));
+        expect(XRegExp(XRegExp(/./im))[REGEX_DATA].source).toBeNull();
+        expect(XRegExp(XRegExp(/./im))[REGEX_DATA].flags).toBeNull();
     });
 
     describe('fixes regex syntax cross-browser:', function() {
