@@ -226,11 +226,11 @@ var XRegExp = (function(undefined) {
     }
 
 /**
- * Returns native flags for the provided regex, not including special XRegExp flags.
+ * Returns native `RegExp` flags used by a regex object.
  *
  * @private
  * @param {RegExp} regex Regex to check.
- * @returns {String} Native flags.
+ * @returns {String} Native flags in use.
  */
     function getNativeFlags(regex) {
         return hasFlagsProp ?
@@ -1437,11 +1437,11 @@ var XRegExp = (function(undefined) {
 
 /**
  * Adds support for `${n}` tokens for named and numbered backreferences in replacement text, and
- * provides named backreferences to replacement functions as `arguments[0].name`. Also fixes
- * browser bugs in replacement text syntax when performing a replacement using a nonregex search
- * value, and the value of a replacement regex's `lastIndex` property during replacement iterations
- * and upon completion. Note that this doesn't support SpiderMonkey's proprietary third (`flags`)
- * argument. Calling `XRegExp.install('natives')` uses this to override the native method. Use via
+ * provides named backreferences to replacement functions as `arguments[0].name`. Also fixes browser
+ * bugs in replacement text syntax when performing a replacement using a nonregex search value, and
+ * the value of a replacement regex's `lastIndex` property during replacement iterations and upon
+ * completion. Calling `XRegExp.install('natives')` uses this to override the native method. Note
+ * that this doesn't support SpiderMonkey's proprietary third (`flags`) argument. Use via
  * `XRegExp.replace` without overriding natives.
  *
  * @private
@@ -1553,6 +1553,7 @@ var XRegExp = (function(undefined) {
                         }
                         return args[$2] || '';
                     }
+                    // `$` followed by an unsupported char is an error, unlike native JS
                     throw new SyntaxError('Invalid token ' + $0);
                 });
             });
