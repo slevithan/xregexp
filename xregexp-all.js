@@ -200,12 +200,12 @@ var XRegExp = (function(undefined) {
         }
 
         if (!options.isInternalOnly) {
-            if (xData.source != null) {
+            if (xData.source !== undefined) {
                 xregexpSource = xData.source;
             }
-            if (xData.flags != null) {
-                // Flags are only added for non-internal regexes by `XRegExp.globalize`, so we can
-                // skip handling `flagsToRemove` for perf reasons
+            if (xData.flags !== undefined) {
+                // Flags are only added for non-internal regexes by `XRegExp.globalize`. Flags are
+                // never removed for non-internal regexes, so don't need to handle it
                 xregexpFlags = flagsToAdd ? clipDuplicates(xData.flags + flagsToAdd) : xData.flags;
             }
         }
@@ -584,7 +584,7 @@ var XRegExp = (function(undefined) {
                 flags: nativ.replace.call(appliedFlags, /[^gimy]+/g, ''),
                 // `context.captureNames` has an item for each capturing group, even if unnamed
                 captures: context.hasNamedCapture ? context.captureNames : null
-            }
+            };
         }
 
         generated = patternCache[pattern][flags];
@@ -597,7 +597,7 @@ var XRegExp = (function(undefined) {
     };
 
 // Add `RegExp.prototype` to the prototype chain
-    self.prototype = new RegExp;
+    self.prototype = new RegExp();
 
 /* ==============================
  * Public properties
@@ -844,7 +844,7 @@ var XRegExp = (function(undefined) {
             // `XRegExp.exec` doesn't use `lastIndex` to set the search position, this can't lead
             // to an infinite loop, at least. Actually, because of the way `XRegExp.exec` caches
             // globalized versions of regexes, mutating the regex will not have any effect on the
-            // iteration or matched strings, which is a nice side effect that brings extra safety.
+            // iteration or matched strings, which is a nice side effect that brings extra safety
             callback(match, ++i, str, regex);
 
             pos = match.index + (match[0].length || 1);
@@ -965,8 +965,7 @@ var XRegExp = (function(undefined) {
  */
     self.match = function(str, regex, scope) {
         var global = (regex.global && scope !== 'one') || scope === 'all',
-            cacheFlags = (global ? 'g' : '') + (regex.sticky ? 'y' : ''),
-            cacheKey = cacheFlags || 'noGY',
+            cacheKey = ((global ? 'g' : '') + (regex.sticky ? 'y' : '')) || 'noGY',
             result,
             r2;
 
@@ -1106,8 +1105,7 @@ var XRegExp = (function(undefined) {
     self.replace = function(str, search, replacement, scope) {
         var isRegex = self.isRegExp(search),
             global = (search.global && scope !== 'one') || scope === 'all',
-            cacheFlags = (global ? 'g' : '') + (search.sticky ? 'y' : ''),
-            cacheKey = cacheFlags || 'noGY',
+            cacheKey = ((global ? 'g' : '') + (search.sticky ? 'y' : '')) || 'noGY',
             s2 = search,
             result;
 
