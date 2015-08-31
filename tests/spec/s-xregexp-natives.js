@@ -63,14 +63,8 @@ describe('When overridden, RegExp.prototype.exec()', function() {
      * - Are mirrored by XRegExp.exec and nonglobal String.prototype.match.
      */
 
-    describe('provides extensions:', function() {
-
+    xdescribe('provides extensions:', function() {
         // TODO: Copy/update named capture specs from XRegExp.exec here
-
-        it('', function() {
-
-        });
-
     });
 
 });
@@ -248,14 +242,8 @@ describe('When overridden, String.prototype.match()', function() {
          * - Are mirrored by RegExp.prototype.exec and XRegExp.exec.
          */
 
-        describe('provides extensions:', function() {
-
+        xdescribe('provides extensions:', function() {
             // TODO: Copy/update specs from RegExp.prototype.exec here
-
-            it('', function() {
-
-            });
-
         });
 
     });

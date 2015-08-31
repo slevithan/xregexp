@@ -771,21 +771,6 @@ describe('XRegExp.install()', function() {
         });
     });
 
-    // NOTE: The 'all' shortcut was supported in XRegExp 2.0.0 only
-    it('should not allow using the "all" shortcut', function() {
-        XRegExp.install({all: true});
-
-        features.forEach(function(feature) {
-            expect(XRegExp.isInstalled(feature)).toBe(false);
-        });
-
-        XRegExp.install('all');
-
-        features.forEach(function(feature) {
-            expect(XRegExp.isInstalled(feature)).toBe(false);
-        });
-    });
-
     // TODO: Add basic specs that verify whether actual functionality of installed features is
     // present. Deeper testing of optional features is done in other specs
 
@@ -1642,21 +1627,6 @@ describe('XRegExp.uninstall()', function() {
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(false);
-        });
-    });
-
-    // NOTE: The 'all' shortcut was supported in XRegExp 2.0.0 only
-    it('should not allow using the "all" shortcut', function() {
-        XRegExp.uninstall({all: true});
-
-        features.forEach(function(feature) {
-            expect(XRegExp.isInstalled(feature)).toBe(true);
-        });
-
-        XRegExp.install('all');
-
-        features.forEach(function(feature) {
-            expect(XRegExp.isInstalled(feature)).toBe(true);
         });
     });
 

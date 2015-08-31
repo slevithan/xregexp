@@ -703,12 +703,8 @@ describe('XRegExp()', function() {
 
         });
 
-        describe('A (astral), via the Unicode Base addon', function() {
-
-            it('', function() {
-                // Covered by the specs for Unicode Base
-            });
-
+        xdescribe('A (astral), via the Unicode Base addon', function() {
+            // Covered by the specs for Unicode Base
         });
 
     });
