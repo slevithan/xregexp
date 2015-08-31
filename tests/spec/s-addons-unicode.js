@@ -280,7 +280,7 @@ describe('Unicode Base addon:', function() {
             expect(function() {XRegExp('[\\p{L}]', 'A');}).toThrowError(SyntaxError);
         });
 
-        it('should be equivalent to implicit astral-mode opt-in', function() {
+        it('should be equivalent to implicit astral mode', function() {
             XRegExp.install('astral');
             var implicit = XRegExp('\\p{L}');
 
@@ -288,6 +288,24 @@ describe('Unicode Base addon:', function() {
             var explicit = XRegExp('\\p{L}', 'A');
 
             expect(explicit).toEqual(implicit);
+        });
+
+        it('should be exposed in extended flags prop when using implicit astral mode', function() {
+            XRegExp.install('astral');
+            expect(XRegExp('')[REGEX_DATA].flags).toBe('A');
+
+            XRegExp.uninstall('astral');
+            expect(XRegExp('')[REGEX_DATA].flags).toBe('');
+        });
+
+        it('should be exposed in flags arg of token functions when using implicit astral mode', function() {
+            XRegExp.addToken(/~~FLAG-A-TEST/, function(match, scope, flags) {return flags;});
+
+            XRegExp.install('astral');
+            expect(XRegExp('~~FLAG-A-TEST!').source).toBe('A!');
+
+            XRegExp.uninstall('astral');
+            expect(XRegExp('~~FLAG-A-TEST!').source).toBe('!');
         });
 
     });

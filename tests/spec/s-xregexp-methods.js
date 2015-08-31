@@ -524,6 +524,16 @@ describe('XRegExp.forEach()', function() {
         expect(result).toEqual([regex, regex, regex]);
     });
 
+    it('should include precompilation source and flags props on source regexes in callback functions', function() {
+        var regex = XRegExp('(?<a>\\w+)', 'x');
+        var result = [];
+        XRegExp.forEach('abc', regex, function(m, i, s, r) {
+            result.push(r[REGEX_DATA].source, r[REGEX_DATA].flags);
+        });
+
+        expect(result).toEqual([regex[REGEX_DATA].source, regex[REGEX_DATA].flags]);
+    });
+
     it('should not let iteration be affected by source string manipulation in the callback function', function() {
         var str1 = 'abc 123 def';
         var str2 = 'abc 123 def';
