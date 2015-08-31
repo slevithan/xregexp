@@ -41,7 +41,7 @@ describe('When overridden, RegExp.prototype.exec()', function() {
         var regex = /x/g;
 
         regex.lastIndex = 4;
-        expect(regex.exec('123x5')).toBe(null);
+        expect(regex.exec('123x5')).toBeNull();
 
         regex.lastIndex = 2;
         expect(regex.exec('123x5')).toEqualMatch(['x']);
@@ -54,7 +54,7 @@ describe('When overridden, RegExp.prototype.exec()', function() {
         expect(regex.exec('123x5')).toEqualMatch(['x']);
 
         regex.lastIndex = '4';
-        expect(regex.exec('123x5')).toBe(null);
+        expect(regex.exec('123x5')).toBeNull();
     });
 
     /*
@@ -145,7 +145,7 @@ describe('When overridden, String.prototype.match()', function() {
         });
 
         it('should return null if no match is found', function() {
-            expect('a bc'.match(/x/g)).toBe(null);
+            expect('a bc'.match(/x/g)).toBeNull();
         });
 
         it('should reset lastIndex to 0 when a match is found', function() {

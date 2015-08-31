@@ -66,7 +66,7 @@ describe('XRegExp.build addon:', function() {
 
             expect(match).toBeTruthy();
             expect(match.n1).toBe('aa');
-            expect(match.n2).toBe(undefined);
+            expect(match.n2).toBeUndefined();
             expect(match.nX).toBe('bb');
             expect(match.yo).toBe('a');
             expect(match.yo2).toBe('b');

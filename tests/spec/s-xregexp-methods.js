@@ -252,7 +252,7 @@ describe('XRegExp.exec()', function() {
      */
 
     it('should return null if no match is found', function() {
-        expect(XRegExp.exec('abcxdef', /z/)).toBe(null);
+        expect(XRegExp.exec('abcxdef', /z/)).toBeNull();
     });
 
     it('should return a match array with backreferences if a match is found', function() {
@@ -346,12 +346,12 @@ describe('XRegExp.exec()', function() {
     it('should use the specified search start position', function() {
         expect(XRegExp.exec('abcxdef', /x/, 2)).toBeTruthy();
         expect(XRegExp.exec('abcxdef', /x/g, 2)).toBeTruthy();
-        expect(XRegExp.exec('abcxdef', /x/, 5)).toBe(null);
-        expect(XRegExp.exec('abcxdef', /x/g, 5)).toBe(null);
+        expect(XRegExp.exec('abcxdef', /x/, 5)).toBeNull();
+        expect(XRegExp.exec('abcxdef', /x/g, 5)).toBeNull();
     });
 
     it('should fail to match if the start position is greater than the string length', function() {
-        expect(XRegExp.exec('abc', /a/, 5)).toBe(null);
+        expect(XRegExp.exec('abc', /a/, 5)).toBeNull();
     });
 
     it('should ignore lastIndex when setting the search start position', function() {
@@ -370,8 +370,8 @@ describe('XRegExp.exec()', function() {
 
         regex.lastIndex = regexG.lastIndex = 0;
 
-        expect(XRegExp.exec('abcxdef', regex, 5)).toBe(null);
-        expect(XRegExp.exec('abcxdef', regexG, 5)).toBe(null);
+        expect(XRegExp.exec('abcxdef', regex, 5)).toBeNull();
+        expect(XRegExp.exec('abcxdef', regexG, 5)).toBeNull();
     });
 
     it('should allow matching at or after the specified position when not using sticky mode', function() {
@@ -389,8 +389,8 @@ describe('XRegExp.exec()', function() {
     });
 
     it('should not allow matching after the specified position when using sticky mode', function() {
-        expect(XRegExp.exec('abcxdef', /x/, 0, true)).toBe(null);
-        expect(XRegExp.exec('abcxdef', /x/, 0, 'sticky')).toBe(null);
+        expect(XRegExp.exec('abcxdef', /x/, 0, true)).toBeNull();
+        expect(XRegExp.exec('abcxdef', /x/, 0, 'sticky')).toBeNull();
     });
 
     (function() {
@@ -604,7 +604,7 @@ describe('XRegExp.forEach()', function() {
     });
 
     it('should not return a value', function() {
-        expect(XRegExp.forEach('', /x/, function() {})).toBe(undefined);
+        expect(XRegExp.forEach('', /x/, function() {})).toBeUndefined();
     });
 
 });
@@ -906,9 +906,9 @@ describe('XRegExp.match()', function() {
     });
 
     it('should return null upon failure for scope "one" or with a nonglobal regex when scope is unspecified', function() {
-        expect(XRegExp.match('a bc', /x/)).toBe(null);
-        expect(XRegExp.match('a bc', /x/, 'one')).toBe(null);
-        expect(XRegExp.match('a bc', /x/g, 'one')).toBe(null);
+        expect(XRegExp.match('a bc', /x/)).toBeNull();
+        expect(XRegExp.match('a bc', /x/, 'one')).toBeNull();
+        expect(XRegExp.match('a bc', /x/g, 'one')).toBeNull();
     });
 
     it('should match all and return an array for scope "all" or with a global regex when scope is unspecified', function() {
