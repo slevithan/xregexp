@@ -82,12 +82,28 @@ var XRegExp = (function(undefined) {
         replacementToken = /\$(?:{([\w$]+)}|(\d\d?|[\s\S]))/g,
         // Check for correct `exec` handling of nonparticipating capturing groups
         correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined,
-        // Check for ES6 flag u support
-        hasNativeU = RegExp.prototype.unicode !== undefined,
-        // Check for ES6 (and Firefox 3+) flag y support
-        hasNativeY = RegExp.prototype.sticky !== undefined,
+        // Check for ES6 `u` flag support
+        hasNativeU = (function() {
+            var isSupported = true;
+            try {
+                /a/u;
+            } catch (exception) {
+                isSupported = false;
+            }
+            return isSupported;
+        }()),
+        // Check for ES6 `y` flag support
+        hasNativeY = (function() {
+            var isSupported = true;
+            try {
+                /a/y;
+            } catch (exception) {
+                isSupported = false;
+            }
+            return isSupported;
+        }()),
         // Check for ES6 `flags` prop support
-        hasFlagsProp = RegExp.prototype.flags !== undefined,
+        hasFlagsProp = /a/.flags !== undefined,
         // Tracker for known flags, including addon flags
         registeredFlags = {
             g: true,
