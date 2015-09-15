@@ -82,6 +82,8 @@ var XRegExp = (function(undefined) {
         replacementToken = /\$(?:{([\w$]+)}|(\d\d?|[\s\S]))/g,
         // Check for correct `exec` handling of nonparticipating capturing groups
         correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined,
+        // Check for ES6 flag u support
+        hasNativeU = RegExp.prototype.unicode !== undefined,
         // Check for ES6 (and Firefox 3+) flag y support
         hasNativeY = RegExp.prototype.sticky !== undefined,
         // Check for ES6 `flags` prop support
@@ -91,6 +93,7 @@ var XRegExp = (function(undefined) {
             g: true,
             i: true,
             m: true,
+            u: hasNativeU,
             y: hasNativeY
         },
         // Shortcut to `Object.prototype.toString`
@@ -488,6 +491,7 @@ var XRegExp = (function(undefined) {
  *     <li>`g` - global
  *     <li>`i` - ignore case
  *     <li>`m` - multiline anchors
+ *     <li>`u` - unicode (ES6)
  *     <li>`y` - sticky (Firefox 3+, ES6)
  *   Additional XRegExp flags:
  *     <li>`n` - explicit capture
@@ -583,7 +587,7 @@ var XRegExp = (function(undefined) {
                 // Cleanup token cruft: repeated `(?:)(?:)` and leading/trailing `(?:)`
                 pattern: nativ.replace.call(output, /\(\?:\)(?=\(\?:\))|^\(\?:\)|\(\?:\)$/g, ''),
                 // Strip all but native flags
-                flags: nativ.replace.call(appliedFlags, /[^gimy]+/g, ''),
+                flags: nativ.replace.call(appliedFlags, /[^gimuy]+/g, ''),
                 // `context.captureNames` has an item for each capturing group, even if unnamed
                 captures: context.hasNamedCapture ? context.captureNames : null
             };
@@ -2092,7 +2096,7 @@ var XRegExp = (function(undefined) {
                     XRegExp.union([left, right]).source +
                     ')[^' + escapeChar + '])+)+',
                 // Flags `gy` not needed here
-                flags.replace(/[^im]+/g, '')
+                flags.replace(/[^imu]+/g, '')
             );
         }
 

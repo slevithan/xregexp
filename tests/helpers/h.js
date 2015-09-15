@@ -12,6 +12,9 @@ function repeat(str, num) {
 // Property name used for extended regex instance data
 var REGEX_DATA = 'xregexp';
 
+// Check for flag u support
+var hasNativeU = RegExp.prototype.unicode !== undefined;
+
 // Check for flag y support
 var hasNativeY = RegExp.prototype.sticky !== undefined;
 

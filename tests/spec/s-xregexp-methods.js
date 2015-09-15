@@ -638,8 +638,8 @@ describe('XRegExp.globalize()', function() {
 
     it('should retain the original source and flags (except /g)', function() {
         var regexes = [
-            XRegExp('(?i)(?<n>x)', 'm' + (hasNativeY ? 'y' : '')),
-            XRegExp('(?<n>x)', 'im' + (hasNativeY ? 'y' : '')),
+            XRegExp('(?i)(?<n>x)', 'm' + (hasNativeU ? 'u' : '') + (hasNativeY ? 'y' : '')),
+            XRegExp('(?<n>x)', 'im' + (hasNativeU ? 'u' : '') + (hasNativeY ? 'y' : '')),
             /(x)/im
         ];
 

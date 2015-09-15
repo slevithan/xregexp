@@ -104,7 +104,7 @@
                     XRegExp.union([left, right]).source +
                     ')[^' + escapeChar + '])+)+',
                 // Flags `gy` not needed here
-                flags.replace(/[^im]+/g, '')
+                flags.replace(/[^imu]+/g, '')
             );
         }
 

@@ -96,6 +96,12 @@ describe('XRegExp()', function() {
         expect(XRegExp('', 'i').ignoreCase).toBe(true);
         expect(XRegExp('', 'm').multiline).toBe(true);
 
+        if (hasNativeU) {
+            expect(XRegExp('', 'u').unicode).toBe(true);
+        } else {
+            expect(function() {XRegExp('', 'u');}).toThrowError(SyntaxError);
+        }
+
         if (hasNativeY) {
             expect(XRegExp('', 'y').sticky).toBe(true);
         } else {
@@ -123,7 +129,8 @@ describe('XRegExp()', function() {
         expect(XRegExp('').global).toBe(false);
         expect(XRegExp('').ignoreCase).toBe(false);
         expect(XRegExp('').multiline).toBe(false);
-        // Should be `false` or `undefined`, depending of whether flag y is supported natively
+        // Should be `false` or `undefined`, depending of whether flags `uy` are supported natively
+        expect(XRegExp('').unicode).toBeFalsy();
         expect(XRegExp('').sticky).toBeFalsy();
     });
 
