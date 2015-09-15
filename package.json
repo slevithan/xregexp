@@ -17,5 +17,8 @@
     "files": [
         "LICENSE.txt",
         "xregexp-all.js"
-    ]
+    ],
+    "scripts": {
+        "build": "./tools/concatenate-source.sh"
+    }
 }
