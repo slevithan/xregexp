@@ -3518,7 +3518,8 @@ var XRegExp = (function(undefined) {
  */
 
 /**
- * Adds support for all Unicode categories. E.g., `\p{Lu}` or `\p{Uppercase Letter}`. Token names
+ * Adds support for Unicode's general categories. E.g., `\p{Lu}` or `\p{Uppercase Letter}`. See
+ * category descriptions in UAX #44 <http://unicode.org/reports/tr44/#GC_Values_Table>. Token names
  * are case insensitive, and any spaces, hyphens, and underscores are ignored.
  *
  * Uses Unicode 8.0.0.
@@ -3753,10 +3754,40 @@ var XRegExp = (function(undefined) {
  */
 
 /**
- * Adds Level 1 Unicode properties (detailed in UTS #18 RL1.2). Token names are case insensitive,
- * and any spaces, hyphens, and underscores are ignored.
+ * Adds properties to meet the UTS #18 Level 1 RL1.2 requirements for Unicode regex support. See
+ * <http://unicode.org/reports/tr18/#RL1.2>. Following are definitions of these properties from UAX
+ * #44 <http://unicode.org/reports/tr44/>:
  *
- * Uses Unicode 7.0.0.
+ * - Alphabetic
+ *   Characters with the Alphabetic property. Generated from: Lowercase + Uppercase + Lt + Lm + Lo +
+ *   Nl + Other_Alphabetic.
+ *
+ * - Default_Ignorable_Code_Point
+ *   For programmatic determination of default ignorable code points. New characters that should be
+ *   ignored in rendering (unless explicitly supported) will be assigned in these ranges, permitting
+ *   programs to correctly handle the default rendering of such characters when not otherwise
+ *   supported.
+ *
+ * - Lowercase
+ *   Characters with the Lowercase property. Generated from: Ll + Other_Lowercase.
+ *
+ * - Noncharacter_Code_Point
+ *   Code points permanently reserved for internal use.
+ *
+ * - Uppercase
+ *   Characters with the Uppercase property. Generated from: Lu + Other_Uppercase.
+ *
+ * - White_Space
+ *   Spaces, separator characters and other control characters which should be treated by
+ *   programming languages as "white space" for the purpose of parsing elements.
+ *
+ * The properties ASCII, Any, and Assigned are also included but are not defined in UAX #44. UTS #18
+ * RL1.2 additionally requires support for Unicode scripts and general categories. These are
+ * included in XRegExp's Unicode Categories and Unicode Scripts addons.
+ *
+ * Token names are case insensitive, and any spaces, hyphens, and underscores are ignored.
+ *
+ * Uses Unicode 8.0.0.
  *
  * @requires XRegExp, Unicode Base
  */
@@ -3767,7 +3798,7 @@ var XRegExp = (function(undefined) {
         throw new ReferenceError('Unicode Base must be loaded before Unicode Properties');
     }
 
-    XRegExp.addUnicodeData([
+    var unicodeData = [
         {
             name: 'ASCII',
             bmp: '\0-\x7F'
@@ -3782,12 +3813,6 @@ var XRegExp = (function(undefined) {
             isBmpLast: true,
             bmp: '\0-\uFFFF',
             astral: '[\uD800-\uDBFF][\uDC00-\uDFFF]'
-        },
-        {
-            name: 'Assigned',
-            // Since this is defined as the inverse of Unicode category Cn (Unassigned), the Unicode
-            // Categories addon is required to use this property
-            inverseOf: 'Cn'
         },
         {
             name: 'Default_Ignorable_Code_Point',
@@ -3813,7 +3838,17 @@ var XRegExp = (function(undefined) {
             name: 'White_Space',
             bmp: '\x09-\x0D\x20\x85\xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000'
         }
-    ]);
+    ];
+
+    // Add non-generated data
+    unicodeData.push({
+        name: 'Assigned',
+        // Since this is defined as the inverse of Unicode category Cn (Unassigned), the Unicode
+        // Categories addon is required to use this property
+        inverseOf: 'Cn'
+    });
+
+    XRegExp.addUnicodeData(unicodeData);
 
 }(XRegExp));
 
