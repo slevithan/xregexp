@@ -4,12 +4,20 @@
             astral: '\uD800[\uDD00-\uDD3F]'
         },
         {
+            name: 'InAhom',
+            astral: '\uD805[\uDF00-\uDF3F]'
+        },
+        {
             name: 'InAlchemical_Symbols',
             astral: '\uD83D[\uDF00-\uDF7F]'
         },
         {
             name: 'InAlphabetic_Presentation_Forms',
             bmp: '\uFB00-\uFB4F'
+        },
+        {
+            name: 'InAnatolian_Hieroglyphs',
+            astral: '\uD811[\uDC00-\uDE7F]'
         },
         {
             name: 'InAncient_Greek_Musical_Notation',
@@ -172,6 +180,10 @@
             astral: '\uD86D[\uDF40-\uDFFF]|\uD86E[\uDC00-\uDC1F]'
         },
         {
+            name: 'InCJK_Unified_Ideographs_Extension_E',
+            astral: '[\uD86F-\uD872][\uDC00-\uDFFF]|\uD873[\uDC00-\uDEAF]|\uD86E[\uDC20-\uDFFF]'
+        },
+        {
             name: 'InCarian',
             astral: '\uD800[\uDEA0-\uDEDF]'
         },
@@ -190,6 +202,10 @@
         {
             name: 'InCherokee',
             bmp: '\u13A0-\u13FF'
+        },
+        {
+            name: 'InCherokee_Supplement',
+            bmp: '\uAB70-\uABBF'
         },
         {
             name: 'InCombining_Diacritical_Marks',
@@ -286,6 +302,10 @@
         {
             name: 'InDuployan',
             astral: '\uD82F[\uDC00-\uDC9F]'
+        },
+        {
+            name: 'InEarly_Dynastic_Cuneiform',
+            astral: '\uD809[\uDC80-\uDD4F]'
         },
         {
             name: 'InEgyptian_Hieroglyphs',
@@ -406,6 +426,10 @@
         {
             name: 'InHanunoo',
             bmp: '\u1720-\u173F'
+        },
+        {
+            name: 'InHatran',
+            astral: '\uD802[\uDCE0-\uDCFF]'
         },
         {
             name: 'InHebrew',
@@ -664,6 +688,10 @@
             astral: '\uD81A[\uDE40-\uDE6F]'
         },
         {
+            name: 'InMultani',
+            astral: '\uD804[\uDE80-\uDEAF]'
+        },
+        {
             name: 'InMusical_Symbols',
             astral: '\uD834[\uDD00-\uDDFF]'
         },
@@ -702,6 +730,10 @@
         {
             name: 'InOl_Chiki',
             bmp: '\u1C50-\u1C7F'
+        },
+        {
+            name: 'InOld_Hungarian',
+            astral: '\uD803[\uDC80-\uDCFF]'
         },
         {
             name: 'InOld_Italic',
@@ -880,12 +912,20 @@
             bmp: '\u2E00-\u2E7F'
         },
         {
+            name: 'InSupplemental_Symbols_and_Pictographs',
+            astral: '\uD83E[\uDD00-\uDDFF]'
+        },
+        {
             name: 'InSupplementary_Private_Use_Area_A',
             astral: '[\uDB80-\uDBBF][\uDC00-\uDFFF]'
         },
         {
             name: 'InSupplementary_Private_Use_Area_B',
             astral: '[\uDBC0-\uDBFF][\uDC00-\uDFFF]'
+        },
+        {
+            name: 'InSutton_SignWriting',
+            astral: '\uD836[\uDC00-\uDEAF]'
         },
         {
             name: 'InSyloti_Nagri',
