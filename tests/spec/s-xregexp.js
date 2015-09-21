@@ -562,9 +562,32 @@ describe('XRegExp()', function() {
             });
 
             it('should throw an exception for incomplete character references', function() {
-                var badValues = ['\\c', '\\c!', '\\c0', '\\x', '\\xF', '\\xFG', '\\u', '\\uF',
-                    '\\uFF', '\\uFFF', '\\uFFFG'];
-                var goodValues = ['\\cZ', '\\cz', '\\xFF', '\\xff', '\\uFFFF', '\\uffff'];
+                var badValues = [
+                    '\\c',
+                    '\\c!',
+                    '\\c0',
+                    '\\x',
+                    '\\xF',
+                    '\\xFG',
+                    '\\u',
+                    '\\uF',
+                    '\\uFF',
+                    '\\uFFF',
+                    '\\uFFFG',
+                    '\\u{}',
+                    '\\u{FFFG}',
+                    '\\u{F_F}',
+                    '\\u{ F}'
+                ];
+                var goodValues = [
+                    '\\cZ',
+                    '\\cz',
+                    '\\xFF',
+                    '\\xff',
+                    '\\uFFFF',
+                    '\\uffff'
+                    // Good values for the `\u{N..}` syntax are tested separately
+                ];
 
                 badValues.forEach(function(value) {
                     expect(function() {XRegExp(value);}).toThrowError(SyntaxError);
@@ -578,7 +601,43 @@ describe('XRegExp()', function() {
 
         });
 
-        // Covered by the specs for Unicode Base
+        describe('Unicode code point with braces', function() {
+
+            it('should always allow 1-4 hex digit values', function() {
+                expect(XRegExp('\\u{1}').test('\u0001')).toBe(true);
+                expect(XRegExp('\\u{10}').test('\u0010')).toBe(true);
+                expect(XRegExp('\\u{100}').test('\u0100')).toBe(true);
+                expect(XRegExp('\\u{1000}').test('\u1000')).toBe(true);
+            });
+
+            it('should allow leading zeros', function() {
+                expect(XRegExp('\\u{01}').test('\u0001')).toBe(true);
+                expect(XRegExp('\\u{010}').test('\u0010')).toBe(true);
+                expect(XRegExp('\\u{00001000}').test('\u1000')).toBe(true);
+                expect(XRegExp('\\u{00000000001}').test('\u0001')).toBe(true);
+            });
+
+            it('should throw an exception for code points above U+10FFFF', function() {
+                expect(function() {XRegExp('\\u{110000}');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('\\u{00110000}');}).toThrowError(SyntaxError);
+            });
+
+            it('should throw an exception for code points above U+FFFF if not using flag u', function() {
+                expect(function() {XRegExp('\\u{10000}');}).toThrowError(SyntaxError);
+                if (hasNativeU) {
+                    expect(XRegExp('\\u{10000}', 'u').test(String.fromCodePoint(0x10000))).toBe(true);
+                }
+            });
+
+            it('should handle code points as atomic non-literal characters', function() {
+                expect(XRegExp('\\u{28}').test('(')).toBe(true);
+                expect(function() {XRegExp('\\u{28})');}).toThrowError(SyntaxError);
+                expect(XRegExp('a{\\u{31}}').test('a{1}')).toBe(true);
+            });
+
+        });
+
+        // Unicode property syntax is covered by the specs for Unicode Base
         /*describe('Unicode', function() {
             //...
         });*/

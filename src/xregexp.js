@@ -48,9 +48,9 @@ var XRegExp = (function(undefined) {
         // Regexes that match native regex syntax, including octals
         nativeTokens = {
             // Any native multicharacter token in default scope, or any single character
-            'default': /\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S])|\(\?[:=!]|[?*+]\?|{\d+(?:,\d*)?}\??|[\s\S]/,
+            'default': /\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u(?:[\dA-Fa-f]{4}|{[\dA-Fa-f]+})|c[A-Za-z]|[\s\S])|\(\?[:=!]|[?*+]\?|{\d+(?:,\d*)?}\??|[\s\S]/,
             // Any native multicharacter token in character class scope, or any single character
-            'class': /\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S])|[\s\S]/
+            'class': /\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u(?:[\dA-Fa-f]{4}|{[\dA-Fa-f]+})|c[A-Za-z]|[\s\S])|[\s\S]/
         },
         // Any backreference or dollar-prefixed character in replacement strings
         replacementToken = /\$(?:{([\w$]+)}|(\d\d?|[\s\S]))/g,
@@ -221,6 +221,17 @@ var XRegExp = (function(undefined) {
     }
 
 /**
+ * Converts hexadecimal to decimal.
+ *
+ * @private
+ * @param {String} hex
+ * @returns {Number}
+ */
+    function dec(hex) {
+        return parseInt(hex, 16);
+    }
+
+/**
  * Returns native `RegExp` flags used by a regex object.
  *
  * @private
@@ -245,6 +256,17 @@ var XRegExp = (function(undefined) {
  */
     function hasNamedCapture(regex) {
         return !!(regex[REGEX_DATA] && regex[REGEX_DATA].captureNames);
+    }
+
+/**
+ * Converts decimal to hexadecimal.
+ *
+ * @private
+ * @param {Number|String} dec
+ * @returns {String}
+ */
+    function hex(dec) {
+        return parseInt(dec, 10).toString(16);
     }
 
 /**
@@ -297,6 +319,21 @@ var XRegExp = (function(undefined) {
                 /^(?:\(\?#[^)]*\))*(?:[?*+]|{\d+(?:,\d*)?})/,
             pattern.slice(pos)
         );
+    }
+
+/**
+ * Pads the provided string with as many leading zeros as needed to get to length 4. Used to produce
+ * fixed-length hexadecimal values.
+ *
+ * @private
+ * @param {String} str
+ * @returns {String}
+ */
+    function pad4(str) {
+        while (str.length < 4) {
+            str = '0' + str;
+        }
+        return str;
     }
 
 /**
@@ -1628,18 +1665,50 @@ var XRegExp = (function(undefined) {
     add = self.addToken;
 
 /*
- * Letter identity escapes that natively match literal characters: `\a`, `\A`, etc. These should be
+ * Letter escapes that natively match literal characters: `\a`, `\A`, etc. These should be
  * SyntaxErrors but are allowed in web reality. XRegExp makes them errors for cross-browser
  * consistency and to reserve their syntax, but lets them be superseded by addons.
  */
     add(
-        /\\([ABCE-RTUVXYZaeg-mopqyz]|c(?![A-Za-z])|u(?![\dA-Fa-f]{4})|x(?![\dA-Fa-f]{2}))/,
+        /\\([ABCE-RTUVXYZaeg-mopqyz]|c(?![A-Za-z])|u(?![\dA-Fa-f]{4}|{[\dA-Fa-f]+})|x(?![\dA-Fa-f]{2}))/,
         function(match, scope) {
             // \B is allowed in default scope only
             if (match[1] === 'B' && scope === defaultScope) {
                 return match[0];
             }
             throw new SyntaxError('Invalid escape ' + match[0]);
+        },
+        {
+            scope: 'all',
+            leadChar: '\\'
+        }
+    );
+
+/*
+ * Unicode code point escape with curly braces: `\u{N..}`. `N..` is any one or more digit
+ * hexadecimal number from 0-10FFFF, and can include leading zeros. Requires the native ES6 `u` flag
+ * to support code points greater than U+FFFF. Avoids converting code points above U+FFFF to
+ * surrogate pairs (which could be done without flag `u`), since that could lead to broken behavior
+ * if you follow a `\u{N..}` token that references a code point above U+FFFF with a quantifier, or
+ * if you use the same in a character class.
+ */
+    add(
+        /\\u{([\dA-Fa-f]+)}/,
+        function(match, scope, flags) {
+            var code = dec(match[1]);
+            if (code > 0x10FFFF) {
+                throw new SyntaxError('Invalid Unicode code point ' + match[0]);
+            }
+            if (code <= 0xFFFF) {
+                // Converting to \uNNNN avoids needing to escape the literal character and keep it
+                // separate from preceding tokens
+                return '\\u' + pad4(hex(code));
+            }
+            // If `code` is between 0xFFFF and 0x10FFFF, require and defer to native handling
+            if (hasNativeU && flags.indexOf('u') > -1) {
+                return match[0];
+            }
+            throw new SyntaxError('Cannot use Unicode code point above \\u{FFFF} without flag u');
         },
         {
             scope: 'all',
