@@ -9,11 +9,11 @@ source_files='
     ../src/xregexp.js
     ../src/addons/build.js
     ../src/addons/matchrecursive.js
-    ../src/addons/unicode/unicode-base.js
-    ../src/addons/unicode/unicode-blocks.js
-    ../src/addons/unicode/unicode-categories.js
-    ../src/addons/unicode/unicode-properties.js
-    ../src/addons/unicode/unicode-scripts.js
+    ../src/addons/unicode-base.js
+    ../src/addons/unicode-blocks.js
+    ../src/addons/unicode-categories.js
+    ../src/addons/unicode-properties.js
+    ../src/addons/unicode-scripts.js
     ./outro.js
 '
 
