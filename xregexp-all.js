@@ -86,7 +86,7 @@ var XRegExp = (function(undefined) {
         hasNativeU = (function() {
             var isSupported = true;
             try {
-                /a/u;
+                new RegExp('', 'u');
             } catch (exception) {
                 isSupported = false;
             }
@@ -96,7 +96,7 @@ var XRegExp = (function(undefined) {
         hasNativeY = (function() {
             var isSupported = true;
             try {
-                /a/y;
+                new RegExp('', 'y');
             } catch (exception) {
                 isSupported = false;
             }

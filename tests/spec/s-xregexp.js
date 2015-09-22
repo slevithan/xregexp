@@ -165,7 +165,7 @@ describe('XRegExp()', function() {
             {regex: XRegExp('(?<a>)()(?<b>)'), captureNames: ['a', null, 'b']},
             {regex: XRegExp('(?<a>((?<b>)))'), captureNames: ['a', null, 'b']},
             {regex: XRegExp('(?n)()'), captureNames: null},
-            {regex: XRegExp('(?n)(?<a>)()(?<b>)'), captureNames: ['a', 'b']},
+            {regex: XRegExp('(?n)(?<a>)()(?<b>)'), captureNames: ['a', 'b']}
         ];
         tests.forEach(function(test) {
             expect(test.regex[REGEX_DATA].captureNames).toEqual(test.captureNames);
