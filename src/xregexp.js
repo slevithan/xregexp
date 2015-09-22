@@ -1,5 +1,5 @@
 /*!
- * XRegExp 3.0.0-pre
+ * XRegExp 3.0.0
  * <http://xregexp.com/>
  * Steven Levithan (c) 2007-2015 MIT License
  */
@@ -643,7 +643,7 @@ var XRegExp = (function(undefined) {
  * @memberOf XRegExp
  * @type String
  */
-    self.version = '3.0.0-pre';
+    self.version = '3.0.0';
 
 /* ==============================
  * Public methods
