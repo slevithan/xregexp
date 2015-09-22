@@ -15,7 +15,7 @@
     ],
     "main": "xregexp-all.js",
     "files": [
-        "LICENSE.txt",
+        "LICENSE",
         "xregexp-all.js"
     ],
     "scripts": {
