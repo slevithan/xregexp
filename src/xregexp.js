@@ -100,7 +100,7 @@ var XRegExp = (function(undefined) {
  *
  * @private
  * @param {RegExp} regex Regex to augment.
- * @param {Array} captureNames Array with capture names, or `null`.
+ * @param {Array} _captures Array with capture names, or `null`.
  * @param {String} xSource XRegExp pattern used to generate `regex`, or `null` if N/A.
  * @param {String} xFlags XRegExp flags used to generate `regex`, or `null` if N/A.
  * @param {Boolean} [isInternalOnly=false] Whether the regex will be used only for internal
@@ -108,22 +108,22 @@ var XRegExp = (function(undefined) {
  *   skipping some operations like attaching `XRegExp.prototype` properties.
  * @returns {RegExp} Augmented regex.
  */
-    function augment(regex, captureNames, xSource, xFlags, isInternalOnly) {
+    function augment(regex, _captures, xSource, xFlags, isInternalOnly) {
         var p;
         var names = [];
 
         // Set .names to a list of the named capture groups without any null
-        // values for unnamed capture groups as is the behaviour of captureNames
-        if (captureNames) {
-            for (var i = 0; i < captureNames.length; i++) {
-                if (captureNames[i] !== null) {
-                    names.push(captureNames[i]);
+        // values for unnamed capture groups as is the behaviour of _captures
+        if (_captures) {
+            for (var i = 0; i < _captures.length; i++) {
+                if (_captures[i] !== null) {
+                    names.push(_captures[i]);
                 }
             }
         }
 
         regex[REGEX_DATA] = {
-            captureNames: captureNames,
+            _captures: _captures,
             names: names
         };
 
@@ -223,7 +223,7 @@ var XRegExp = (function(undefined) {
         // already undergone the translation to native regex syntax
         regex = augment(
             new RegExp(regex.source, flags),
-            hasNamedCapture(regex) ? xData.captureNames.slice(0) : null,
+            hasNamedCapture(regex) ? xData._captures.slice(0) : null,
             xregexpSource,
             xregexpFlags,
             options.isInternalOnly
@@ -267,7 +267,7 @@ var XRegExp = (function(undefined) {
  * @returns {Boolean} Whether the regex uses named capture.
  */
     function hasNamedCapture(regex) {
-        return !!(regex[REGEX_DATA] && regex[REGEX_DATA].captureNames);
+        return !!(regex[REGEX_DATA] && regex[REGEX_DATA]._captures);
     }
 
 /**
@@ -554,7 +554,7 @@ var XRegExp = (function(undefined) {
     self = function(pattern, flags) {
         var context = {
                 hasNamedCapture: false,
-                captureNames: []
+                _captures: []
             },
             scope = defaultScope,
             output = '',
@@ -627,8 +627,8 @@ var XRegExp = (function(undefined) {
                 pattern: nativ.replace.call(output, /\(\?:\)(?=\(\?:\))|^\(\?:\)|\(\?:\)$/g, ''),
                 // Strip all but native flags
                 flags: nativ.replace.call(appliedFlags, /[^gimuy]+/g, ''),
-                // `context.captureNames` has an item for each capturing group, even if unnamed
-                captures: context.hasNamedCapture ? context.captureNames : null
+                // `context._captures` has an item for each capturing group, even if unnamed
+                captures: context.hasNamedCapture ? context._captures : null
             };
         }
 
@@ -1327,10 +1327,10 @@ var XRegExp = (function(undefined) {
             output = [],
             numCaptures = 0,
             numPriorCaptures,
-            captureNames,
+            _captures,
             pattern,
             rewrite = function(match, paren, backref) {
-                var name = captureNames[numCaptures - numPriorCaptures];
+                var name = _captures[numCaptures - numPriorCaptures];
 
                 // Capturing group
                 if (paren) {
@@ -1358,7 +1358,7 @@ var XRegExp = (function(undefined) {
 
             if (self.isRegExp(pattern)) {
                 numPriorCaptures = numCaptures;
-                captureNames = (pattern[REGEX_DATA] && pattern[REGEX_DATA].captureNames) || [];
+                _captures = (pattern[REGEX_DATA] && pattern[REGEX_DATA]._captures) || [];
 
                 // Rewrite backreferences. Passing to XRegExp dies on octals and ensures patterns
                 // are independently valid; helps keep this simple. Named captures are put back
@@ -1414,10 +1414,10 @@ var XRegExp = (function(undefined) {
             }
 
             // Attach named capture properties
-            if (this[REGEX_DATA] && this[REGEX_DATA].captureNames) {
+            if (this[REGEX_DATA] && this[REGEX_DATA]._captures) {
                 // Skip index 0
                 for (i = 1; i < match.length; ++i) {
-                    name = this[REGEX_DATA].captureNames[i - 1];
+                    name = this[REGEX_DATA]._captures[i - 1];
                     if (name) {
                         match[name] = match[i];
                     }
@@ -1495,12 +1495,12 @@ var XRegExp = (function(undefined) {
     fixed.replace = function(search, replacement) {
         var isRegex = self.isRegExp(search),
             origLastIndex,
-            captureNames,
+            _captures,
             result;
 
         if (isRegex) {
             if (search[REGEX_DATA]) {
-                captureNames = search[REGEX_DATA].captureNames;
+                _captures = search[REGEX_DATA]._captures;
             }
             // Only needed if `search` is nonglobal
             origLastIndex = search.lastIndex;
@@ -1514,14 +1514,14 @@ var XRegExp = (function(undefined) {
             // functions isn't type-converted to a string
             result = nativ.replace.call(String(this), search, function() {
                 var args = arguments, i;
-                if (captureNames) {
+                if (_captures) {
                     // Change the `arguments[0]` string primitive to a `String` object that can
                     // store properties. This really does need to use `String` as a constructor
                     args[0] = new String(args[0]);
                     // Store named backreferences on the first argument
-                    for (i = 0; i < captureNames.length; ++i) {
-                        if (captureNames[i]) {
-                            args[0][captureNames[i]] = args[i + 1];
+                    for (i = 0; i < _captures.length; ++i) {
+                        if (_captures[i]) {
+                            args[0][_captures[i]] = args[i + 1];
                         }
                     }
                 }
@@ -1557,7 +1557,7 @@ var XRegExp = (function(undefined) {
                             return args[n] || '';
                         }
                         // Groups with the same name is an error, else would need `lastIndexOf`
-                        n = captureNames ? indexOf(captureNames, $1) : -1;
+                        n = _captures ? indexOf(_captures, $1) : -1;
                         if (n < 0) {
                             throw new SyntaxError('Backreference to undefined group ' + $0);
                         }
@@ -1792,9 +1792,9 @@ var XRegExp = (function(undefined) {
         /\\k<([\w$]+)>/,
         function(match) {
             // Groups with the same name is an error, else would need `lastIndexOf`
-            var index = isNaN(match[1]) ? (indexOf(this.captureNames, match[1]) + 1) : +match[1],
+            var index = isNaN(match[1]) ? (indexOf(this._captures, match[1]) + 1) : +match[1],
                 endIndex = match.index + match[0].length;
-            if (!index || index > this.captureNames.length) {
+            if (!index || index > this._captures.length) {
                 throw new SyntaxError('Backreference to undefined group ' + match[0]);
             }
             // Keep backreferences separate from subsequent literal numbers
@@ -1818,7 +1818,7 @@ var XRegExp = (function(undefined) {
                 !(
                     scope === defaultScope &&
                     /^[1-9]/.test(match[1]) &&
-                    +match[1] <= this.captureNames.length
+                    +match[1] <= this._captures.length
                 ) &&
                 match[1] !== '0'
             ) {
@@ -1851,10 +1851,10 @@ var XRegExp = (function(undefined) {
             if (match[1] === 'length' || match[1] === '__proto__') {
                 throw new SyntaxError('Cannot use reserved word as capture name ' + match[0]);
             }
-            if (indexOf(this.captureNames, match[1]) > -1) {
+            if (indexOf(this._captures, match[1]) > -1) {
                 throw new SyntaxError('Cannot use same name for multiple groups ' + match[0]);
             }
-            this.captureNames.push(match[1]);
+            this._captures.push(match[1]);
             this.hasNamedCapture = true;
             return '(';
         },
@@ -1871,7 +1871,7 @@ var XRegExp = (function(undefined) {
             if (flags.indexOf('n') > -1) {
                 return '(?:';
             }
-            this.captureNames.push(null);
+            this._captures.push(null);
             return '(';
         },
         {

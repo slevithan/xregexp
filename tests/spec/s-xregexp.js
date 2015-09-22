@@ -156,19 +156,19 @@ describe('XRegExp()', function() {
     });
 
     it('should store capture data on regex instances', function() {
-        // The `captureNames` property is undocumented, so this is technically just testing
+        // The `_captures` property is undocumented, so this is technically just testing
         // implementation details. However, any changes to this need to be very intentional
         var tests = [
-            {regex: XRegExp(''), captureNames: null},
-            {regex: XRegExp('()'), captureNames: null},
-            {regex: XRegExp('(?<a>)'), captureNames: ['a']},
-            {regex: XRegExp('(?<a>)()(?<b>)'), captureNames: ['a', null, 'b']},
-            {regex: XRegExp('(?<a>((?<b>)))'), captureNames: ['a', null, 'b']},
-            {regex: XRegExp('(?n)()'), captureNames: null},
-            {regex: XRegExp('(?n)(?<a>)()(?<b>)'), captureNames: ['a', 'b']}
+            {regex: XRegExp(''), _captures: null},
+            {regex: XRegExp('()'), _captures: null},
+            {regex: XRegExp('(?<a>)'), _captures: ['a']},
+            {regex: XRegExp('(?<a>)()(?<b>)'), _captures: ['a', null, 'b']},
+            {regex: XRegExp('(?<a>((?<b>)))'), _captures: ['a', null, 'b']},
+            {regex: XRegExp('(?n)()'), _captures: null},
+            {regex: XRegExp('(?n)(?<a>)()(?<b>)'), _captures: ['a', 'b']}
         ];
         tests.forEach(function(test) {
-            expect(test.regex[REGEX_DATA].captureNames).toEqual(test.captureNames);
+            expect(test.regex[REGEX_DATA]._captures).toEqual(test._captures);
         });
     });
 
@@ -234,7 +234,7 @@ describe('XRegExp()', function() {
     });
 
     it('should preserve capture data when copying a regex', function() {
-        expect(XRegExp(XRegExp('(?<name>a)'))[REGEX_DATA].captureNames).toContain('name');
+        expect(XRegExp(XRegExp('(?<name>a)'))[REGEX_DATA]._captures).toContain('name');
     });
 
     it('should preserve named capture data when copying a regex', function() {
