@@ -110,9 +110,21 @@ var XRegExp = (function(undefined) {
  */
     function augment(regex, captureNames, xSource, xFlags, isInternalOnly) {
         var p;
+        var names = [];
+
+        // Set .names to a list of the named capture groups without any null
+        // values for unnamed capture groups as is the behaviour of captureNames
+        if (captureNames) {
+            for (var i = 0; i < captureNames.length; i++) {
+                if (captureNames[i] !== null) {
+                    names.push(captureNames[i]);
+                }
+            }
+        }
 
         regex[REGEX_DATA] = {
-            captureNames: captureNames
+            captureNames: captureNames,
+            names: names
         };
 
         if (isInternalOnly) {
