@@ -1,11 +1,9 @@
 ﻿[XRegExp](http://xregexp.com/) 3.0.0-pre
 ========================================
 
-XRegExp provides augmented and extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your client-side grepping simpler and more powerful, while freeing you from worrying about pesky cross-browser inconsistencies and the dubious `lastIndex` property.
+XRegExp provides augmented and extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your client-side grepping simpler and more powerful, while freeing you from worrying about pesky cross-browser inconsistencies and things like manually manipulating `lastIndex` or slicing strings when tokenizing.
 
-XRegExp supports all native ES6 regular expression syntax. It works with Internet Explorer 5.5+, Firefox 1.5+, Chrome, Safari 3+, and Opera 11+. You can also use it on the server with Node.js, or as a RequireJS module. The base library is about 3.8 KB, minified and gzipped.
-
-See [what's new in version 3.0.0-pre](https://github.com/slevithan/xregexp/wiki/Roadmap).
+XRegExp supports all native ES6 regular expression syntax. It supports Internet Explorer 5.5+, Firefox 1.5+, Chrome, Safari 3+, and Opera 11+. You can also use it with Node.js, or as a RequireJS module. The base library is about 4.25 KB, minified and gzipped.
 
 ## Performance
 
@@ -89,9 +87,9 @@ In browsers, first include the Unicode Base script and then one or more of the a
 
 ```html
 <script src="src/xregexp.js"></script>
-<script src="src/addons/unicode/unicode-base.js"></script>
-<script src="src/addons/unicode/unicode-categories.js"></script>
-<script src="src/addons/unicode/unicode-scripts.js"></script>
+<script src="src/addons/unicode-base.js"></script>
+<script src="src/addons/unicode-categories.js"></script>
+<script src="src/addons/unicode-scripts.js"></script>
 ```
 
 Then you can do this:
@@ -108,7 +106,7 @@ XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
 XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
 ```
 
-By default, `\p{…}` and `\P{…}` support the Basic Multilingual Plane (i.e., code points up to `U+FFFF`). You can opt-in to full 21-bit Unicode support (with code points up to `U+10FFFF`) on a per-regex basis by using flag `A`. In XRegExp, this is called *astral mode*. You can implicitly apply astral mode for all new regexes by running `XRegExp.install('astral')`. When in astral mode, `\p{…}` and `\P{…}` always match a full code point rather than a code unit, using surrogate pairs for code points above `U+FFFF`.
+By default, `\p{…}` and `\P{…}` support the Basic Multilingual Plane (i.e. code points up to `U+FFFF`). You can opt-in to full 21-bit Unicode support (with code points up to `U+10FFFF`) on a per-regex basis by using flag `A`. In XRegExp, this is called *astral mode*. You can automatically apply astral mode for all new regexes by running `XRegExp.install('astral')`. When in astral mode, `\p{…}` and `\P{…}` always match a full code point rather than a code unit, using surrogate pairs for code points above `U+FFFF`.
 
 ```js
 // Using flag A. The test string uses a surrogate pair to represent U+1F4A9
@@ -224,9 +222,9 @@ npm install xregexp
 In [Node.js](http://nodejs.org/):
 
 ```js
-var XRegExp = require('xregexp'); // Requires XRegExp 3.0
+var XRegExp = require('xregexp');
 ```
-The [CommonJS](http://wiki.commonjs.org/wiki/Modules)-style `require('xregexp').XRegExp` also works, and is the only method supported by XRegExp 2.0.
+The [CommonJS](http://wiki.commonjs.org/wiki/Modules)-style `require('xregexp').XRegExp` also works.
 
 In an AMD loader like [RequireJS](http://requirejs.org/):
 
@@ -239,7 +237,7 @@ require({paths: {xregexp: 'xregexp-all'}}, ['xregexp'], function(XRegExp) {
 ## Changelog
 
 * Releases: [Version history](http://xregexp.com/history/).
-* Upcoming: [Issue tracker](https://github.com/slevithan/xregexp/issues), [Roadmap](https://github.com/slevithan/xregexp/wiki/Roadmap).
+* Upcoming: [Issue tracker](https://github.com/slevithan/xregexp/issues).
 
 ## About
 
