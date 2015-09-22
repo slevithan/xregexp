@@ -31,7 +31,7 @@
             if (version === null || version === 'latest') {
                 document.write('<script src="../../xregexp-all.js"><\/script>');
             } else if (knownVersion[version]) {
-                document.write('<script src="old_versions/xregexp-all-v'+version+'.js"><\/script>');
+                document.write('<script src="versions/xregexp-all-v'+version+'.js"><\/script>');
             } else {
                 document.getElementById('log').innerHTML = 'Unrecognized version provided in query';
             }
