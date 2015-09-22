@@ -534,6 +534,16 @@ describe('XRegExp.forEach()', function() {
         expect(result).toEqual([regex[REGEX_DATA].source, regex[REGEX_DATA].flags]);
     });
 
+    it('should include named capture groups on source regexes in callback functions', function() {
+        var regex = XRegExp('(?<a>\\w+)', 'x');
+        var result = [];
+        XRegExp.forEach('abc 123 def', regex, function(m, i, s, r) {
+            result.push(r[REGEX_DATA].names);
+        });
+
+        expect(result).toEqual([regex[REGEX_DATA].names, regex[REGEX_DATA].names, regex[REGEX_DATA].names]);
+    });
+
     it('should not let iteration be affected by source string manipulation in the callback function', function() {
         var str1 = 'abc 123 def';
         var str2 = 'abc 123 def';

@@ -155,7 +155,7 @@ describe('XRegExp()', function() {
         expect(function() {XRegExp('', '?');}).toThrowError(SyntaxError);
     });
 
-    it('should store named capture data on regex instances', function() {
+    it('should store capture data on regex instances', function() {
         // The `captureNames` property is undocumented, so this is technically just testing
         // implementation details. However, any changes to this need to be very intentional
         var tests = [
@@ -169,6 +169,21 @@ describe('XRegExp()', function() {
         ];
         tests.forEach(function(test) {
             expect(test.regex[REGEX_DATA].captureNames).toEqual(test.captureNames);
+        });
+    });
+
+    it('should store named capture data on regex instances', function() {
+        var tests = [
+            {regex: XRegExp(''), names: []},
+            {regex: XRegExp('()'), names: []},
+            {regex: XRegExp('(?<a>)'), names: ['a']},
+            {regex: XRegExp('(?<a>)()(?<b>)'), names: ['a', 'b']},
+            {regex: XRegExp('(?<a>((?<b>)))'), names: ['a', 'b']},
+            {regex: XRegExp('(?n)()'), names: []},
+            {regex: XRegExp('(?n)(?<a>)()(?<b>)'), names: ['a', 'b']}
+        ];
+        tests.forEach(function(test) {
+            expect(test.regex[REGEX_DATA].names).toEqual(test.names);
         });
     });
 
@@ -218,8 +233,12 @@ describe('XRegExp()', function() {
         expect(function() {XRegExp(/\00/);}).not.toThrow();
     });
 
-    it('should preserve named capture data when copying a regex', function() {
+    it('should preserve capture data when copying a regex', function() {
         expect(XRegExp(XRegExp('(?<name>a)'))[REGEX_DATA].captureNames).toContain('name');
+    });
+
+    it('should preserve named capture data when copying a regex', function() {
+        expect(XRegExp(XRegExp('(?<name>a)'))[REGEX_DATA].names).toContain('name');
     });
 
     it('should preserve precompilation source and flags when copying a regex', function() {
@@ -270,7 +289,7 @@ describe('XRegExp()', function() {
             it('should set properties for native flags', function() {
                 expect(XRegExp('(?i)').ignoreCase).toBe(true);
                 expect(XRegExp('(?m)').multiline).toBe(true);
-    
+
                 var regexIM = XRegExp('(?im)');
                 expect(regexIM.ignoreCase).toBe(true);
                 expect(regexIM.multiline).toBe(true);
