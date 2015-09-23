@@ -637,7 +637,7 @@ var XRegExp = (function(undefined) {
  * ============================== */
 
 /**
- * The XRegExp version number.
+ * The XRegExp version number as a string containing three dot-separated parts.
  *
  * @static
  * @memberOf XRegExp
@@ -848,7 +848,9 @@ var XRegExp = (function(undefined) {
     };
 
 /**
- * Executes a provided function once per regex match.
+ * Executes a provided function once per regex match. Searches always start at the beginning of the
+ * string and continue until the end, regardless of the state of the regex's `global` property and
+ * initial `lastIndex`.
  *
  * @memberOf XRegExp
  * @param {String} str String to search.
@@ -861,10 +863,11 @@ var XRegExp = (function(undefined) {
  * @example
  *
  * // Extracts every other digit from a string
+ * var evens = [];
  * XRegExp.forEach('1a2345', /\d/, function(match, i) {
- *   if (i % 2) this.push(+match[0]);
- * }, []);
- * // -> [2, 4]
+ *   if (i % 2) evens.push(+match[0]);
+ * });
+ * // evens -> [2, 4]
  */
     self.forEach = function(str, regex, callback) {
         var pos = 0,
