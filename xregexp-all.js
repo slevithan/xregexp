@@ -1,5 +1,5 @@
 /*!
- * XRegExp-All 3.0.0
+ * XRegExp-All 3.1.0-dev
  * <http://xregexp.com/>
  * Steven Levithan (c) 2012-2015 MIT License
  */
@@ -24,7 +24,7 @@
 }(this, function() {
 
 /*!
- * XRegExp 3.0.0
+ * XRegExp 3.1.0-dev
  * <http://xregexp.com/>
  * Steven Levithan (c) 2007-2015 MIT License
  */
@@ -669,7 +669,7 @@ var XRegExp = (function(undefined) {
  * @memberOf XRegExp
  * @type String
  */
-    self.version = '3.0.0';
+    self.version = '3.1.0-dev';
 
 /* ==============================
  * Public methods
@@ -1910,7 +1910,7 @@ var XRegExp = (function(undefined) {
 }());
 
 /*!
- * XRegExp.build 3.0.0
+ * XRegExp.build 3.1.0-dev
  * <http://xregexp.com/>
  * Steven Levithan (c) 2012-2015 MIT License
  * Inspired by Lea Verou's RegExp.create <http://lea.verou.me/>
@@ -2083,7 +2083,7 @@ var XRegExp = (function(undefined) {
 }(XRegExp));
 
 /*!
- * XRegExp.matchRecursive 3.0.0
+ * XRegExp.matchRecursive 3.1.0-dev
  * <http://xregexp.com/>
  * Steven Levithan (c) 2009-2015 MIT License
  */
@@ -2275,7 +2275,7 @@ var XRegExp = (function(undefined) {
 }(XRegExp));
 
 /*!
- * XRegExp Unicode Base 3.0.0
+ * XRegExp Unicode Base 3.1.0-dev
  * <http://xregexp.com/>
  * Steven Levithan (c) 2008-2015 MIT License
  */
@@ -2512,7 +2512,7 @@ var XRegExp = (function(undefined) {
 }(XRegExp));
 
 /*!
- * XRegExp Unicode Blocks 3.0.0
+ * XRegExp Unicode Blocks 3.1.0-dev
  * <http://xregexp.com/>
  * Steven Levithan (c) 2010-2015 MIT License
  * Unicode data provided by Mathias Bynens <http://mathiasbynens.be/>
@@ -3587,7 +3587,7 @@ var XRegExp = (function(undefined) {
 }(XRegExp));
 
 /*!
- * XRegExp Unicode Categories 3.0.0
+ * XRegExp Unicode Categories 3.1.0-dev
  * <http://xregexp.com/>
  * Steven Levithan (c) 2010-2015 MIT License
  * Unicode data provided by Mathias Bynens <http://mathiasbynens.be/>
@@ -3823,7 +3823,7 @@ var XRegExp = (function(undefined) {
 }(XRegExp));
 
 /*!
- * XRegExp Unicode Properties 3.0.0
+ * XRegExp Unicode Properties 3.1.0-dev
  * <http://xregexp.com/>
  * Steven Levithan (c) 2012-2015 MIT License
  * Unicode data provided by Mathias Bynens <http://mathiasbynens.be/>
@@ -3929,7 +3929,7 @@ var XRegExp = (function(undefined) {
 }(XRegExp));
 
 /*!
- * XRegExp Unicode Scripts 3.0.0
+ * XRegExp Unicode Scripts 3.1.0-dev
  * <http://xregexp.com/>
  * Steven Levithan (c) 2010-2015 MIT License
  * Unicode data provided by Mathias Bynens <http://mathiasbynens.be/>
