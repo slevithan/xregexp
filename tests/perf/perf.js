@@ -161,11 +161,15 @@
                 var r = /^|(((?=x).)\2)+/;
                 var matches = [];
                 if (!r.global) {
-                    //r = XRegExp.globalize(r);
-                    r = new RegExp(r.source, 'g' +
-                        (r.ignoreCase ? 'i' : '') +
-                        (r.multiline ? 'm' : '') +
-                        (r.sticky ? 'y' : ''));
+                    // globalize
+                    r = new RegExp(
+                        r.source,
+                        'g' +
+                            (r.ignoreCase ? 'i' : '') +
+                            (r.multiline ? 'm' : '') +
+                            (r.unicode ? 'u' : '') +
+                            (r.sticky ? 'y' : '')
+                    );
                 }
                 str.replace(r, function(match) {
                     matches.push(match);
@@ -178,11 +182,15 @@
                 if (r.global) {
                     r.lastIndex = 0;
                 } else {
-                    //r = XRegExp.globalize(r);
-                    r = new RegExp(r.source, 'g' +
-                        (r.ignoreCase ? 'i' : '') +
-                        (r.multiline ? 'm' : '') +
-                        (r.sticky ? 'y' : ''));
+                    // globalize
+                    r = new RegExp(
+                        r.source,
+                        'g' +
+                            (r.ignoreCase ? 'i' : '') +
+                            (r.multiline ? 'm' : '') +
+                            (r.unicode ? 'u' : '') +
+                            (r.sticky ? 'y' : '')
+                    );
                 }
                 while (match = r.exec(str)) {
                     matches.push(match[0]);
@@ -203,9 +211,10 @@
             })
             .add('XRegExp.forEach', function() {
                 var r = /^|(((?=x).)\2)+/;
-                var matches = XRegExp.forEach(str, r, function(match) {
-                    this.push(match[0]);
-                }, []);
+                var matches = [];
+                XRegExp.forEach(str, r, function(match) {
+                    matches.push(match[0]);
+                });
             })
         );
     }());
