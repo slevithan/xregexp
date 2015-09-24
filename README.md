@@ -1,7 +1,7 @@
-﻿[XRegExp](http://xregexp.com/) 3.0.0
+[XRegExp](http://xregexp.com/) 3.0.0
 ====================================
 
-XRegExp provides augmented and extensible JavaScript regular expressions. You get new syntax, flags, and methods beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your client-side grepping simpler and more powerful, while freeing you from worrying about pesky cross-browser inconsistencies and things like manually manipulating `lastIndex` or slicing strings when tokenizing.
+XRegExp provides augmented (and extensible!) JavaScript regular expressions. You get new modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your client-side grepping and parsing easier, while freeing you from worrying about pesky cross-browser inconsistencies and things like manually manipulating `lastIndex` or slicing strings when tokenizing.
 
 XRegExp supports all native ES6 regular expression syntax. It supports Internet Explorer 5.5+, Firefox 1.5+, Chrome, Safari 3+, and Opera 11+. You can also use it with Node.js, or as a RequireJS module. The base library is about 4.25 KB, minified and gzipped.
 

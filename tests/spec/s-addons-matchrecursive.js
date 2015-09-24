@@ -22,8 +22,8 @@ describe('XRegExp.matchRecursive addon:', function() {
             ]);
         });
 
-        it('should pass the readme example for omitting unneeded parts with null valueNames, and using escapeChar', function() {
-            var str = '...{1}\\{{function(x,y){return y+x;}}';
+        it('should pass the readme example for omitting unneeded parts with null valueNames and using escapeChar', function() {
+            var str = '...{1}.\\{{function(x,y){return {y:x}}}';
             expect(
                 XRegExp.matchRecursive(str, '{', '}', 'g', {
                     valueNames: ['literal', null, 'value', null],
@@ -32,8 +32,8 @@ describe('XRegExp.matchRecursive addon:', function() {
             .toEqual([
                 {name: 'literal', value: '...', start: 0, end: 3},
                 {name: 'value',   value: '1',   start: 4, end: 5},
-                {name: 'literal', value: '\\{', start: 6, end: 8},
-                {name: 'value',   value: 'function(x,y){return y+x;}', start: 9, end: 35}
+                {name: 'literal', value: '.\\{', start: 6, end: 9},
+                {name: 'value',   value: 'function(x,y){return {y:x}}', start: 10, end: 37}
             ]);
         });
 

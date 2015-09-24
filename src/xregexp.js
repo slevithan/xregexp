@@ -637,7 +637,8 @@ var XRegExp = (function(undefined) {
  * ============================== */
 
 /**
- * The XRegExp version number as a string containing three dot-separated parts.
+ * The XRegExp version number as a string containing three dot-separated parts. For example,
+ * '2.0.0-beta-3'.
  *
  * @static
  * @memberOf XRegExp
@@ -675,7 +676,8 @@ var XRegExp = (function(undefined) {
  *     token chaining or deferring.
  *   <li>`leadChar` {String} Single character that occurs at the beginning of any successful match
  *     of the token (not always applicable). This doesn't change the behavior of the token unless
- *     you provide an erroneous value. However, providing it can increase the token's performance.
+ *     you provide an erroneous value. However, providing it can increase the token's performance
+ *     since the token can be skipped at any positions where this character doesn't appear.
  * @example
  *
  * // Basic usage: Add \a for the ALERT control code
@@ -686,7 +688,9 @@ var XRegExp = (function(undefined) {
  * );
  * XRegExp('\\a[\\a-\\n]+').test('\x07\n\x07'); // -> true
  *
- * // Add the U (ungreedy) flag from PCRE and RE2, which reverses greedy and lazy quantifiers
+ * // Add the U (ungreedy) flag from PCRE and RE2, which reverses greedy and lazy quantifiers.
+ * // Since `scope` is not specified, it uses 'default' (i.e., transformations apply outside of
+ * // character classes only)
  * XRegExp.addToken(
  *   /([?*+]|{\d+(?:,\d*)?})(\??)/,
  *   function(match) {return match[1] + (match[2] ? '' : '?');},
@@ -1032,9 +1036,9 @@ var XRegExp = (function(undefined) {
 
 /**
  * Retrieves the matches from searching a string using a chain of regexes that successively search
- * within previous matches. The provided `chain` array can contain regexes and objects with `regex`
- * and `backref` properties. When a backreference is specified, the named or numbered backreference
- * is passed forward to the next regex or returned.
+ * within previous matches. The provided `chain` array can contain regexes and or objects with
+ * `regex` and `backref` properties. When a backreference is specified, the named or numbered
+ * backreference is passed forward to the next regex or returned.
  *
  * @memberOf XRegExp
  * @param {String} str String to search.
@@ -1259,6 +1263,7 @@ var XRegExp = (function(undefined) {
  *
  * // With pos and sticky
  * XRegExp.test('abc', /c/, 0, 'sticky'); // -> false
+ * XRegExp.test('abc', /c/, 2, 'sticky'); // -> true
  */
     self.test = function(str, regex, pos, sticky) {
         // Do this the easy way :-)

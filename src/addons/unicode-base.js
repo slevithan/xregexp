@@ -7,7 +7,7 @@
 /**
  * Adds base support for Unicode matching:
  * - Adds syntax `\p{..}` for matching Unicode tokens. Tokens can be inverted using `\P{..}` or
- *   `\p{^..}`. Token names ignore case, spaces, hyphens, and underscores. You can omit the brackets
+ *   `\p{^..}`. Token names ignore case, spaces, hyphens, and underscores. You can omit the braces
  *   for token names that are a single letter (e.g. `\pL` or `PL`).
  * - Adds flag A (astral), which enables 21-bit Unicode support.
  * - Adds the `XRegExp.addUnicodeData` method used by other addons to provide character data.

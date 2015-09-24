@@ -4,16 +4,15 @@
  * Steven Levithan (c) 2012-2015 MIT License
  */
 
-// Module systems magic dance. Don't use strict mode for this function, so it can assign to global.
+// Module systems magic dance
+// Don't use strict mode for this function, so it can assign to global
 ;(function(root, definition) {
-    var self;
-
     // RequireJS
     if (typeof define === 'function') {
         define(definition);
     // CommonJS
     } else if (typeof exports === 'object') {
-        self = definition();
+        var self = definition();
         // Use Node.js's `module.exports`. This supports both `require('xregexp')` and
         // `require('xregexp').XRegExp`
         (typeof module === 'object' ? (module.exports = self) : exports).XRegExp = self;
@@ -663,7 +662,8 @@ var XRegExp = (function(undefined) {
  * ============================== */
 
 /**
- * The XRegExp version number as a string containing three dot-separated parts.
+ * The XRegExp version number as a string containing three dot-separated parts. For example,
+ * '2.0.0-beta-3'.
  *
  * @static
  * @memberOf XRegExp
@@ -701,7 +701,8 @@ var XRegExp = (function(undefined) {
  *     token chaining or deferring.
  *   <li>`leadChar` {String} Single character that occurs at the beginning of any successful match
  *     of the token (not always applicable). This doesn't change the behavior of the token unless
- *     you provide an erroneous value. However, providing it can increase the token's performance.
+ *     you provide an erroneous value. However, providing it can increase the token's performance
+ *     since the token can be skipped at any positions where this character doesn't appear.
  * @example
  *
  * // Basic usage: Add \a for the ALERT control code
@@ -712,7 +713,9 @@ var XRegExp = (function(undefined) {
  * );
  * XRegExp('\\a[\\a-\\n]+').test('\x07\n\x07'); // -> true
  *
- * // Add the U (ungreedy) flag from PCRE and RE2, which reverses greedy and lazy quantifiers
+ * // Add the U (ungreedy) flag from PCRE and RE2, which reverses greedy and lazy quantifiers.
+ * // Since `scope` is not specified, it uses 'default' (i.e., transformations apply outside of
+ * // character classes only)
  * XRegExp.addToken(
  *   /([?*+]|{\d+(?:,\d*)?})(\??)/,
  *   function(match) {return match[1] + (match[2] ? '' : '?');},
@@ -1058,9 +1061,9 @@ var XRegExp = (function(undefined) {
 
 /**
  * Retrieves the matches from searching a string using a chain of regexes that successively search
- * within previous matches. The provided `chain` array can contain regexes and objects with `regex`
- * and `backref` properties. When a backreference is specified, the named or numbered backreference
- * is passed forward to the next regex or returned.
+ * within previous matches. The provided `chain` array can contain regexes and or objects with
+ * `regex` and `backref` properties. When a backreference is specified, the named or numbered
+ * backreference is passed forward to the next regex or returned.
  *
  * @memberOf XRegExp
  * @param {String} str String to search.
@@ -1285,6 +1288,7 @@ var XRegExp = (function(undefined) {
  *
  * // With pos and sticky
  * XRegExp.test('abc', /c/, 0, 'sticky'); // -> false
+ * XRegExp.test('abc', /c/, 2, 'sticky'); // -> true
  */
     self.test = function(str, regex, pos, sticky) {
         // Do this the easy way :-)
@@ -2134,7 +2138,7 @@ var XRegExp = (function(undefined) {
  * // ]
  *
  * // Omitting unneeded parts with null valueNames, and using escapeChar
- * str = '...{1}\\{{function(x,y){return y+x;}}';
+ * str = '...{1}.\\{{function(x,y){return {y:x}}}';
  * XRegExp.matchRecursive(str, '{', '}', 'g', {
  *   valueNames: ['literal', null, 'value', null],
  *   escapeChar: '\\'
@@ -2142,8 +2146,8 @@ var XRegExp = (function(undefined) {
  * // -> [
  * // {name: 'literal', value: '...', start: 0, end: 3},
  * // {name: 'value',   value: '1',   start: 4, end: 5},
- * // {name: 'literal', value: '\\{', start: 6, end: 8},
- * // {name: 'value',   value: 'function(x,y){return y+x;}', start: 9, end: 35}
+ * // {name: 'literal', value: '.\{', start: 6, end: 9},
+ * // {name: 'value',   value: 'function(x,y){return {y:x}}', start: 10, end: 37}
  * // ]
  *
  * // Sticky mode via flag y
@@ -2279,7 +2283,7 @@ var XRegExp = (function(undefined) {
 /**
  * Adds base support for Unicode matching:
  * - Adds syntax `\p{..}` for matching Unicode tokens. Tokens can be inverted using `\P{..}` or
- *   `\p{^..}`. Token names ignore case, spaces, hyphens, and underscores. You can omit the brackets
+ *   `\p{^..}`. Token names ignore case, spaces, hyphens, and underscores. You can omit the braces
  *   for token names that are a single letter (e.g. `\pL` or `PL`).
  * - Adds flag A (astral), which enables 21-bit Unicode support.
  * - Adds the `XRegExp.addUnicodeData` method used by other addons to provide character data.

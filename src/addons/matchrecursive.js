@@ -54,7 +54,7 @@
  * // ]
  *
  * // Omitting unneeded parts with null valueNames, and using escapeChar
- * str = '...{1}\\{{function(x,y){return y+x;}}';
+ * str = '...{1}.\\{{function(x,y){return {y:x}}}';
  * XRegExp.matchRecursive(str, '{', '}', 'g', {
  *   valueNames: ['literal', null, 'value', null],
  *   escapeChar: '\\'
@@ -62,8 +62,8 @@
  * // -> [
  * // {name: 'literal', value: '...', start: 0, end: 3},
  * // {name: 'value',   value: '1',   start: 4, end: 5},
- * // {name: 'literal', value: '\\{', start: 6, end: 8},
- * // {name: 'value',   value: 'function(x,y){return y+x;}', start: 9, end: 35}
+ * // {name: 'literal', value: '.\{', start: 6, end: 9},
+ * // {name: 'value',   value: 'function(x,y){return {y:x}}', start: 10, end: 37}
  * // ]
  *
  * // Sticky mode via flag y
