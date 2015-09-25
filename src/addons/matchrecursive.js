@@ -1,6 +1,6 @@
 /*!
  * XRegExp.matchRecursive 3.1.0-dev
- * <http://xregexp.com/>
+ * <xregexp.com>
  * Steven Levithan (c) 2009-2015 MIT License
  */
 

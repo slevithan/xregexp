@@ -1,6 +1,6 @@
 /*!
  * XRegExp 3.1.0-dev
- * <http://xregexp.com/>
+ * <xregexp.com>
  * Steven Levithan (c) 2007-2015 MIT License
  */
 

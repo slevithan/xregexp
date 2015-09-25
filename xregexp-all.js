@@ -1,6 +1,6 @@
 /*!
  * XRegExp-All 3.1.0-dev
- * <http://xregexp.com/>
+ * <xregexp.com>
  * Steven Levithan (c) 2012-2015 MIT License
  */
 
@@ -25,7 +25,7 @@
 
 /*!
  * XRegExp 3.1.0-dev
- * <http://xregexp.com/>
+ * <xregexp.com>
  * Steven Levithan (c) 2007-2015 MIT License
  */
 
@@ -1911,9 +1911,9 @@ var XRegExp = (function(undefined) {
 
 /*!
  * XRegExp.build 3.1.0-dev
- * <http://xregexp.com/>
+ * <xregexp.com>
  * Steven Levithan (c) 2012-2015 MIT License
- * Inspired by Lea Verou's RegExp.create <http://lea.verou.me/>
+ * Inspired by Lea Verou's RegExp.create <lea.verou.me>
  */
 
 (function(XRegExp) {
@@ -2084,7 +2084,7 @@ var XRegExp = (function(undefined) {
 
 /*!
  * XRegExp.matchRecursive 3.1.0-dev
- * <http://xregexp.com/>
+ * <xregexp.com>
  * Steven Levithan (c) 2009-2015 MIT License
  */
 
@@ -2276,7 +2276,7 @@ var XRegExp = (function(undefined) {
 
 /*!
  * XRegExp Unicode Base 3.1.0-dev
- * <http://xregexp.com/>
+ * <xregexp.com>
  * Steven Levithan (c) 2008-2015 MIT License
  */
 
@@ -2513,9 +2513,9 @@ var XRegExp = (function(undefined) {
 
 /*!
  * XRegExp Unicode Blocks 3.1.0-dev
- * <http://xregexp.com/>
+ * <xregexp.com>
  * Steven Levithan (c) 2010-2015 MIT License
- * Unicode data provided by Mathias Bynens <http://mathiasbynens.be/>
+ * Unicode data by Mathias Bynens <mathiasbynens.be>
  */
 
 /**
@@ -3588,9 +3588,9 @@ var XRegExp = (function(undefined) {
 
 /*!
  * XRegExp Unicode Categories 3.1.0-dev
- * <http://xregexp.com/>
+ * <xregexp.com>
  * Steven Levithan (c) 2010-2015 MIT License
- * Unicode data provided by Mathias Bynens <http://mathiasbynens.be/>
+ * Unicode data by Mathias Bynens <mathiasbynens.be>
  */
 
 /**
@@ -3824,9 +3824,9 @@ var XRegExp = (function(undefined) {
 
 /*!
  * XRegExp Unicode Properties 3.1.0-dev
- * <http://xregexp.com/>
+ * <xregexp.com>
  * Steven Levithan (c) 2012-2015 MIT License
- * Unicode data provided by Mathias Bynens <http://mathiasbynens.be/>
+ * Unicode data by Mathias Bynens <mathiasbynens.be>
  */
 
 /**
@@ -3930,9 +3930,9 @@ var XRegExp = (function(undefined) {
 
 /*!
  * XRegExp Unicode Scripts 3.1.0-dev
- * <http://xregexp.com/>
+ * <xregexp.com>
  * Steven Levithan (c) 2010-2015 MIT License
- * Unicode data provided by Mathias Bynens <http://mathiasbynens.be/>
+ * Unicode data provided by Mathias Bynens <mathiasbynens.be>
  */
 
 /**

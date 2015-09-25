@@ -1,8 +1,8 @@
 /*!
  * XRegExp Unicode Scripts 3.1.0-dev
- * <http://xregexp.com/>
+ * <xregexp.com>
  * Steven Levithan (c) 2010-2015 MIT License
- * Unicode data provided by Mathias Bynens <http://mathiasbynens.be/>
+ * Unicode data provided by Mathias Bynens <mathiasbynens.be>
  */
 
 /**
