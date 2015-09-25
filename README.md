@@ -79,7 +79,7 @@ These examples should give you the flavor of what's possible, but XRegExp has mo
 
 ## Addons
 
-You can either load addons individually, or bundle all addons together with XRegExp by loading `xregexp-all.js`. XRegExp's [npm](http://npmjs.org/) package uses `xregexp-all.js`, so addons are always available when XRegExp is installed using npm.
+You can either load addons individually, or bundle all addons together with XRegExp by loading `xregexp-all.js`. XRegExp's [npm package](https://www.npmjs.com/package/xregexp) uses `xregexp-all.js`, so addons are always available when XRegExp is installed using npm.
 
 ### Unicode
 
@@ -179,7 +179,7 @@ XRegExp.matchRecursive(str, '<div\\s*>', '</div>', 'gi', {
 ] */
 
 // Omitting unneeded parts with null valueNames, and using escapeChar
-str = '...{1}\\{{function(x,y){return y+x;}}';
+str = '...{1}.\\{{function(x,y){return {y:x}}}';
 XRegExp.matchRecursive(str, '{', '}', 'g', {
     valueNames: ['literal', null, 'value', null],
     escapeChar: '\\'
@@ -187,8 +187,8 @@ XRegExp.matchRecursive(str, '{', '}', 'g', {
 /* -> [
 {name: 'literal', value: '...', start: 0, end: 3},
 {name: 'value',   value: '1',   start: 4, end: 5},
-{name: 'literal', value: '\\{', start: 6, end: 8},
-{name: 'value',   value: 'function(x,y){return y+x;}', start: 9, end: 35}
+{name: 'literal', value: '.\{', start: 6, end: 9},
+{name: 'value',   value: 'function(x,y){return {y:x}}', start: 10, end: 37}
 ] */
 
 // Sticky mode via flag y
@@ -234,11 +234,6 @@ require({paths: {xregexp: 'xregexp-all'}}, ['xregexp'], function(XRegExp) {
 });
 ```
 
-## Changelog
-
-* Releases: [Version history](http://xregexp.com/history/).
-* Upcoming: [Issue tracker](https://github.com/slevithan/xregexp/issues).
-
 ## About
 
 XRegExp copyright 2007-2015 by [Steven Levithan](http://stevenlevithan.com/).
@@ -249,6 +244,6 @@ Tests: Uses [Jasmine](http://pivotal.github.com/jasmine/) for unit tests, and [B
 
 Prior art: `XRegExp.build` inspired by [Lea Verou](http://lea.verou.me/)'s [RegExp.create](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/). `XRegExp.union` inspired by [Ruby](http://www.ruby-lang.org/). XRegExp's syntax extensions and flags come from [Perl](http://www.perl.org/), [.NET](http://www.microsoft.com/net), etc.
 
-All code, including addons, tools, and tests, is released under the terms of the [MIT License](http://mit-license.org/).
+All code, including addons, tools, and tests, is released under the terms of the [MIT](http://mit-license.org/) license.
 
 Fork me to show support, fix, and extend.
