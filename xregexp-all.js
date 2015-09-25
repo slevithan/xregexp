@@ -3932,7 +3932,7 @@ var XRegExp = (function(undefined) {
  * XRegExp Unicode Scripts 3.1.0-dev
  * <xregexp.com>
  * Steven Levithan (c) 2010-2015 MIT License
- * Unicode data provided by Mathias Bynens <mathiasbynens.be>
+ * Unicode data by Mathias Bynens <mathiasbynens.be>
  */
 
 /**
