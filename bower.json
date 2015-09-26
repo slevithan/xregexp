@@ -1,0 +1,34 @@
+{
+    "name": "xregexp",
+    "main": "xregexp-all.js",
+    "authors": [
+        "Steven Levithan <steves_list@hotmail.com>"
+    ],
+    "description": "Extended regular expressions",
+    "dependencies": {},
+    "devDependencies": {},
+    "moduleType": [
+        "amd",
+        "globals",
+        "node"
+    ],
+    "homepage": "http://xregexp.com/",
+    "license": "MIT",
+    "keywords": [
+        "regex",
+        "regexp"
+    ],
+    "ignore": [
+        "**/.*",
+        "package.json",
+        "README.md",
+        "src",
+        "tests",
+        "tools"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/slevithan/xregexp.git"
+    }
+}
+
