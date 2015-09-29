@@ -30,8 +30,8 @@ describe('XRegExp.matchRecursive addon:', function() {
                     escapeChar: '\\'
                 }))
             .toEqual([
-                {name: 'literal', value: '...', start: 0, end: 3},
-                {name: 'value',   value: '1',   start: 4, end: 5},
+                {name: 'literal', value: '...',  start: 0, end: 3},
+                {name: 'value',   value: '1',    start: 4, end: 5},
                 {name: 'literal', value: '.\\{', start: 6, end: 9},
                 {name: 'value',   value: 'function(x,y){return {y:x}}', start: 10, end: 37}
             ]);

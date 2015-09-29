@@ -1,7 +1,7 @@
 [XRegExp](http://xregexp.com/) 3.0.0
 ====================================
 
-XRegExp provides augmented (and extensible!) JavaScript regular expressions. You get new modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your client-side grepping and parsing easier, while freeing you from worrying about pesky cross-browser inconsistencies and things like manually manipulating `lastIndex` or slicing strings when tokenizing.
+XRegExp provides augmented (and extensible) JavaScript regular expressions. You get new modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your client-side grepping and parsing easier, while freeing you from worrying about pesky aspects of JavaScript regexes like cross-browser inconsistencies and manually manipulating `lastIndex`.
 
 XRegExp supports all native ES6 regular expression syntax. It supports Internet Explorer 5.5+, Firefox 1.5+, Chrome, Safari 3+, and Opera 11+. You can also use it with Node.js, or as a RequireJS module. The base library is about 4.25 KB, minified and gzipped.
 
@@ -106,15 +106,19 @@ XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
 XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
 ```
 
-By default, `\p{…}` and `\P{…}` support the Basic Multilingual Plane (i.e. code points up to `U+FFFF`). You can opt-in to full 21-bit Unicode support (with code points up to `U+10FFFF`) on a per-regex basis by using flag `A`. In XRegExp, this is called *astral mode*. You can automatically apply astral mode for all new regexes by running `XRegExp.install('astral')`. When in astral mode, `\p{…}` and `\P{…}` always match a full code point rather than a code unit, using surrogate pairs for code points above `U+FFFF`.
+By default, `\p{…}` and `\P{…}` support the Basic Multilingual Plane (i.e. code points up to `U+FFFF`). You can opt-in to full 21-bit Unicode support (with code points up to `U+10FFFF`) on a per-regex basis by using flag `A`. In XRegExp, this is called *astral mode*. You can automatically add flag `A` for all new regexes by running `XRegExp.install('astral')`. When in astral mode, `\p{…}` and `\P{…}` always match a full code point rather than a code unit, using surrogate pairs for code points above `U+FFFF`.
 
 ```js
-// Using flag A. The test string uses a surrogate pair to represent U+1F4A9
-XRegExp('^\\pS$', 'A').test('\uD83D\uDCA9'); // -> true
+// Using flag A to match astral code points
+XRegExp('^\\pS$').test('💩'); // -> false
+XRegExp('^\\pS$', 'A').test('💩'); // -> true
+XRegExp('(?A)^\\pS$').test('💩'); // -> true
+// Using surrogate pair U+D83D U+DCA9 to represent U+1F4A9 (pile of poo)
+XRegExp('(?A)^\\pS$').test('\uD83D\uDCA9'); // -> true
 
 // Implicit flag A
 XRegExp.install('astral');
-XRegExp('^\\pS$').test('\uD83D\uDCA9'); // -> true
+XRegExp('^\\pS$').test('💩'); // -> true
 ```
 
 Opting in to astral mode disables the use of `\p{…}` and `\P{…}` within character classes. In astral mode, use e.g. `(\pL|[0-9_])+` instead of `[\pL0-9_]+`.
@@ -185,9 +189,9 @@ XRegExp.matchRecursive(str, '{', '}', 'g', {
     escapeChar: '\\'
 });
 /* -> [
-{name: 'literal', value: '...', start: 0, end: 3},
-{name: 'value',   value: '1',   start: 4, end: 5},
-{name: 'literal', value: '.\{', start: 6, end: 9},
+{name: 'literal', value: '...',  start: 0, end: 3},
+{name: 'value',   value: '1',    start: 4, end: 5},
+{name: 'literal', value: '.\\{', start: 6, end: 9},
 {name: 'value',   value: 'function(x,y){return {y:x}}', start: 10, end: 37}
 ] */
 
