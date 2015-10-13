@@ -40,7 +40,7 @@
  */
     function asXRegExp(value) {
         return XRegExp.isRegExp(value) ?
-            (value[REGEX_DATA] && value[REGEX_DATA].captureNames ?
+            (value[REGEX_DATA] && value[REGEX_DATA]._captures ?
                 // Don't recompile, to preserve capture names
                 value :
                 // Recompile as XRegExp
@@ -106,7 +106,7 @@
                     // Deanchoring allows embedding independently useful anchored regexes. If you
                     // really need to keep your anchors, double them (i.e., `^^...$$`)
                     pattern: deanchor(sub.source),
-                    names: sub[REGEX_DATA].captureNames || []
+                    names: sub[REGEX_DATA]._captures || []
                 };
             }
         }
@@ -114,7 +114,7 @@
         // Passing to XRegExp dies on octals and ensures the outer pattern is independently valid;
         // helps keep this simple. Named captures will be put back
         pattern = asXRegExp(pattern);
-        outerCapNames = pattern[REGEX_DATA].captureNames || [];
+        outerCapNames = pattern[REGEX_DATA]._captures || [];
         pattern = pattern.source.replace(parts, function($0, $1, $2, $3, $4) {
             var subName = $1 || $2, capName, intro;
             // Named subpattern
