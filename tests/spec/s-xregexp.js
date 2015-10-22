@@ -155,6 +155,14 @@ describe('XRegExp()', function() {
         expect(function() {XRegExp('', '?');}).toThrowError(SyntaxError);
     });
 
+    it('should allow (?:) followed by a quantifier as a pattern', function() {
+        var quantifiers = ['*', '+', '?', '{1}', '{1,}', '{1,2}', '??', '*?', '+?'];
+
+        for (var i = 0; i < quantifiers.length; i++) {
+            expect(function() {XRegExp('(?:)' + quantifiers[i], 'g');}).not.toThrow();
+        }
+    });
+
     it('should store named capture data on regex instances', function() {
         // The `captureNames` property is undocumented, so this is technically just testing
         // implementation details. However, any changes to this need to be very intentional
@@ -270,7 +278,7 @@ describe('XRegExp()', function() {
             it('should set properties for native flags', function() {
                 expect(XRegExp('(?i)').ignoreCase).toBe(true);
                 expect(XRegExp('(?m)').multiline).toBe(true);
-    
+
                 var regexIM = XRegExp('(?im)');
                 expect(regexIM.ignoreCase).toBe(true);
                 expect(regexIM.multiline).toBe(true);

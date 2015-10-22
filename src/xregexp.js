@@ -612,7 +612,7 @@ var XRegExp = (function(undefined) {
 
             patternCache[pattern][flags] = {
                 // Cleanup token cruft: repeated `(?:)(?:)` and leading/trailing `(?:)`
-                pattern: nativ.replace.call(output, /\(\?:\)(?=\(\?:\))|^\(\?:\)|\(\?:\)$/g, ''),
+                pattern: nativ.replace.call(output, /\(\?:\)(?:[*+?]|\{\d+(?:,\d*)?})?\??(?=\(\?:\))|^\(\?:\)(?:[*+?]|\{\d+(?:,\d*)?})?\??|\(\?:\)(?:[*+?]|\{\d+(?:,\d*)?})?\??$/g, ''),
                 // Strip all but native flags
                 flags: nativ.replace.call(appliedFlags, /[^gimuy]+/g, ''),
                 // `context.captureNames` has an item for each capturing group, even if unnamed
