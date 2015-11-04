@@ -1701,7 +1701,7 @@ var XRegExp = (function(undefined) {
  * if you use the same in a character class.
  */
     add(
-        /\\u{([\dA-Fa-f]+)}/,
+        /(?:(?:\\u)|(?:\\x)){([\dA-Fa-f]+)}/,
         function(match, scope, flags) {
             var code = dec(match[1]);
             if (code > 0x10FFFF) {
@@ -1713,7 +1713,7 @@ var XRegExp = (function(undefined) {
                 return '\\u' + pad4(hex(code));
             }
             // If `code` is between 0xFFFF and 0x10FFFF, require and defer to native handling
-            if (hasNativeU && flags.indexOf('u') > -1) {
+            if (hasNativeU && (flags.indexOf('u') > -1 || flags.indexOf('x') > -1)) {
                 return match[0];
             }
             throw new SyntaxError('Cannot use Unicode code point above \\u{FFFF} without flag u');

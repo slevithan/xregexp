@@ -643,6 +643,13 @@ describe('XRegExp()', function() {
                 expect(XRegExp('a{\\u{31}}').test('a{1}')).toBe(true);
             });
 
+            it("it allows 'x' flag as alternative to 'u'", function() {
+                expect(XRegExp('\\x{1}').test('\u0001')).toBe(true);
+                expect(XRegExp('\\x{10}').test('\u0010')).toBe(true);
+                expect(XRegExp('\\x{100}').test('\u0100')).toBe(true);
+                expect(XRegExp('\\x{1000}').test('\u1000')).toBe(true);
+            });
+
         });
 
         // Unicode property syntax is covered by the specs for Unicode Base
