@@ -42,79 +42,75 @@ var XRegExp = (function(undefined) {
  * Private variables
  * ============================== */
 
-    var // Internal reference to the `XRegExp` object
-        XRegExp,
-        // Property name used for extended regex instance data
-        REGEX_DATA = 'xregexp',
-        // Optional features that can be installed and uninstalled
-        features = {
-            astral: false,
-            natives: false
-        },
-        // Native methods to use and restore ('native' is an ES3 reserved keyword)
-        nativ = {
-            exec: RegExp.prototype.exec,
-            test: RegExp.prototype.test,
-            match: String.prototype.match,
-            replace: String.prototype.replace,
-            split: String.prototype.split
-        },
-        // Storage for fixed/extended native methods
-        fixed = {},
-        // Storage for regexes cached by `XRegExp.cache`
-        regexCache = {},
-        // Storage for pattern details cached by the `XRegExp` constructor
-        patternCache = {},
-        // Storage for regex syntax tokens added internally or by `XRegExp.addToken`
-        tokens = [],
-        // Token scopes
-        defaultScope = 'default',
-        classScope = 'class',
-        // Regexes that match native regex syntax, including octals
-        nativeTokens = {
-            // Any native multicharacter token in default scope, or any single character
-            'default': /\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u(?:[\dA-Fa-f]{4}|{[\dA-Fa-f]+})|c[A-Za-z]|[\s\S])|\(\?[:=!]|[?*+]\?|{\d+(?:,\d*)?}\??|[\s\S]/,
-            // Any native multicharacter token in character class scope, or any single character
-            'class': /\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u(?:[\dA-Fa-f]{4}|{[\dA-Fa-f]+})|c[A-Za-z]|[\s\S])|[\s\S]/
-        },
-        // Any backreference or dollar-prefixed character in replacement strings
-        replacementToken = /\$(?:{([\w$]+)}|(\d\d?|[\s\S]))/g,
-        // Check for correct `exec` handling of nonparticipating capturing groups
-        correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined,
-        // Check for ES6 `u` flag support
-        hasNativeU = (function() {
-            var isSupported = true;
-            try {
-                new RegExp('', 'u');
-            } catch (exception) {
-                isSupported = false;
-            }
-            return isSupported;
-        }()),
-        // Check for ES6 `y` flag support
-        hasNativeY = (function() {
-            var isSupported = true;
-            try {
-                new RegExp('', 'y');
-            } catch (exception) {
-                isSupported = false;
-            }
-            return isSupported;
-        }()),
-        // Check for ES6 `flags` prop support
-        hasFlagsProp = /a/.flags !== undefined,
-        // Tracker for known flags, including addon flags
-        registeredFlags = {
-            g: true,
-            i: true,
-            m: true,
-            u: hasNativeU,
-            y: hasNativeY
-        },
-        // Shortcut to `Object.prototype.toString`
-        toString = {}.toString,
-        // Shortcut to `XRegExp.addToken`
-        add;
+    // Property name used for extended regex instance data
+    var REGEX_DATA = 'xregexp';
+    // Optional features that can be installed and uninstalled
+    var features = {
+        astral: false,
+        natives: false
+    };
+    // Native methods to use and restore ('native' is an ES3 reserved keyword)
+    var nativ = {
+        exec: RegExp.prototype.exec,
+        test: RegExp.prototype.test,
+        match: String.prototype.match,
+        replace: String.prototype.replace,
+        split: String.prototype.split
+    };
+    // Storage for fixed/extended native methods
+    var fixed = {};
+    // Storage for regexes cached by `XRegExp.cache`
+    var regexCache = {};
+    // Storage for pattern details cached by the `XRegExp` constructor
+    var patternCache = {};
+    // Storage for regex syntax tokens added internally or by `XRegExp.addToken`
+    var tokens = [];
+    // Token scopes
+    var defaultScope = 'default';
+    var classScope = 'class';
+    // Regexes that match native regex syntax, including octals
+    var nativeTokens = {
+        // Any native multicharacter token in default scope, or any single character
+        'default': /\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u(?:[\dA-Fa-f]{4}|{[\dA-Fa-f]+})|c[A-Za-z]|[\s\S])|\(\?[:=!]|[?*+]\?|{\d+(?:,\d*)?}\??|[\s\S]/,
+        // Any native multicharacter token in character class scope, or any single character
+        'class': /\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u(?:[\dA-Fa-f]{4}|{[\dA-Fa-f]+})|c[A-Za-z]|[\s\S])|[\s\S]/
+    };
+    // Any backreference or dollar-prefixed character in replacement strings
+    var replacementToken = /\$(?:{([\w$]+)}|(\d\d?|[\s\S]))/g;
+    // Check for correct `exec` handling of nonparticipating capturing groups
+    var correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined;
+    // Check for ES6 `u` flag support
+    var hasNativeU = (function() {
+        var isSupported = true;
+        try {
+            new RegExp('', 'u');
+        } catch (exception) {
+            isSupported = false;
+        }
+        return isSupported;
+    }());
+    // Check for ES6 `y` flag support
+    var hasNativeY = (function() {
+        var isSupported = true;
+        try {
+            new RegExp('', 'y');
+        } catch (exception) {
+            isSupported = false;
+        }
+        return isSupported;
+    }());
+    // Check for ES6 `flags` prop support
+    var hasFlagsProp = /a/.flags !== undefined;
+    // Tracker for known flags, including addon flags
+    var registeredFlags = {
+        g: true,
+        i: true,
+        m: true,
+        u: hasNativeU,
+        y: hasNativeY
+    };
+    // Shortcut to `Object.prototype.toString`
+    var toString = {}.toString;
 
 /* ==============================
  * Private functions
@@ -149,9 +145,9 @@ var XRegExp = (function(undefined) {
             regex.__proto__ = XRegExp.prototype;
         } else {
             for (p in XRegExp.prototype) {
-                // A `XRegExp.prototype.hasOwnProperty(p)` check wouldn't be worth it here, since this
-                // is performance sensitive, and enumerable `Object.prototype` or `RegExp.prototype`
-                // extensions exist on `regex.prototype` anyway
+                // An `XRegExp.prototype.hasOwnProperty(p)` check wouldn't be worth it here, since
+                // this is performance sensitive, and enumerable `Object.prototype` or
+                // `RegExp.prototype` extensions exist on `regex.prototype` anyway
                 regex[p] = XRegExp.prototype[p];
             }
         }
@@ -564,7 +560,7 @@ var XRegExp = (function(undefined) {
  * // have fresh `lastIndex` properties (set to zero).
  * XRegExp(/regex/);
  */
-    XRegExp = function(pattern, flags) {
+    function XRegExp(pattern, flags) {
         var context = {
                 hasNamedCapture: false,
                 captureNames: []
@@ -1695,14 +1691,12 @@ var XRegExp = (function(undefined) {
  * Built-in syntax/flag tokens
  * ============================== */
 
-    add = XRegExp.addToken;
-
 /*
  * Letter escapes that natively match literal characters: `\a`, `\A`, etc. These should be
  * SyntaxErrors but are allowed in web reality. XRegExp makes them errors for cross-browser
  * consistency and to reserve their syntax, but lets them be superseded by addons.
  */
-    add(
+    XRegExp.addToken(
         /\\([ABCE-RTUVXYZaeg-mopqyz]|c(?![A-Za-z])|u(?![\dA-Fa-f]{4}|{[\dA-Fa-f]+})|x(?![\dA-Fa-f]{2}))/,
         function(match, scope) {
             // \B is allowed in default scope only
@@ -1725,7 +1719,7 @@ var XRegExp = (function(undefined) {
  * if you follow a `\u{N..}` token that references a code point above U+FFFF with a quantifier, or
  * if you use the same in a character class.
  */
-    add(
+    XRegExp.addToken(
         /\\u{([\dA-Fa-f]+)}/,
         function(match, scope, flags) {
             var code = dec(match[1]);
@@ -1754,7 +1748,7 @@ var XRegExp = (function(undefined) {
  * Unless this is standardized (per the ES spec), regex syntax can't be accurately parsed because
  * character class endings can't be determined.
  */
-    add(
+    XRegExp.addToken(
         /\[(\^?)]/,
         function(match) {
             // For cross-browser compatibility with ES3, convert [] to \b\B and [^] to [\s\S].
@@ -1768,7 +1762,7 @@ var XRegExp = (function(undefined) {
  * Comment pattern: `(?# )`. Inline comments are an alternative to the line comments allowed in
  * free-spacing mode (flag x).
  */
-    add(
+    XRegExp.addToken(
         /\(\?#[^)]*\)/,
         function(match, scope, flags) {
             // Keep tokens separated unless the following token is a quantifier
@@ -1781,7 +1775,7 @@ var XRegExp = (function(undefined) {
 /*
  * Whitespace and line comments, in free-spacing mode (aka extended mode, flag x) only.
  */
-    add(
+    XRegExp.addToken(
         /\s+|#.*/,
         function(match, scope, flags) {
             // Keep tokens separated unless the following token is a quantifier
@@ -1794,7 +1788,7 @@ var XRegExp = (function(undefined) {
 /*
  * Dot, in dotall mode (aka singleline mode, flag s) only.
  */
-    add(
+    XRegExp.addToken(
         /\./,
         function() {
             return '[\\s\\S]';
@@ -1809,7 +1803,7 @@ var XRegExp = (function(undefined) {
  * Named backreference: `\k<name>`. Backreference names can use the characters A-Z, a-z, 0-9, _,
  * and $ only. Also allows numbered backreferences as `\k<n>`.
  */
-    add(
+    XRegExp.addToken(
         /\\k<([\w$]+)>/,
         function(match) {
             // Groups with the same name is an error, else would need `lastIndexOf`
@@ -1832,7 +1826,7 @@ var XRegExp = (function(undefined) {
  * not followed by 0-9 and backreferences to unopened capture groups throw an error. Other matches
  * are returned unaltered. IE < 9 doesn't support backreferences above `\99` in regex syntax.
  */
-    add(
+    XRegExp.addToken(
         /\\(\d+)/,
         function(match, scope) {
             if (
@@ -1861,7 +1855,7 @@ var XRegExp = (function(undefined) {
  * supported the Python-style syntax. Otherwise, XRegExp might treat numbered backreferences to
  * Python-style named capture as octals.
  */
-    add(
+    XRegExp.addToken(
         /\(\?P?<([\w$]+)>/,
         function(match) {
             // Disallow bare integers as names because named backreferences are added to match
@@ -1886,7 +1880,7 @@ var XRegExp = (function(undefined) {
  * Capturing group; match the opening parenthesis only. Required for support of named capturing
  * groups. Also adds explicit capture mode (flag n).
  */
-    add(
+    XRegExp.addToken(
         /\((?!\?)/,
         function(match, scope, flags) {
             if (flags.indexOf('n') > -1) {
