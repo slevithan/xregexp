@@ -10,7 +10,7 @@
  * make your client-side grepping simpler and more powerful, while freeing you from related
  * cross-browser inconsistencies.
  */
-var XRegExp = (function(undefined) {
+
     'use strict';
 
 /* ==============================
@@ -1874,6 +1874,4 @@ var XRegExp = (function(undefined) {
  * Expose XRegExp
  * ============================== */
 
-    return XRegExp;
-
-}());
+    module.exports = XRegExp;
