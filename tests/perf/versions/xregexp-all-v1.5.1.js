@@ -119,7 +119,7 @@ if (XRegExp) {
             nativ.test.call(x, "");
             return !x.lastIndex;
         }(),
-        hasNativeY = RegExp.prototype.sticky !== undefined,
+        hasNativeY = RegExp.prototype.hasOwnProperty('sticky'),
         nativeTokens = {};
 
     // `nativeTokens` match native multicharacter metasequences only (including deprecated octals,
