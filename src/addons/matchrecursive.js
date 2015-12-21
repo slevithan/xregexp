@@ -188,4 +188,4 @@ module.exports = function(XRegExp) {
         return output;
     };
 
-}
+};

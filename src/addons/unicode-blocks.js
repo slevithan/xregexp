@@ -1071,4 +1071,4 @@ module.exports = function(XRegExp) {
         }
     ]);
 
-}
+};

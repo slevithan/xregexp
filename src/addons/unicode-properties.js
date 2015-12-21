@@ -102,4 +102,4 @@ module.exports = function(XRegExp) {
 
     XRegExp.addUnicodeData(unicodeData);
 
-}
+};

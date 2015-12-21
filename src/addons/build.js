@@ -169,4 +169,4 @@ module.exports = function(XRegExp) {
         return XRegExp(pattern, flags);
     };
 
-}
+};

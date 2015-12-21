@@ -232,4 +232,4 @@ module.exports = function(XRegExp) {
         }
     ]);
 
-}
+};

@@ -556,4 +556,4 @@ module.exports = function(XRegExp) {
         }
     ]);
 
-}
+};
