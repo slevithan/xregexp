@@ -54,28 +54,14 @@ var XRegExp = (function(undefined) {
     var replacementToken = /\$(?:{([\w$]+)}|(\d\d?|[\s\S]))/g;
     // Check for correct `exec` handling of nonparticipating capturing groups
     var correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined;
+    // Dummy regular expression for testing purposes
+    var dummyRegExp = /x/;
     // Check for ES6 `u` flag support
-    var hasNativeU = (function() {
-        var isSupported = true;
-        try {
-            new RegExp('', 'u');
-        } catch (exception) {
-            isSupported = false;
-        }
-        return isSupported;
-    }());
+    var hasNativeU = 'unicode' in dummyRegExp;
     // Check for ES6 `y` flag support
-    var hasNativeY = (function() {
-        var isSupported = true;
-        try {
-            new RegExp('', 'y');
-        } catch (exception) {
-            isSupported = false;
-        }
-        return isSupported;
-    }());
+    var hasNativeY = 'sticky' in dummyRegExp;
     // Check for ES6 `flags` prop support
-    var hasFlagsProp = /a/.flags !== undefined;
+    var hasFlagsProp = dummyRegExp.flags !== undefined;
     // Tracker for known flags, including addon flags
     var registeredFlags = {
         g: true,
