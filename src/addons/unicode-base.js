@@ -17,7 +17,7 @@
  *
  * @requires XRegExp
  */
-(function(XRegExp) {
+module.exports = function(XRegExp) {
     'use strict';
 
 // Storage for Unicode data
@@ -233,4 +233,4 @@
         XRegExp.cache.flush('patterns');
     };
 
-}(XRegExp));
+};

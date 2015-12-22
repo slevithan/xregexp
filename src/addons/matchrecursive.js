@@ -4,7 +4,7 @@
  * Steven Levithan (c) 2009-2015 MIT License
  */
 
-(function(XRegExp) {
+module.exports = function(XRegExp) {
     'use strict';
 
 /**
@@ -188,4 +188,4 @@
         return output;
     };
 
-}(XRegExp));
+};

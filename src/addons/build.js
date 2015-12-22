@@ -5,7 +5,7 @@
  * Inspired by Lea Verou's RegExp.create <lea.verou.me>
  */
 
-(function(XRegExp) {
+module.exports = function(XRegExp) {
     'use strict';
 
     var REGEX_DATA = 'xregexp',
@@ -169,4 +169,4 @@
         return XRegExp(pattern, flags);
     };
 
-}(XRegExp));
+};

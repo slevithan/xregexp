@@ -14,7 +14,7 @@
  *
  * @requires XRegExp, Unicode Base
  */
-(function(XRegExp) {
+module.exports = function(XRegExp) {
     'use strict';
 
     if (!XRegExp.addUnicodeData) {
@@ -232,4 +232,4 @@
         }
     ]);
 
-}(XRegExp));
+};
