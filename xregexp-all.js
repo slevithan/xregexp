@@ -2614,7 +2614,7 @@ module.exports = XRegExp;
     'use strict';
 
 /* ==============================
- * Private variables
+ * Private stuff
  * ============================== */
 
     // Property name used for extended regex instance data
@@ -2654,14 +2654,29 @@ module.exports = XRegExp;
     var replacementToken = /\$(?:{([\w$]+)}|(\d\d?|[\s\S]))/g;
     // Check for correct `exec` handling of nonparticipating capturing groups
     var correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined;
-    // Dummy regular expression for testing purposes
-    var dummyRegExp = /x/;
-    // Check for ES6 `u` flag support
-    var hasNativeU = 'unicode' in dummyRegExp;
-    // Check for ES6 `y` flag support
-    var hasNativeY = 'sticky' in dummyRegExp;
     // Check for ES6 `flags` prop support
-    var hasFlagsProp = dummyRegExp.flags !== undefined;
+    var hasFlagsProp = /x/.flags !== undefined;
+    // Shortcut to `Object.prototype.toString`
+    var toString = {}.toString;
+
+    function hasNativeFlag(flag) {
+        // Can't check based on the presense of properties/getters since
+        // browsers might support such properties even when don't support the
+        // corresponding flag in regex construction (tested in Chrome 48, where
+        // `'unicode' in /x/` is true but trying to construct a regex with flag
+        // `u` throws an error).
+        var isSupported = true;
+        try {
+            new RegExp('', flag);
+        } catch (exception) {
+            isSupported = false;
+        }
+        return isSupported;
+    }
+    // Check for ES6 `u` flag support
+    var hasNativeU = hasNativeFlag('u');
+    // Check for ES6 `y` flag support
+    var hasNativeY = hasNativeFlag('y');
     // Tracker for known flags, including addon flags
     var registeredFlags = {
         g: true,
@@ -2670,12 +2685,6 @@ module.exports = XRegExp;
         u: hasNativeU,
         y: hasNativeY
     };
-    // Shortcut to `Object.prototype.toString`
-    var toString = {}.toString;
-
-/* ==============================
- * Private functions
- * ============================== */
 
 /**
  * Attaches extended data and `XRegExp.prototype` properties to a regex object.
@@ -3231,6 +3240,9 @@ module.exports = XRegExp;
 /* ==============================
  * Public methods
  * ============================== */
+
+// Intentionally undocumented
+    XRegExp._hasNativeFlag = hasNativeFlag;
 
 /**
  * Extends XRegExp syntax and allows custom flags. This is used internally and can be used to

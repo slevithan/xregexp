@@ -3,7 +3,6 @@ beforeEach(function() {
     XRegExp.uninstall('natives astral');
 });
 
-
 // Repeat a string the specified number of times
 function repeat(str, num) {
     return Array(num + 1).join(str);
@@ -13,30 +12,11 @@ function repeat(str, num) {
 var REGEX_DATA = 'xregexp';
 
 // Check for ES6 `u` flag support
-var hasNativeU = (function() {
-    var isSupported = true;
-    try {
-        new RegExp('', 'u');
-    } catch (exception) {
-        isSupported = false;
-    }
-    return isSupported;
-}());
-
+var hasNativeU = XRegExp._hasNativeFlag('u');
 // Check for ES6 `y` flag support
-var hasNativeY = (function() {
-    var isSupported = true;
-    try {
-        new RegExp('', 'y');
-    } catch (exception) {
-        isSupported = false;
-    }
-    return isSupported;
-}());
-
+var hasNativeY = XRegExp._hasNativeFlag('y');
 // Check for strict mode support
 var hasStrictMode = (function() {'use strict'; return !this;}());
-
 
 // Add the complete ES5 Array.prototype.forEach shim from <https://github.com/kriskowal/es5-shim>.
 // Commented out the `if (i in self)` sparse array check because it causes this to skip keys with
