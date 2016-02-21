@@ -3609,7 +3609,6 @@ module.exports = XRegExp;
         r2 = regex[REGEX_DATA][cacheKey] || (
             regex[REGEX_DATA][cacheKey] = copyRegex(regex, {
                 addG: !!global,
-                addY: !!regex.sticky,
                 removeG: scope === 'one',
                 isInternalOnly: true
             })
@@ -3751,7 +3750,6 @@ module.exports = XRegExp;
             s2 = search[REGEX_DATA][cacheKey] || (
                 search[REGEX_DATA][cacheKey] = copyRegex(search, {
                     addG: !!global,
-                    addY: !!search.sticky,
                     removeG: scope === 'one',
                     isInternalOnly: true
                 })
