@@ -904,7 +904,7 @@
 
 /**
  * Installs optional features according to the specified options. Can be undone using
- * {@link #XRegExp.uninstall}.
+ * `XRegExp.uninstall`.
  *
  * @memberOf XRegExp
  * @param {Object|String} options Options object or string.
@@ -915,8 +915,7 @@
  *   // Enables support for astral code points in Unicode addons (implicitly sets flag A)
  *   astral: true,
  *
- *   // Overrides native regex methods with fixed/extended versions that support named
- *   // backreferences and fix numerous cross-browser bugs
+ *   // DEPRECATED: Overrides native regex methods with fixed/extended versions
  *   natives: true
  * });
  *
@@ -940,12 +939,12 @@
  *
  * @memberOf XRegExp
  * @param {String} feature Name of the feature to check. One of:
- *   <li>`natives`
  *   <li>`astral`
+ *   <li>`natives`
  * @returns {Boolean} Whether the feature is installed.
  * @example
  *
- * XRegExp.isInstalled('natives');
+ * XRegExp.isInstalled('astral');
  */
     XRegExp.isInstalled = function(feature) {
         return !!(features[feature]);
@@ -1170,10 +1169,10 @@
     };
 
 /**
- * Performs batch processing of string replacements. Used like {@link #XRegExp.replace}, but
- * accepts an array of replacement details. Later replacements operate on the output of earlier
- * replacements. Replacement details are accepted as an array with a regex or string to search for,
- * the replacement string or function, and an optional scope of 'one' or 'all'. Uses the XRegExp
+ * Performs batch processing of string replacements. Used like `XRegExp.replace`, but accepts an
+ * array of replacement details. Later replacements operate on the output of earlier replacements.
+ * Replacement details are accepted as an array with a regex or string to search for, the
+ * replacement string or function, and an optional scope of 'one' or 'all'. Uses the XRegExp
  * replacement text syntax, which supports named backreference properties via `${name}`.
  *
  * @memberOf XRegExp
@@ -1264,7 +1263,7 @@
 
 /**
  * Uninstalls optional features according to the specified options. All optional features start out
- * uninstalled, so this is used to undo the actions of {@link #XRegExp.install}.
+ * uninstalled, so this is used to undo the actions of `XRegExp.install`.
  *
  * @memberOf XRegExp
  * @param {Object|String} options Options object or string.
@@ -1275,7 +1274,7 @@
  *   // Disables support for astral code points in Unicode addons
  *   astral: true,
  *
- *   // Restores native regex methods
+ *   // DEPRECATED: Restores native regex methods
  *   natives: true
  * });
  *

@@ -40,15 +40,6 @@ date.test('2015-02-22'); // -> true
 // The *only* caveat is that named captures must be referenced using numbered backreferences
 '2015-02-22'.replace(date, '$2/$3/$1'); // -> '02/22/2015'
 
-// If you want, you can extend native methods so you don't have to worry about this.
-// Doing so also fixes numerous browser bugs in the native methods
-XRegExp.install('natives');
-'2015-02-22'.replace(date, '${month}/${day}/${year}'); // -> '02/22/2015'
-'2015-02-22'.replace(date, function(match) {
-    return match.month + '/' + match.day + '/' + match.year;
-}); // -> '02/22/2015'
-date.exec('2015-02-22').year; // -> '2015'
-
 // Extract every other digit from a string using XRegExp.forEach
 var evens = [];
 XRegExp.forEach('1a2345', /\d/, function(match, i) {
