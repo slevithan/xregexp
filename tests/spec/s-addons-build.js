@@ -43,6 +43,11 @@ describe('XRegExp.build addon:', function() {
             expect(XRegExp.build('{{x}}', {x: '123$'}).test('01234')).toBe(false);
         });
 
+        it('should not strip a leading ^ and trailing unescaped $ in subpatterns, when both are present but not leading/trailing', function() {
+            expect(XRegExp.build('{{x}}', {x: '^1$'}).test('11')).toBe(true);
+            expect(XRegExp.build('{{x}}', {x: '^1$\\b'}).test('11')).toBe(false);
+        });
+
         it('should not strip a trailing escaped $ in subpatterns', function() {
             expect(XRegExp.build('{{x}}', {x: '^123\\$'}).test('123$')).toBe(true);
             expect(XRegExp.build('{{x}}', {x: '^123\\$'}).test('0123$4')).toBe(false);

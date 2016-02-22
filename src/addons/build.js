@@ -27,6 +27,7 @@ module.exports = function(XRegExp) {
 
         if (
             leadingAnchor.test(pattern) &&
+            trailingAnchor.test(pattern) &&
             // Ensure that the trailing `$` isn't escaped
             trailingAnchor.test(pattern.replace(/\\[\s\S]/g, ''))
         ) {
