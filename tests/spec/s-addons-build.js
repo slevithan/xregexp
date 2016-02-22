@@ -53,6 +53,12 @@ describe('XRegExp.build addon:', function() {
             expect(XRegExp.build('{{x}}', {x: '^123\\$'}).test('0123$4')).toBe(false);
         });
 
+        it('should support flag n with mixed named and unnamed groups', function() {
+            expect(function() {XRegExp.build('()(?<n>)\\k<n>', {}, 'n');}).not.toThrow();
+            expect(function() {XRegExp.build('{{a}}', {a: '()(?<n>)\\k<n>'}, 'n');}).not.toThrow();
+            expect(function() {XRegExp.build('()(?<x>)\\k<x>{{a}}', {a: '()(?<n>)\\k<n>'}, 'n');}).not.toThrow();
+        });
+
         // TODO: Add complete specs
 
         it('should pass the readme example', function() {

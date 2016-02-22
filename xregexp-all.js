@@ -123,7 +123,10 @@ module.exports = function(XRegExp) {
         pattern = asXRegExp(pattern);
         outerCapNames = pattern[REGEX_DATA].captureNames || [];
         pattern = pattern.source.replace(parts, function($0, $1, $2, $3, $4) {
-            var subName = $1 || $2, capName, intro;
+            var subName = $1 || $2,
+                capName,
+                intro,
+                localCapIndex;
             // Named subpattern
             if (subName) {
                 if (!data.hasOwnProperty(subName)) {
@@ -151,8 +154,12 @@ module.exports = function(XRegExp) {
                         }
                     // Backreference
                     } else if (backref) {
+                        localCapIndex = +backref - 1;
                         // Rewrite the backreference
-                        return '\\' + (+backref + numPriorCaps);
+                        return data[subName].names[localCapIndex] ?
+                            // Need to preserve the backreference name in case using flag `n`
+                            '\\k<' + data[subName].names[localCapIndex] + '>' :
+                            '\\' + (+backref + numPriorCaps);
                     }
                     return match;
                 }) + ')';
@@ -167,8 +174,12 @@ module.exports = function(XRegExp) {
                 }
             // Backreference
             } else if ($4) {
+                localCapIndex = +$4 - 1;
                 // Rewrite the backreference
-                return '\\' + outerCapsMap[+$4];
+                return outerCapNames[localCapIndex] ?
+                    // Need to preserve the backreference name in case using flag `n`
+                    '\\k<' + outerCapNames[localCapIndex] + '>' :
+                    '\\' + outerCapsMap[+$4];
             }
             return $0;
         });
