@@ -25,8 +25,15 @@ describe('XRegExp.build addon:', function() {
         });
 
         it('should strip a leading ^ and trailing unescaped $ in subpatterns, when both are present', function() {
-            expect(XRegExp.build('{{x}}', {x: '^123$'}).test('01234')).toBe(true);
             expect(XRegExp.build('{{x}}', {x: /^123$/}).test('01234')).toBe(true);
+            expect(XRegExp.build('{{x}}', {x: '^123$'}).test('01234')).toBe(true);
+            expect(
+                XRegExp.build(
+                    ' (?#comment) {{sub}} ',
+                    {sub: XRegExp(' (?#comment) ^123$ ', 'x')},
+                    'x'
+                ).test('01234')
+            ).toBe(true);
         });
 
         it('should not strip a leading ^ and trailing unescaped $ in subpatterns, when both are not present', function() {

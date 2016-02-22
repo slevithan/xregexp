@@ -156,11 +156,30 @@ describe('XRegExp()', function() {
     });
 
     it('should allow (?:) followed by a quantifier as a pattern', function() {
-        var quantifiers = ['*', '+', '?', '{1}', '{1,}', '{1,2}', '??', '*?', '+?'];
+        var quantifiers = [
+            '?',
+            '??',
+            '*',
+            '*?',
+            '+',
+            '+?',
+            '{1}',
+            '{1}?',
+            '{1,}',
+            '{1,}?',
+            '{1,2}',
+            '{1,2}?'
+        ];
 
         for (var i = 0; i < quantifiers.length; i++) {
-            expect(function() {XRegExp('(?:)' + quantifiers[i], 'g');}).not.toThrow();
+            expect(function() {XRegExp('(?:)' + quantifiers[i]);}).not.toThrow();
         }
+    });
+
+    it('should allow escaped \\(?:) at end of pattern', function() {
+        // Ensuring that any cleanup routine looking for unneeded regex parts like empty groups does
+        // not strip this
+        expect(function() {XRegExp('(\\(?:)');}).not.toThrow();
     });
 
     it('should store named capture data on regex instances', function() {
