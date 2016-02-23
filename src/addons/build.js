@@ -1,7 +1,7 @@
 /*!
- * XRegExp.build 3.1.0-dev
+ * XRegExp.build 3.1.0
  * <xregexp.com>
- * Steven Levithan (c) 2012-2015 MIT License
+ * Steven Levithan (c) 2012-2016 MIT License
  * Inspired by Lea Verou's RegExp.create <lea.verou.me>
  */
 

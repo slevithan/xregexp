@@ -1,7 +1,7 @@
 /*!
- * XRegExp.matchRecursive 3.1.0-dev
+ * XRegExp.matchRecursive 3.1.0
  * <xregexp.com>
- * Steven Levithan (c) 2009-2015 MIT License
+ * Steven Levithan (c) 2009-2016 MIT License
  */
 
 module.exports = function(XRegExp) {

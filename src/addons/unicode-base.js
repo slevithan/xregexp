@@ -1,7 +1,7 @@
 /*!
- * XRegExp Unicode Base 3.1.0-dev
+ * XRegExp Unicode Base 3.1.0
  * <xregexp.com>
- * Steven Levithan (c) 2008-2015 MIT License
+ * Steven Levithan (c) 2008-2016 MIT License
  */
 
 /**

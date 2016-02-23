@@ -1,7 +1,7 @@
 /*!
- * XRegExp Unicode Blocks 3.1.0-dev
+ * XRegExp Unicode Blocks 3.1.0
  * <xregexp.com>
- * Steven Levithan (c) 2010-2015 MIT License
+ * Steven Levithan (c) 2010-2016 MIT License
  * Unicode data by Mathias Bynens <mathiasbynens.be>
  */
 
