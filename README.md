@@ -208,7 +208,7 @@ Or, to bundle XRegExp with all of its addons:
 <script src="xregexp-all.js"></script>
 ```
 
-Using [npm](http://npmjs.org/):
+Using [npm](https://www.npmjs.com/):
 
 ```bash
 npm install xregexp
@@ -219,7 +219,6 @@ In [Node.js](http://nodejs.org/):
 ```js
 var XRegExp = require('xregexp');
 ```
-The [CommonJS](http://wiki.commonjs.org/wiki/Modules)-style `require('xregexp').XRegExp` also works.
 
 In an AMD loader like [RequireJS](http://requirejs.org/):
 
@@ -231,11 +230,11 @@ require({paths: {xregexp: 'xregexp-all'}}, ['xregexp'], function(XRegExp) {
 
 ## About
 
-XRegExp copyright 2007-2015 by [Steven Levithan](http://stevenlevithan.com/).
+XRegExp copyright 2007-2016 by [Steven Levithan](http://stevenlevithan.com/).
 
-Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/), and adapted from his [unicode-data](https://github.com/mathiasbynens/unicode-data) project. Source file concatenator by [Bjarke Walling](http://twitter.com/walling).
+Tools: Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/), and adapted from his [unicode-data](https://github.com/mathiasbynens/unicode-data) project.
 
-Tests: Uses [Jasmine](http://pivotal.github.com/jasmine/) for unit tests, and [Benchmark.js](http://benchmarkjs.com) for performance tests.
+Tests: Uses [Jasmine](http://jasmine.github.io/) for unit tests, and [Benchmark.js](http://benchmarkjs.com) for performance tests.
 
 Prior art: `XRegExp.build` inspired by [Lea Verou](http://lea.verou.me/)'s [RegExp.create](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/). `XRegExp.union` inspired by [Ruby](http://www.ruby-lang.org/). XRegExp's syntax extensions and flags come from [Perl](http://www.perl.org/), [.NET](http://www.microsoft.com/net), etc.
 
