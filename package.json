@@ -11,7 +11,8 @@
   },
   "keywords": [
     "regex",
-    "regexp"
+    "regexp",
+    "unicode"
   ],
   "main": "./src/index.js",
   "files": [
