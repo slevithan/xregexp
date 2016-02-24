@@ -33,6 +33,10 @@
             if (version === null || version === 'latest') {
                 document.write('<script src="../../xregexp-all.js"><\/script>');
             } else if (knownVersion[version]) {
+                // Hack around ES6 incompatibility in XRegExp versions prior to 3.0.0
+                if (parseInt(version, 10) < 3) {
+                    delete RegExp.prototype.sticky;
+                }
                 document.write('<script src="versions/xregexp-all-v'+version+'.js"><\/script>');
             } else {
                 document.getElementById('log').innerHTML = 'Unrecognized version provided in query';
