@@ -2616,7 +2616,7 @@ module.exports = XRegExp;
 
 },{"./addons/build":1,"./addons/matchrecursive":2,"./addons/unicode-base":3,"./addons/unicode-blocks":4,"./addons/unicode-categories":5,"./addons/unicode-properties":6,"./addons/unicode-scripts":7,"./xregexp":9}],9:[function(require,module,exports){
 /*!
- * XRegExp 3.1.0-next
+ * XRegExp 3.1.1-dev
  * <xregexp.com>
  * Steven Levithan (c) 2007-2016 MIT License
  */
@@ -3252,7 +3252,7 @@ module.exports = XRegExp;
  * @memberOf XRegExp
  * @type String
  */
-    XRegExp.version = '3.1.0';
+    XRegExp.version = '3.1.1-dev';
 
 /* ==============================
  * Public methods

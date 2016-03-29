@@ -1,6 +1,6 @@
 {
     "name": "xregexp",
-    "version": "3.1.0",
+    "version": "3.1.1-dev",
     "description": "Extended regular expressions",
     "homepage": "http://xregexp.com/",
     "authors": [
@@ -18,7 +18,9 @@
     },
     "keywords": [
         "regex",
-        "regexp"
+        "regexp",
+        "regular expression",
+        "unicode"
     ],
     "main": "xregexp-all.js",
     "ignore": [

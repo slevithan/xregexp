@@ -1,5 +1,5 @@
 /*!
- * XRegExp 3.1.0-next
+ * XRegExp 3.1.1-dev
  * <xregexp.com>
  * Steven Levithan (c) 2007-2016 MIT License
  */
@@ -635,7 +635,7 @@
  * @memberOf XRegExp
  * @type String
  */
-    XRegExp.version = '3.1.0';
+    XRegExp.version = '3.1.1-dev';
 
 /* ==============================
  * Public methods
