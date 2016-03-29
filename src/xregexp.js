@@ -532,19 +532,6 @@
  * XRegExp(/regex/);
  */
     function XRegExp(pattern, flags) {
-        var context = {
-                hasNamedCapture: false,
-                captureNames: []
-            },
-            scope = defaultScope,
-            output = '',
-            pos = 0,
-            result,
-            token,
-            generated,
-            appliedPattern,
-            appliedFlags;
-
         if (XRegExp.isRegExp(pattern)) {
             if (flags !== undefined) {
                 throw new TypeError('Cannot supply flags when copying a RegExp');
@@ -566,10 +553,19 @@
         }
 
         if (!patternCache[pattern][flags]) {
+            var context = {
+                hasNamedCapture: false,
+                captureNames: []
+            };
+            var scope = defaultScope;
+            var output = '';
+            var pos = 0;
+            var result;
+
             // Check for flag-related errors, and strip/apply flags in a leading mode modifier
-            result = prepareFlags(pattern, flags);
-            appliedPattern = result.pattern;
-            appliedFlags = result.flags;
+            var applied = prepareFlags(pattern, flags);
+            var appliedPattern = applied.pattern;
+            var appliedFlags = applied.flags;
 
             // Use XRegExp's tokens to translate the pattern to a native regex pattern.
             // `appliedPattern.length` may change on each iteration if tokens use `reparse`
@@ -591,7 +587,7 @@
                     pos += (result.matchLength || 1);
                 } else {
                     // Get the native token at the current position
-                    token = XRegExp.exec(appliedPattern, nativeTokens[scope], pos, 'sticky')[0];
+                    var token = XRegExp.exec(appliedPattern, nativeTokens[scope], pos, 'sticky')[0];
                     output += token;
                     pos += token.length;
                     if (token === '[' && scope === defaultScope) {
@@ -611,7 +607,7 @@
             };
         }
 
-        generated = patternCache[pattern][flags];
+        var generated = patternCache[pattern][flags];
         return augment(
             new RegExp(generated.pattern, generated.flags),
             generated.captures,

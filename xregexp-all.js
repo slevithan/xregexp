@@ -2616,7 +2616,7 @@ module.exports = XRegExp;
 
 },{"./addons/build":1,"./addons/matchrecursive":2,"./addons/unicode-base":3,"./addons/unicode-blocks":4,"./addons/unicode-categories":5,"./addons/unicode-properties":6,"./addons/unicode-scripts":7,"./xregexp":9}],9:[function(require,module,exports){
 /*!
- * XRegExp 3.1.0
+ * XRegExp 3.1.0-next
  * <xregexp.com>
  * Steven Levithan (c) 2007-2016 MIT License
  */
@@ -2677,13 +2677,14 @@ module.exports = XRegExp;
     var toString = {}.toString;
 
     function hasNativeFlag(flag) {
-        // Can't check based on the presense of properties/getters since
-        // browsers might support such properties even when don't support the
-        // corresponding flag in regex construction (tested in Chrome 48, where
-        // `'unicode' in /x/` is true but trying to construct a regex with flag
-        // `u` throws an error).
+        // Can't check based on the presense of properties/getters since browsers might support such
+        // properties even when they don't support the corresponding flag in regex construction
+        // (tested in Chrome 48, where `'unicode' in /x/` is true but trying to construct a regex
+        // with flag `u` throws an error)
         var isSupported = true;
         try {
+            // Can't use regex literals for testing even in a `try` because regex literals with
+            // unsupported flags cause a compilation error in IE
             new RegExp('', flag);
         } catch (exception) {
             isSupported = false;
@@ -3148,19 +3149,6 @@ module.exports = XRegExp;
  * XRegExp(/regex/);
  */
     function XRegExp(pattern, flags) {
-        var context = {
-                hasNamedCapture: false,
-                captureNames: []
-            },
-            scope = defaultScope,
-            output = '',
-            pos = 0,
-            result,
-            token,
-            generated,
-            appliedPattern,
-            appliedFlags;
-
         if (XRegExp.isRegExp(pattern)) {
             if (flags !== undefined) {
                 throw new TypeError('Cannot supply flags when copying a RegExp');
@@ -3182,10 +3170,19 @@ module.exports = XRegExp;
         }
 
         if (!patternCache[pattern][flags]) {
+            var context = {
+                hasNamedCapture: false,
+                captureNames: []
+            };
+            var scope = defaultScope;
+            var output = '';
+            var pos = 0;
+            var result;
+
             // Check for flag-related errors, and strip/apply flags in a leading mode modifier
-            result = prepareFlags(pattern, flags);
-            appliedPattern = result.pattern;
-            appliedFlags = result.flags;
+            var applied = prepareFlags(pattern, flags);
+            var appliedPattern = applied.pattern;
+            var appliedFlags = applied.flags;
 
             // Use XRegExp's tokens to translate the pattern to a native regex pattern.
             // `appliedPattern.length` may change on each iteration if tokens use `reparse`
@@ -3207,7 +3204,7 @@ module.exports = XRegExp;
                     pos += (result.matchLength || 1);
                 } else {
                     // Get the native token at the current position
-                    token = XRegExp.exec(appliedPattern, nativeTokens[scope], pos, 'sticky')[0];
+                    var token = XRegExp.exec(appliedPattern, nativeTokens[scope], pos, 'sticky')[0];
                     output += token;
                     pos += token.length;
                     if (token === '[' && scope === defaultScope) {
@@ -3227,7 +3224,7 @@ module.exports = XRegExp;
             };
         }
 
-        generated = patternCache[pattern][flags];
+        var generated = patternCache[pattern][flags];
         return augment(
             new RegExp(generated.pattern, generated.flags),
             generated.captures,
