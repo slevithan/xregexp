@@ -599,7 +599,11 @@
             }
 
             patternCache[pattern][flags] = {
-                pattern: output,
+                // Run basic cleanup routine to collapse repeated empty groups like `(?:)(?:)` to
+                // `(?:)`. Empty groups are sometimes inserted during the regex transpilation
+                // process in order to keep tokens separated, but more than one empty group is never
+                // needed in a row.
+                pattern: nativ.replace.call(output, /(?:\(\?:\))+/g, '(?:)'),
                 // Strip all but native flags
                 flags: nativ.replace.call(appliedFlags, /[^gimuy]+/g, ''),
                 // `context.captureNames` has an item for each capturing group, even if unnamed
@@ -1731,7 +1735,8 @@
     XRegExp.addToken(
         /\(\?#[^)]*\)/,
         function(match, scope, flags) {
-            // Keep tokens separated unless the following token is a quantifier
+            // Keep tokens separated unless the following token is a quantifier. This avoids e.g.
+            // inadvertedly changing `\1(?#)1` to `\11`.
             return isQuantifierNext(match.input, match.index + match[0].length, flags) ?
                 '' : '(?:)';
         },
@@ -1744,7 +1749,8 @@
     XRegExp.addToken(
         /\s+|#.*/,
         function(match, scope, flags) {
-            // Keep tokens separated unless the following token is a quantifier
+            // Keep tokens separated unless the following token is a quantifier. This avoids e.g.
+            // inadvertedly changing `\1 1` to `\11`.
             return isQuantifierNext(match.input, match.index + match[0].length, flags) ?
                 '' : '(?:)';
         },
@@ -1778,7 +1784,8 @@
             if (!index || index > this.captureNames.length) {
                 throw new SyntaxError('Backreference to undefined group ' + match[0]);
             }
-            // Keep backreferences separate from subsequent literal numbers
+            // Keep backreferences separate from subsequent literal numbers. This avoids e.g.
+            // inadvertedly changing `(?<n>)\k<n>1` to `()\11`.
             return '\\' + index + (
                 endIndex === match.input.length || isNaN(match.input.charAt(endIndex)) ?
                     '' : '(?:)'
