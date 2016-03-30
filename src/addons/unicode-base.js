@@ -20,34 +20,21 @@
 module.exports = function(XRegExp) {
     'use strict';
 
+// ==--------------------------==
+// Private stuff
+// ==--------------------------==
+
     // Storage for Unicode data
     var unicode = {};
 
-// ==--------------------------==
-// Private functions
-// ==--------------------------==
+    // Reuse utils
+    var dec = XRegExp._dec;
+    var hex = XRegExp._hex;
+    var pad4 = XRegExp._pad4;
 
     // Generates a token lookup name: lowercase, with hyphens, spaces, and underscores removed
     function normalize(name) {
         return name.replace(/[- _]+/g, '').toLowerCase();
-    }
-
-    // Adds leading zeros if shorter than four characters
-    function pad4(str) {
-        while (str.length < 4) {
-            str = '0' + str;
-        }
-        return str;
-    }
-
-    // Converts a hexadecimal number to decimal
-    function dec(hex) {
-        return parseInt(hex, 16);
-    }
-
-    // Converts a decimal number to hexadecimal
-    function hex(dec) {
-        return parseInt(dec, 10).toString(16);
     }
 
     // Gets the decimal code of a literal code unit, \xHH, \uHHHH, or a backslash-escaped literal

@@ -399,34 +399,21 @@ module.exports = function(XRegExp) {
 module.exports = function(XRegExp) {
     'use strict';
 
+// ==--------------------------==
+// Private stuff
+// ==--------------------------==
+
     // Storage for Unicode data
     var unicode = {};
 
-// ==--------------------------==
-// Private functions
-// ==--------------------------==
+    // Reuse utils
+    var dec = XRegExp._dec;
+    var hex = XRegExp._hex;
+    var pad4 = XRegExp._pad4;
 
     // Generates a token lookup name: lowercase, with hyphens, spaces, and underscores removed
     function normalize(name) {
         return name.replace(/[- _]+/g, '').toLowerCase();
-    }
-
-    // Adds leading zeros if shorter than four characters
-    function pad4(str) {
-        while (str.length < 4) {
-            str = '0' + str;
-        }
-        return str;
-    }
-
-    // Converts a hexadecimal number to decimal
-    function dec(hex) {
-        return parseInt(hex, 16);
-    }
-
-    // Converts a decimal number to hexadecimal
-    function hex(dec) {
-        return parseInt(dec, 10).toString(16);
     }
 
     // Gets the decimal code of a literal code unit, \xHH, \uHHHH, or a backslash-escaped literal
@@ -2918,8 +2905,7 @@ function isQuantifierNext(pattern, pos, flags) {
 }
 
 /**
- * Pads the provided string with as many leading zeros as needed to get to length 4. Used to produce
- * fixed-length hexadecimal values.
+ * Adds leading zeros if shorter than four characters. Used for fixed-length hexadecimal values.
  *
  * @param {String} str
  * @returns {String}
@@ -3213,7 +3199,7 @@ function XRegExp(pattern, flags) {
         pattern,
         flags
     );
-};
+}
 
 // Add `RegExp.prototype` to the prototype chain
 XRegExp.prototype = new RegExp();
@@ -3235,8 +3221,11 @@ XRegExp.version = '3.1.1-dev';
 // Public methods
 // ==--------------------------==
 
-// Intentionally undocumented; used in tests
+// Intentionally undocumented; used in tests and addons
 XRegExp._hasNativeFlag = hasNativeFlag;
+XRegExp._dec = dec;
+XRegExp._hex = hex;
+XRegExp._pad4 = pad4;
 
 /**
  * Extends XRegExp syntax and allows custom flags. This is used internally and can be used to

@@ -304,8 +304,7 @@ function isQuantifierNext(pattern, pos, flags) {
 }
 
 /**
- * Pads the provided string with as many leading zeros as needed to get to length 4. Used to produce
- * fixed-length hexadecimal values.
+ * Adds leading zeros if shorter than four characters. Used for fixed-length hexadecimal values.
  *
  * @param {String} str
  * @returns {String}
@@ -599,7 +598,7 @@ function XRegExp(pattern, flags) {
         pattern,
         flags
     );
-};
+}
 
 // Add `RegExp.prototype` to the prototype chain
 XRegExp.prototype = new RegExp();
@@ -621,8 +620,11 @@ XRegExp.version = '3.1.1-dev';
 // Public methods
 // ==--------------------------==
 
-// Intentionally undocumented; used in tests
+// Intentionally undocumented; used in tests and addons
 XRegExp._hasNativeFlag = hasNativeFlag;
+XRegExp._dec = dec;
+XRegExp._hex = hex;
+XRegExp._pad4 = pad4;
 
 /**
  * Extends XRegExp syntax and allows custom flags. This is used internally and can be used to
