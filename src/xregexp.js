@@ -306,7 +306,7 @@
         return nativ.test.call(
             flags.indexOf('x') > -1 ?
                 // Ignore any leading whitespace, line comments, and inline comments
-                /^(?:\s+|#.*|\(\?#[^)]*\))*(?:[?*+]|{\d+(?:,\d*)?})/ :
+                /^(?:\s|#[^#\n]*|\(\?#[^)]*\))*(?:[?*+]|{\d+(?:,\d*)?})/ :
                 // Ignore any leading inline comments
                 /^(?:\(\?#[^)]*\))*(?:[?*+]|{\d+(?:,\d*)?})/,
             pattern.slice(pos)
@@ -1747,7 +1747,7 @@
  * Whitespace and line comments, in free-spacing mode (aka extended mode, flag x) only.
  */
     XRegExp.addToken(
-        /\s+|#.*/,
+        /\s+|#[^\n]*\n?/,
         function(match, scope, flags) {
             // Keep tokens separated unless the following token is a quantifier. This avoids e.g.
             // inadvertedly changing `\1 1` to `\11`.
