@@ -1,9 +1,9 @@
-[XRegExp](http://xregexp.com/) 3.1.0
+[XRegExp](http://xregexp.com/) 3.1.1-dev
 ====================================
 
 XRegExp provides augmented (and extensible) JavaScript regular expressions. You get new modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your client-side grepping and parsing easier, while freeing you from worrying about pesky aspects of JavaScript regexes like cross-browser inconsistencies or manually manipulating `lastIndex`.
 
-XRegExp supports all native ES6 regular expression syntax. It supports Internet Explorer 5.5+, Firefox 1.5+, Chrome, Safari 3+, and Opera 11+. You can also use it with Node.js, or as a RequireJS module.
+XRegExp supports all native ES6 regular expression syntax. It supports Internet Explorer 5.5+, Firefox 1.5+, Chrome, Safari 3+, and Opera 11+. You can also use it with Node.js or as a RequireJS module.
 
 ## Performance
 
@@ -83,14 +83,7 @@ You can either load addons individually, or bundle all addons with XRegExp by lo
 
 ### Unicode
 
-In browsers, first include the Unicode Base script and then one or more of the addons for Unicode blocks, categories, properties, or scripts.
-
-```html
-<script src="src/xregexp.js"></script>
-<script src="src/addons/unicode-base.js"></script>
-<script src="src/addons/unicode-categories.js"></script>
-<script src="src/addons/unicode-scripts.js"></script>
-```
+If not using `xregexp-all.js`, first include the Unicode Base script and then one or more of the addons for Unicode blocks, categories, properties, or scripts.
 
 Then you can do this:
 
@@ -127,14 +120,7 @@ XRegExp uses Unicode 8.0.0.
 
 ### XRegExp.build
 
-In browsers, first include the script:
-
-```html
-<script src="src/xregexp.js"></script>
-<script src="src/addons/build.js"></script>
-```
-
-You can then build regular expressions using named subpatterns, for readability and pattern reuse:
+Build regular expressions using named subpatterns, for readability and pattern reuse:
 
 ```js
 var time = XRegExp.build('(?x)^ {{hours}} ({{minutes}}) $', {
@@ -155,14 +141,7 @@ See also: *[Creating Grammatical Regexes Using XRegExp.build](http://blog.steven
 
 ### XRegExp.matchRecursive
 
-In browsers, first include the script:
-
-```html
-<script src="src/xregexp.js"></script>
-<script src="src/addons/matchrecursive.js"></script>
-```
-
-You can then match recursive constructs using XRegExp pattern strings as left and right delimiters:
+Match recursive constructs using XRegExp pattern strings as left and right delimiters:
 
 ```js
 var str = '(t((e))s)t()(ing)';
@@ -205,13 +184,7 @@ XRegExp.matchRecursive(str, '<', '>', 'gy');
 
 ## Installation and usage
 
-In browsers:
-
-```html
-<script src="src/xregexp.js"></script>
-```
-
-Or, to bundle XRegExp with all of its addons:
+In browsers (bundle XRegExp with all of its addons):
 
 ```html
 <script src="xregexp-all.js"></script>

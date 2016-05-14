@@ -4,25 +4,26 @@
  * Steven Levithan (c) 2008-2016 MIT License
  */
 
-/**
- * Adds base support for Unicode matching:
- * - Adds syntax `\p{..}` for matching Unicode tokens. Tokens can be inverted using `\P{..}` or
- *   `\p{^..}`. Token names ignore case, spaces, hyphens, and underscores. You can omit the braces
- *   for token names that are a single letter (e.g. `\pL` or `PL`).
- * - Adds flag A (astral), which enables 21-bit Unicode support.
- * - Adds the `XRegExp.addUnicodeData` method used by other addons to provide character data.
- *
- * Unicode Base relies on externally provided Unicode character data. Official addons are available
- * to provide data for Unicode categories, scripts, blocks, and properties.
- *
- * @requires XRegExp
- */
 module.exports = function(XRegExp) {
     'use strict';
 
-// ==--------------------------==
-// Private stuff
-// ==--------------------------==
+    /**
+     * Adds base support for Unicode matching:
+     * - Adds syntax `\p{..}` for matching Unicode tokens. Tokens can be inverted using `\P{..}` or
+     *   `\p{^..}`. Token names ignore case, spaces, hyphens, and underscores. You can omit the
+     *   braces for token names that are a single letter (e.g. `\pL` or `PL`).
+     * - Adds flag A (astral), which enables 21-bit Unicode support.
+     * - Adds the `XRegExp.addUnicodeData` method used by other addons to provide character data.
+     *
+     * Unicode Base relies on externally provided Unicode character data. Official addons are
+     * available to provide data for Unicode categories, scripts, blocks, and properties.
+     *
+     * @requires XRegExp
+     */
+
+    // ==--------------------------==
+    // Private stuff
+    // ==--------------------------==
 
     // Storage for Unicode data
     var unicode = {};
@@ -107,9 +108,9 @@ module.exports = function(XRegExp) {
         );
     }
 
-// ==--------------------------==
-// Core functionality
-// ==--------------------------==
+    // ==--------------------------==
+    // Core functionality
+    // ==--------------------------==
 
     /*
      * Add Unicode token syntax: \p{..}, \P{..}, \p{^..}. Also add astral mode (flag A).

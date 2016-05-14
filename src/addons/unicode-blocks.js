@@ -5,16 +5,18 @@
  * Unicode data by Mathias Bynens <mathiasbynens.be>
  */
 
-/**
- * Adds support for all Unicode blocks. Block names use the prefix 'In'. E.g., `\p{InBasicLatin}`.
- * Token names are case insensitive, and any spaces, hyphens, and underscores are ignored.
- *
- * Uses Unicode 8.0.0.
- *
- * @requires XRegExp, Unicode Base
- */
 module.exports = function(XRegExp) {
     'use strict';
+
+    /**
+     * Adds support for all Unicode blocks. Block names use the prefix 'In'. E.g.,
+     * `\p{InBasicLatin}`. Token names are case insensitive, and any spaces, hyphens, and
+     * underscores are ignored.
+     *
+     * Uses Unicode 8.0.0.
+     *
+     * @requires XRegExp, Unicode Base
+     */
 
     if (!XRegExp.addUnicodeData) {
         throw new ReferenceError('Unicode Base must be loaded before Unicode Blocks');

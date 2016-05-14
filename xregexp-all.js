@@ -9,9 +9,9 @@
 module.exports = function(XRegExp) {
     'use strict';
 
-    var REGEX_DATA = 'xregexp',
-        subParts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*]/g,
-        parts = XRegExp.union([/\({{([\w$]+)}}\)|{{([\w$]+)}}/, subParts], 'g');
+    var REGEX_DATA = 'xregexp';
+    var subParts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*]/g;
+    var parts = XRegExp.union([/\({{([\w$]+)}}\)|{{([\w$]+)}}/, subParts], 'g');
 
     /**
      * Strips a leading `^` and trailing unescaped `$`, if both are present.
@@ -383,25 +383,26 @@ module.exports = function(XRegExp) {
  * Steven Levithan (c) 2008-2016 MIT License
  */
 
-/**
- * Adds base support for Unicode matching:
- * - Adds syntax `\p{..}` for matching Unicode tokens. Tokens can be inverted using `\P{..}` or
- *   `\p{^..}`. Token names ignore case, spaces, hyphens, and underscores. You can omit the braces
- *   for token names that are a single letter (e.g. `\pL` or `PL`).
- * - Adds flag A (astral), which enables 21-bit Unicode support.
- * - Adds the `XRegExp.addUnicodeData` method used by other addons to provide character data.
- *
- * Unicode Base relies on externally provided Unicode character data. Official addons are available
- * to provide data for Unicode categories, scripts, blocks, and properties.
- *
- * @requires XRegExp
- */
 module.exports = function(XRegExp) {
     'use strict';
 
-// ==--------------------------==
-// Private stuff
-// ==--------------------------==
+    /**
+     * Adds base support for Unicode matching:
+     * - Adds syntax `\p{..}` for matching Unicode tokens. Tokens can be inverted using `\P{..}` or
+     *   `\p{^..}`. Token names ignore case, spaces, hyphens, and underscores. You can omit the
+     *   braces for token names that are a single letter (e.g. `\pL` or `PL`).
+     * - Adds flag A (astral), which enables 21-bit Unicode support.
+     * - Adds the `XRegExp.addUnicodeData` method used by other addons to provide character data.
+     *
+     * Unicode Base relies on externally provided Unicode character data. Official addons are
+     * available to provide data for Unicode categories, scripts, blocks, and properties.
+     *
+     * @requires XRegExp
+     */
+
+    // ==--------------------------==
+    // Private stuff
+    // ==--------------------------==
 
     // Storage for Unicode data
     var unicode = {};
@@ -486,9 +487,9 @@ module.exports = function(XRegExp) {
         );
     }
 
-// ==--------------------------==
-// Core functionality
-// ==--------------------------==
+    // ==--------------------------==
+    // Core functionality
+    // ==--------------------------==
 
     /*
      * Add Unicode token syntax: \p{..}, \P{..}, \p{^..}. Also add astral mode (flag A).
@@ -612,16 +613,18 @@ module.exports = function(XRegExp) {
  * Unicode data by Mathias Bynens <mathiasbynens.be>
  */
 
-/**
- * Adds support for all Unicode blocks. Block names use the prefix 'In'. E.g., `\p{InBasicLatin}`.
- * Token names are case insensitive, and any spaces, hyphens, and underscores are ignored.
- *
- * Uses Unicode 8.0.0.
- *
- * @requires XRegExp, Unicode Base
- */
 module.exports = function(XRegExp) {
     'use strict';
+
+    /**
+     * Adds support for all Unicode blocks. Block names use the prefix 'In'. E.g.,
+     * `\p{InBasicLatin}`. Token names are case insensitive, and any spaces, hyphens, and
+     * underscores are ignored.
+     *
+     * Uses Unicode 8.0.0.
+     *
+     * @requires XRegExp, Unicode Base
+     */
 
     if (!XRegExp.addUnicodeData) {
         throw new ReferenceError('Unicode Base must be loaded before Unicode Blocks');
@@ -1688,17 +1691,18 @@ module.exports = function(XRegExp) {
  * Unicode data by Mathias Bynens <mathiasbynens.be>
  */
 
-/**
- * Adds support for Unicode's general categories. E.g., `\p{Lu}` or `\p{Uppercase Letter}`. See
- * category descriptions in UAX #44 <http://unicode.org/reports/tr44/#GC_Values_Table>. Token names
- * are case insensitive, and any spaces, hyphens, and underscores are ignored.
- *
- * Uses Unicode 8.0.0.
- *
- * @requires XRegExp, Unicode Base
- */
 module.exports = function(XRegExp) {
     'use strict';
+
+    /**
+     * Adds support for Unicode's general categories. E.g., `\p{Lu}` or `\p{Uppercase Letter}`. See
+     * category descriptions in UAX #44 <http://unicode.org/reports/tr44/#GC_Values_Table>. Token
+     * names are case insensitive, and any spaces, hyphens, and underscores are ignored.
+     *
+     * Uses Unicode 8.0.0.
+     *
+     * @requires XRegExp, Unicode Base
+     */
 
     if (!XRegExp.addUnicodeData) {
         throw new ReferenceError('Unicode Base must be loaded before Unicode Categories');
@@ -1925,46 +1929,47 @@ module.exports = function(XRegExp) {
  * Unicode data by Mathias Bynens <mathiasbynens.be>
  */
 
-/**
- * Adds properties to meet the UTS #18 Level 1 RL1.2 requirements for Unicode regex support. See
- * <http://unicode.org/reports/tr18/#RL1.2>. Following are definitions of these properties from UAX
- * #44 <http://unicode.org/reports/tr44/>:
- *
- * - Alphabetic
- *   Characters with the Alphabetic property. Generated from: Lowercase + Uppercase + Lt + Lm + Lo +
- *   Nl + Other_Alphabetic.
- *
- * - Default_Ignorable_Code_Point
- *   For programmatic determination of default ignorable code points. New characters that should be
- *   ignored in rendering (unless explicitly supported) will be assigned in these ranges, permitting
- *   programs to correctly handle the default rendering of such characters when not otherwise
- *   supported.
- *
- * - Lowercase
- *   Characters with the Lowercase property. Generated from: Ll + Other_Lowercase.
- *
- * - Noncharacter_Code_Point
- *   Code points permanently reserved for internal use.
- *
- * - Uppercase
- *   Characters with the Uppercase property. Generated from: Lu + Other_Uppercase.
- *
- * - White_Space
- *   Spaces, separator characters and other control characters which should be treated by
- *   programming languages as "white space" for the purpose of parsing elements.
- *
- * The properties ASCII, Any, and Assigned are also included but are not defined in UAX #44. UTS #18
- * RL1.2 additionally requires support for Unicode scripts and general categories. These are
- * included in XRegExp's Unicode Categories and Unicode Scripts addons.
- *
- * Token names are case insensitive, and any spaces, hyphens, and underscores are ignored.
- *
- * Uses Unicode 8.0.0.
- *
- * @requires XRegExp, Unicode Base
- */
 module.exports = function(XRegExp) {
     'use strict';
+
+    /**
+     * Adds properties to meet the UTS #18 Level 1 RL1.2 requirements for Unicode regex support. See
+     * <http://unicode.org/reports/tr18/#RL1.2>. Following are definitions of these properties from
+     * UAX #44 <http://unicode.org/reports/tr44/>:
+     *
+     * - Alphabetic
+     *   Characters with the Alphabetic property. Generated from: Lowercase + Uppercase + Lt + Lm +
+     *   Lo + Nl + Other_Alphabetic.
+     *
+     * - Default_Ignorable_Code_Point
+     *   For programmatic determination of default ignorable code points. New characters that should
+     *   be ignored in rendering (unless explicitly supported) will be assigned in these ranges,
+     *   permitting programs to correctly handle the default rendering of such characters when not
+     *   otherwise supported.
+     *
+     * - Lowercase
+     *   Characters with the Lowercase property. Generated from: Ll + Other_Lowercase.
+     *
+     * - Noncharacter_Code_Point
+     *   Code points permanently reserved for internal use.
+     *
+     * - Uppercase
+     *   Characters with the Uppercase property. Generated from: Lu + Other_Uppercase.
+     *
+     * - White_Space
+     *   Spaces, separator characters and other control characters which should be treated by
+     *   programming languages as "white space" for the purpose of parsing elements.
+     *
+     * The properties ASCII, Any, and Assigned are also included but are not defined in UAX #44. UTS
+     * #18 RL1.2 additionally requires support for Unicode scripts and general categories. These are
+     * included in XRegExp's Unicode Categories and Unicode Scripts addons.
+     *
+     * Token names are case insensitive, and any spaces, hyphens, and underscores are ignored.
+     *
+     * Uses Unicode 8.0.0.
+     *
+     * @requires XRegExp, Unicode Base
+     */
 
     if (!XRegExp.addUnicodeData) {
         throw new ReferenceError('Unicode Base must be loaded before Unicode Properties');
@@ -2032,16 +2037,17 @@ module.exports = function(XRegExp) {
  * Unicode data by Mathias Bynens <mathiasbynens.be>
  */
 
-/**
- * Adds support for all Unicode scripts. E.g., `\p{Latin}`. Token names are case insensitive, and
- * any spaces, hyphens, and underscores are ignored.
- *
- * Uses Unicode 8.0.0.
- *
- * @requires XRegExp, Unicode Base
- */
 module.exports = function(XRegExp) {
     'use strict';
+
+    /**
+     * Adds support for all Unicode scripts. E.g., `\p{Latin}`. Token names are case insensitive,
+     * and any spaces, hyphens, and underscores are ignored.
+     *
+     * Uses Unicode 8.0.0.
+     *
+     * @requires XRegExp, Unicode Base
+     */
 
     if (!XRegExp.addUnicodeData) {
         throw new ReferenceError('Unicode Base must be loaded before Unicode Scripts');
@@ -4431,10 +4437,6 @@ XRegExp.addToken(
         leadChar: '('
     }
 );
-
-// ==--------------------------==
-// Expose XRegExp
-// ==--------------------------==
 
 module.exports = XRegExp;
 

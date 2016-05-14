@@ -8,9 +8,9 @@
 module.exports = function(XRegExp) {
     'use strict';
 
-    var REGEX_DATA = 'xregexp',
-        subParts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*]/g,
-        parts = XRegExp.union([/\({{([\w$]+)}}\)|{{([\w$]+)}}/, subParts], 'g');
+    var REGEX_DATA = 'xregexp';
+    var subParts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*]/g;
+    var parts = XRegExp.union([/\({{([\w$]+)}}\)|{{([\w$]+)}}/, subParts], 'g');
 
     /**
      * Strips a leading `^` and trailing unescaped `$`, if both are present.
