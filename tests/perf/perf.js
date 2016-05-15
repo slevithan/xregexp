@@ -43,7 +43,7 @@
     // Expose as global
     window.run = function() {
         log('Testing XRegExp ' + XRegExp.version + '.\n');
-        log('Sit back and relax; this might take a while.\n');
+        log('Sit back and relax. This might take a while.\n');
         suites[0].run();
     };
 
@@ -64,25 +64,36 @@
             {
                 name: 'Constructor with long pattern',
                 pattern: XRegExp('\\p{L}').source
+            },
+            {
+                name: 'Constructor with x flag, whitespace, and comments',
+                pattern: '\n                       # comment\n                       # comment\n',
+                flags: 'x'
             }
         ];
 
         configs.forEach(function(config) {
-            suites.push(Benchmark.Suite(config.name)
+            var flags = config.flags || '';
+            var allFlagsNative = /^[gimuy]*$/.test(flags);
+
+            var suite = Benchmark.Suite(config.name)
                 .add('XRegExp with pattern cache flush', function() {
-                    XRegExp(config.pattern, 'g');
+                    XRegExp(config.pattern, flags);
                     XRegExp.cache.flush('patterns');
                 })
                 .add('XRegExp', function() {
-                    XRegExp(config.pattern, 'g');
+                    XRegExp(config.pattern, flags);
                 })
                 .add('XRegExp.cache', function() {
-                    XRegExp.cache(config.pattern, 'g');
-                })
-                .add('RegExp', function() {
-                    new RegExp(config.pattern, 'g');
-                })
-            );
+                    XRegExp.cache(config.pattern, flags);
+                });
+            if (allFlagsNative) {
+                suite.add('RegExp', function() {
+                    new RegExp(config.pattern, flags);
+                });
+            }
+
+            suites.push(suite);
         });
     }());
 
