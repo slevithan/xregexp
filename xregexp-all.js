@@ -378,6 +378,37 @@ module.exports = function(XRegExp) {
 
 },{}],3:[function(require,module,exports){
 /*!
+ * XRegExp Quote Meta 4.0
+ * <xregexp.com>
+ * Everlaw (c) 2016 MIT License
+ */
+
+module.exports = function(XRegExp) {
+    'use strict';
+
+    /**
+     * Adds support for \Q..\E escape sequences, used in Java and Perl regular expressions. All
+     * intervening characters are interpreted as literals instead of special regex characters.
+     *
+     * @requires XRegExp
+     */
+
+    XRegExp.addToken(
+        // Non-greedy matching is important for patterns that have multiple escaped sequences.
+        /\\Q((?!\\E).*?)\\E/,
+        function(match) {
+            return XRegExp.escape(match[1]);
+        },
+        {
+            scope: 'all',
+            leadChar: '\\'
+        }
+    );
+
+};
+
+},{}],4:[function(require,module,exports){
+/*!
  * XRegExp Unicode Base 3.1.1
  * <xregexp.com>
  * Steven Levithan (c) 2008-2016 MIT License
@@ -605,7 +636,7 @@ module.exports = function(XRegExp) {
 
 };
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /*!
  * XRegExp Unicode Blocks 3.1.1
  * <xregexp.com>
@@ -1683,7 +1714,7 @@ module.exports = function(XRegExp) {
 
 };
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /*!
  * XRegExp Unicode Categories 3.1.1
  * <xregexp.com>
@@ -1921,7 +1952,7 @@ module.exports = function(XRegExp) {
 
 };
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 /*!
  * XRegExp Unicode Properties 3.1.1
  * <xregexp.com>
@@ -2029,7 +2060,7 @@ module.exports = function(XRegExp) {
 
 };
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /*!
  * XRegExp Unicode Scripts 3.1.1
  * <xregexp.com>
@@ -2591,11 +2622,12 @@ module.exports = function(XRegExp) {
 
 };
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var XRegExp = require('./xregexp');
 
 require('./addons/build')(XRegExp);
 require('./addons/matchrecursive')(XRegExp);
+require('./addons/quotemeta')(XRegExp);
 require('./addons/unicode-base')(XRegExp);
 require('./addons/unicode-blocks')(XRegExp);
 require('./addons/unicode-categories')(XRegExp);
@@ -2604,7 +2636,7 @@ require('./addons/unicode-scripts')(XRegExp);
 
 module.exports = XRegExp;
 
-},{"./addons/build":1,"./addons/matchrecursive":2,"./addons/unicode-base":3,"./addons/unicode-blocks":4,"./addons/unicode-categories":5,"./addons/unicode-properties":6,"./addons/unicode-scripts":7,"./xregexp":9}],9:[function(require,module,exports){
+},{"./addons/build":1,"./addons/matchrecursive":2,"./addons/quotemeta":3,"./addons/unicode-base":4,"./addons/unicode-blocks":5,"./addons/unicode-categories":6,"./addons/unicode-properties":7,"./addons/unicode-scripts":8,"./xregexp":10}],10:[function(require,module,exports){
 /*!
  * XRegExp 3.1.1
  * <xregexp.com>
@@ -4440,5 +4472,5 @@ XRegExp.addToken(
 
 module.exports = XRegExp;
 
-},{}]},{},[8])(8)
+},{}]},{},[9])(9)
 });
