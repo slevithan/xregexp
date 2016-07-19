@@ -1305,7 +1305,7 @@ XRegExp.union = function(patterns, flags) {
         throw new TypeError('Must provide a nonempty array of patterns to merge');
     }
 
-    var parts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*]/g;
+    var parts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*\]/g;
     var output = [];
     var pattern;
     for (var i = 0; i < patterns.length; ++i) {
@@ -1682,7 +1682,7 @@ XRegExp.addToken(
  * character class endings can't be determined.
  */
 XRegExp.addToken(
-    /\[(\^?)]/,
+    /\[(\^?)\]/,
     function(match) {
         // For cross-browser compatibility with ES3, convert [] to \b\B and [^] to [\s\S].
         // (?!) should work like \b\B, but is unreliable in some versions of Firefox
