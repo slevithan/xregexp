@@ -224,4 +224,20 @@ module.exports = function(XRegExp) {
         XRegExp.cache.flush('patterns');
     };
 
+    /**
+     * Test if the given name is a legal Unicode Slug for use in XRegExp `\p` or `\P` regex constructs.
+     *
+     * @memberOf XRegExp
+     * @param {String} name Name by which the Unicode slug may be recognized (case-insensitive),
+     *   e.g. `'N'` or `'Number'`.
+     *   
+     *   The given name is matched against all registered Unicode names and aliases.
+     *
+     * @return {Object} Truthy when the name matches a Unicode slug (the internal slug definition
+     *   object is returned); `false` when the name does not match *any* Unicode name or alias. 
+     */
+    XRegExp.isUnicodeSlug = function(name) {
+        return unicode[normalize(name)] || false;
+    };
+
 };
