@@ -757,7 +757,7 @@ XRegExp.cache.flush = function(cacheName) {
  * // -> 'Escaped\?\ <\.>'
  */
 XRegExp.escape = function(str) {
-    return nativ.replace.call(toObject(str), /[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+    return nativ.replace.call(toObject(str), /[-\[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 };
 
 /**
