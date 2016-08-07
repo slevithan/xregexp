@@ -234,7 +234,7 @@ function getNativeFlags(regex) {
         regex.flags :
         // Explicitly using `RegExp.prototype.toString` (rather than e.g. `String` or concatenation
         // with an empty string) allows this to continue working predictably when
-        // `XRegExp.proptotype.toString` is overriden
+        // `XRegExp.proptotype.toString` is overridden
         nativ.exec.call(/\/([a-z]*)$/i, RegExp.prototype.toString.call(regex))[1];
 }
 
