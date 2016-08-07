@@ -19,25 +19,33 @@
         window.scroll(0, document.body.scrollHeight);
     }
 
-    Benchmark.options.async = true;
-    Benchmark.Suite.options.onStart = function() {
-        log('\n' + this.name + ':');
-    };
-    Benchmark.Suite.options.onCycle = function(event) {
-        log('\n' + String(event.target));
-        scrollToEnd();
-    };
-    Benchmark.Suite.options.onComplete = function() {
-        log('\nFastest is ' + this.filter('fastest').pluck('name') + '\n');
-        // Remove current suite from queue
-        suites.shift();
-        if (suites.length) {
-            // Run next suite
-            suites[0].run();
-        } else {
-            log('\nFinished. &#x263A;');
+    var suiteOptions = {
+        onStart: function () {
+            log('\n' + this.name + ':');
+        },
+
+        onCycle: function (event) {
+            log('\n' + String(event.target));
+            scrollToEnd();
+        },
+
+        onComplete: function () {
+            log('\nFastest is ' + this.filter('fastest').map('name') + '\n');
+            // Remove current suite from queue
+            suites.shift();
+            if (suites.length) {
+                // Run next suite
+                suites[0].run();
+            } else {
+                log('\nFinished. &#x263A;');
+            }
+            scrollToEnd();
         }
-        scrollToEnd();
+    };
+
+    // run async
+    var benchmarkOptions = {
+        async: true
     };
 
     // Expose as global
@@ -76,21 +84,21 @@
             var flags = config.flags || '';
             var allFlagsNative = /^[gimuy]*$/.test(flags);
 
-            var suite = Benchmark.Suite(config.name)
+            var suite = new Benchmark.Suite(config.name, suiteOptions)
                 .add('XRegExp with pattern cache flush', function() {
                     XRegExp(config.pattern, flags);
                     XRegExp.cache.flush('patterns');
-                })
+                }, benchmarkOptions)
                 .add('XRegExp', function() {
                     XRegExp(config.pattern, flags);
-                })
+                }, benchmarkOptions)
                 .add('XRegExp.cache', function() {
                     XRegExp.cache(config.pattern, flags);
-                });
+                }, benchmarkOptions);
             if (allFlagsNative) {
                 suite.add('RegExp', function() {
                     new RegExp(config.pattern, flags);
-                });
+                }, benchmarkOptions);
             }
 
             suites.push(suite);
@@ -106,18 +114,18 @@
         var fixedExec = RegExp.prototype.exec;
         XRegExp.uninstall('natives');
 
-        suites.push(Benchmark.Suite('exec')
+        suites.push(new Benchmark.Suite('exec', suiteOptions)
             .add('Native exec', function() {
                 regexG.lastIndex = pos;
                 regexG.exec(str);
-            })
+            }, benchmarkOptions)
             .add('Shimmed exec', function() {
                 regexG.lastIndex = pos;
                 fixedExec.call(regexG, str);
-            })
+            }, benchmarkOptions)
             .add('XRegExp.exec', function() {
                 XRegExp.exec(str, regexG, pos);
-            })
+            }, benchmarkOptions)
         );
 
         var numStrs = 2e5;
@@ -129,45 +137,45 @@
             strs.push(str + i);
         }
 
-        suites.push(Benchmark.Suite('exec with ' + numStrs + ' different strings')
+        suites.push(new Benchmark.Suite('exec with ' + numStrs + ' different strings', suiteOptions)
             .add('Native exec', function() {
                 regexG.lastIndex = pos;
-                regexG.exec(strs[++i] || strs[i=0]);
-            })
+                regexG.exec(strs[++i] || strs[i = 0]);
+            }, benchmarkOptions)
             .add('Shimmed exec', function() {
                 regexG.lastIndex = pos;
-                fixedExec.call(regexG, strs[++i] || strs[i=0]);
-            })
+                fixedExec.call(regexG, strs[++i] || strs[i = 0]);
+            }, benchmarkOptions)
             .add('XRegExp.exec', function() {
-                XRegExp.exec(strs[++i] || strs[i=0], regexG, pos);
-            })
+                XRegExp.exec(strs[++i] || strs[i = 0], regexG, pos);
+            }, benchmarkOptions)
         );
 
-        suites.push(Benchmark.Suite('Sticky exec with ' + numStrs + ' different strings')
+        suites.push(new Benchmark.Suite('Sticky exec with ' + numStrs + ' different strings', suiteOptions)
             .add('Native exec', function() {
                 regexG.lastIndex = pos;
-                var match = regexG.exec(strs[++i] || strs[i=0]);
+                var match = regexG.exec(strs[++i] || strs[i = 0]);
                 if (match && match.index !== pos) {
                     match = null;
                 }
-            })
+            }, benchmarkOptions)
             .add('Shimmed exec', function() {
                 regexG.lastIndex = pos;
-                var match = fixedExec.call(regexG, strs[++i] || strs[i=0]);
+                var match = fixedExec.call(regexG, strs[++i] || strs[i = 0]);
                 if (match && match.index !== pos) {
                     match = null;
                 }
-            })
+            }, benchmarkOptions)
             .add('XRegExp.exec', function() {
-                var match = XRegExp.exec(strs[++i] || strs[i=0], regexG, pos, 'sticky');
-            })
+                var match = XRegExp.exec(strs[++i] || strs[i = 0], regexG, pos, 'sticky');
+            }, benchmarkOptions)
         );
     }());
 
     (function() {
         var str = Array(30 + 1).join('hello xx world ');
 
-        suites.push(Benchmark.Suite('Iteration with a nonglobal regex')
+        suites.push(Benchmark.Suite('Iteration with a nonglobal regex', suiteOptions)
             .add('replace with callback', function() {
                 var r = /^|(((?=x).)\2)+/;
                 var matches = [];
@@ -185,7 +193,7 @@
                 str.replace(r, function(match) {
                     matches.push(match);
                 });
-            })
+            }, benchmarkOptions)
             .add('while/exec', function() {
                 var r = /^|(((?=x).)\2)+/;
                 var matches = [];
@@ -209,7 +217,7 @@
                         ++r.lastIndex;
                     }
                 }
-            })
+            }, benchmarkOptions)
             .add('while/XRegExp.exec', function() {
                 var r = /^|(((?=x).)\2)+/;
                 var matches = [];
@@ -219,14 +227,14 @@
                     matches.push(match[0]);
                     pos = match.index + (match[0].length || 1);
                 }
-            })
+            }, benchmarkOptions)
             .add('XRegExp.forEach', function() {
                 var r = /^|(((?=x).)\2)+/;
                 var matches = [];
                 XRegExp.forEach(str, r, function(match) {
                     matches.push(match[0]);
                 });
-            })
+            }, benchmarkOptions)
         );
     }());
 
@@ -236,13 +244,13 @@
         var regexp = new RegExp(pattern);
         var xregexp = XRegExp(pattern);
 
-        suites.push(Benchmark.Suite('Regex object type')
+        suites.push(new Benchmark.Suite('Regex object type', suiteOptions)
             .add('RegExp object', function() {
                 regexp.exec(str);
-            })
+            }, benchmarkOptions)
             .add('XRegExp object', function() {
                 xregexp.exec(str);
-            })
+            }, benchmarkOptions)
         );
 
         var xregexpNamed4 =
@@ -261,36 +269,36 @@
                     '   (          [^?\\s]*   ) \\??  # optional path  \n' +
                     '   (          [^\\s]*    )       # optional query', 'x');
 
-        suites.push(Benchmark.Suite('Capturing')
+        suites.push(new Benchmark.Suite('Capturing', suiteOptions)
             .add('Numbered capture', function() {
                 XRegExp.exec(str, xregexpNumbered);
-            })
+            }, benchmarkOptions)
             .add('Named capture (one name)', function() {
                 XRegExp.exec(str, xregexpNamed1);
-            })
+            }, benchmarkOptions)
             .add('Named capture (four names)', function() {
                 XRegExp.exec(str, xregexpNamed4);
-            })
+            }, benchmarkOptions)
         );
     }());
 
-    suites.push(Benchmark.Suite('Unicode letter construction')
+    suites.push(new Benchmark.Suite('Unicode letter construction', suiteOptions)
         .add('Incomplete set: /[a-z]/i', function() {
             XRegExp('(?i)[a-z]');
             XRegExp.cache.flush('patterns');
-        })
+        }, benchmarkOptions)
         .add('BMP only: /\\p{L}/', function() {
             XRegExp('\\p{L}');
             XRegExp.cache.flush('patterns');
-        })
-        .add('Full Unicode: /\\p{L}/A', hasAstralSupport ?
+        }, benchmarkOptions)
+        .add('Full Unicode: /\\p{L}/A', (hasAstralSupport ?
             function() {
                 XRegExp('(?A)\\p{L}');
                 XRegExp.cache.flush('patterns');
             } :
             function() {
                 throw new Error('Astral mode unsupported');
-            }
+            }), benchmarkOptions
         )
     );
 
@@ -311,20 +319,20 @@
         var bmpLetterChar = XRegExp('\\p{L}!');
         var astralLetterChar = hasAstralSupport ? XRegExp('(?A)\\p{L}!') : null;
 
-        suites.push(Benchmark.Suite('Unicode letter matching')
+        suites.push(new Benchmark.Suite('Unicode letter matching', suiteOptions)
             .add('a-z caseless', function() {
                 test(azCaselessChar);
-            })
+            }, benchmarkOptions)
             .add('\\p{L}', function() {
                 test(bmpLetterChar);
-            })
-            .add('\\p{L} astral', hasAstralSupport ?
+            }, benchmarkOptions)
+            .add('\\p{L} astral', (hasAstralSupport ?
                 function() {
                     test(astralLetterChar);
                 } :
                 function() {
                     throw new Error('Astral mode unsupported');
-                }
+                }), benchmarkOptions
             )
         );
 
@@ -332,20 +340,20 @@
         var bmpLetterWord = XRegExp('\\p{L}+!');
         var astralLetterWord = hasAstralSupport ? XRegExp('(?A)\\p{L}+!') : null;
 
-        suites.push(Benchmark.Suite('Unicode word matching')
+        suites.push(new Benchmark.Suite('Unicode word matching', suiteOptions)
             .add('a-z caseless', function() {
                 test(azCaselessWord);
-            })
+            }, benchmarkOptions)
             .add('\\p{L}', function() {
                 test(bmpLetterWord);
-            })
-            .add('\\p{L} astral', hasAstralSupport ?
+            }, benchmarkOptions)
+            .add('\\p{L} astral', (hasAstralSupport ?
                 function() {
                     test(astralLetterWord);
                 } :
                 function() {
                     throw new Error('Astral mode unsupported');
-                }
+                }), benchmarkOptions
             )
         );
     }());

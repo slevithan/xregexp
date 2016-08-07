@@ -1,46 +1,48 @@
-# Benchmark.js <sup>v1.0.0</sup>
+# Benchmark.js <sup>v2.1.1</sup>
 
-A [robust](http://calendar.perfplanet.com/2010/bulletproof-javascript-benchmarks/ "Bulletproof JavaScript benchmarks") benchmarking library that works on nearly all JavaScript platforms<sup><a name="fnref1" href="#fn1">1</a></sup>, supports high-resolution timers, and returns statistically significant results. As seen on [jsPerf](http://jsperf.com/).
+A [robust](https://mathiasbynens.be/notes/javascript-benchmarking "Bulletproof JavaScript benchmarks") benchmarking library that supports high-resolution timers & returns statistically significant results. As seen on [jsPerf](https://jsperf.com/).
+
+## Documentation
+
+* [API Documentation](https://benchmarkjs.com/docs)
 
 ## Download
 
- * [Development source](https://raw.github.com/bestiejs/benchmark.js/v1.0.0/benchmark.js)
+ * [Development source](https://raw.githubusercontent.com/bestiejs/benchmark.js/2.1.1/benchmark.js)
 
-## Dive in
+## Installation
 
-We’ve got [API docs](http://benchmarkjs.com/docs) and [unit tests](http://benchmarkjs.com/tests).
+Benchmark.js’ only hard dependency is [lodash](https://lodash.com/).
+Include [platform.js](https://mths.be/platform) to populate [Benchmark.platform](https://benchmarkjs.com/docs#platform).
 
-For a list of upcoming features, check out our [roadmap](https://github.com/bestiejs/benchmark.js/wiki/Roadmap).
-
-## Support
-
-Benchmark.js has been tested in at least Adobe AIR 3.1, Chrome 5-21, Firefox 1.5-13, IE 6-9, Opera 9.25-12.01, Safari 3-6, Node.js 0.8.7, Narwhal 0.3.2, RingoJS 0.8, and Rhino 1.7RC5.
-
-## Installation and usage
-
-In a browser or Adobe AIR:
+In a browser:
 
 ```html
+<script src="lodash.js"></script>
+<script src="platform.js"></script>
 <script src="benchmark.js"></script>
 ```
 
-Optionally, expose Java’s nanosecond timer by adding the `nano` applet to the `<body>`:
+In an AMD loader:
 
-```html
-<applet code="nano" archive="nano.jar"></applet>
+```js
+require({
+  'paths': {
+    'benchmark': 'path/to/benchmark',
+    'lodash': 'path/to/lodash',
+    'platform': 'path/to/platform'
+  }
+},
+['benchmark'], function(Benchmark) {/*…*/});
 ```
 
-Or enable Chrome’s microsecond timer by using the [command line switch](http://peter.sh/experiments/chromium-command-line-switches/#enable-benchmarking):
-
-    --enable-benchmarking
-
-Via [npm](http://npmjs.org/):
+Using npm:
 
 ```bash
-npm install benchmark
+$ npm i --save benchmark
 ```
 
-In [Node.js](http://nodejs.org/) and [RingoJS v0.8.0+](http://ringojs.org/):
+In Node.js:
 
 ```js
 var Benchmark = require('benchmark');
@@ -49,45 +51,7 @@ var Benchmark = require('benchmark');
 Optionally, use the [microtime module](https://github.com/wadey/node-microtime) by Wade Simmons:
 
 ```bash
-npm install microtime
-```
-
-In [RingoJS v0.7.0-](http://ringojs.org/):
-
-```js
-var Benchmark = require('benchmark').Benchmark;
-```
-
-In [Rhino](http://www.mozilla.org/rhino/):
-
-```js
-load('benchmark.js');
-```
-
-In an AMD loader like [RequireJS](http://requirejs.org/):
-
-```js
-require({
-  'paths': {
-    'benchmark': 'path/to/benchmark'
-  }
-},
-['benchmark'], function(Benchmark) {
-  console.log(Benchmark.version);
-});
-
-// or with platform.js
-// https://github.com/bestiejs/platform.js
-require({
-  'paths': {
-    'benchmark': 'path/to/benchmark',
-    'platform': 'path/to/platform'
-  }
-},
-['benchmark', 'platform'], function(Benchmark, platform) {
-  Benchmark.platform = platform;
-  console.log(Benchmark.platform.name);
-});
+npm i --save microtime
 ```
 
 Usage example:
@@ -107,29 +71,34 @@ suite.add('RegExp#test', function() {
   console.log(String(event.target));
 })
 .on('complete', function() {
-  console.log('Fastest is ' + this.filter('fastest').pluck('name'));
+  console.log('Fastest is ' + this.filter('fastest').map('name'));
 })
 // run async
 .run({ 'async': true });
 
 // logs:
-// > RegExp#test x 4,161,532 +-0.99% (59 cycles)
-// > String#indexOf x 6,139,623 +-1.00% (131 cycles)
-// > Fastest is String#indexOf
+// => RegExp#test x 4,161,532 +-0.99% (59 cycles)
+// => String#indexOf x 6,139,623 +-1.00% (131 cycles)
+// => Fastest is String#indexOf
 ```
+
+## Developing
+
+The following `npm` tasks are available to assist during development and release:
+
+- `npm run server` will start `live-server` and open the base directory in your browser; then you can, for example, browse to /example/jsperf/ to run the available tests in your browser using the local benchmark.js file. 
+
+- `npm run test` -- nuff said.
+
+- `npm run doc` -- will regenerate the documentation from source.
+
+Also note that rough support for a test *catalog* is available for the `/example/jsperf/` demo: run `./build-jsperf.sh` to update the catalog file and then the next reload of the `/example/jsperf/index.html` page will show a clickable list of all available tests near the bottom so you can browse and jump from one test file/suite to another.
+
+
+## Support
+
+Tested in Chrome 46-47, Firefox 42-43, IE 9-11, Edge 13, Safari 8-9, Node.js 0.10-6, & PhantomJS 1.9.8.
 
 ## BestieJS
 
-Benchmark.js is part of the BestieJS *"Best in Class"* module collection. This means we promote solid browser/environment support, ES5 precedents, unit testing, and plenty of documentation.
-
-## Authors
-
-* [Mathias Bynens](http://mathiasbynens.be/)
-  [![twitter/mathias](http://gravatar.com/avatar/24e08a9ea84deb17ae121074d0f17125?s=70)](https://twitter.com/mathias "Follow @mathias on Twitter")
-* [John-David Dalton](http://allyoucanleet.com/)
-  [![twitter/jdalton](http://gravatar.com/avatar/299a3d891ff1920b69c364d061007043?s=70)](https://twitter.com/jdalton "Follow @jdalton on Twitter")
-
-## Contributors
-
-* [Kit Cambridge](http://kitcambridge.github.com/)
-  [![twitter/kitcambridge](http://gravatar.com/avatar/6662a1d02f351b5ef2f8b4d815804661?s=70)](https://twitter.com/kitcambridge "Follow @kitcambridge on Twitter")
+Benchmark.js is part of the BestieJS *“Best in Class”* module collection. This means we promote solid browser/environment support, ES5+ precedents, unit testing, & plenty of documentation.
