@@ -298,8 +298,8 @@
             } :
             function() {
                 throw new Error('Astral mode unsupported');
-            }), benchmarkOptions
-        )
+            }
+        ), benchmarkOptions)
     );
 
     (function() {
