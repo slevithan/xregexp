@@ -1,6 +1,6 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.XRegExp = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*!
- * XRegExp.build 3.1.1
+ * XRegExp.build 3.1.1-next
  * <xregexp.com>
  * Steven Levithan (c) 2012-2016 MIT License
  * Inspired by Lea Verou's RegExp.create <lea.verou.me>
@@ -188,7 +188,7 @@ module.exports = function(XRegExp) {
 
 },{}],2:[function(require,module,exports){
 /*!
- * XRegExp.matchRecursive 3.1.1
+ * XRegExp.matchRecursive 3.1.1-next
  * <xregexp.com>
  * Steven Levithan (c) 2009-2016 MIT License
  */
@@ -378,7 +378,7 @@ module.exports = function(XRegExp) {
 
 },{}],3:[function(require,module,exports){
 /*!
- * XRegExp Unicode Base 3.1.1
+ * XRegExp Unicode Base 3.1.1-next
  * <xregexp.com>
  * Steven Levithan (c) 2008-2016 MIT License
  */
@@ -607,7 +607,7 @@ module.exports = function(XRegExp) {
 
 },{}],4:[function(require,module,exports){
 /*!
- * XRegExp Unicode Blocks 3.1.1
+ * XRegExp Unicode Blocks 3.1.1-next
  * <xregexp.com>
  * Steven Levithan (c) 2010-2016 MIT License
  * Unicode data by Mathias Bynens <mathiasbynens.be>
@@ -1685,7 +1685,7 @@ module.exports = function(XRegExp) {
 
 },{}],5:[function(require,module,exports){
 /*!
- * XRegExp Unicode Categories 3.1.1
+ * XRegExp Unicode Categories 3.1.1-next
  * <xregexp.com>
  * Steven Levithan (c) 2010-2016 MIT License
  * Unicode data by Mathias Bynens <mathiasbynens.be>
@@ -1923,7 +1923,7 @@ module.exports = function(XRegExp) {
 
 },{}],6:[function(require,module,exports){
 /*!
- * XRegExp Unicode Properties 3.1.1
+ * XRegExp Unicode Properties 3.1.1-next
  * <xregexp.com>
  * Steven Levithan (c) 2012-2016 MIT License
  * Unicode data by Mathias Bynens <mathiasbynens.be>
@@ -2031,7 +2031,7 @@ module.exports = function(XRegExp) {
 
 },{}],7:[function(require,module,exports){
 /*!
- * XRegExp Unicode Scripts 3.1.1
+ * XRegExp Unicode Scripts 3.1.1-next
  * <xregexp.com>
  * Steven Levithan (c) 2010-2016 MIT License
  * Unicode data by Mathias Bynens <mathiasbynens.be>
@@ -2606,7 +2606,7 @@ module.exports = XRegExp;
 
 },{"./addons/build":1,"./addons/matchrecursive":2,"./addons/unicode-base":3,"./addons/unicode-blocks":4,"./addons/unicode-categories":5,"./addons/unicode-properties":6,"./addons/unicode-scripts":7,"./xregexp":9}],9:[function(require,module,exports){
 /*!
- * XRegExp 3.1.1
+ * XRegExp 3.1.1-next
  * <xregexp.com>
  * Steven Levithan (c) 2007-2016 MIT License
  */
@@ -3225,7 +3225,7 @@ XRegExp.prototype = new RegExp();
  * @static
  * @type String
  */
-XRegExp.version = '3.1.1';
+XRegExp.version = '3.1.1-next';
 
 // ==--------------------------==
 // Public methods
