@@ -20,7 +20,7 @@
     "src"
   ],
   "scripts": {
-    "build": "browserify src/index.js --standalone XRegExp > xregexp-all.js"
+    "postinstall": "browserify src/index.js --standalone XRegExp > xregexp-all.js"
   },
   "devDependencies": {
     "browserify": "^12.0.1"
