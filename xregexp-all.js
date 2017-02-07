@@ -603,6 +603,44 @@ module.exports = function(XRegExp) {
         XRegExp.cache.flush('patterns');
     };
 
+    /**
+     * @ignore
+     *
+     * Return a reference to the internal Unicode definition structure for the given Unicode Property
+     * if the given name is a legal Unicode Property for use in XRegExp `\p` or `\P` regex constructs.
+     *
+     * @memberOf XRegExp
+     * @param {String} name Name by which the Unicode Property may be recognized (case-insensitive),
+     *   e.g. `'N'` or `'Number'`.
+     *
+     *   The given name is matched against all registered Unicode Properties and Property Aliases.
+     *
+     * @return {Object} Reference to definition structure when the name matches a Unicode Property;
+     * `false` when the name does not match *any* Unicode Property or Property Alias.
+     *
+     * @note
+     * For more info on Unicode Properties, see also http://unicode.org/reports/tr18/#Categories.
+     *
+     * @note
+     * This method is *not* part of the officially documented and published API and is meant 'for
+     * advanced use only' where userland code wishes to re-use the (large) internal Unicode
+     * structures set up by XRegExp as a single point of Unicode 'knowledge' in the application.
+     *
+     * See some example usage of this functionality, used as a boolean check if the given name
+     * is legal and to obtain internal structural data:
+     * - `function prepareMacros(...)` in https://github.com/GerHobbelt/jison-lex/blob/master/regexp-lexer.js#L885
+     * - `function generateRegexesInitTableCode(...)` in https://github.com/GerHobbelt/jison-lex/blob/master/regexp-lexer.js#L1999
+     *
+     * Note that the second function in the example (`function generateRegexesInitTableCode(...)`)
+     * uses a approach without using this API to obtain a Unicode range spanning regex for use in environments
+     * which do not support XRegExp by simply expanding the XRegExp instance to a String through
+     * the `map()` mapping action and subsequent `join()`.
+     */
+    XRegExp._getUnicodeProperty = function(name) {
+        var slug = normalize(name);
+        return unicode[slug] || false;
+    };
+
 };
 
 },{}],4:[function(require,module,exports){
@@ -2667,7 +2705,7 @@ var hasFlagsProp = /x/.flags !== undefined;
 var toString = {}.toString;
 
 function hasNativeFlag(flag) {
-    // Can't check based on the presense of properties/getters since browsers might support such
+    // Can't check based on the presence of properties/getters since browsers might support such
     // properties even when they don't support the corresponding flag in regex construction (tested
     // in Chrome 48, where `'unicode' in /x/` is true but trying to construct a regex with flag `u`
     // throws an error)
