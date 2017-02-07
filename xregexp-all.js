@@ -2848,7 +2848,7 @@ function copyRegex(regex, options) {
     // unnecessary for regexes constructed by `XRegExp` because the regex has already undergone the
     // translation to native regex syntax
     regex = augment(
-        new RegExp(regex.source, flags),
+        new RegExp(options.source || regex.source, flags),
         hasNamedCapture(regex) ? xData.captureNames.slice(0) : null,
         xregexpSource,
         xregexpFlags,
@@ -3436,13 +3436,23 @@ XRegExp.escape = function(str) {
 XRegExp.exec = function(str, regex, pos, sticky) {
     var cacheKey = 'g',
         addY = false,
+        sourceY,
         match,
         r2;
 
     addY = hasNativeY && !!(sticky || (regex.sticky && sticky !== false));
     if (addY) {
         cacheKey += 'y';
+    } else if (sticky) {
+        // Simulate sticky matching by appending an empty capture to the original regexp.
+        // The resulting regexp will succeed no matter what at the current index (set with
+        // `lastIndex`), it will not search the rest of the subject string. We'll know that
+        // the original regexp has failed if that last capture is not `undefined`.
+        sourceY = regex.source + '|()';
+        cacheKey += 'FakeY';
     }
+
+
 
     regex[REGEX_DATA] = regex[REGEX_DATA] || {};
 
@@ -3451,6 +3461,7 @@ XRegExp.exec = function(str, regex, pos, sticky) {
         regex[REGEX_DATA][cacheKey] = copyRegex(regex, {
             addG: true,
             addY: addY,
+            source: sourceY,
             removeY: sticky === false,
             isInternalOnly: true
         })
@@ -3461,7 +3472,9 @@ XRegExp.exec = function(str, regex, pos, sticky) {
     // Fixed `exec` required for `lastIndex` fix, named backreferences, etc.
     match = fixed.exec.call(r2, str);
 
-    if (sticky && match && match.index !== pos) {
+    // Get rid of the capture added by the pseudo-sticky matcher if needed. An empty string
+    // means the original regexp failed (see above)
+    if (sourceY && match && match.pop() === '') {
         match = null;
     }
 
