@@ -94,6 +94,7 @@ var registeredFlags = {
 /**
  * Attaches extended data and `XRegExp.prototype` properties to a regex object.
  *
+ * @private
  * @param {RegExp} regex Regex to augment.
  * @param {Array} captureNames Array with capture names, or `null`.
  * @param {String} xSource XRegExp pattern used to generate `regex`, or `null` if N/A.
@@ -136,6 +137,7 @@ function augment(regex, captureNames, xSource, xFlags, isInternalOnly) {
 /**
  * Removes any duplicate characters from the provided string.
  *
+ * @private
  * @param {String} str String to remove duplicate characters from.
  * @returns {String} String with any duplicate characters removed.
  */
@@ -148,6 +150,7 @@ function clipDuplicates(str) {
  * properties. The copy has a fresh `lastIndex` property (set to zero). Allows adding and removing
  * flags g and y while copying the regex.
  *
+ * @private
  * @param {RegExp} regex Regex to copy.
  * @param {Object} [options] Options object with optional properties:
  *   <li>`addG` {Boolean} Add flag g while copying the regex.
@@ -216,6 +219,7 @@ function copyRegex(regex, options) {
 /**
  * Converts hexadecimal to decimal.
  *
+ * @private
  * @param {String} hex
  * @returns {Number}
  */
@@ -226,6 +230,7 @@ function dec(hex) {
 /**
  * Returns native `RegExp` flags used by a regex object.
  *
+ * @private
  * @param {RegExp} regex Regex to check.
  * @returns {String} Native flags in use.
  */
@@ -241,6 +246,7 @@ function getNativeFlags(regex) {
 /**
  * Determines whether a regex has extended instance data used to track capture names.
  *
+ * @private
  * @param {RegExp} regex Regex to check.
  * @returns {Boolean} Whether the regex uses named capture.
  */
@@ -251,6 +257,7 @@ function hasNamedCapture(regex) {
 /**
  * Converts decimal to hexadecimal.
  *
+ * @private
  * @param {Number|String} dec
  * @returns {String}
  */
@@ -261,6 +268,7 @@ function hex(dec) {
 /**
  * Returns the first index at which a given value can be found in an array.
  *
+ * @private
  * @param {Array} array Array to search.
  * @param {*} value Value to locate in the array.
  * @returns {Number} Zero-based index at which the item is found, or -1.
@@ -280,6 +288,7 @@ function indexOf(array, value) {
 /**
  * Determines whether a value is of the specified type, by resolving its internal [[Class]].
  *
+ * @private
  * @param {*} value Object to check.
  * @param {String} type Type to check for, in TitleCase.
  * @returns {Boolean} Whether the object matches the type.
@@ -291,6 +300,7 @@ function isType(value, type) {
 /**
  * Checks whether the next nonignorable token after the specified position is a quantifier.
  *
+ * @private
  * @param {String} pattern Pattern to search within.
  * @param {Number} pos Index in `pattern` to search at.
  * @param {String} flags Flags used by the pattern.
@@ -310,6 +320,7 @@ function isQuantifierNext(pattern, pos, flags) {
 /**
  * Adds leading zeros if shorter than four characters. Used for fixed-length hexadecimal values.
  *
+ * @private
  * @param {String} str
  * @returns {String}
  */
@@ -324,6 +335,7 @@ function pad4(str) {
  * Checks for flag-related errors, and strips/applies flags in a leading mode modifier. Offloads
  * the flag preparation logic from the `XRegExp` constructor.
  *
+ * @private
  * @param {String} pattern Regex pattern, possibly with a leading mode modifier.
  * @param {String} flags Any combination of flags.
  * @returns {Object} Object with properties `pattern` and `flags`.
@@ -362,6 +374,7 @@ function prepareFlags(pattern, flags) {
 /**
  * Prepares an options object from the given value.
  *
+ * @private
  * @param {String|Object} value Value to convert to an options object.
  * @returns {Object} Options object.
  */
@@ -382,6 +395,7 @@ function prepareOptions(value) {
 /**
  * Registers a flag so it doesn't throw an 'unknown flag' error.
  *
+ * @private
  * @param {String} flag Single-character flag to register.
  */
 function registerFlag(flag) {
@@ -396,6 +410,7 @@ function registerFlag(flag) {
  * Runs built-in and custom regex syntax tokens in reverse insertion order at the specified
  * position, until a match is found.
  *
+ * @private
  * @param {String} pattern Original pattern from which an XRegExp object is being built.
  * @param {String} flags Flags being used to construct the regex.
  * @param {Number} pos Position to search for tokens within `pattern`.
@@ -441,6 +456,7 @@ function runTokens(pattern, flags, pos, scope, context) {
  * all new regexes created by XRegExp. This causes an error to be thrown when creating regexes if
  * the Unicode Base addon is not available, since flag A is registered by that addon.
  *
+ * @private
  * @param {Boolean} on `true` to enable; `false` to disable.
  */
 function setAstral(on) {
@@ -450,6 +466,7 @@ function setAstral(on) {
 /**
  * Enables or disables native method overrides.
  *
+ * @private
  * @param {Boolean} on `true` to enable; `false` to disable.
  */
 function setNatives(on) {
@@ -466,6 +483,7 @@ function setNatives(on) {
  * Returns the object, or throws an error if it is `null` or `undefined`. This is used to follow
  * the ES5 abstract operation `ToObject`.
  *
+ * @private
  * @param {*} value Object to check and return.
  * @returns {*} The provided object.
  */
@@ -616,6 +634,7 @@ XRegExp.prototype = new RegExp();
  * '2.0.0-beta-3'.
  *
  * @static
+ * @memberOf XRegExp
  * @type String
  */
 XRegExp.version = '3.1.1-next';
@@ -634,6 +653,7 @@ XRegExp._pad4 = pad4;
  * Extends XRegExp syntax and allows custom flags. This is used internally and can be used to
  * create XRegExp addons. If more than one token can match the same string, the last added wins.
  *
+ * @memberOf XRegExp
  * @param {RegExp} regex Regex object that matches the new token.
  * @param {Function} handler Function that returns a new pattern string (using native regex syntax)
  *   to replace the matched token within all future XRegExp regexes. Has access to persistent
@@ -716,6 +736,7 @@ XRegExp.addToken = function(regex, handler, options) {
  * Caches and returns the result of calling `XRegExp(pattern, flags)`. On any subsequent call with
  * the same pattern and flag combination, the cached copy of the regex is returned.
  *
+ * @memberOf XRegExp
  * @param {String} pattern Regex pattern string.
  * @param {String} [flags] Any combination of XRegExp flags.
  * @returns {RegExp} Cached XRegExp object.
@@ -749,6 +770,7 @@ XRegExp.cache.flush = function(cacheName) {
  * Escapes any regular expression metacharacters, for use when matching literal strings. The result
  * can safely be used at any point within a regex that uses any flags.
  *
+ * @memberOf XRegExp
  * @param {String} str String to escape.
  * @returns {String} String with regex metacharacters escaped.
  * @example
@@ -768,6 +790,7 @@ XRegExp.escape = function(str) {
  * used, but is updated for compatibility. Also fixes browser bugs compared to the native
  * `RegExp.prototype.exec` and can be used reliably cross-browser.
  *
+ * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp} regex Regex to search with.
  * @param {Number} [pos=0] Zero-based index at which to start the search.
@@ -845,6 +868,7 @@ XRegExp.exec = function(str, regex, pos, sticky) {
  * string and continue until the end, regardless of the state of the regex's `global` property and
  * initial `lastIndex`.
  *
+ * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp} regex Regex to search with.
  * @param {Function} callback Function to execute for each match. Invoked with four arguments:
@@ -884,6 +908,7 @@ XRegExp.forEach = function(str, regex, callback) {
  * `XRegExp.prototype` properties, and has a fresh `lastIndex` property (set to zero). Native
  * regexes are not recompiled using XRegExp syntax.
  *
+ * @memberOf XRegExp
  * @param {RegExp} regex Regex to globalize.
  * @returns {RegExp} Copy of the provided regex with flag `g` added.
  * @example
@@ -899,6 +924,7 @@ XRegExp.globalize = function(regex) {
  * Installs optional features according to the specified options. Can be undone using
  * `XRegExp.uninstall`.
  *
+ * @memberOf XRegExp
  * @param {Object|String} options Options object or string.
  * @example
  *
@@ -929,6 +955,7 @@ XRegExp.install = function(options) {
 /**
  * Checks whether an individual optional feature is installed.
  *
+ * @memberOf XRegExp
  * @param {String} feature Name of the feature to check. One of:
  *   <li>`astral`
  *   <li>`natives`
@@ -945,6 +972,7 @@ XRegExp.isInstalled = function(feature) {
  * Returns `true` if an object is a regex; `false` if it isn't. This works correctly for regexes
  * created in another frame, when `instanceof` and `constructor` checks would fail.
  *
+ * @memberOf XRegExp
  * @param {*} value Object to check.
  * @returns {Boolean} Whether the object is a `RegExp` object.
  * @example
@@ -966,6 +994,7 @@ XRegExp.isRegExp = function(value) {
  * and an empty array instead of `null` when no matches are found in match-all mode). It also lets
  * you override flag g and ignore `lastIndex`, and fixes browser bugs.
  *
+ * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp} regex Regex to search with.
  * @param {String} [scope='one'] Use 'one' to return the first match as a string. Use 'all' to
@@ -1021,6 +1050,7 @@ XRegExp.match = function(str, regex, scope) {
  * `regex` and `backref` properties. When a backreference is specified, the named or numbered
  * backreference is passed forward to the next regex or returned.
  *
+ * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {Array} chain Regexes that each search for matches within preceding results.
  * @returns {Array} Matches by the last regex in the chain, or an empty array.
@@ -1082,6 +1112,7 @@ XRegExp.matchChain = function(str, chain) {
  * functions can use named backreferences via `arguments[0].name`. Also fixes browser bugs compared
  * to the native `String.prototype.replace` and can be used reliably cross-browser.
  *
+ * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp|String} search Search pattern to be replaced.
  * @param {String|Function} replacement Replacement string or a function invoked to create it.
@@ -1161,6 +1192,7 @@ XRegExp.replace = function(str, search, replacement, scope) {
  * replacement string or function, and an optional scope of 'one' or 'all'. Uses the XRegExp
  * replacement text syntax, which supports named backreference properties via `${name}`.
  *
+ * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {Array} replacements Array of replacement detail arrays.
  * @returns {String} New string with all replacements.
@@ -1195,6 +1227,7 @@ XRegExp.replaceEach = function(str, replacements) {
  * Fixes browser bugs compared to the native `String.prototype.split` and can be used reliably
  * cross-browser.
  *
+ * @memberOf XRegExp
  * @param {String} str String to split.
  * @param {RegExp|String} separator Regex or string to use for separating the string.
  * @param {Number} [limit] Maximum number of items to include in the result array.
@@ -1224,6 +1257,7 @@ XRegExp.split = function(str, separator, limit) {
  * updated for compatibility. Also fixes browser bugs compared to the native
  * `RegExp.prototype.test` and can be used reliably cross-browser.
  *
+ * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp} regex Regex to search with.
  * @param {Number} [pos=0] Zero-based index at which to start the search.
@@ -1248,6 +1282,7 @@ XRegExp.test = function(str, regex, pos, sticky) {
  * Uninstalls optional features according to the specified options. All optional features start out
  * uninstalled, so this is used to undo the actions of `XRegExp.install`.
  *
+ * @memberOf XRegExp
  * @param {Object|String} options Options object or string.
  * @example
  *
@@ -1282,6 +1317,7 @@ XRegExp.uninstall = function(options) {
  * the larger combined pattern. Native flags used by provided regexes are ignored in favor of the
  * `flags` argument.
  *
+ * @memberOf XRegExp
  * @param {Array} patterns Regexes and strings to combine.
  * @param {String} [flags] Any combination of XRegExp flags.
  * @returns {RegExp} Union of the provided regexes and strings.
@@ -1348,6 +1384,7 @@ XRegExp.union = function(patterns, flags) {
  * bugs in the native `RegExp.prototype.exec`. Calling `XRegExp.install('natives')` uses this to
  * override the native method. Use via `XRegExp.exec` without overriding natives.
  *
+ * @memberOf RegExp
  * @param {String} str String to search.
  * @returns {Array} Match array with named backreference properties, or `null`.
  */
@@ -1409,6 +1446,7 @@ fixed.exec = function(str) {
  * Fixes browser bugs in the native `RegExp.prototype.test`. Calling `XRegExp.install('natives')`
  * uses this to override the native method.
  *
+ * @memberOf RegExp
  * @param {String} str String to search.
  * @returns {Boolean} Whether the regex matched the provided value.
  */
@@ -1422,6 +1460,7 @@ fixed.test = function(str) {
  * bugs in the native `String.prototype.match`. Calling `XRegExp.install('natives')` uses this to
  * override the native method.
  *
+ * @memberOf String
  * @param {RegExp|*} regex Regex to search with. If not a regex object, it is passed to `RegExp`.
  * @returns {Array} If `regex` uses flag g, an array of match strings or `null`. Without flag g,
  *   the result of calling `regex.exec(this)`.
@@ -1452,6 +1491,7 @@ fixed.match = function(regex) {
  * that this doesn't support SpiderMonkey's proprietary third (`flags`) argument. Use via
  * `XRegExp.replace` without overriding natives.
  *
+ * @memberOf String
  * @param {RegExp|String} search Search pattern to be replaced.
  * @param {String|Function} replacement Replacement string or a function invoked to create it.
  * @returns {String} New string with one or all matches replaced.
@@ -1583,6 +1623,7 @@ fixed.replace = function(search, replacement) {
  * Fixes browser bugs in the native `String.prototype.split`. Calling `XRegExp.install('natives')`
  * uses this to override the native method. Use via `XRegExp.split` without overriding natives.
  *
+ * @memberOf String
  * @param {RegExp|String} separator Regex or string to use for separating the string.
  * @param {Number} [limit] Maximum number of items to include in the result array.
  * @returns {Array} Array of substrings.

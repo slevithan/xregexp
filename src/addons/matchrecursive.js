@@ -9,6 +9,8 @@ module.exports = function(XRegExp) {
 
     /**
      * Returns a match detail object composed of the provided values.
+     *
+     * @private
      */
     function row(name, value, start, end) {
         return {
@@ -24,6 +26,7 @@ module.exports = function(XRegExp) {
      * objects with detailed match parts and position data. An error is thrown if delimiters are
      * unbalanced within the data.
      *
+     * @memberOf XRegExp
      * @param {String} str String to search.
      * @param {String} left Left delimiter as an XRegExp pattern.
      * @param {String} right Right delimiter as an XRegExp pattern.
