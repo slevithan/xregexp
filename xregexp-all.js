@@ -16,6 +16,7 @@ module.exports = function(XRegExp) {
     /**
      * Strips a leading `^` and trailing unescaped `$`, if both are present.
      *
+     * @private
      * @param {String} pattern Pattern to process.
      * @returns {String} Pattern with edge anchors removed.
      */
@@ -40,6 +41,7 @@ module.exports = function(XRegExp) {
     /**
      * Converts the provided value to an XRegExp. Native RegExp flags are not preserved.
      *
+     * @private
      * @param {String|RegExp} value Value to convert.
      * @returns {RegExp} XRegExp object with XRegExp syntax applied.
      */
@@ -60,6 +62,7 @@ module.exports = function(XRegExp) {
      * the outer pattern and provided subpatterns are automatically renumbered to work correctly.
      * Native flags used by provided subpatterns are ignored in favor of the `flags` argument.
      *
+     * @memberOf XRegExp
      * @param {String} pattern XRegExp pattern using `{{name}}` for embedded subpatterns. Allows
      *   `({{name}})` as shorthand for `(?<name>{{name}})`. Patterns cannot be embedded within
      *   character classes.
@@ -198,6 +201,8 @@ module.exports = function(XRegExp) {
 
     /**
      * Returns a match detail object composed of the provided values.
+     *
+     * @private
      */
     function row(name, value, start, end) {
         return {
@@ -213,6 +218,7 @@ module.exports = function(XRegExp) {
      * objects with detailed match parts and position data. An error is thrown if delimiters are
      * unbalanced within the data.
      *
+     * @memberOf XRegExp
      * @param {String} str String to search.
      * @param {String} left Left delimiter as an XRegExp pattern.
      * @param {String} right Right delimiter as an XRegExp pattern.
@@ -429,6 +435,7 @@ module.exports = function(XRegExp) {
     function invertBmp(range) {
         var output = '';
         var lastEnd = -1;
+
         XRegExp.forEach(
             range,
             /(\\x..|\\u....|\\?[\s\S])(?:-(\\x..|\\u....|\\?[\s\S]))?/,
@@ -443,27 +450,31 @@ module.exports = function(XRegExp) {
                 lastEnd = charCode(m[2] || m[1]);
             }
         );
+
         if (lastEnd < 0xFFFF) {
             output += '\\u' + pad4(hex(lastEnd + 1));
             if (lastEnd < 0xFFFE) {
                 output += '-\\uFFFF';
             }
         }
+
         return output;
     }
 
     // Generates an inverted BMP range on first use
     function cacheInvertedBmp(slug) {
         var prop = 'b!';
-        return unicode[slug][prop] || (
-            unicode[slug][prop] = invertBmp(unicode[slug].bmp)
+        return (
+            unicode[slug][prop] ||
+            (unicode[slug][prop] = invertBmp(unicode[slug].bmp))
         );
     }
 
     // Combines and optionally negates BMP and astral data
     function buildAstral(slug, isNegated) {
-        var item = unicode[slug],
-            combined = '';
+        var item = unicode[slug];
+        var combined = '';
+
         if (item.bmp && !item.isBmpLast) {
             combined = '[' + item.bmp + ']' + (item.astral ? '|' : '');
         }
@@ -473,6 +484,7 @@ module.exports = function(XRegExp) {
         if (item.isBmpLast && item.bmp) {
             combined += (item.astral ? '|' : '') + '[' + item.bmp + ']';
         }
+
         // Astral Unicode tokens always match a code point, never a code unit
         return isNegated ?
             '(?:(?!' + combined + ')(?:[\uD800-\uDBFF][\uDC00-\uDFFF]|[\0-\uFFFF]))' :
@@ -482,8 +494,9 @@ module.exports = function(XRegExp) {
     // Builds a complete astral pattern on first use
     function cacheAstral(slug, isNegated) {
         var prop = isNegated ? 'a!' : 'a=';
-        return unicode[slug][prop] || (
-            unicode[slug][prop] = buildAstral(slug, isNegated)
+        return (
+            unicode[slug][prop] ||
+            (unicode[slug][prop] = buildAstral(slug, isNegated))
         );
     }
 
@@ -492,25 +505,25 @@ module.exports = function(XRegExp) {
     // ==--------------------------==
 
     /*
-     * Add Unicode token syntax: \p{..}, \P{..}, \p{^..}. Also add astral mode (flag A).
+     * Add astral mode (flag A) and Unicode token syntax: `\p{..}`, `\P{..}`, `\p{^..}`, `\pC`.
      */
     XRegExp.addToken(
         // Use `*` instead of `+` to avoid capturing `^` as the token name in `\p{^}`
         /\\([pP])(?:{(\^?)([^}]*)}|([A-Za-z]))/,
         function(match, scope, flags) {
-            var ERR_DOUBLE_NEG = 'Invalid double negation ',
-                ERR_UNKNOWN_NAME = 'Unknown Unicode token ',
-                ERR_UNKNOWN_REF = 'Unicode token missing data ',
-                ERR_ASTRAL_ONLY = 'Astral mode required for Unicode token ',
-                ERR_ASTRAL_IN_CLASS = 'Astral mode does not support Unicode tokens within character classes',
-                // Negated via \P{..} or \p{^..}
-                isNegated = match[1] === 'P' || !!match[2],
-                // Switch from BMP (0-FFFF) to astral (0-10FFFF) mode via flag A
-                isAstralMode = flags.indexOf('A') > -1,
-                // Token lookup name. Check `[4]` first to avoid passing `undefined` via `\p{}`
-                slug = normalize(match[4] || match[3]),
-                // Token data object
-                item = unicode[slug];
+            var ERR_DOUBLE_NEG = 'Invalid double negation ';
+            var ERR_UNKNOWN_NAME = 'Unknown Unicode token ';
+            var ERR_UNKNOWN_REF = 'Unicode token missing data ';
+            var ERR_ASTRAL_ONLY = 'Astral mode required for Unicode token ';
+            var ERR_ASTRAL_IN_CLASS = 'Astral mode does not support Unicode tokens within character classes';
+            // Negated via \P{..} or \p{^..}
+            var isNegated = match[1] === 'P' || !!match[2];
+            // Switch from BMP (0-FFFF) to astral (0-10FFFF) mode via flag A
+            var isAstralMode = flags.indexOf('A') > -1;
+            // Token lookup name. Check `[4]` first to avoid passing `undefined` via `\p{}`
+            var slug = normalize(match[4] || match[3]);
+            // Token data object
+            var item = unicode[slug];
 
             if (match[1] === 'P' && match[2]) {
                 throw new SyntaxError(ERR_DOUBLE_NEG + match[0]);
@@ -554,6 +567,7 @@ module.exports = function(XRegExp) {
     /**
      * Adds to the list of Unicode tokens that XRegExp regexes can match via `\p` or `\P`.
      *
+     * @memberOf XRegExp
      * @param {Array} data Objects with named character ranges. Each object may have properties
      *   `name`, `alias`, `isBmpLast`, `inverseOf`, `bmp`, and `astral`. All but `name` are
      *   optional, although one of `bmp` or `astral` is required (unless `inverseOf` is set). If
@@ -579,12 +593,11 @@ module.exports = function(XRegExp) {
      * XRegExp('\\p{XDigit}:\\p{Hexadecimal}+').test('0:3D'); // -> true
      */
     XRegExp.addUnicodeData = function(data) {
-        var ERR_NO_NAME = 'Unicode token requires name',
-            ERR_NO_DATA = 'Unicode token has no character data ',
-            item,
-            i;
+        var ERR_NO_NAME = 'Unicode token requires name';
+        var ERR_NO_DATA = 'Unicode token has no character data ';
+        var item;
 
-        for (i = 0; i < data.length; ++i) {
+        for (var i = 0; i < data.length; ++i) {
             item = data[i];
             if (!item.name) {
                 throw new Error(ERR_NO_NAME);
@@ -606,39 +619,27 @@ module.exports = function(XRegExp) {
     /**
      * @ignore
      *
-     * Return a reference to the internal Unicode definition structure for the given Unicode Property
-     * if the given name is a legal Unicode Property for use in XRegExp `\p` or `\P` regex constructs.
+     * Return a reference to the internal Unicode definition structure for the given Unicode
+     * Property if the given name is a legal Unicode Property for use in XRegExp `\p` or `\P` regex
+     * constructs.
      *
      * @memberOf XRegExp
      * @param {String} name Name by which the Unicode Property may be recognized (case-insensitive),
-     *   e.g. `'N'` or `'Number'`.
-     *
-     *   The given name is matched against all registered Unicode Properties and Property Aliases.
-     *
-     * @return {Object} Reference to definition structure when the name matches a Unicode Property;
-     * `false` when the name does not match *any* Unicode Property or Property Alias.
+     *   e.g. `'N'` or `'Number'`. The given name is matched against all registered Unicode
+     *   Properties and Property Aliases.
+     * @returns {Object} Reference to definition structure when the name matches a Unicode Property.
      *
      * @note
      * For more info on Unicode Properties, see also http://unicode.org/reports/tr18/#Categories.
      *
      * @note
-     * This method is *not* part of the officially documented and published API and is meant 'for
-     * advanced use only' where userland code wishes to re-use the (large) internal Unicode
-     * structures set up by XRegExp as a single point of Unicode 'knowledge' in the application.
-     *
-     * See some example usage of this functionality, used as a boolean check if the given name
-     * is legal and to obtain internal structural data:
-     * - `function prepareMacros(...)` in https://github.com/GerHobbelt/jison-lex/blob/master/regexp-lexer.js#L885
-     * - `function generateRegexesInitTableCode(...)` in https://github.com/GerHobbelt/jison-lex/blob/master/regexp-lexer.js#L1999
-     *
-     * Note that the second function in the example (`function generateRegexesInitTableCode(...)`)
-     * uses a approach without using this API to obtain a Unicode range spanning regex for use in environments
-     * which do not support XRegExp by simply expanding the XRegExp instance to a String through
-     * the `map()` mapping action and subsequent `join()`.
+     * This method is *not* part of the officially documented API and may change or be removed in
+     * the future. It is meant for userland code that wishes to reuse the (large) internal Unicode
+     * structures set up by XRegExp.
      */
     XRegExp._getUnicodeProperty = function(name) {
         var slug = normalize(name);
-        return unicode[slug] || false;
+        return unicode[slug];
     };
 
 };
@@ -2739,6 +2740,7 @@ var registeredFlags = {
 /**
  * Attaches extended data and `XRegExp.prototype` properties to a regex object.
  *
+ * @private
  * @param {RegExp} regex Regex to augment.
  * @param {Array} captureNames Array with capture names, or `null`.
  * @param {String} xSource XRegExp pattern used to generate `regex`, or `null` if N/A.
@@ -2781,6 +2783,7 @@ function augment(regex, captureNames, xSource, xFlags, isInternalOnly) {
 /**
  * Removes any duplicate characters from the provided string.
  *
+ * @private
  * @param {String} str String to remove duplicate characters from.
  * @returns {String} String with any duplicate characters removed.
  */
@@ -2793,6 +2796,7 @@ function clipDuplicates(str) {
  * properties. The copy has a fresh `lastIndex` property (set to zero). Allows adding and removing
  * flags g and y while copying the regex.
  *
+ * @private
  * @param {RegExp} regex Regex to copy.
  * @param {Object} [options] Options object with optional properties:
  *   <li>`addG` {Boolean} Add flag g while copying the regex.
@@ -2802,6 +2806,7 @@ function clipDuplicates(str) {
  *   <li>`isInternalOnly` {Boolean} Whether the copied regex will be used only for internal
  *     operations, and never exposed to users. For internal-only regexes, we can improve perf by
  *     skipping some operations like attaching `XRegExp.prototype` properties.
+ *   <li>`source` {String} Overrides `<regex>.source`, for special cases.
  * @returns {RegExp} Copy of the provided regex, possibly with modified flags.
  */
 function copyRegex(regex, options) {
@@ -2861,6 +2866,7 @@ function copyRegex(regex, options) {
 /**
  * Converts hexadecimal to decimal.
  *
+ * @private
  * @param {String} hex
  * @returns {Number}
  */
@@ -2871,6 +2877,7 @@ function dec(hex) {
 /**
  * Returns native `RegExp` flags used by a regex object.
  *
+ * @private
  * @param {RegExp} regex Regex to check.
  * @returns {String} Native flags in use.
  */
@@ -2886,6 +2893,7 @@ function getNativeFlags(regex) {
 /**
  * Determines whether a regex has extended instance data used to track capture names.
  *
+ * @private
  * @param {RegExp} regex Regex to check.
  * @returns {Boolean} Whether the regex uses named capture.
  */
@@ -2896,6 +2904,7 @@ function hasNamedCapture(regex) {
 /**
  * Converts decimal to hexadecimal.
  *
+ * @private
  * @param {Number|String} dec
  * @returns {String}
  */
@@ -2906,6 +2915,7 @@ function hex(dec) {
 /**
  * Returns the first index at which a given value can be found in an array.
  *
+ * @private
  * @param {Array} array Array to search.
  * @param {*} value Value to locate in the array.
  * @returns {Number} Zero-based index at which the item is found, or -1.
@@ -2925,6 +2935,7 @@ function indexOf(array, value) {
 /**
  * Determines whether a value is of the specified type, by resolving its internal [[Class]].
  *
+ * @private
  * @param {*} value Object to check.
  * @param {String} type Type to check for, in TitleCase.
  * @returns {Boolean} Whether the object matches the type.
@@ -2936,6 +2947,7 @@ function isType(value, type) {
 /**
  * Checks whether the next nonignorable token after the specified position is a quantifier.
  *
+ * @private
  * @param {String} pattern Pattern to search within.
  * @param {Number} pos Index in `pattern` to search at.
  * @param {String} flags Flags used by the pattern.
@@ -2955,6 +2967,7 @@ function isQuantifierNext(pattern, pos, flags) {
 /**
  * Adds leading zeros if shorter than four characters. Used for fixed-length hexadecimal values.
  *
+ * @private
  * @param {String} str
  * @returns {String}
  */
@@ -2969,6 +2982,7 @@ function pad4(str) {
  * Checks for flag-related errors, and strips/applies flags in a leading mode modifier. Offloads
  * the flag preparation logic from the `XRegExp` constructor.
  *
+ * @private
  * @param {String} pattern Regex pattern, possibly with a leading mode modifier.
  * @param {String} flags Any combination of flags.
  * @returns {Object} Object with properties `pattern` and `flags`.
@@ -3007,6 +3021,7 @@ function prepareFlags(pattern, flags) {
 /**
  * Prepares an options object from the given value.
  *
+ * @private
  * @param {String|Object} value Value to convert to an options object.
  * @returns {Object} Options object.
  */
@@ -3027,6 +3042,7 @@ function prepareOptions(value) {
 /**
  * Registers a flag so it doesn't throw an 'unknown flag' error.
  *
+ * @private
  * @param {String} flag Single-character flag to register.
  */
 function registerFlag(flag) {
@@ -3041,6 +3057,7 @@ function registerFlag(flag) {
  * Runs built-in and custom regex syntax tokens in reverse insertion order at the specified
  * position, until a match is found.
  *
+ * @private
  * @param {String} pattern Original pattern from which an XRegExp object is being built.
  * @param {String} flags Flags being used to construct the regex.
  * @param {Number} pos Position to search for tokens within `pattern`.
@@ -3086,6 +3103,7 @@ function runTokens(pattern, flags, pos, scope, context) {
  * all new regexes created by XRegExp. This causes an error to be thrown when creating regexes if
  * the Unicode Base addon is not available, since flag A is registered by that addon.
  *
+ * @private
  * @param {Boolean} on `true` to enable; `false` to disable.
  */
 function setAstral(on) {
@@ -3095,6 +3113,7 @@ function setAstral(on) {
 /**
  * Enables or disables native method overrides.
  *
+ * @private
  * @param {Boolean} on `true` to enable; `false` to disable.
  */
 function setNatives(on) {
@@ -3111,6 +3130,7 @@ function setNatives(on) {
  * Returns the object, or throws an error if it is `null` or `undefined`. This is used to follow
  * the ES5 abstract operation `ToObject`.
  *
+ * @private
  * @param {*} value Object to check and return.
  * @returns {*} The provided object.
  */
@@ -3261,6 +3281,7 @@ XRegExp.prototype = new RegExp();
  * '2.0.0-beta-3'.
  *
  * @static
+ * @memberOf XRegExp
  * @type String
  */
 XRegExp.version = '3.1.1-next';
@@ -3279,6 +3300,7 @@ XRegExp._pad4 = pad4;
  * Extends XRegExp syntax and allows custom flags. This is used internally and can be used to
  * create XRegExp addons. If more than one token can match the same string, the last added wins.
  *
+ * @memberOf XRegExp
  * @param {RegExp} regex Regex object that matches the new token.
  * @param {Function} handler Function that returns a new pattern string (using native regex syntax)
  *   to replace the matched token within all future XRegExp regexes. Has access to persistent
@@ -3361,6 +3383,7 @@ XRegExp.addToken = function(regex, handler, options) {
  * Caches and returns the result of calling `XRegExp(pattern, flags)`. On any subsequent call with
  * the same pattern and flag combination, the cached copy of the regex is returned.
  *
+ * @memberOf XRegExp
  * @param {String} pattern Regex pattern string.
  * @param {String} [flags] Any combination of XRegExp flags.
  * @returns {RegExp} Cached XRegExp object.
@@ -3394,6 +3417,7 @@ XRegExp.cache.flush = function(cacheName) {
  * Escapes any regular expression metacharacters, for use when matching literal strings. The result
  * can safely be used at any point within a regex that uses any flags.
  *
+ * @memberOf XRegExp
  * @param {String} str String to escape.
  * @returns {String} String with regex metacharacters escaped.
  * @example
@@ -3413,6 +3437,7 @@ XRegExp.escape = function(str) {
  * used, but is updated for compatibility. Also fixes browser bugs compared to the native
  * `RegExp.prototype.exec` and can be used reliably cross-browser.
  *
+ * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp} regex Regex to search with.
  * @param {Number} [pos=0] Zero-based index at which to start the search.
@@ -3444,15 +3469,14 @@ XRegExp.exec = function(str, regex, pos, sticky) {
     if (addY) {
         cacheKey += 'y';
     } else if (sticky) {
-        // Simulate sticky matching by appending an empty capture to the original regexp.
-        // The resulting regexp will succeed no matter what at the current index (set with
-        // `lastIndex`), it will not search the rest of the subject string. We'll know that
-        // the original regexp has failed if that last capture is not `undefined`.
+        // Simulate sticky matching by appending an empty capture to the original regex. The
+        // resulting regex will succeed no matter what at the current index (set with `lastIndex`),
+        // and will not search the rest of the subject string. We'll know that the original regex
+        // has failed if that last capture is `''` rather than `undefined` (i.e., if that last
+        // capture participated in the match).
         sourceY = regex.source + '|()';
         cacheKey += 'FakeY';
     }
-
-
 
     regex[REGEX_DATA] = regex[REGEX_DATA] || {};
 
@@ -3467,13 +3491,14 @@ XRegExp.exec = function(str, regex, pos, sticky) {
         })
     );
 
-    r2.lastIndex = pos = pos || 0;
+    pos = pos || 0;
+    r2.lastIndex = pos;
 
     // Fixed `exec` required for `lastIndex` fix, named backreferences, etc.
     match = fixed.exec.call(r2, str);
 
-    // Get rid of the capture added by the pseudo-sticky matcher if needed. An empty string
-    // means the original regexp failed (see above)
+    // Get rid of the capture added by the pseudo-sticky matcher if needed. An empty string means
+    // the original regexp failed (see above).
     if (sourceY && match && match.pop() === '') {
         match = null;
     }
@@ -3490,6 +3515,7 @@ XRegExp.exec = function(str, regex, pos, sticky) {
  * string and continue until the end, regardless of the state of the regex's `global` property and
  * initial `lastIndex`.
  *
+ * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp} regex Regex to search with.
  * @param {Function} callback Function to execute for each match. Invoked with four arguments:
@@ -3529,6 +3555,7 @@ XRegExp.forEach = function(str, regex, callback) {
  * `XRegExp.prototype` properties, and has a fresh `lastIndex` property (set to zero). Native
  * regexes are not recompiled using XRegExp syntax.
  *
+ * @memberOf XRegExp
  * @param {RegExp} regex Regex to globalize.
  * @returns {RegExp} Copy of the provided regex with flag `g` added.
  * @example
@@ -3544,6 +3571,7 @@ XRegExp.globalize = function(regex) {
  * Installs optional features according to the specified options. Can be undone using
  * `XRegExp.uninstall`.
  *
+ * @memberOf XRegExp
  * @param {Object|String} options Options object or string.
  * @example
  *
@@ -3574,6 +3602,7 @@ XRegExp.install = function(options) {
 /**
  * Checks whether an individual optional feature is installed.
  *
+ * @memberOf XRegExp
  * @param {String} feature Name of the feature to check. One of:
  *   <li>`astral`
  *   <li>`natives`
@@ -3590,6 +3619,7 @@ XRegExp.isInstalled = function(feature) {
  * Returns `true` if an object is a regex; `false` if it isn't. This works correctly for regexes
  * created in another frame, when `instanceof` and `constructor` checks would fail.
  *
+ * @memberOf XRegExp
  * @param {*} value Object to check.
  * @returns {Boolean} Whether the object is a `RegExp` object.
  * @example
@@ -3611,6 +3641,7 @@ XRegExp.isRegExp = function(value) {
  * and an empty array instead of `null` when no matches are found in match-all mode). It also lets
  * you override flag g and ignore `lastIndex`, and fixes browser bugs.
  *
+ * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp} regex Regex to search with.
  * @param {String} [scope='one'] Use 'one' to return the first match as a string. Use 'all' to
@@ -3666,6 +3697,7 @@ XRegExp.match = function(str, regex, scope) {
  * `regex` and `backref` properties. When a backreference is specified, the named or numbered
  * backreference is passed forward to the next regex or returned.
  *
+ * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {Array} chain Regexes that each search for matches within preceding results.
  * @returns {Array} Matches by the last regex in the chain, or an empty array.
@@ -3727,6 +3759,7 @@ XRegExp.matchChain = function(str, chain) {
  * functions can use named backreferences via `arguments[0].name`. Also fixes browser bugs compared
  * to the native `String.prototype.replace` and can be used reliably cross-browser.
  *
+ * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp|String} search Search pattern to be replaced.
  * @param {String|Function} replacement Replacement string or a function invoked to create it.
@@ -3806,6 +3839,7 @@ XRegExp.replace = function(str, search, replacement, scope) {
  * replacement string or function, and an optional scope of 'one' or 'all'. Uses the XRegExp
  * replacement text syntax, which supports named backreference properties via `${name}`.
  *
+ * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {Array} replacements Array of replacement detail arrays.
  * @returns {String} New string with all replacements.
@@ -3840,6 +3874,7 @@ XRegExp.replaceEach = function(str, replacements) {
  * Fixes browser bugs compared to the native `String.prototype.split` and can be used reliably
  * cross-browser.
  *
+ * @memberOf XRegExp
  * @param {String} str String to split.
  * @param {RegExp|String} separator Regex or string to use for separating the string.
  * @param {Number} [limit] Maximum number of items to include in the result array.
@@ -3869,6 +3904,7 @@ XRegExp.split = function(str, separator, limit) {
  * updated for compatibility. Also fixes browser bugs compared to the native
  * `RegExp.prototype.test` and can be used reliably cross-browser.
  *
+ * @memberOf XRegExp
  * @param {String} str String to search.
  * @param {RegExp} regex Regex to search with.
  * @param {Number} [pos=0] Zero-based index at which to start the search.
@@ -3893,6 +3929,7 @@ XRegExp.test = function(str, regex, pos, sticky) {
  * Uninstalls optional features according to the specified options. All optional features start out
  * uninstalled, so this is used to undo the actions of `XRegExp.install`.
  *
+ * @memberOf XRegExp
  * @param {Object|String} options Options object or string.
  * @example
  *
@@ -3927,6 +3964,7 @@ XRegExp.uninstall = function(options) {
  * the larger combined pattern. Native flags used by provided regexes are ignored in favor of the
  * `flags` argument.
  *
+ * @memberOf XRegExp
  * @param {Array} patterns Regexes and strings to combine.
  * @param {String} [flags] Any combination of XRegExp flags.
  * @returns {RegExp} Union of the provided regexes and strings.
@@ -3993,6 +4031,7 @@ XRegExp.union = function(patterns, flags) {
  * bugs in the native `RegExp.prototype.exec`. Calling `XRegExp.install('natives')` uses this to
  * override the native method. Use via `XRegExp.exec` without overriding natives.
  *
+ * @memberOf RegExp
  * @param {String} str String to search.
  * @returns {Array} Match array with named backreference properties, or `null`.
  */
@@ -4054,6 +4093,7 @@ fixed.exec = function(str) {
  * Fixes browser bugs in the native `RegExp.prototype.test`. Calling `XRegExp.install('natives')`
  * uses this to override the native method.
  *
+ * @memberOf RegExp
  * @param {String} str String to search.
  * @returns {Boolean} Whether the regex matched the provided value.
  */
@@ -4067,6 +4107,7 @@ fixed.test = function(str) {
  * bugs in the native `String.prototype.match`. Calling `XRegExp.install('natives')` uses this to
  * override the native method.
  *
+ * @memberOf String
  * @param {RegExp|*} regex Regex to search with. If not a regex object, it is passed to `RegExp`.
  * @returns {Array} If `regex` uses flag g, an array of match strings or `null`. Without flag g,
  *   the result of calling `regex.exec(this)`.
@@ -4097,6 +4138,7 @@ fixed.match = function(regex) {
  * that this doesn't support SpiderMonkey's proprietary third (`flags`) argument. Use via
  * `XRegExp.replace` without overriding natives.
  *
+ * @memberOf String
  * @param {RegExp|String} search Search pattern to be replaced.
  * @param {String|Function} replacement Replacement string or a function invoked to create it.
  * @returns {String} New string with one or all matches replaced.
@@ -4228,6 +4270,7 @@ fixed.replace = function(search, replacement) {
  * Fixes browser bugs in the native `String.prototype.split`. Calling `XRegExp.install('natives')`
  * uses this to override the native method. Use via `XRegExp.split` without overriding natives.
  *
+ * @memberOf String
  * @param {RegExp|String} separator Regex or string to use for separating the string.
  * @param {Number} [limit] Maximum number of items to include in the result array.
  * @returns {Array} Array of substrings.

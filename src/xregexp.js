@@ -160,6 +160,7 @@ function clipDuplicates(str) {
  *   <li>`isInternalOnly` {Boolean} Whether the copied regex will be used only for internal
  *     operations, and never exposed to users. For internal-only regexes, we can improve perf by
  *     skipping some operations like attaching `XRegExp.prototype` properties.
+ *   <li>`source` {String} Overrides `<regex>.source`, for special cases.
  * @returns {RegExp} Copy of the provided regex, possibly with modified flags.
  */
 function copyRegex(regex, options) {
@@ -822,15 +823,14 @@ XRegExp.exec = function(str, regex, pos, sticky) {
     if (addY) {
         cacheKey += 'y';
     } else if (sticky) {
-        // Simulate sticky matching by appending an empty capture to the original regexp.
-        // The resulting regexp will succeed no matter what at the current index (set with
-        // `lastIndex`), it will not search the rest of the subject string. We'll know that
-        // the original regexp has failed if that last capture is not `undefined`.
+        // Simulate sticky matching by appending an empty capture to the original regex. The
+        // resulting regex will succeed no matter what at the current index (set with `lastIndex`),
+        // and will not search the rest of the subject string. We'll know that the original regex
+        // has failed if that last capture is `''` rather than `undefined` (i.e., if that last
+        // capture participated in the match).
         sourceY = regex.source + '|()';
         cacheKey += 'FakeY';
     }
-
-
 
     regex[REGEX_DATA] = regex[REGEX_DATA] || {};
 
@@ -845,13 +845,14 @@ XRegExp.exec = function(str, regex, pos, sticky) {
         })
     );
 
-    r2.lastIndex = pos = pos || 0;
+    pos = pos || 0;
+    r2.lastIndex = pos;
 
     // Fixed `exec` required for `lastIndex` fix, named backreferences, etc.
     match = fixed.exec.call(r2, str);
 
-    // Get rid of the capture added by the pseudo-sticky matcher if needed. An empty string
-    // means the original regexp failed (see above)
+    // Get rid of the capture added by the pseudo-sticky matcher if needed. An empty string means
+    // the original regexp failed (see above).
     if (sourceY && match && match.pop() === '') {
         match = null;
     }
