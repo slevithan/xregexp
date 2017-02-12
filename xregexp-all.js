@@ -3503,7 +3503,7 @@ XRegExp.exec = function(str, regex, pos, sticky) {
         match = null;
     }
 
-    if (regex.global) {
+    if (regex.global || regex.sticky && sticky !== false) {
         regex.lastIndex = match ? r2.lastIndex : 0;
     }
 
