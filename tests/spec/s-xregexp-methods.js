@@ -260,7 +260,7 @@ describe('XRegExp.exec()', function() {
         expect(XRegExp.exec('abcxdef', /(a)/)).toEqualMatch(['a', 'a']);
     });
 
-    it('should not modify the lastIndex of a nonglobal regex', function() {
+    it('should not modify the lastIndex of a nonglobal, non-sticky regex', function() {
         var regexX = /x/;
         var str = 'abcxdef';
         XRegExp.exec(str, regexX);
@@ -306,6 +306,60 @@ describe('XRegExp.exec()', function() {
 
         expect(regex.lastIndex).toBe(0);
     });
+
+    if (hasNativeY) {
+        it('should not modify the lastIndex of a sticky regex when exec is invoked in explicitly non-sticky mode', function() {
+            var regexX = new RegExp('x', 'y');
+            var str = 'abcxdef';
+            XRegExp.exec(str, regexX, 0, false);
+
+            expect(regexX.lastIndex).toBe(0);
+
+            regexX.lastIndex = 5;
+            XRegExp.exec(str, regexX, 0, false);
+
+            expect(regexX.lastIndex).toBe(5);
+
+            var regexZ = new RegExp('z', 'y');
+            regexZ.lastIndex = 5;
+            XRegExp.exec(str, regexZ, 0, false);
+
+            expect(regexZ.lastIndex).toBe(5);
+        });
+
+        it('should set the lastIndex of a sticky regex to the end position of a successful match', function() {
+            var regex1 = new RegExp('x', 'y');
+            XRegExp.exec('abcxdef', regex1, 3);
+
+            expect(regex1.lastIndex).toBe(4);
+
+            var regex2 = new RegExp('x', 'y');
+            XRegExp.exec('abcxdef', regex2, 3, 'sticky');
+
+            expect(regex2.lastIndex).toBe(4);
+        });
+
+        it('should set the lastIndex of a sticky regex to 0 after a failed match', function() {
+            var regexZ = new RegExp('z', 'y');
+            regexZ.lastIndex = 1;
+            XRegExp.exec('abcxdef', regexZ);
+
+            expect(regexZ.lastIndex).toBe(0);
+
+            var regexX = new RegExp('x', 'y');
+            regexX.lastIndex = 1;
+            XRegExp.exec('abcxdef', regexX, 2, 'sticky');
+
+            expect(regexX.lastIndex).toBe(0);
+        });
+
+        it('should not increment the lastIndex of a sticky regex after a zero-length match', function() {
+            var regex = new RegExp('', 'y');
+            XRegExp.exec('abc', regex);
+
+            expect(regex.lastIndex).toBe(0);
+        });
+    }
 
     it('should convert any nonstring subject to a string', function() {
         var values = [
