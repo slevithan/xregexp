@@ -22,10 +22,10 @@
   "scripts": {
     "build": "browserify src/index.js --standalone XRegExp > xregexp-all.js",
     "pretest": "npm run build",
-    "test": "opener tests/index.html"
+    "test": "jasmine JASMINE_CONFIG_PATH=tests/jasmine.json"
   },
   "devDependencies": {
     "browserify": "^12.0.1",
-    "opener": "^1.4.2"
+    "jasmine": "^2.5.3"
   }
 }
