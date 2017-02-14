@@ -1552,9 +1552,7 @@ fixed.replace = function(search, replacement) {
                     // 1. Backreference to numbered capture, if `n` is an integer. Use `0` for the
                     //    entire match. Any number of leading zeros may be used.
                     // 2. Backreference to named capture `n`, if it exists and is not an integer
-                    //    overridden by numbered capture. In practice, this does not overlap with
-                    //    numbered capture since XRegExp does not allow named capture to use a bare
-                    //    integer as the name.
+                    //    overridden by numbered capture.
                     // 3. If the name or number does not refer to an existing capturing group, it's
                     //    an error.
                     n = +$1; // Type-convert; drop leading zeros
@@ -1841,17 +1839,23 @@ XRegExp.addToken(
 
 /*
  * Named capturing group; match the opening delimiter only: `(?<name>`. Capture names can use the
- * characters A-Z, a-z, 0-9, _, and $ only. Names can't be integers. Supports Python-style
- * `(?P<name>` as an alternate syntax to avoid issues in some older versions of Opera which natively
- * supported the Python-style syntax. Otherwise, XRegExp might treat numbered backreferences to
- * Python-style named capture as octals.
+ * characters A-Z, a-z, 0-9, _, and $ only. Names can be positive integers if explicit capture is
+ * enabled. Supports Python-style `(?P<name>` as an alternate syntax to avoid issues in some older
+ * versions of Opera which natively supported the Python-style syntax. Otherwise, XRegExp might
+ * treat numbered backreferences to Python-style named capture as octals.
  */
 XRegExp.addToken(
     /\(\?P?<([\w$]+)>/,
-    function(match) {
-        // Disallow bare integers as names because named backreferences are added to match arrays
-        // and therefore numeric properties may lead to incorrect lookups
-        if (!isNaN(match[1])) {
+    function(match, scope, flags) {
+        // Disallow nonpositive bare integers as names because named backreferences are added to
+        // match arrays and therefore numeric properties may lead to incorrect lookups.
+        //
+        // However, if explicit capture is enabled, allow positive bare integers to be used. This
+        // makes it easier to do transformations like the following without breaking code that
+        // assumes $1 can be used in a replacement:
+        // From: /(?:not captured) (captured)/
+        // To: XRegExp('(?n)(not captured) (?<1>captured)')
+        if (!isNaN(match[1]) && (Number(match[1]) <= 0 || flags.indexOf('n') < 0)) {
             throw new SyntaxError('Cannot use integer as capture name ' + match[0]);
         }
         if (match[1] === 'length' || match[1] === '__proto__') {
