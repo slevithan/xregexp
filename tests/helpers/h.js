@@ -1,22 +1,28 @@
+if (typeof global === 'undefined') {
+    global = window;
+} else {
+    global.XRegExp = require('../../xregexp-all');
+}
+
 // Ensure that all opt-in features are disabled when each spec starts
 beforeEach(function() {
     XRegExp.uninstall('natives astral');
 });
 
 // Repeat a string the specified number of times
-function repeat(str, num) {
+global.repeat = function (str, num) {
     return Array(num + 1).join(str);
 }
 
 // Property name used for extended regex instance data
-var REGEX_DATA = 'xregexp';
+global.REGEX_DATA = 'xregexp';
 
 // Check for ES6 `u` flag support
-var hasNativeU = XRegExp._hasNativeFlag('u');
+global.hasNativeU = XRegExp._hasNativeFlag('u');
 // Check for ES6 `y` flag support
-var hasNativeY = XRegExp._hasNativeFlag('y');
+global.hasNativeY = XRegExp._hasNativeFlag('y');
 // Check for strict mode support
-var hasStrictMode = (function() {'use strict'; return !this;}());
+global.hasStrictMode = (function() {'use strict'; return !this;}());
 
 // Add the complete ES5 Array.prototype.forEach shim from <https://github.com/kriskowal/es5-shim>.
 // Commented out the `if (i in self)` sparse array check because it causes this to skip keys with
