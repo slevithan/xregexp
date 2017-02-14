@@ -409,6 +409,14 @@ describe('XRegExp()', function() {
                 expect(function() {XRegExp('(?<234>)');}).toThrowError(SyntaxError);
             });
 
+            it('should allow positive bare integers as capture names if explicit capture is enabled', function() {
+                expect(function() {XRegExp('(?n)(?<0>)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?n)(?<1>)');}).not.toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?n)(?<234>)');}).not.toThrowError(SyntaxError);
+
+                expect(XRegExp.replace('abc', XRegExp('(?n)(?<1>abc)'), '$1$1')).toEqual('abcabc');
+            });
+
             it('should throw an exception if reserved words are used as capture names', function() {
                 // Only these names are reserved
                 ['length', '__proto__'].forEach(function(name) {
