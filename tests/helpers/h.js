@@ -5,9 +5,9 @@ if (typeof global === 'undefined') {
 }
 
 // Ensure that all opt-in features are disabled when each spec starts
-beforeEach(function() {
+global.disableOptInFeatures = function() {
     XRegExp.uninstall('natives astral');
-});
+}
 
 // Repeat a string the specified number of times
 global.repeat = function (str, num) {

@@ -1,3 +1,8 @@
+beforeEach(function() {
+    global.disableOptInFeatures();
+    global.addToEqualMatchMatcher();
+});
+
 describe('XRegExp.matchRecursive addon:', function() {
 
     describe('XRegExp.matchRecursive()', function() {

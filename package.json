@@ -24,10 +24,13 @@
   "scripts": {
     "build": "browserify src/index.js --standalone XRegExp > xregexp-all.js",
     "pretest": "npm run build",
-    "test": "jasmine JASMINE_CONFIG_PATH=tests/jasmine.json"
+    "test": "jasmine JASMINE_CONFIG_PATH=tests/jasmine.json",
+    "test-saucelabs": "npm run pretest && zuul tests/spec/*.js",
+    "test-browser": "npm run test-saucelabs -- --local --open"
   },
   "devDependencies": {
     "browserify": "^12.0.1",
-    "jasmine": "^2.5.3"
+    "jasmine": "^2.5.3",
+    "zuul": "^3.11.1"
   }
 }
