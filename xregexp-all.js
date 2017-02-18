@@ -39,22 +39,24 @@ module.exports = function(XRegExp) {
     }
 
     /**
-     * Converts the provided value to an XRegExp. Native RegExp flags are not preserved.
+     * Converts the provided value to an XRegExp. Native RegExp flags are not preserved. Flags can
+     * be provided as a separate argument.
      *
      * @private
      * @param {String|RegExp} value Value to convert.
+     * @param {String} [flags] Any combination of XRegExp flags.
      * @returns {RegExp} XRegExp object with XRegExp syntax applied.
      */
-    function asXRegExp(value) {
+    function asXRegExp(value, flags) {
         return XRegExp.isRegExp(value) ?
             (value[REGEX_DATA] && value[REGEX_DATA].captureNames ?
                 // Don't recompile, to preserve capture names
                 value :
                 // Recompile as XRegExp
-                XRegExp(value.source)
+                XRegExp(value.source, flags)
             ) :
             // Compile string as XRegExp
-            XRegExp(value);
+            XRegExp(value, flags);
     }
 
     /**
@@ -120,7 +122,7 @@ module.exports = function(XRegExp) {
 
         // Passing to XRegExp dies on octals and ensures the outer pattern is independently valid;
         // helps keep this simple. Named captures will be put back
-        pattern = asXRegExp(pattern);
+        pattern = asXRegExp(pattern, flags);
         outerCapNames = pattern[REGEX_DATA].captureNames || [];
         pattern = pattern.source.replace(parts, function($0, $1, $2, $3, $4) {
             var subName = $1 || $2,
