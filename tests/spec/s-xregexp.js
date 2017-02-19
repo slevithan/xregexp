@@ -182,6 +182,19 @@ describe('XRegExp()', function() {
         expect(function() {XRegExp('(\\(?:)');}).not.toThrow();
     });
 
+    it('should not put (?:) at beginning/end of groups', function() {
+        var regex = XRegExp('( [0-9]{4} ) -?  # year  \n' +
+                            '( [0-9]{2} ) -?  # month \n' +
+                            '( [0-9]{2} )     # day     ', 'x');
+        expect(regex.source).toEqual('([0-9]{4})(?:)-?(?:)([0-9]{2})(?:)-?(?:)([0-9]{2})(?:)');
+    });
+
+    it('should leave escaped (?:) at end of group', function() {
+        var regex = XRegExp('(.(\\(?:))');
+        expect(regex.test('x:')).toBe(true);
+        expect(regex.test('x(:')).toBe(true);
+    });
+
     it('should store named capture data on regex instances', function() {
         // The `captureNames` property is undocumented, so this is technically just testing
         // implementation details. However, any changes to this need to be very intentional
