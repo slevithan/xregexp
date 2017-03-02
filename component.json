@@ -1,0 +1,15 @@
+{
+    "name": "xregexp",
+    "version": "3.0.0-pre",
+    "license": "MIT",
+    "description": "Extended regular expressions",
+    "keywords": [
+        "regex",
+        "regexp"
+    ],
+    "repo": "slevithan/xregexp",
+    "main": "./xregexp-all.js",
+    "scripts": ["./xregexp-all.js"],
+    "dependencies": {},
+    "development": {}
+}
