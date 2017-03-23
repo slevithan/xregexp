@@ -38,22 +38,24 @@ module.exports = function(XRegExp) {
     }
 
     /**
-     * Converts the provided value to an XRegExp. Native RegExp flags are not preserved.
+     * Converts the provided value to an XRegExp. Native RegExp flags are not preserved. Flags can
+     * be provided as a separate argument.
      *
      * @private
      * @param {String|RegExp} value Value to convert.
+     * @param {String} [flags] Any combination of XRegExp flags.
      * @returns {RegExp} XRegExp object with XRegExp syntax applied.
      */
-    function asXRegExp(value) {
+    function asXRegExp(value, flags) {
         return XRegExp.isRegExp(value) ?
             (value[REGEX_DATA] && value[REGEX_DATA].captureNames ?
                 // Don't recompile, to preserve capture names
                 value :
                 // Recompile as XRegExp
-                XRegExp(value.source)
+                XRegExp(value.source, flags)
             ) :
             // Compile string as XRegExp
-            XRegExp(value);
+            XRegExp(value, flags);
     }
 
     /**
@@ -83,6 +85,13 @@ module.exports = function(XRegExp) {
      */
     XRegExp.build = function(pattern, subs, flags) {
         var inlineFlags = /^\(\?([\w$]+)\)/.exec(pattern),
+            // These flags will be passed to the asXRegExp calls for `pattern` and for every
+            // subpattern in `subs`. This is to work around the following browser bugs:
+            //
+            // * Firefox converts '\n' to a regex that contains the literal characters \ and n
+            //   You can verify this by running `console.log(RegExp('\n').source)`
+            //   See here for more details: https://github.com/slevithan/xregexp/pull/163
+            asXRegExpFlags = (flags || '').indexOf('x') > -1 ? 'x' : '',
             data = {},
             numCaps = 0, // 'Caps' is short for captures
             numPriorCaps,
@@ -107,7 +116,7 @@ module.exports = function(XRegExp) {
                 // lest an unescaped `(`, `)`, `[`, or trailing `\` breaks the `(?:)` wrapper. For
                 // subpatterns provided as native regexes, it dies on octals and adds the property
                 // used to hold extended regex instance data, for simplicity
-                sub = asXRegExp(subs[p]);
+                sub = asXRegExp(subs[p], asXRegExpFlags);
                 data[p] = {
                     // Deanchoring allows embedding independently useful anchored regexes. If you
                     // really need to keep your anchors, double them (i.e., `^^...$$`)
@@ -119,7 +128,7 @@ module.exports = function(XRegExp) {
 
         // Passing to XRegExp dies on octals and ensures the outer pattern is independently valid;
         // helps keep this simple. Named captures will be put back
-        pattern = asXRegExp(pattern);
+        pattern = asXRegExp(pattern, asXRegExpFlags);
         outerCapNames = pattern[REGEX_DATA].captureNames || [];
         pattern = pattern.source.replace(parts, function($0, $1, $2, $3, $4) {
             var subName = $1 || $2,
