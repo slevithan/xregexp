@@ -86,6 +86,12 @@ module.exports = function(XRegExp) {
      */
     XRegExp.build = function(pattern, subs, flags) {
         var inlineFlags = /^\(\?([\w$]+)\)/.exec(pattern),
+            // These flags will be passed to the asXRegExp calls for `pattern` and for every
+            // subpattern in `subs`. This is to work around the following browser bugs:
+            //
+            // * Firefox converts '\n' to a regex that contains the literal characters \ and n
+            //   You can verify this by running `console.log(RegExp('\n').source)`
+            //   See here for more details: https://github.com/slevithan/xregexp/pull/163
             asXRegExpFlags = (flags || '').indexOf('x') > -1 ? 'x' : '',
             data = {},
             numCaps = 0, // 'Caps' is short for captures
