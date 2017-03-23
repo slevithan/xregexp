@@ -10,6 +10,7 @@ describe('XRegExp.build addon:', function() {
 
         it('should ignore newlines when "x" flag is passed', function() {
             expect(XRegExp.build("\n", {}, 'x').test('')).toBe(true);
+            expect(XRegExp.build("{{sub}}", {sub: "\n"}, "x").test('')).toBe(true);
         });
 
         it('should apply a mode modifier with a native flag in the outer pattern to the final result', function() {
