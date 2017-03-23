@@ -85,6 +85,7 @@ module.exports = function(XRegExp) {
      */
     XRegExp.build = function(pattern, subs, flags) {
         var inlineFlags = /^\(\?([\w$]+)\)/.exec(pattern),
+            asXRegExpFlags = (flags || '').indexOf('x') > -1 ? 'x' : '',
             data = {},
             numCaps = 0, // 'Caps' is short for captures
             numPriorCaps,
@@ -109,7 +110,7 @@ module.exports = function(XRegExp) {
                 // lest an unescaped `(`, `)`, `[`, or trailing `\` breaks the `(?:)` wrapper. For
                 // subpatterns provided as native regexes, it dies on octals and adds the property
                 // used to hold extended regex instance data, for simplicity
-                sub = asXRegExp(subs[p]);
+                sub = asXRegExp(subs[p], asXRegExpFlags);
                 data[p] = {
                     // Deanchoring allows embedding independently useful anchored regexes. If you
                     // really need to keep your anchors, double them (i.e., `^^...$$`)
@@ -121,7 +122,7 @@ module.exports = function(XRegExp) {
 
         // Passing to XRegExp dies on octals and ensures the outer pattern is independently valid;
         // helps keep this simple. Named captures will be put back
-        pattern = asXRegExp(pattern, flags);
+        pattern = asXRegExp(pattern, asXRegExpFlags);
         outerCapNames = pattern[REGEX_DATA].captureNames || [];
         pattern = pattern.source.replace(parts, function($0, $1, $2, $3, $4) {
             var subName = $1 || $2,
