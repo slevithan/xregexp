@@ -645,6 +645,7 @@ XRegExp.version = '3.1.1-next';
 // ==--------------------------==
 
 // Intentionally undocumented; used in tests and addons
+XRegExp._clipDuplicates = clipDuplicates;
 XRegExp._hasNativeFlag = hasNativeFlag;
 XRegExp._dec = dec;
 XRegExp._hex = hex;
