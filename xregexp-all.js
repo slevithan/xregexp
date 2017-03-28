@@ -4426,7 +4426,10 @@ XRegExp.addToken(
     function(match, scope, flags) {
         // Keep tokens separated unless the following token is a quantifier. This avoids e.g.
         // inadvertedly changing `\1(?#)1` to `\11`.
-        return isQuantifierNext(match.input, match.index + match[0].length, flags) ?
+        return (
+            match.input.charAt(match.index - 1) === '(' ||
+            isQuantifierNext(match.input, match.index + match[0].length, flags) ||
+            isPatternNext(match.input, match.index + match[0].length, flags, '\\)')) ?
             '' : '(?:)';
     },
     {leadChar: '('}
@@ -4440,7 +4443,10 @@ XRegExp.addToken(
     function(match, scope, flags) {
         // Keep tokens separated unless the following token is a quantifier. This avoids e.g.
         // inadvertedly changing `\1 1` to `\11`.
-        return isQuantifierNext(match.input, match.index + match[0].length, flags) ?
+        return (
+            match.input.charAt(match.index - 1) === '(' ||
+            isQuantifierNext(match.input, match.index + match[0].length, flags) ||
+            isPatternNext(match.input, match.index + match[0].length, flags, '\\)')) ?
             '' : '(?:)';
     },
     {flag: 'x'}
