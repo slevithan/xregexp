@@ -2959,12 +2959,16 @@ function isType(value, type) {
  * @returns {Boolean} Whether the next token is a quantifier.
  */
 function isQuantifierNext(pattern, pos, flags) {
+    var inlineCommentPattern = '\\(\\?#[^)]*\\)';
+    var lineCommentPattern = '#[^#\\n]*';
+    var quantifierPattern = '[?*+]|{\\d+(?:,\\d*)?}';
+    var patternsToIgnore = flags.indexOf('x') > -1 ?
+        // Ignore any leading whitespace, line comments, and inline comments
+        ['\\s', lineCommentPattern, inlineCommentPattern] :
+        // Ignore any leading inline comments
+        [inlineCommentPattern];
     return nativ.test.call(
-        flags.indexOf('x') > -1 ?
-            // Ignore any leading whitespace, line comments, and inline comments
-            /^(?:\s|#[^#\n]*|\(\?#[^)]*\))*(?:[?*+]|{\d+(?:,\d*)?})/ :
-            // Ignore any leading inline comments
-            /^(?:\(\?#[^)]*\))*(?:[?*+]|{\d+(?:,\d*)?})/,
+        RegExp('^(?:' + patternsToIgnore.join('|') + ')*(?:' + quantifierPattern + ')'),
         pattern.slice(pos)
     );
 }
