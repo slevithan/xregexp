@@ -2959,16 +2959,31 @@ function isType(value, type) {
  * @returns {Boolean} Whether the next token is a quantifier.
  */
 function isQuantifierNext(pattern, pos, flags) {
+    var quantifierPattern = '[?*+]|{\\d+(?:,\\d*)?}';
+    return isPatternNext(pattern, pos, flags, quantifierPattern);
+}
+
+/**
+ * Checks whether the next nonignorable token after the specified position matches the
+ * `needlePattern`
+ *
+ * @private
+ * @param {String} pattern Pattern to search within.
+ * @param {Number} pos Index in `pattern` to search at.
+ * @param {String} flags Flags used by the pattern.
+ * @param {String} needlePattern Pattern to match the next token against.
+ * @returns {Boolean} Whether the next token matches `needlePattern`
+ */
+function isPatternNext(pattern, pos, flags, needlePattern) {
     var inlineCommentPattern = '\\(\\?#[^)]*\\)';
     var lineCommentPattern = '#[^#\\n]*';
-    var quantifierPattern = '[?*+]|{\\d+(?:,\\d*)?}';
     var patternsToIgnore = flags.indexOf('x') > -1 ?
         // Ignore any leading whitespace, line comments, and inline comments
         ['\\s', lineCommentPattern, inlineCommentPattern] :
         // Ignore any leading inline comments
         [inlineCommentPattern];
     return nativ.test.call(
-        RegExp('^(?:' + patternsToIgnore.join('|') + ')*(?:' + quantifierPattern + ')'),
+        RegExp('^(?:' + patternsToIgnore.join('|') + ')*(?:' + needlePattern + ')'),
         pattern.slice(pos)
     );
 }
