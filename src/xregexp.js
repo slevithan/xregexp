@@ -332,7 +332,7 @@ function isPatternNext(pattern, pos, flags, needlePattern) {
         // Ignore any leading inline comments
         [inlineCommentPattern];
     return nativ.test.call(
-        RegExp('^(?:' + patternsToIgnore.join('|') + ')*(?:' + needlePattern + ')'),
+        new RegExp('^(?:' + patternsToIgnore.join('|') + ')*(?:' + needlePattern + ')'),
         pattern.slice(pos)
     );
 }
