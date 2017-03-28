@@ -4423,15 +4423,7 @@ XRegExp.addToken(
  */
 XRegExp.addToken(
     /\(\?#[^)]*\)/,
-    function(match, scope, flags) {
-        // Keep tokens separated unless the following token is a quantifier. This avoids e.g.
-        // inadvertedly changing `\1(?#)1` to `\11`.
-        return (
-            match.input.charAt(match.index - 1) === '(' ||
-            isQuantifierNext(match.input, match.index + match[0].length, flags) ||
-            isPatternNext(match.input, match.index + match[0].length, flags, '\\)')) ?
-            '' : '(?:)';
-    },
+    getCommentOrWhitespaceSeparator,
     {leadChar: '('}
 );
 
@@ -4440,17 +4432,31 @@ XRegExp.addToken(
  */
 XRegExp.addToken(
     /\s+|#[^\n]*\n?/,
-    function(match, scope, flags) {
-        // Keep tokens separated unless the following token is a quantifier. This avoids e.g.
-        // inadvertedly changing `\1 1` to `\11`.
-        return (
-            match.input.charAt(match.index - 1) === '(' ||
-            isQuantifierNext(match.input, match.index + match[0].length, flags) ||
-            isPatternNext(match.input, match.index + match[0].length, flags, '\\)')) ?
-            '' : '(?:)';
-    },
+    getCommentOrWhitespaceSeparator,
     {flag: 'x'}
 );
+
+/**
+ * Returns a pattern that can be used in a native RegExp instead of a comment or whitespace.
+ * Depending on the context of the match, this can be either '' or '(?:)'.
+ *
+ * @private
+ * @param {String} match Match object for inline comments, whitespace, or line comments
+ * @param {String} scope (unused)
+ * @param {String} flags Flags used in the match
+ * @returns {String} Either '' or '(?:)', depending on which is needed in the context of the match.
+ */
+function getCommentOrWhitespaceSeparator (match, scope, flags) {
+    return (
+        // Keep tokens separated unless the following token is a quantifier. This avoids e.g.
+        // inadvertedly changing `\1 1` or `\1(?#)1` to `\11`
+        isQuantifierNext(match.input, match.index + match[0].length, flags) ||
+        // If the match is at the beginning or end of a group,
+        // we don't need to insert an empty non-capturing group.
+        match.input.charAt(match.index - 1) === '(' ||
+        isPatternNext(match.input, match.index + match[0].length, flags, '\\)')) ?
+        '' : '(?:)';
+}
 
 /*
  * Dot, in dotall mode (aka singleline mode, flag s) only.
