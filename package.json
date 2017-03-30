@@ -17,7 +17,8 @@
   ],
   "main": "./src/index.js",
   "files": [
-    "src"
+    "src",
+    "xregexp-all.js"
   ],
   "scripts": {
     "build": "browserify src/index.js --standalone XRegExp > xregexp-all.js",
