@@ -15,10 +15,11 @@
     "regular expression",
     "unicode"
   ],
-  "main": "./src/index.js",
+  "main": "xregexp-all.js",
   "files": [
     "src",
-    "xregexp-all.js"
+    "xregexp-all.js",
+    "LICENSE"
   ],
   "scripts": {
     "build": "browserify src/index.js --standalone XRegExp > xregexp-all.js",
