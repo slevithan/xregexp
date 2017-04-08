@@ -72,10 +72,6 @@ function hasNativeFlag(flag) {
     } catch (exception) {
         isSupported = false;
     }
-    if (isSupported && flag === 'y') {
-        // Work around Safari 9.1.1 bug
-        return new RegExp('aa|.', 'y').test('b');
-    }
     return isSupported;
 }
 // Check for ES6 `u` flag support
