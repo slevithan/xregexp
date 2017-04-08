@@ -101,7 +101,7 @@ module.exports = function(XRegExp) {
             // Using `XRegExp.union` safely rewrites backreferences in `left` and `right`
             esc = new RegExp(
                 '(?:' + escapeChar + '[\\S\\s]|(?:(?!' +
-                    XRegExp.union([left, right]).source +
+                    XRegExp.union([left, right], basicFlags, {conjunction: 'or'}).source +
                     ')[^' + escapeChar + '])+)+',
                 // Flags `gy` not needed here
                 flags.replace(/[^imu]+/g, '')
