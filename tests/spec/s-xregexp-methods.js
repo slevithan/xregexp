@@ -1693,21 +1693,33 @@ describe('XRegExp.union()', function() {
 
     it('should set default conjunction to "or"', function() {
         var regex = XRegExp.union([/man/, /bear/, /pig/], 'i');
-        expect('man'.match(regex)).toEqualMatch(['man']);
-        expect('bear'.match(regex)).toEqualMatch(['bear']);
-        expect('pig'.match(regex)).toEqualMatch(['pig']);
+        expect(regex.test('man')).toBe(true);
+        expect(regex.test('bear')).toBe(true);
+        expect(regex.test('pig')).toBe(true);
     });
 
     it('should allow setting conjunction to "or"', function() {
         var regex = XRegExp.union([/man/, /bear/, /pig/], 'i', {conjunction: 'or'});
-        expect('man'.match(regex)).toEqualMatch(['man']);
-        expect('bear'.match(regex)).toEqualMatch(['bear']);
-        expect('pig'.match(regex)).toEqualMatch(['pig']);
+        expect(regex.test('man')).toBe(true);
+        expect(regex.test('bear')).toBe(true);
+        expect(regex.test('pig')).toBe(true);
     });
 
     it('should allow setting conjunction to "none"', function() {
         var regex = XRegExp.union([/man/, /bear/, /pig/], 'i', {conjunction: 'none'});
-        expect('manbearpig'.match(regex)).toEqualMatch(['manbearpig']);
+        expect(regex.test('man')).toBe(false);
+        expect(regex.test('bear')).toBe(false);
+        expect(regex.test('pig')).toBe(false);
+        expect(regex.test('manbearpig')).toBe(true);
+    });
+
+    it('should rewrite backreferences when using conjunction "none"', function() {
+        var regex = XRegExp.union([/(dogs)\1/, /(cats)\1/], '', {conjunction: 'none'});
+        expect(regex.exec('dogsdogscatscats')).toEqualMatch([
+            'dogsdogscatscats',
+            'dogs',
+            'cats'
+        ]);
     });
 
     it('should throw an exception when the same group name appears in separate regexes', function() {

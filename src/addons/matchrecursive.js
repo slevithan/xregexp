@@ -98,10 +98,18 @@ module.exports = function(XRegExp) {
                 throw new Error('Cannot use more than one escape character');
             }
             escapeChar = XRegExp.escape(escapeChar);
-            // Using `XRegExp.union` safely rewrites backreferences in `left` and `right`
+            // Example of concatenated `esc` regex:
+            // `escapeChar`: '%'
+            // `left`: '<'
+            // `right`: '>'
+            // Regex is: /(?:%[\S\s]|(?:(?!<|>)[^%])+)+/
             esc = new RegExp(
                 '(?:' + escapeChar + '[\\S\\s]|(?:(?!' +
-                    XRegExp.union([left, right], basicFlags, {conjunction: 'or'}).source +
+                    // Using `XRegExp.union` safely rewrites backreferences in `left` and `right`.
+                    // Intentionally not passing `basicFlags` to `XRegExp.union` since any syntax
+                    // transformation resulting from those flags was already applied to `left` and
+                    // `right` when they were passed through the XRegExp constructor above.
+                    XRegExp.union([left, right], '', {conjunction: 'or'}).source +
                     ')[^' + escapeChar + '])+)+',
                 // Flags `gy` not needed here
                 flags.replace(/[^imu]+/g, '')

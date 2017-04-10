@@ -1332,7 +1332,6 @@ XRegExp.uninstall = function(options) {
 XRegExp.union = function(patterns, flags, options) {
     options = options || {};
     var conjunction = options.conjunction || 'or';
-
     var numCaptures = 0;
     var numPriorCaptures;
     var captureNames;
