@@ -1,7 +1,7 @@
 /*!
  * XRegExp Unicode Base 3.1.1-next
  * <xregexp.com>
- * Steven Levithan (c) 2008-2016 MIT License
+ * Steven Levithan (c) 2008-2017 MIT License
  */
 
 module.exports = function(XRegExp) {

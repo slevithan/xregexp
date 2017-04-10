@@ -212,7 +212,7 @@ require({paths: {xregexp: 'xregexp-all'}}, ['xregexp'], function(XRegExp) {
 
 ## About
 
-XRegExp copyright 2007-2016 by [Steven Levithan](http://stevenlevithan.com/).
+XRegExp copyright 2007-2017 by [Steven Levithan](http://stevenlevithan.com/).
 
 Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/), and adapted from his [unicode-data](https://github.com/mathiasbynens/unicode-data) project. Uses [Jasmine](http://jasmine.github.io/) for unit tests, and [Benchmark.js](http://benchmarkjs.com) for performance tests. `XRegExp.build` inspired by [RegExp.create](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/) by [Lea Verou](http://lea.verou.me/). `XRegExp.union` inspired by [Ruby](http://www.ruby-lang.org/). XRegExp's syntax extensions and flags come from [Perl](http://www.perl.org/), [.NET](http://www.microsoft.com/net), etc.
 

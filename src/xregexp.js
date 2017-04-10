@@ -1,7 +1,7 @@
 /*!
  * XRegExp 3.1.1-next
  * <xregexp.com>
- * Steven Levithan (c) 2007-2016 MIT License
+ * Steven Levithan (c) 2007-2017 MIT License
  */
 
 'use strict';
