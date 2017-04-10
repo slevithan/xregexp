@@ -1318,13 +1318,21 @@ XRegExp.uninstall = function(options) {
  * @memberOf XRegExp
  * @param {Array} patterns Regexes and strings to combine.
  * @param {String} [flags] Any combination of XRegExp flags.
+ * @param {Object} [options] Options object with optional properties:
+ *   <li>`conjunction` {String} Type of conjunction to use: 'or' (default) or 'none'.
  * @returns {RegExp} Union of the provided regexes and strings.
  * @example
  *
  * XRegExp.union(['a+b*c', /(dogs)\1/, /(cats)\1/], 'i');
  * // -> /a\+b\*c|(dogs)\1|(cats)\2/i
+ *
+ * XRegExp.union([/man/, /bear/, /pig/], 'i', {conjunction: 'none'});
+ * // -> /manbearpig/i
  */
-XRegExp.union = function(patterns, flags) {
+XRegExp.union = function(patterns, flags, options) {
+    options = options || {};
+    var conjunction = options.conjunction || 'or';
+
     var numCaptures = 0;
     var numPriorCaptures;
     var captureNames;
@@ -1370,7 +1378,8 @@ XRegExp.union = function(patterns, flags) {
         }
     }
 
-    return XRegExp(output.join('|'), flags);
+    var separator = conjunction === 'none' ? '' : '|';
+    return XRegExp(output.join(separator), flags);
 };
 
 // ==--------------------------==

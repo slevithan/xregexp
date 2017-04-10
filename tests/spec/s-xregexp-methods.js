@@ -1691,6 +1691,25 @@ describe('XRegExp.union()', function() {
         expect(XRegExp.union([/x/g]).global).toBe(false);
     });
 
+    it('should set default conjunction to "or"', function() {
+        var regex = XRegExp.union([/man/, /bear/, /pig/], 'i');
+        expect('man'.match(regex)).toEqualMatch(['man']);
+        expect('bear'.match(regex)).toEqualMatch(['bear']);
+        expect('pig'.match(regex)).toEqualMatch(['pig']);
+    });
+
+    it('should allow setting conjunction to "or"', function() {
+        var regex = XRegExp.union([/man/, /bear/, /pig/], 'i', {conjunction: 'or'});
+        expect('man'.match(regex)).toEqualMatch(['man']);
+        expect('bear'.match(regex)).toEqualMatch(['bear']);
+        expect('pig'.match(regex)).toEqualMatch(['pig']);
+    });
+
+    it('should allow setting conjunction to "none"', function() {
+        var regex = XRegExp.union([/man/, /bear/, /pig/], 'i', {conjunction: 'none'});
+        expect('manbearpig'.match(regex)).toEqualMatch(['manbearpig']);
+    });
+
     it('should throw an exception when the same group name appears in separate regexes', function() {
         expect(function() {XRegExp.union([
             XRegExp('(?<pet>dogs)\\k<pet>'),
