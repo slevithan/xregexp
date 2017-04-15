@@ -126,10 +126,10 @@ module.exports = function(XRegExp) {
         var outerCapsMap = [0];
         var outerCapNames = patternAsRegex[REGEX_DATA].captureNames || [];
         var output = patternAsRegex.source.replace(parts, function($0, $1, $2, $3, $4) {
-            var subName = $1 || $2,
-                capName,
-                intro,
-                localCapIndex;
+            var subName = $1 || $2;
+            var capName;
+            var intro;
+            var localCapIndex;
             // Named subpattern
             if (subName) {
                 if (!data.hasOwnProperty(subName)) {
