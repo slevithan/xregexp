@@ -272,10 +272,8 @@ module.exports = function(XRegExp) {
         options = options || {};
         var global = flags.indexOf('g') > -1;
         var sticky = flags.indexOf('y') > -1;
-
         // Flag `y` is controlled internally
         var basicFlags = flags.replace(/y/g, '');
-
         var escapeChar = options.escapeChar;
         var vN = options.valueNames;
         var output = [];
@@ -4468,7 +4466,6 @@ XRegExp.addToken(
     function(match) {
         // Groups with the same name is an error, else would need `lastIndexOf`
         var index = isNaN(match[1]) ? (indexOf(this.captureNames, match[1]) + 1) : +match[1];
-
         var endIndex = match.index + match[0].length;
         if (!index || index > this.captureNames.length) {
             throw new SyntaxError('Backreference to undefined group ' + match[0]);

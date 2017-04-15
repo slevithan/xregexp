@@ -76,10 +76,8 @@ module.exports = function(XRegExp) {
         options = options || {};
         var global = flags.indexOf('g') > -1;
         var sticky = flags.indexOf('y') > -1;
-
         // Flag `y` is controlled internally
         var basicFlags = flags.replace(/y/g, '');
-
         var escapeChar = options.escapeChar;
         var vN = options.valueNames;
         var output = [];
