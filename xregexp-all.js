@@ -127,10 +127,10 @@ module.exports = function(XRegExp) {
         var outerCapsMap = [0];
         var outerCapNames = patternAsRegex[REGEX_DATA].captureNames || [];
         var output = patternAsRegex.source.replace(parts, function($0, $1, $2, $3, $4) {
-            var subName = $1 || $2,
-                capName,
-                intro,
-                localCapIndex;
+            var subName = $1 || $2;
+            var capName;
+            var intro;
+            var localCapIndex;
             // Named subpattern
             if (subName) {
                 if (!data.hasOwnProperty(subName)) {
@@ -270,22 +270,22 @@ module.exports = function(XRegExp) {
     XRegExp.matchRecursive = function(str, left, right, flags, options) {
         flags = flags || '';
         options = options || {};
-        var global = flags.indexOf('g') > -1,
-            sticky = flags.indexOf('y') > -1,
-            // Flag `y` is controlled internally
-            basicFlags = flags.replace(/y/g, ''),
-            escapeChar = options.escapeChar,
-            vN = options.valueNames,
-            output = [],
-            openTokens = 0,
-            delimStart = 0,
-            delimEnd = 0,
-            lastOuterEnd = 0,
-            outerStart,
-            innerStart,
-            leftMatch,
-            rightMatch,
-            esc;
+        var global = flags.indexOf('g') > -1;
+        var sticky = flags.indexOf('y') > -1;
+        // Flag `y` is controlled internally
+        var basicFlags = flags.replace(/y/g, '');
+        var escapeChar = options.escapeChar;
+        var vN = options.valueNames;
+        var output = [];
+        var openTokens = 0;
+        var delimStart = 0;
+        var delimEnd = 0;
+        var lastOuterEnd = 0;
+        var outerStart;
+        var innerStart;
+        var leftMatch;
+        var rightMatch;
+        var esc;
         left = XRegExp(left, basicFlags);
         right = XRegExp(right, basicFlags);
 
@@ -2822,12 +2822,12 @@ function copyRegex(regex, options) {
         throw new TypeError('Type RegExp expected');
     }
 
-    var xData = regex[REGEX_DATA] || {},
-        flags = getNativeFlags(regex),
-        flagsToAdd = '',
-        flagsToRemove = '',
-        xregexpSource = null,
-        xregexpFlags = null;
+    var xData = regex[REGEX_DATA] || {};
+    var flags = getNativeFlags(regex);
+    var flagsToAdd = '';
+    var flagsToRemove = '';
+    var xregexpSource = null;
+    var xregexpFlags = null;
 
     options = options || {};
 
@@ -2929,7 +2929,8 @@ function hex(dec) {
  * @returns {Number} Zero-based index at which the item is found, or -1.
  */
 function indexOf(array, value) {
-    var len = array.length, i;
+    var len = array.length;
+    var i;
 
     for (i = 0; i < len; ++i) {
         if (array[i] === value) {
@@ -3074,11 +3075,11 @@ function registerFlag(flag) {
  * @returns {Object} Object with properties `matchLength`, `output`, and `reparse`; or `null`.
  */
 function runTokens(pattern, flags, pos, scope, context) {
-    var i = tokens.length,
-        leadChar = pattern.charAt(pos),
-        result = null,
-        match,
-        t;
+    var i = tokens.length;
+    var leadChar = pattern.charAt(pos);
+    var result = null;
+    var match;
+    var t;
 
     // Run in reverse insertion order
     while (i--) {
@@ -3356,7 +3357,8 @@ XRegExp._pad4 = pad4;
  */
 XRegExp.addToken = function(regex, handler, options) {
     options = options || {};
-    var optionalFlags = options.optionalFlags, i;
+    var optionalFlags = options.optionalFlags;
+    var i;
 
     if (options.flag) {
         registerFlag(options.flag);
@@ -3468,11 +3470,11 @@ XRegExp.escape = function(str) {
  * // result -> ['2', '3', '4']
  */
 XRegExp.exec = function(str, regex, pos, sticky) {
-    var cacheKey = 'g',
-        addY = false,
-        fakeY = false,
-        match,
-        r2;
+    var cacheKey = 'g';
+    var addY = false;
+    var fakeY = false;
+    var match;
+    var r2;
 
     addY = hasNativeY && !!(sticky || (regex.sticky && sticky !== false));
     if (addY) {
@@ -3542,9 +3544,9 @@ XRegExp.exec = function(str, regex, pos, sticky) {
  * // evens -> [2, 4]
  */
 XRegExp.forEach = function(str, regex, callback) {
-    var pos = 0,
-        i = -1,
-        match;
+    var pos = 0;
+    var i = -1;
+    var match;
 
     while ((match = XRegExp.exec(str, regex, pos))) {
         // Because `regex` is provided to `callback`, the function could use the deprecated/
@@ -3671,10 +3673,10 @@ XRegExp.isRegExp = function(value) {
  * XRegExp.match('abc', /x/, 'all'); // -> []
  */
 XRegExp.match = function(str, regex, scope) {
-    var global = (regex.global && scope !== 'one') || scope === 'all',
-        cacheKey = ((global ? 'g' : '') + (regex.sticky ? 'y' : '')) || 'noGY',
-        result,
-        r2;
+    var global = (regex.global && scope !== 'one') || scope === 'all';
+    var cacheKey = ((global ? 'g' : '') + (regex.sticky ? 'y' : '')) || 'noGY';
+    var result;
+    var r2;
 
     regex[REGEX_DATA] = regex[REGEX_DATA] || {};
 
@@ -3808,11 +3810,11 @@ XRegExp.matchChain = function(str, chain) {
  * // -> 'XRegExp builds XRegExps'
  */
 XRegExp.replace = function(str, search, replacement, scope) {
-    var isRegex = XRegExp.isRegExp(search),
-        global = (search.global && scope !== 'one') || scope === 'all',
-        cacheKey = ((global ? 'g' : '') + (search.sticky ? 'y' : '')) || 'noGY',
-        s2 = search,
-        result;
+    var isRegex = XRegExp.isRegExp(search);
+    var global = (search.global && scope !== 'one') || scope === 'all';
+    var cacheKey = ((global ? 'g' : '') + (search.sticky ? 'y' : '')) || 'noGY';
+    var s2 = search;
+    var result;
 
     if (isRegex) {
         search[REGEX_DATA] = search[REGEX_DATA] || {};
@@ -3866,7 +3868,8 @@ XRegExp.replace = function(str, search, replacement, scope) {
  * ]);
  */
 XRegExp.replaceEach = function(str, replacements) {
-    var i, r;
+    var i;
+    var r;
 
     for (i = 0; i < replacements.length; ++i) {
         r = replacements[i];
@@ -4053,11 +4056,11 @@ XRegExp.union = function(patterns, flags, options) {
  * @returns {Array} Match array with named backreference properties, or `null`.
  */
 fixed.exec = function(str) {
-    var origLastIndex = this.lastIndex,
-        match = nativ.exec.apply(this, arguments),
-        name,
-        r2,
-        i;
+    var origLastIndex = this.lastIndex;
+    var match = nativ.exec.apply(this, arguments);
+    var name;
+    var r2;
+    var i;
 
     if (match) {
         // Fix browsers whose `exec` methods don't return `undefined` for nonparticipating capturing
@@ -4071,7 +4074,8 @@ fixed.exec = function(str) {
             // Using `str.slice(match.index)` rather than `match[0]` in case lookahead allowed
             // matching due to characters outside the match
             nativ.replace.call(String(str).slice(match.index), r2, function() {
-                var len = arguments.length, i;
+                var len = arguments.length;
+                var i;
                 // Skip index 0 and the last 2
                 for (i = 1; i < len - 2; ++i) {
                     if (arguments[i] === undefined) {
@@ -4161,10 +4165,10 @@ fixed.match = function(regex) {
  * @returns {String} New string with one or all matches replaced.
  */
 fixed.replace = function(search, replacement) {
-    var isRegex = XRegExp.isRegExp(search),
-        origLastIndex,
-        captureNames,
-        result;
+    var isRegex = XRegExp.isRegExp(search);
+    var origLastIndex;
+    var captureNames;
+    var result;
 
     if (isRegex) {
         if (search[REGEX_DATA]) {
@@ -4181,7 +4185,8 @@ fixed.replace = function(search, replacement) {
         // Stringifying `this` fixes a bug in IE < 9 where the last argument in replacement
         // functions isn't type-converted to a string
         result = nativ.replace.call(String(this), search, function() {
-            var args = arguments, i;
+            var args = arguments;
+            var i;
             if (captureNames) {
                 // Change the `arguments[0]` string primitive to a `String` object that can store
                 // properties. This really does need to use `String` as a constructor
@@ -4298,11 +4303,11 @@ fixed.split = function(separator, limit) {
         return nativ.split.apply(this, arguments);
     }
 
-    var str = String(this),
-        output = [],
-        origLastIndex = separator.lastIndex,
-        lastLastIndex = 0,
-        lastLength;
+    var str = String(this);
+    var output = [];
+    var origLastIndex = separator.lastIndex;
+    var lastLastIndex = 0;
+    var lastLength;
 
     // Values for `limit`, per the spec:
     // If undefined: pow(2,32) - 1
@@ -4460,8 +4465,8 @@ XRegExp.addToken(
     /\\k<([\w$]+)>/,
     function(match) {
         // Groups with the same name is an error, else would need `lastIndexOf`
-        var index = isNaN(match[1]) ? (indexOf(this.captureNames, match[1]) + 1) : +match[1],
-            endIndex = match.index + match[0].length;
+        var index = isNaN(match[1]) ? (indexOf(this.captureNames, match[1]) + 1) : +match[1];
+        var endIndex = match.index + match[0].length;
         if (!index || index > this.captureNames.length) {
             throw new SyntaxError('Backreference to undefined group ' + match[0]);
         }
