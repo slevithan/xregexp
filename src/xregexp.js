@@ -149,14 +149,14 @@ function clipDuplicates(str) {
  * @private
  * @param {RegExp} regex Regex to copy.
  * @param {Object} [options] Options object with optional properties:
- *   <li>`addG` {Boolean} Add flag g while copying the regex.
- *   <li>`addY` {Boolean} Add flag y while copying the regex.
- *   <li>`removeG` {Boolean} Remove flag g while copying the regex.
- *   <li>`removeY` {Boolean} Remove flag y while copying the regex.
- *   <li>`isInternalOnly` {Boolean} Whether the copied regex will be used only for internal
+ *   - `addG` {Boolean} Add flag g while copying the regex.
+ *   - `addY` {Boolean} Add flag y while copying the regex.
+ *   - `removeG` {Boolean} Remove flag g while copying the regex.
+ *   - `removeY` {Boolean} Remove flag y while copying the regex.
+ *   - `isInternalOnly` {Boolean} Whether the copied regex will be used only for internal
  *     operations, and never exposed to users. For internal-only regexes, we can improve perf by
  *     skipping some operations like attaching `XRegExp.prototype` properties.
- *   <li>`source` {String} Overrides `<regex>.source`, for special cases.
+ *   - `source` {String} Overrides `<regex>.source`, for special cases.
  * @returns {RegExp} Copy of the provided regex, possibly with modified flags.
  */
 function copyRegex(regex, options) {
@@ -507,16 +507,16 @@ function toObject(value) {
  * @param {String|RegExp} pattern Regex pattern string, or an existing regex object to copy.
  * @param {String} [flags] Any combination of flags.
  *   Native flags:
- *     <li>`g` - global
- *     <li>`i` - ignore case
- *     <li>`m` - multiline anchors
- *     <li>`u` - unicode (ES6)
- *     <li>`y` - sticky (Firefox 3+, ES6)
+ *     - `g` - global
+ *     - `i` - ignore case
+ *     - `m` - multiline anchors
+ *     - `u` - unicode (ES6)
+ *     - `y` - sticky (Firefox 3+, ES6)
  *   Additional XRegExp flags:
- *     <li>`n` - explicit capture
- *     <li>`s` - dot matches all (aka singleline)
- *     <li>`x` - free-spacing and line comments (aka extended)
- *     <li>`A` - astral (requires the Unicode Base addon)
+ *     - `n` - explicit capture
+ *     - `s` - dot matches all (aka singleline)
+ *     - `x` - free-spacing and line comments (aka extended)
+ *     - `A` - astral (requires the Unicode Base addon)
  *   Flags cannot be provided when constructing one `RegExp` from another.
  * @returns {RegExp} Extended regular expression object.
  * @example
@@ -656,22 +656,22 @@ XRegExp._pad4 = pad4;
  * @param {Function} handler Function that returns a new pattern string (using native regex syntax)
  *   to replace the matched token within all future XRegExp regexes. Has access to persistent
  *   properties of the regex being built, through `this`. Invoked with three arguments:
- *   <li>The match array, with named backreference properties.
- *   <li>The regex scope where the match was found: 'default' or 'class'.
- *   <li>The flags used by the regex, including any flags in a leading mode modifier.
+ *   - The match array, with named backreference properties.
+ *   - The regex scope where the match was found: 'default' or 'class'.
+ *   - The flags used by the regex, including any flags in a leading mode modifier.
  *   The handler function becomes part of the XRegExp construction process, so be careful not to
  *   construct XRegExps within the function or you will trigger infinite recursion.
  * @param {Object} [options] Options object with optional properties:
- *   <li>`scope` {String} Scope where the token applies: 'default', 'class', or 'all'.
- *   <li>`flag` {String} Single-character flag that triggers the token. This also registers the
+ *   - `scope` {String} Scope where the token applies: 'default', 'class', or 'all'.
+ *   - `flag` {String} Single-character flag that triggers the token. This also registers the
  *     flag, which prevents XRegExp from throwing an 'unknown flag' error when the flag is used.
- *   <li>`optionalFlags` {String} Any custom flags checked for within the token `handler` that are
+ *   - `optionalFlags` {String} Any custom flags checked for within the token `handler` that are
  *     not required to trigger the token. This registers the flags, to prevent XRegExp from
  *     throwing an 'unknown flag' error when any of the flags are used.
- *   <li>`reparse` {Boolean} Whether the `handler` function's output should not be treated as
+ *   - `reparse` {Boolean} Whether the `handler` function's output should not be treated as
  *     final, and instead be reparseable by other tokens (including the current token). Allows
  *     token chaining or deferring.
- *   <li>`leadChar` {String} Single character that occurs at the beginning of any successful match
+ *   - `leadChar` {String} Single character that occurs at the beginning of any successful match
  *     of the token (not always applicable). This doesn't change the behavior of the token unless
  *     you provide an erroneous value. However, providing it can increase the token's performance
  *     since the token can be skipped at any positions where this character doesn't appear.
@@ -870,10 +870,10 @@ XRegExp.exec = function(str, regex, pos, sticky) {
  * @param {String} str String to search.
  * @param {RegExp} regex Regex to search with.
  * @param {Function} callback Function to execute for each match. Invoked with four arguments:
- *   <li>The match array, with named backreference properties.
- *   <li>The zero-based match index.
- *   <li>The string being traversed.
- *   <li>The regex object being used to traverse the string.
+ *   - The match array, with named backreference properties.
+ *   - The zero-based match index.
+ *   - The string being traversed.
+ *   - The regex object being used to traverse the string.
  * @example
  *
  * // Extracts every other digit from a string
@@ -955,8 +955,8 @@ XRegExp.install = function(options) {
  *
  * @memberOf XRegExp
  * @param {String} feature Name of the feature to check. One of:
- *   <li>`astral`
- *   <li>`natives`
+ *   - `astral`
+ *   - `natives`
  * @returns {Boolean} Whether the feature is installed.
  * @example
  *
@@ -1115,20 +1115,20 @@ XRegExp.matchChain = function(str, chain) {
  * @param {RegExp|String} search Search pattern to be replaced.
  * @param {String|Function} replacement Replacement string or a function invoked to create it.
  *   Replacement strings can include special replacement syntax:
- *     <li>$$ - Inserts a literal $ character.
- *     <li>$&, $0 - Inserts the matched substring.
- *     <li>$` - Inserts the string that precedes the matched substring (left context).
- *     <li>$' - Inserts the string that follows the matched substring (right context).
- *     <li>$n, $nn - Where n/nn are digits referencing an existent capturing group, inserts
+ *     - $$ - Inserts a literal $ character.
+ *     - $&, $0 - Inserts the matched substring.
+ *     - $` - Inserts the string that precedes the matched substring (left context).
+ *     - $' - Inserts the string that follows the matched substring (right context).
+ *     - $n, $nn - Where n/nn are digits referencing an existent capturing group, inserts
  *       backreference n/nn.
- *     <li>${n} - Where n is a name or any number of digits that reference an existent capturing
+ *     - ${n} - Where n is a name or any number of digits that reference an existent capturing
  *       group, inserts backreference n.
  *   Replacement functions are invoked with three or more arguments:
- *     <li>The matched substring (corresponds to $& above). Named backreferences are accessible as
+ *     - The matched substring (corresponds to $& above). Named backreferences are accessible as
  *       properties of this first argument.
- *     <li>0..n arguments, one for each backreference (corresponding to $1, $2, etc. above).
- *     <li>The zero-based index of the match within the total search string.
- *     <li>The total string being searched.
+ *     - 0..n arguments, one for each backreference (corresponding to $1, $2, etc. above).
+ *     - The zero-based index of the match within the total search string.
+ *     - The total string being searched.
  * @param {String} [scope='one'] Use 'one' to replace the first match only, or 'all'. If not
  *   explicitly specified and using a regex with flag g, `scope` is 'all'.
  * @returns {String} New string with one or all matches replaced.
@@ -1319,7 +1319,7 @@ XRegExp.uninstall = function(options) {
  * @param {Array} patterns Regexes and strings to combine.
  * @param {String} [flags] Any combination of XRegExp flags.
  * @param {Object} [options] Options object with optional properties:
- *   <li>`conjunction` {String} Type of conjunction to use: 'or' (default) or 'none'.
+ *   - `conjunction` {String} Type of conjunction to use: 'or' (default) or 'none'.
  * @returns {RegExp} Union of the provided regexes and strings.
  * @example
  *
