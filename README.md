@@ -1,25 +1,26 @@
-[XRegExp](http://xregexp.com/) 3.1.1 [![Build Status](https://travis-ci.org/slevithan/xregexp.svg?branch=master)](https://travis-ci.org/slevithan/xregexp)
-====================================
+# XRegExp 3.1.1-next
 
-XRegExp provides augmented (and extensible) JavaScript regular expressions. You get new modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your client-side grepping and parsing easier, while freeing you from worrying about pesky aspects of JavaScript regexes like cross-browser inconsistencies or manually manipulating `lastIndex`.
+[xregexp.com](http://xregexp.com/) :: [![Build Status](https://travis-ci.org/slevithan/xregexp.svg?branch=master)](https://travis-ci.org/slevithan/xregexp)
 
-XRegExp supports all native ES6 regular expression syntax. It supports Internet Explorer 5.5+, Firefox 1.5+, Chrome, Safari 3+, and Opera 11+. You can also use it with Node.js or as a RequireJS module.
+XRegExp provides augmented (and extensible) JavaScript regular expressions. You get modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your grepping and parsing easier, while freeing you from JavaScript regex annoyances like cross-browser inconsistencies or manual `lastIndex` updates.
+
+XRegExp supports all native ES6 regular expression syntax. It supports Internet Explorer 5.5+, Firefox 1.5+, Chrome, Safari 3+, and Opera 11+. You can use it with Node.js or as a RequireJS module.
 
 ## Performance
 
-XRegExp regexes compile to native `RegExp` objects, and therefore perform just as fast as native regular expressions. There is a tiny extra cost when compiling a pattern for the first time.
+XRegExp compiles to native `RegExp` objects. Therefore regexes built with XRegExp perform just as fast as native regular expressions. There is a tiny extra cost when compiling a pattern for the first time.
 
 ## Usage examples
 
 ```js
 // Using named capture and flag x (free-spacing and line comments)
-var date = XRegExp('(?<year>  [0-9]{4} ) -?  # year  \n\
-                    (?<month> [0-9]{2} ) -?  # month \n\
-                    (?<day>   [0-9]{2} )     # day   ', 'x');
+var date = XRegExp(`(?<year>  [0-9]{4} ) -?  # year
+                    (?<month> [0-9]{2} ) -?  # month
+                    (?<day>   [0-9]{2} )     # day`, 'x');
 
 // XRegExp.exec gives you named backreferences on the match result
-var match = XRegExp.exec('2015-02-22', date);
-match.year; // -> '2015'
+var match = XRegExp.exec('2017-02-22', date);
+match.year; // -> '2017'
 
 // It also includes optional pos and sticky arguments
 var pos = 3;
@@ -31,31 +32,31 @@ while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d+)>/, pos, 'sticky')) {
 // result -> ['2', '3', '4']
 
 // XRegExp.replace allows named backreferences in replacements
-XRegExp.replace('2015-02-22', date, '${month}/${day}/${year}');
-// -> '02/22/2015'
-XRegExp.replace('2015-02-22', date, function(match) {
+XRegExp.replace('2017-02-22', date, '${month}/${day}/${year}');
+// -> '02/22/2017'
+XRegExp.replace('2017-02-22', date, (match) => {
     return match.month + '/' + match.day + '/' + match.year;
 });
-// -> '02/22/2015'
+// -> '02/22/2017'
 
-// In fact, XRegExps compile to RegExps and work perfectly with native methods
-date.test('2015-02-22');
+// XRegExps compile to RegExps and work perfectly with native methods
+date.test('2017-02-22');
 // -> true
 
 // The only caveat is that named captures must be referenced using numbered
 // backreferences if used with native methods
-'2015-02-22'.replace(date, '$2/$3/$1');
-// -> '02/22/2015'
+'2017-02-22'.replace(date, '$2/$3/$1');
+// -> '02/22/2017'
 
-// Extract every other digit from a string using XRegExp.forEach
+// Use XRegExp.forEach to extract every other digit from a string
 var evens = [];
-XRegExp.forEach('1a2345', /\d/, function(match, i) {
+XRegExp.forEach('1a2345', /\d/, (match, i) => {
     if (i % 2) evens.push(+match[0]);
 });
 // evens -> [2, 4]
 
-// Get numbers within <b> tags using XRegExp.matchChain
-XRegExp.matchChain('1 <b>2</b> 3 <b>4 a 56</b>', [
+// Use XRegExp.matchChain to get numbers within <b> tags
+XRegExp.matchChain('1 <b>2</b> 3 <B>4 \n 56</B>', [
     XRegExp('(?is)<b>.*?</b>'),
     /\d+/
 ]);
@@ -71,11 +72,11 @@ XRegExp.matchChain(html, [
 // -> ['xregexp.com', 'www.google.com']
 
 // Merge strings and regexes into a single pattern with updated backreferences
-XRegExp.union(['a+b*c', /(dog)\1/, /(cat)\1/], 'i');
+XRegExp.union(['a+b*c', /(dog)\1/, /(cat)\1/], 'i', {conjunction: 'or'});
 // -> /a\+b\*c|(dog)\1|(cat)\2/i
 ```
 
-These examples give the flavor of what's possible, but XRegExp has more syntax, flags, methods, options, and browser fixes that aren't shown here. You can even augment XRegExp's regular expression syntax with addons (see below) or write your own. See [xregexp.com](http://xregexp.com/) for details.
+These examples give the flavor of what's possible, but XRegExp has more syntax, flags, methods, options, and browser fixes that aren't shown here. You can also augment XRegExp's regular expression syntax with addons (see below) or write your own. See [xregexp.com](http://xregexp.com/) for details.
 
 ## Addons
 
@@ -99,7 +100,7 @@ XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
 XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
 ```
 
-By default, `\p{…}` and `\P{…}` support the Basic Multilingual Plane (i.e. code points up to `U+FFFF`). You can opt-in to full 21-bit Unicode support (with code points up to `U+10FFFF`) on a per-regex basis by using flag `A`. In XRegExp, this is called *astral mode*. You can automatically add flag `A` for all new regexes by running `XRegExp.install('astral')`. When in astral mode, `\p{…}` and `\P{…}` always match a full code point rather than a code unit, using surrogate pairs for code points above `U+FFFF`.
+By default, `\p{…}` and `\P{…}` support the Basic Multilingual Plane (i.e. code points up to `U+FFFF`). You can opt-in to full 21-bit Unicode support (with code points up to `U+10FFFF`) on a per-regex basis by using flag `A`. This is called *astral mode*. You can automatically add flag `A` for all new regexes by running `XRegExp.install('astral')`. When in astral mode, `\p{…}` and `\P{…}` always match a full code point rather than a code unit, using surrogate pairs for code points above `U+FFFF`.
 
 ```js
 // Using flag A to match astral code points
@@ -205,17 +206,13 @@ var XRegExp = require('xregexp');
 In an AMD loader like [RequireJS](http://requirejs.org/):
 
 ```js
-require({paths: {xregexp: 'xregexp-all'}}, ['xregexp'], function(XRegExp) {
+require({paths: {xregexp: 'xregexp-all'}}, ['xregexp'], (XRegExp) => {
     console.log(XRegExp.version);
 });
 ```
 
 ## About
 
-XRegExp copyright 2007-2017 by [Steven Levithan](http://stevenlevithan.com/).
-
-Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/), and adapted from his [unicode-data](https://github.com/mathiasbynens/unicode-data) project. Uses [Jasmine](http://jasmine.github.io/) for unit tests, and [Benchmark.js](http://benchmarkjs.com) for performance tests. `XRegExp.build` inspired by [RegExp.create](http://lea.verou.me/2011/03/create-complex-regexps-more-easily/) by [Lea Verou](http://lea.verou.me/). `XRegExp.union` inspired by [Ruby](http://www.ruby-lang.org/). XRegExp's syntax extensions and flags come from [Perl](http://www.perl.org/), [.NET](http://www.microsoft.com/net), etc.
+XRegExp copyright 2007-2017 by [Steven Levithan](http://stevenlevithan.com/). Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/), and adapted from his [unicode-data](https://github.com/mathiasbynens/unicode-data) project. XRegExp's syntax extensions and flags come from [Perl](http://www.perl.org/), [.NET](http://www.microsoft.com/net), etc.
 
 All code, including addons, tools, and tests, is released under the terms of the [MIT License](http://mit-license.org/).
-
-Fork me to show support, fix, and extend.
