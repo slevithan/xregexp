@@ -2897,7 +2897,7 @@ function getContextualTokenSeparator(match, scope, flags) {
     if (
         // No need to separate tokens if at the beginning or end of a group
         match.input.charAt(match.index - 1) === '(' ||
-        match.input.charAt(match.index - 1 + match[0].length) === ')' ||
+        match.input.charAt(match.index + match[0].length) === ')' ||
         // Avoid separating tokens when the following token is a quantifier
         isPatternNext(match.input, match.index + match[0].length, flags, '[?*+]|{\\d+(?:,\\d*)?}')
     ) {
