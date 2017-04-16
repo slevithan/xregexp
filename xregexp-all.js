@@ -2963,12 +2963,31 @@ function isType(value, type) {
  * @returns {Boolean} Whether the next token is a quantifier.
  */
 function isQuantifierNext(pattern, pos, flags) {
+    var quantifierPattern = '[?*+]|{\\d+(?:,\\d*)?}';
+    return isPatternNext(pattern, pos, flags, quantifierPattern);
+}
+
+/**
+ * Checks whether the next nonignorable token after the specified position matches the
+ * `needlePattern`
+ *
+ * @private
+ * @param {String} pattern Pattern to search within.
+ * @param {Number} pos Index in `pattern` to search at.
+ * @param {String} flags Flags used by the pattern.
+ * @param {String} needlePattern Pattern to match the next token against.
+ * @returns {Boolean} Whether the next token matches `needlePattern`
+ */
+function isPatternNext(pattern, pos, flags, needlePattern) {
+    var inlineCommentPattern = '\\(\\?#[^)]*\\)';
+    var lineCommentPattern = '#[^#\\n]*';
+    var patternsToIgnore = flags.indexOf('x') > -1 ?
+        // Ignore any leading whitespace, line comments, and inline comments
+        ['\\s', lineCommentPattern, inlineCommentPattern] :
+        // Ignore any leading inline comments
+        [inlineCommentPattern];
     return nativ.test.call(
-        flags.indexOf('x') > -1 ?
-            // Ignore any leading whitespace, line comments, and inline comments
-            /^(?:\s|#[^#\n]*|\(\?#[^)]*\))*(?:[?*+]|{\d+(?:,\d*)?})/ :
-            // Ignore any leading inline comments
-            /^(?:\(\?#[^)]*\))*(?:[?*+]|{\d+(?:,\d*)?})/,
+        new RegExp('^(?:' + patternsToIgnore.join('|') + ')*(?:' + needlePattern + ')'),
         pattern.slice(pos)
     );
 }
@@ -4420,12 +4439,7 @@ XRegExp.addToken(
  */
 XRegExp.addToken(
     /\(\?#[^)]*\)/,
-    function(match, scope, flags) {
-        // Keep tokens separated unless the following token is a quantifier. This avoids e.g.
-        // inadvertedly changing `\1(?#)1` to `\11`.
-        return isQuantifierNext(match.input, match.index + match[0].length, flags) ?
-            '' : '(?:)';
-    },
+    getCommentOrWhitespaceSeparator,
     {leadChar: '('}
 );
 
@@ -4434,14 +4448,31 @@ XRegExp.addToken(
  */
 XRegExp.addToken(
     /\s+|#[^\n]*\n?/,
-    function(match, scope, flags) {
-        // Keep tokens separated unless the following token is a quantifier. This avoids e.g.
-        // inadvertedly changing `\1 1` to `\11`.
-        return isQuantifierNext(match.input, match.index + match[0].length, flags) ?
-            '' : '(?:)';
-    },
+    getCommentOrWhitespaceSeparator,
     {flag: 'x'}
 );
+
+/**
+ * Returns a pattern that can be used in a native RegExp instead of a comment or whitespace.
+ * Depending on the context of the match, this can be either '' or '(?:)'.
+ *
+ * @private
+ * @param {String} match Match object for inline comments, whitespace, or line comments
+ * @param {String} scope (unused)
+ * @param {String} flags Flags used in the match
+ * @returns {String} Either '' or '(?:)', depending on which is needed in the context of the match.
+ */
+function getCommentOrWhitespaceSeparator (match, scope, flags) {
+    return (
+        // Keep tokens separated unless the following token is a quantifier. This avoids e.g.
+        // inadvertedly changing `\1 1` or `\1(?#)1` to `\11`
+        isQuantifierNext(match.input, match.index + match[0].length, flags) ||
+        // If the match is at the beginning or end of a group,
+        // we don't need to insert an empty non-capturing group.
+        match.input.charAt(match.index - 1) === '(' ||
+        isPatternNext(match.input, match.index + match[0].length, flags, '\\)')) ?
+        '' : '(?:)';
+}
 
 /*
  * Dot, in dotall mode (aka singleline mode, flag s) only.
