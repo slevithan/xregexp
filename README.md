@@ -116,7 +116,7 @@ XRegExp('^\\pS$').test('💩'); // -> true
 
 Opting in to astral mode disables the use of `\p{…}` and `\P{…}` within character classes. In astral mode, use e.g. `(\pL|[0-9_])+` instead of `[\pL0-9_]+`.
 
-XRegExp uses Unicode 8.0.0.
+XRegExp uses Unicode 9.0.0.
 
 ### XRegExp.build
 
