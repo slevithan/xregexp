@@ -790,9 +790,21 @@ describe('XRegExp()', function() {
                 expect(XRegExp('^(a)()()()()()()()()()\\1#\n0$', 'x').test('aa0')).toBe(true);
             });
 
-            it('should not add atom separator (?:) at beginning and end of groups in simple cases', function() {
+            it('should not add atom separator (?:) at the beginning or end of groups in simple cases', function() {
                 expect(XRegExp('( . )', 'x').source).toBe('(.)');
                 expect(XRegExp('(#\n.#\n)', 'x').source).toBe('(.)');
+            });
+
+            it('should allow whitespace between ( and ? for special groups', function() {
+                expect(XRegExp('( ?:)', 'x').source).toBe('(?:)');
+                expect(XRegExp('( ?=)', 'x').source).toBe('(?=)');
+                expect(XRegExp('( ?!)', 'x').source).toBe('(?!)');
+            });
+
+            it('should not allow whitespace between (? and other chars for special groups', function() {
+                expect(function() {XRegExp('(? :)', 'x');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(? =)', 'x');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(? !)', 'x');}).toThrowError(SyntaxError);
             });
 
             it('should not apply within character classes', function() {

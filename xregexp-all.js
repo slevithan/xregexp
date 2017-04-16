@@ -2883,6 +2883,33 @@ function dec(hex) {
 }
 
 /**
+ * Returns a pattern that can be used in a native RegExp in place of an ignorable token such as an
+ * inline comment or whitespace with flag x. This is used directly as a token handler function
+ * passed to `XRegExp.addToken`.
+ *
+ * @private
+ * @param {String} match Match arg of `XRegExp.addToken` handler
+ * @param {String} scope Scope arg of `XRegExp.addToken` handler
+ * @param {String} flags Flags arg of `XRegExp.addToken` handler
+ * @returns {String} Either '' or '(?:)', depending on which is needed in the context of the match.
+ */
+function getContextualTokenSeparator(match, scope, flags) {
+    if (
+        // No need to separate tokens if at the beginning or end of a group
+        match.input.charAt(match.index - 1) === '(' ||
+        match.input.charAt(match.index - 1 + match[0].length) === ')' ||
+        // Avoid separating tokens when the following token is a quantifier
+        isPatternNext(match.input, match.index + match[0].length, flags, '[?*+]|{\\d+(?:,\\d*)?}')
+    ) {
+        return '';
+    }
+    // Keep tokens separated. This avoids e.g. inadvertedly changing `\1 1` or `\1(?#)1` to `\11`.
+    // This also ensures all tokens remain as discrete atoms, e.g. it avoids converting the syntax
+    // error `(? :` into `(?:`.
+    return '(?:)';
+}
+
+/**
  * Returns native `RegExp` flags used by a regex object.
  *
  * @private
@@ -2942,32 +2969,6 @@ function indexOf(array, value) {
 }
 
 /**
- * Determines whether a value is of the specified type, by resolving its internal [[Class]].
- *
- * @private
- * @param {*} value Object to check.
- * @param {String} type Type to check for, in TitleCase.
- * @returns {Boolean} Whether the object matches the type.
- */
-function isType(value, type) {
-    return toString.call(value) === '[object ' + type + ']';
-}
-
-/**
- * Checks whether the next nonignorable token after the specified position is a quantifier.
- *
- * @private
- * @param {String} pattern Pattern to search within.
- * @param {Number} pos Index in `pattern` to search at.
- * @param {String} flags Flags used by the pattern.
- * @returns {Boolean} Whether the next token is a quantifier.
- */
-function isQuantifierNext(pattern, pos, flags) {
-    var quantifierPattern = '[?*+]|{\\d+(?:,\\d*)?}';
-    return isPatternNext(pattern, pos, flags, quantifierPattern);
-}
-
-/**
  * Checks whether the next nonignorable token after the specified position matches the
  * `needlePattern`
  *
@@ -2976,7 +2977,7 @@ function isQuantifierNext(pattern, pos, flags) {
  * @param {Number} pos Index in `pattern` to search at.
  * @param {String} flags Flags used by the pattern.
  * @param {String} needlePattern Pattern to match the next token against.
- * @returns {Boolean} Whether the next token matches `needlePattern`
+ * @returns {Boolean} Whether the next nonignorable token matches `needlePattern`
  */
 function isPatternNext(pattern, pos, flags, needlePattern) {
     var inlineCommentPattern = '\\(\\?#[^)]*\\)';
@@ -2990,6 +2991,18 @@ function isPatternNext(pattern, pos, flags, needlePattern) {
         new RegExp('^(?:' + patternsToIgnore.join('|') + ')*(?:' + needlePattern + ')'),
         pattern.slice(pos)
     );
+}
+
+/**
+ * Determines whether a value is of the specified type, by resolving its internal [[Class]].
+ *
+ * @private
+ * @param {*} value Object to check.
+ * @param {String} type Type to check for, in TitleCase.
+ * @returns {Boolean} Whether the object matches the type.
+ */
+function isType(value, type) {
+    return toString.call(value) === '[object ' + type + ']';
 }
 
 /**
@@ -4439,7 +4452,7 @@ XRegExp.addToken(
  */
 XRegExp.addToken(
     /\(\?#[^)]*\)/,
-    getCommentOrWhitespaceSeparator,
+    getContextualTokenSeparator,
     {leadChar: '('}
 );
 
@@ -4448,31 +4461,9 @@ XRegExp.addToken(
  */
 XRegExp.addToken(
     /\s+|#[^\n]*\n?/,
-    getCommentOrWhitespaceSeparator,
+    getContextualTokenSeparator,
     {flag: 'x'}
 );
-
-/**
- * Returns a pattern that can be used in a native RegExp instead of a comment or whitespace.
- * Depending on the context of the match, this can be either '' or '(?:)'.
- *
- * @private
- * @param {String} match Match object for inline comments, whitespace, or line comments
- * @param {String} scope (unused)
- * @param {String} flags Flags used in the match
- * @returns {String} Either '' or '(?:)', depending on which is needed in the context of the match.
- */
-function getCommentOrWhitespaceSeparator (match, scope, flags) {
-    return (
-        // Keep tokens separated unless the following token is a quantifier. This avoids e.g.
-        // inadvertedly changing `\1 1` or `\1(?#)1` to `\11`
-        isQuantifierNext(match.input, match.index + match[0].length, flags) ||
-        // If the match is at the beginning or end of a group,
-        // we don't need to insert an empty non-capturing group.
-        match.input.charAt(match.index - 1) === '(' ||
-        isPatternNext(match.input, match.index + match[0].length, flags, '\\)')) ?
-        '' : '(?:)';
-}
 
 /*
  * Dot, in dotall mode (aka singleline mode, flag s) only.
