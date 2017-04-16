@@ -1,6 +1,6 @@
 # XRegExp 3.1.1-next
 
-[xregexp.com](http://xregexp.com/) :: [![Build Status](https://travis-ci.org/slevithan/xregexp.svg?branch=master)](https://travis-ci.org/slevithan/xregexp)
+[![Build Status](https://travis-ci.org/slevithan/xregexp.svg?branch=master)](https://travis-ci.org/slevithan/xregexp)
 
 XRegExp provides augmented (and extensible) JavaScript regular expressions. You get modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your grepping and parsing easier, while freeing you from JavaScript regex annoyances like cross-browser inconsistencies or manual `lastIndex` updates.
 
@@ -213,6 +213,8 @@ require({paths: {xregexp: 'xregexp-all'}}, ['xregexp'], (XRegExp) => {
 
 ## About
 
-XRegExp copyright 2007-2017 by [Steven Levithan](http://stevenlevithan.com/). Unicode range generators by [Mathias Bynens](http://mathiasbynens.be/), and adapted from his [unicode-data](https://github.com/mathiasbynens/unicode-data) project. XRegExp's syntax extensions and flags come from [Perl](http://www.perl.org/), [.NET](http://www.microsoft.com/net), etc.
+XRegExp copyright 2007-2017 by [Steven Levithan](http://stevenlevithan.com/). Unicode data generators by [Mathias Bynens](http://mathiasbynens.be/), adapted from [unicode-data](http://git.io/unicode). XRegExp's syntax extensions and flags come from [Perl](http://www.perl.org/), [.NET](http://www.microsoft.com/net), etc.
 
 All code, including addons, tools, and tests, is released under the terms of the [MIT License](http://mit-license.org/).
+
+Learn more at [xregexp.com](http://xregexp.com/).
