@@ -176,23 +176,16 @@ describe('XRegExp()', function() {
         }
     });
 
-    it('should allow escaped \\(?:) at end of pattern', function() {
+    it('should allow escaped (?:) at end of pattern', function() {
         // Ensuring that any cleanup routine looking for unneeded regex parts like empty groups does
         // not strip this
         expect(function() {XRegExp('(\\(?:)');}).not.toThrow();
     });
 
-    it('should not put (?:) at beginning/end of groups', function() {
-        var regex = XRegExp('( [0-9]{4} ) -?  # year  \n' +
-                            '( [0-9]{2} ) -?  # month \n' +
-                            '( [0-9]{2} )     # day     ', 'x');
-        expect(regex.source).toEqual('([0-9]{4})(?:)-?(?:)([0-9]{2})(?:)-?(?:)([0-9]{2})(?:)');
-    });
-
-    it('should leave escaped (?:) at end of group', function() {
-        var regex = XRegExp('(.(\\(?:))');
-        expect(regex.test('x:')).toBe(true);
-        expect(regex.test('x(:')).toBe(true);
+    it('should allow escaped (?:) at end of group', function() {
+        var regex = XRegExp('((\\(?:))');
+        expect(regex.test(':')).toBe(true);
+        expect(regex.test('(:')).toBe(true);
     });
 
     it('should store named capture data on regex instances', function() {
@@ -795,6 +788,11 @@ describe('XRegExp()', function() {
             it('should separate atoms', function() {
                 expect(XRegExp('^(a)()()()()()()()()()\\1 0$', 'x').test('aa0')).toBe(true);
                 expect(XRegExp('^(a)()()()()()()()()()\\1#\n0$', 'x').test('aa0')).toBe(true);
+            });
+
+            it('should not add atom separator (?:) at beginning and end of groups in simple cases', function() {
+                expect(XRegExp('( . )', 'x').source).toBe('(.)');
+                expect(XRegExp('(#\n.#\n)', 'x').source).toBe('(.)');
             });
 
             it('should not apply within character classes', function() {
