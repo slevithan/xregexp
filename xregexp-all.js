@@ -3398,9 +3398,9 @@ XRegExp.matchChain = function (str, chain) {
  * Returns a new string with one or all matches of a pattern replaced. The pattern can be a string
  * or regex, and the replacement can be a string or a function to be called for each match. To
  * perform a global search and replace, use the optional `scope` argument or include flag g if using
- * a regex. Replacement strings can use `${n}` for named and numbered backreferences. Replacement
- * functions can use named backreferences via `arguments[0].name`. Also fixes browser bugs compared
- * to the native `String.prototype.replace` and can be used reliably cross-browser.
+ * a regex. Replacement strings can use `${n}` or `$<n>` for named and numbered backreferences.
+ * Replacement functions can use named backreferences via `arguments[0].name`. Also fixes browser
+ * bugs compared to the native `String.prototype.replace` and can be used reliably cross-browser.
  *
  * @memberOf XRegExp
  * @param {String} str String to search.
@@ -3414,6 +3414,8 @@ XRegExp.matchChain = function (str, chain) {
  *     - $n, $nn - Where n/nn are digits referencing an existent capturing group, inserts
  *       backreference n/nn.
  *     - ${n} - Where n is a name or any number of digits that reference an existent capturing
+ *       group, inserts backreference n.
+ *     - $<n> - Where n is a name or any number of digits that reference an existent capturing
  *       group, inserts backreference n.
  *   Replacement functions are invoked with three or more arguments:
  *     - The matched substring (corresponds to $& above). Named backreferences are accessible as
@@ -3429,6 +3431,9 @@ XRegExp.matchChain = function (str, chain) {
  * // Regex search, using named backreferences in replacement string
  * var name = XRegExp('(?<first>\\w+) (?<last>\\w+)');
  * XRegExp.replace('John Smith', name, '${last}, ${first}');
+ * // -> 'Smith, John'
+ *
+ * XRegExp.replace('John Smith', name, '$<last>, $<first>');
  * // -> 'Smith, John'
  *
  * // Regex search, using named backreferences in replacement function
@@ -3478,7 +3483,8 @@ XRegExp.replace = function (str, search, replacement, scope) {
  * array of replacement details. Later replacements operate on the output of earlier replacements.
  * Replacement details are accepted as an array with a regex or string to search for, the
  * replacement string or function, and an optional scope of 'one' or 'all'. Uses the XRegExp
- * replacement text syntax, which supports named backreference properties via `${name}`.
+ * replacement text syntax, which supports named backreference properties via `${name}` or
+ * `$<name>`.
  *
  * @memberOf XRegExp
  * @param {String} str String to search.
@@ -3781,13 +3787,13 @@ fixed.match = function (regex) {
 };
 
 /**
- * Adds support for `${n}` tokens for named and numbered backreferences in replacement text, and
- * provides named backreferences to replacement functions as `arguments[0].name`. Also fixes browser
- * bugs in replacement text syntax when performing a replacement using a nonregex search value, and
- * the value of a replacement regex's `lastIndex` property during replacement iterations and upon
- * completion. Calling `XRegExp.install('natives')` uses this to override the native method. Note
- * that this doesn't support SpiderMonkey's proprietary third (`flags`) argument. Use via
- * `XRegExp.replace` without overriding natives.
+ * Adds support for `${n}` (or `$<n>`) tokens for named and numbered backreferences in replacement
+ * text, and provides named backreferences to replacement functions as `arguments[0].name`. Also
+ * fixes browser bugs in replacement text syntax when performing a replacement using a nonregex
+ * search value, and the value of a replacement regex's `lastIndex` property during replacement
+ * iterations and upon completion. Calling `XRegExp.install('natives')` uses this to override the
+ * native method. Note that this doesn't support SpiderMonkey's proprietary third (`flags`)
+ * argument. Use via `XRegExp.replace` without overriding natives.
  *
  * @memberOf String
  * @param {RegExp|String} search Search pattern to be replaced.
@@ -3848,7 +3854,7 @@ fixed.replace = function (search, replacement) {
                 var n;
                 // Named or numbered backreference with curly braces
                 if ($1) {
-                    // XRegExp behavior for `${n}`:
+                    // XRegExp behavior for `${n}` or `$<n>`:
                     // 1. Backreference to numbered capture, if `n` is an integer. Use `0` for the
                     //    entire match. Any number of leading zeros may be used.
                     // 2. Backreference to named capture `n`, if it exists and is not an integer
@@ -3888,9 +3894,10 @@ fixed.replace = function (search, replacement) {
                 // Else, numbered backreference without curly braces
                 $2 = +$2; // Type-convert; drop leading zero
                 // XRegExp behavior for `$n` and `$nn`:
-                // - Backrefs end after 1 or 2 digits. Use `${..}` for more digits.
+                // - Backrefs end after 1 or 2 digits. Use `${..}` or `$<..>` for more digits.
                 // - `$1` is an error if no capturing groups.
-                // - `$10` is an error if less than 10 capturing groups. Use `${1}0` instead.
+                // - `$10` is an error if less than 10 capturing groups. Use `${1}0` or `$<1>0`
+                //   instead.
                 // - `$01` is `$1` if at least one capturing group, else it's an error.
                 // - `$0` (not followed by 1-9) and `$00` are the entire match.
                 // Native behavior, for comparison:
