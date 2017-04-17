@@ -3842,7 +3842,9 @@ fixed.replace = function (search, replacement) {
         result = nativ.replace.call(this == null ? this : String(this), search, function () {
             // Keep this function's `arguments` available through closure
             var args = arguments;
-            return nativ.replace.call(String(replacement), replacementToken, function ($0, $1, $2) {
+            return nativ.replace.call(String(replacement), replacementToken, replacer);
+
+            function replacer($0, $1, $2) {
                 var n;
                 // Named or numbered backreference with curly braces
                 if ($1) {
@@ -3905,7 +3907,7 @@ fixed.replace = function (search, replacement) {
                 }
                 // `$` followed by an unsupported char is an error, unlike native JS
                 throw new SyntaxError('Invalid token ' + $0);
-            });
+            }
         });
     }
 
