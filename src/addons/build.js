@@ -62,6 +62,30 @@ module.exports = function(XRegExp) {
     }
 
     /**
+     * Provides a tag function for building regexes using template literals [1]. See GitHub issue
+     * 103 for discussion [2].
+     *
+     * [1]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#Tagged_template_literals
+     * [2]: https://github.com/slevithan/xregexp/issues/103
+     */
+    XRegExp.tag = function (flags) {
+        return function tag (literals /*, ...substitutions */) {
+            var substitutions = [].slice.call(arguments, 1);
+            var subpatterns = substitutions.concat('').map(interpolate);
+            var pattern = literals.raw.map(embedSubpatternAfter).join('');
+            return XRegExp.build(pattern, subpatterns, flags);
+        };
+
+        function interpolate (substitution) {
+            return substitution instanceof RegExp ? substitution : XRegExp.escape(substitution);
+        }
+
+        function embedSubpatternAfter (raw, subpatternIndex) {
+            return raw + '{{' + subpatternIndex + '}}';
+        }
+    };
+
+    /**
      * Builds regexes using named subpatterns, for readability and pattern reuse. Backreferences in
      * the outer pattern and provided subpatterns are automatically renumbered to work correctly.
      * Native flags used by provided subpatterns are ignored in favor of the `flags` argument.
