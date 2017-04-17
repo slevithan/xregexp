@@ -1,5 +1,81 @@
 describe('XRegExp.build addon:', function() {
 
+    describe('XRegExp.tag()', function() {
+
+        it('should escape the metacharacters of interpolated strings', function() {
+            var inner = '.html'
+            var re = XRegExp.tag()`^index${inner}$`;
+
+            expect(re.test('index.html')).toBe(true);
+            expect(re.test('index-html')).toBe(false);
+        });
+
+        it('should rewrite the backreferences of interpolated regexes', function() {
+            var inner = /(.)\1/;
+            var re = XRegExp.tag()`^${inner}${inner}$`;
+
+            expect(re.test('aabb')).toBe(true);
+            expect(re.test('aaba')).toBe(false);
+        });
+
+        it('should treat interpolated strings as atomic tokens', function() {
+            var inner = 'ab';
+            var re = XRegExp.tag()`^${inner}+$`;
+
+            expect(re.test('abab')).toBe(true);
+            expect(re.test('abb')).toBe(false);
+        });
+
+        it('should treat interpolated regexes as atomic tokens', function() {
+            var inner = /ab/;
+            var re = XRegExp.tag()`^${inner}+$`;
+
+            expect(re.test('abab')).toBe(true);
+            expect(re.test('abb')).toBe(false);
+        });
+
+        it('should support the "x" flag', function() {
+            var inner = /ab/;
+            var re = XRegExp.tag('x')`
+                ^
+                ${inner}
+                +
+                $
+            `;
+
+            expect(re.test('abab')).toBe(true);
+            expect(re.test('abb')).toBe(false);
+        });
+
+        it('should support the "n" flag', function() {
+            var inner = XRegExp('(unnamed), (?<name>named)');
+            var re = XRegExp.tag('n')`${inner}`;
+
+            expect(re.exec('unnamed, named')[1]).toBe('named');
+        });
+
+        it('should support the "g" flag', function() {
+            var inner = 'a';
+            var re = XRegExp.tag('g')`${inner}`;
+
+            expect('aaa'.match(re)).toEqual(['a', 'a', 'a']);
+        });
+
+        it('should allow `false` to be interpolated', function() {
+            var inner = false;
+            var re = XRegExp.tag()`^${inner}$`;
+
+            expect(re.test('false')).toBe(true);
+        });
+
+        it('should allow unescaped character classes', function() {
+            var re = XRegExp.tag()`\d`;
+
+            expect(re.test('1')).toBe(true);
+        });
+
+    });
+
     describe('XRegExp.build()', function() {
 
         it('should apply a mode modifier in the outer pattern to the full regex with interpolated values', function() {
