@@ -51,7 +51,10 @@ var nativeTokens = {
     'class': /\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u(?:[\dA-Fa-f]{4}|{[\dA-Fa-f]+})|c[A-Za-z]|[\s\S])|[\s\S]/
 };
 // Any backreference or dollar-prefixed character in replacement strings
-var replacementToken = /\$(?:{([\w$]+)}|(\d\d?|[\s\S]))/g;
+var replacementTokens = [
+    /\$(?:<([\w$]+)>)/g,
+    /\$(?:{([\w$]+)}|(\d\d?|[\s\S]))/g
+];
 // Check for correct `exec` handling of nonparticipating capturing groups
 var correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined;
 // Check for ES6 `flags` prop support
@@ -1590,7 +1593,9 @@ fixed.replace = function(search, replacement) {
         result = nativ.replace.call(this == null ? this : String(this), search, function() {
             // Keep this function's `arguments` available through closure
             var args = arguments;
-            return nativ.replace.call(String(replacement), replacementToken, replacer);
+            return replacementTokens.reduce(function (replacement, replacementToken) {
+                return nativ.replace.call(String(replacement), replacementToken, replacer);
+            }, replacement);
 
             function replacer ($0, $1, $2) {
                 var n;
