@@ -2882,7 +2882,7 @@ function XRegExp(pattern, flags) {
 }
 
 // Add `RegExp.prototype` to the prototype chain
-XRegExp.prototype = new RegExp();
+XRegExp.prototype = /(?:)/;
 
 // ==--------------------------==
 // Public properties
