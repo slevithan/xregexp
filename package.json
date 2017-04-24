@@ -15,7 +15,7 @@
     "regular expression",
     "unicode"
   ],
-  "main": "xregexp-all.js",
+  "main": "./lib",
   "files": [
     "src",
     "lib",
