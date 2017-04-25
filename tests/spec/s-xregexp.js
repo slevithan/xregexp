@@ -800,6 +800,21 @@ describe('XRegExp()', function() {
                 expect(XRegExp('(#\n.#\n)', 'x').source).toBe('(.)');
             });
 
+            it('should not add atom separator (?:) at the beginning or end of non-capturing groups in simple cases', function() {
+                expect(XRegExp('(?: . )', 'x').source).toBe('(?:.)');
+                expect(XRegExp('(?:#\n.#\n)', 'x').source).toBe('(?:.)');
+            });
+
+            it('should not add atom separator (?:) at the beginning or end of the pattern in simple cases', function() {
+                expect(XRegExp(' ( . ) ', 'x').source).toBe('(.)');
+                expect(XRegExp(' (#\n.#\n) ', 'x').source).toBe('(.)');
+            });
+
+            it('should not add atom separator (?:) around | in simple cases', function() {
+                expect(XRegExp('( a | b )', 'x').source).toBe('(a|b)');
+                expect(XRegExp('(#\na#\n|#\nb#\n)', 'x').source).toBe('(a|b)');
+            });
+
             it('should allow whitespace between ( and ? for special groups', function() {
                 expect(XRegExp('( ?:)', 'x').source).toBe('(?:)');
                 expect(XRegExp('( ?=)', 'x').source).toBe('(?=)');

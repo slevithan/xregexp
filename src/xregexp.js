@@ -238,6 +238,14 @@ function getContextualTokenSeparator(match, scope, flags) {
         // No need to separate tokens if at the beginning or end of a group
         match.input[match.index - 1] === '(' ||
         match.input[match.index + match[0].length] === ')' ||
+        // No need to separate tokens if at the beginning of a non-capturing group
+        match.input.slice(match.index - 3, 3) === '(?:' ||
+        // No need to separate tokens if before or after a `|`
+        match.input[match.index - 1] === '|' ||
+        match.input[match.index + match[0].length] === '|' ||
+        // No need to separate tokens if at the beginning or end of the pattern
+        match.input[match.index - 1] === undefined ||
+        match.input[match.index + match[0].length] === undefined ||
         // Avoid separating tokens when the following token is a quantifier
         isQuantifierNext(match.input, match.index + match[0].length, flags)
     ) {
