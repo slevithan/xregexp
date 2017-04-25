@@ -71,8 +71,9 @@ module.exports = function(XRegExp) {
         return subpatterns;
     }
 
-    function embedSubpatternAfter(raw, subpatternIndex) {
-        return raw + '{{subpattern' + subpatternIndex + '}}';
+    function embedSubpatternAfter(raw, subpatternIndex, rawLiterals) {
+        var hasSubpattern = subpatternIndex < rawLiterals.length - 1;
+        return raw + (hasSubpattern ? '{{subpattern' + subpatternIndex + '}}' : '');
     }
 
     /**
@@ -96,7 +97,7 @@ module.exports = function(XRegExp) {
     XRegExp.tag = function(flags) {
         return function(literals /*, ...substitutions */) {
             var substitutions = [].slice.call(arguments, 1);
-            var subpatterns = substitutions.concat('').map(interpolate).reduce(reduceToSubpatternsObject, {});
+            var subpatterns = substitutions.map(interpolate).reduce(reduceToSubpatternsObject, {});
             var pattern = literals.raw.map(embedSubpatternAfter).join('');
             return XRegExp.build(pattern, subpatterns, flags);
         };
