@@ -86,9 +86,11 @@ module.exports = function(XRegExp) {
      * var h24 = /2[0-3]|[01][0-9]/;
      * var hours = XRegExp.tag('x')`${h12} : | ${h24}`
      * var minutes = /^[0-5][0-9]$/;
-     * var time = XRegExp.tag('x')`^ ${hours} (${minutes}) $`
+     * // Note that explicitly naming the 'minutes' group is required for it to appear in the
+     * // `XRegExp.exec()` return value object.
+     * var time = XRegExp.tag('x')`^ ${hours} (?<minutes>${minutes}) $`
      * time.test('10:59'); // -> true
-     * XRegExp.exec('10:59', time)[1]; // -> '59'
+     * XRegExp.exec('10:59', time).minutes; // -> '59'
      */
     XRegExp.tag = function(flags) {
         return function(literals /*, ...substitutions */) {

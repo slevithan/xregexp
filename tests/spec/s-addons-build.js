@@ -79,9 +79,10 @@ describe('XRegExp.build addon:', function() {
             var h24 = /2[0-3]|[01][0-9]/;
             var hours = XRegExp.tag('x')`${h12} : | ${h24}`
             var minutes = /^[0-5][0-9]$/;
-            var time = XRegExp.tag('x')`^ ${hours} (${minutes}) $`
+            var time = XRegExp.tag('x')`^ ${hours} (?<minutes>${minutes}) $`
+
             expect(time.test('10:59')).toBe(true);
-            expect(XRegExp.exec('10:59', time)[1]).toEqual('59');
+            expect(XRegExp.exec('10:59', time).minutes).toEqual('59');
         });
 
     });
