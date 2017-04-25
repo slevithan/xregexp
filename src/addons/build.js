@@ -61,6 +61,14 @@ module.exports = function(XRegExp) {
             XRegExp(value, flags);
     }
 
+    function interpolate(substitution) {
+        return substitution instanceof RegExp ? substitution : XRegExp.escape(substitution);
+    }
+
+    function embedSubpatternAfter(raw, subpatternIndex) {
+        return raw + '{{' + subpatternIndex + '}}';
+    }
+
     /**
      * Provides a tag function for building regexes using template literals [1]. See GitHub issue
      * 103 for discussion [2].
@@ -84,14 +92,6 @@ module.exports = function(XRegExp) {
             var pattern = literals.raw.map(embedSubpatternAfter).join('');
             return XRegExp.build(pattern, subpatterns, flags);
         };
-
-        function interpolate (substitution) {
-            return substitution instanceof RegExp ? substitution : XRegExp.escape(substitution);
-        }
-
-        function embedSubpatternAfter (raw, subpatternIndex) {
-            return raw + '{{' + subpatternIndex + '}}';
-        }
     };
 
     /**
