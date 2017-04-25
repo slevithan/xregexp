@@ -23,7 +23,9 @@
     "LICENSE"
   ],
   "scripts": {
-    "prebuild": "babel src -d lib",
+    "lint": "eslint src",
+    "babel": "babel src -d lib",
+    "prebuild": "npm run lint && npm run babel",
     "build": "browserify lib/index.js --standalone XRegExp > xregexp-all.js",
     "pretest": "npm run build",
     "test": "jasmine JASMINE_CONFIG_PATH=tests/jasmine.json"
@@ -33,6 +35,7 @@
     "babel-plugin-transform-xregexp": "^0.0.4",
     "babel-preset-env": "^1.4.0",
     "browserify": "^12.0.1",
+    "eslint": "^3.19.0",
     "jasmine": "^2.5.3"
   }
 }
