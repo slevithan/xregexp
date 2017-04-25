@@ -3413,9 +3413,7 @@ XRegExp.matchChain = function (str, chain) {
  *     - $' - Inserts the string that follows the matched substring (right context).
  *     - $n, $nn - Where n/nn are digits referencing an existent capturing group, inserts
  *       backreference n/nn.
- *     - ${n} - Where n is a name or any number of digits that reference an existent capturing
- *       group, inserts backreference n.
- *     - $<n> - Where n is a name or any number of digits that reference an existent capturing
+ *     - ${n}, $<n> - Where n is a name or any number of digits that reference an existent capturing
  *       group, inserts backreference n.
  *   Replacement functions are invoked with three or more arguments:
  *     - The matched substring (corresponds to $& above). Named backreferences are accessible as
