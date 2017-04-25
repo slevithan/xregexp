@@ -74,6 +74,16 @@ describe('XRegExp.build addon:', function() {
             expect(re.test('1')).toBe(true);
         });
 
+        it('should work as described in the comment @example', function() {
+            var h12 = /1[0-2]|0?[1-9]/;
+            var h24 = /2[0-3]|[01][0-9]/;
+            var hours = XRegExp.tag('x')`${h12} : | ${h24}`
+            var minutes = /^[0-5][0-9]$/;
+            var time = XRegExp.tag('x')`^ ${hours} (${minutes}) $`
+            expect(time.test('10:59')).toBe(true);
+            expect(XRegExp.exec('10:59', time).minutes).toEqual('59');
+        });
+
     });
 
     describe('XRegExp.build()', function() {

@@ -67,6 +67,15 @@ module.exports = function(XRegExp) {
      *
      * [1]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#Tagged_template_literals
      * [2]: https://github.com/slevithan/xregexp/issues/103
+     * @example
+     *
+     * var h12 = /1[0-2]|0?[1-9]/;
+     * var h24 = /2[0-3]|[01][0-9]/;
+     * var hours = XRegExp.tag('x')`${h12} : | ${h24}`
+     * var minutes = /^[0-5][0-9]$/;
+     * var time = XRegExp.tag('x')`^ ${hours} (${minutes}) $`
+     * time.test('10:59'); // -> true
+     * XRegExp.exec('10:59', time).minutes; // -> '59'
      */
     XRegExp.tag = function (flags) {
         return function tag (literals /*, ...substitutions */) {
