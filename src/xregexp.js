@@ -1592,8 +1592,8 @@ fixed.replace = function(search, replacement) {
             var args = arguments;
             return nativ.replace.call(String(replacement), replacementToken, replacer);
 
-            function replacer ($0, bracketed, angled, dollarToken) {
-                bracketed = bracketed || angled
+            function replacer($0, bracketed, angled, dollarToken) {
+                bracketed = bracketed || angled;
                 var n;
                 // Named or numbered backreference with curly braces
                 if (bracketed) {
