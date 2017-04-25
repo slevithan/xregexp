@@ -51,10 +51,7 @@ var nativeTokens = {
     'class': /\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u(?:[\dA-Fa-f]{4}|{[\dA-Fa-f]+})|c[A-Za-z]|[\s\S])|[\s\S]/
 };
 // Any backreference or dollar-prefixed character in replacement strings
-var replacementTokens = [
-    /\$(?:<([\w$]+)>)/g,
-    /\$(?:{([\w$]+)}|(\d\d?|[\s\S]))/g
-];
+var replacementToken = /\$(?:{([\w$]+)}|<([\w$]+)>|(\d\d?|[\s\S]))/g;
 // Check for correct `exec` handling of nonparticipating capturing groups
 var correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined;
 // Check for ES6 `flags` prop support
@@ -1593,11 +1590,10 @@ fixed.replace = function(search, replacement) {
         result = nativ.replace.call(this == null ? this : String(this), search, function() {
             // Keep this function's `arguments` available through closure
             var args = arguments;
-            return replacementTokens.reduce(function (replacement, replacementToken) {
-                return nativ.replace.call(String(replacement), replacementToken, replacer);
-            }, replacement);
+            return nativ.replace.call(String(replacement), replacementToken, replacer);
 
-            function replacer ($0, $1, $2) {
+            function replacer ($0, $1, $2, $3) {
+                $1 = $1 || $2
                 var n;
                 // Named or numbered backreference with curly braces
                 if ($1) {
@@ -1622,20 +1618,20 @@ fixed.replace = function(search, replacement) {
                     return args[n + 1] || '';
                 }
                 // Else, special variable or numbered backreference without curly braces
-                if ($2 === '$') { // $$
+                if ($3 === '$') { // $$
                     return '$';
                 }
-                if ($2 === '&' || +$2 === 0) { // $&, $0 (not followed by 1-9), $00
+                if ($3 === '&' || +$3 === 0) { // $&, $0 (not followed by 1-9), $00
                     return args[0];
                 }
-                if ($2 === '`') { // $` (left context)
+                if ($3 === '`') { // $` (left context)
                     return args[args.length - 1].slice(0, args[args.length - 2]);
                 }
-                if ($2 === "'") { // $' (right context)
+                if ($3 === "'") { // $' (right context)
                     return args[args.length - 1].slice(args[args.length - 2] + args[0].length);
                 }
                 // Else, numbered backreference without curly braces
-                $2 = +$2; // Type-convert; drop leading zero
+                $3 = +$3; // Type-convert; drop leading zero
                 // XRegExp behavior for `$n` and `$nn`:
                 // - Backrefs end after 1 or 2 digits. Use `${..}` or `$<..>` for more digits.
                 // - `$1` is an error if no capturing groups.
@@ -1649,11 +1645,11 @@ fixed.replace = function(search, replacement) {
                 // - `$10` is `$1` followed by a literal `0` if less than 10 capturing groups.
                 // - `$01` is `$1` if at least one capturing group, else it's a literal `$01`.
                 // - `$0` is a literal `$0`.
-                if (!isNaN($2)) {
-                    if ($2 > args.length - 3) {
+                if (!isNaN($3)) {
+                    if ($3 > args.length - 3) {
                         throw new SyntaxError('Backreference to undefined group ' + $0);
                     }
-                    return args[$2] || '';
+                    return args[$3] || '';
                 }
                 // `$` followed by an unsupported char is an error, unlike native JS
                 throw new SyntaxError('Invalid token ' + $0);
