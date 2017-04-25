@@ -588,6 +588,7 @@ describe('When overridden, String.prototype.replace()', function() {
 
                         expect('aabbcd'.replace(lottaGroups, '${0} ${01} ${001} ${0001} ${1} ${10} ${100} ${1000}')).toBe('aabbcd a a a a b c d');
                         expect('aabbcd'.replace(lottaGroups, '$<0> $<01> $<001> $<0001> $<1> $<10> $<100> $<1000>')).toBe('aabbcd a a a a b c d');
+                        expect('aabbcd'.replace(lottaGroups, '$<0> ${01} $<001> ${0001} $<1> ${10} $<100> ${1000}')).toBe('aabbcd a a a a b c d');
                         // For comparison...
                         expect('aabbcd'.replace(lottaGroups, '$0 $01 $001 $0001 $1 $10 $100 $1000')).toBe('aabbcd a aabbcd1 aabbcd01 a b b0 b00');
                     } catch (err) {
