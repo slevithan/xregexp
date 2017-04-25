@@ -3850,11 +3850,11 @@ fixed.replace = function (search, replacement) {
             var args = arguments;
             return nativ.replace.call(String(replacement), replacementToken, replacer);
 
-            function replacer($0, $1, $2, $3) {
-                $1 = $1 || $2;
+            function replacer($0, bracketed, angled, dollarToken) {
+                bracketed = bracketed || angled;
                 var n;
                 // Named or numbered backreference with curly braces
-                if ($1) {
+                if (bracketed) {
                     // XRegExp behavior for `${n}` or `$<n>`:
                     // 1. Backreference to numbered capture, if `n` is an integer. Use `0` for the
                     //    entire match. Any number of leading zeros may be used.
@@ -3864,36 +3864,36 @@ fixed.replace = function (search, replacement) {
                     //    integer as the name.
                     // 3. If the name or number does not refer to an existing capturing group, it's
                     //    an error.
-                    n = +$1; // Type-convert; drop leading zeros
+                    n = +bracketed; // Type-convert; drop leading zeros
                     if (n <= args.length - 3) {
                         return args[n] || '';
                     }
                     // Groups with the same name is an error, else would need `lastIndexOf`
-                    n = captureNames ? indexOf(captureNames, $1) : -1;
+                    n = captureNames ? indexOf(captureNames, bracketed) : -1;
                     if (n < 0) {
                         throw new SyntaxError('Backreference to undefined group ' + $0);
                     }
                     return args[n + 1] || '';
                 }
                 // Else, special variable or numbered backreference without curly braces
-                if ($3 === '$') {
+                if (dollarToken === '$') {
                     // $$
                     return '$';
                 }
-                if ($3 === '&' || +$3 === 0) {
+                if (dollarToken === '&' || +dollarToken === 0) {
                     // $&, $0 (not followed by 1-9), $00
                     return args[0];
                 }
-                if ($3 === '`') {
+                if (dollarToken === '`') {
                     // $` (left context)
                     return args[args.length - 1].slice(0, args[args.length - 2]);
                 }
-                if ($3 === "'") {
+                if (dollarToken === "'") {
                     // $' (right context)
                     return args[args.length - 1].slice(args[args.length - 2] + args[0].length);
                 }
                 // Else, numbered backreference without curly braces
-                $3 = +$3; // Type-convert; drop leading zero
+                dollarToken = +dollarToken; // Type-convert; drop leading zero
                 // XRegExp behavior for `$n` and `$nn`:
                 // - Backrefs end after 1 or 2 digits. Use `${..}` or `$<..>` for more digits.
                 // - `$1` is an error if no capturing groups.
@@ -3907,11 +3907,11 @@ fixed.replace = function (search, replacement) {
                 // - `$10` is `$1` followed by a literal `0` if less than 10 capturing groups.
                 // - `$01` is `$1` if at least one capturing group, else it's a literal `$01`.
                 // - `$0` is a literal `$0`.
-                if (!isNaN($3)) {
-                    if ($3 > args.length - 3) {
+                if (!isNaN(dollarToken)) {
+                    if (dollarToken > args.length - 3) {
                         throw new SyntaxError('Backreference to undefined group ' + $0);
                     }
-                    return args[$3] || '';
+                    return args[dollarToken] || '';
                 }
                 // `$` followed by an unsupported char is an error, unlike native JS
                 throw new SyntaxError('Invalid token ' + $0);
