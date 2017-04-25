@@ -65,8 +65,13 @@ module.exports = function(XRegExp) {
         return substitution instanceof RegExp ? substitution : XRegExp.escape(substitution);
     }
 
+    function reduceToSubpatternsObject(subpatterns, interpolated, subpatternIndex) {
+        subpatterns['subpattern' + subpatternIndex] = interpolated;
+        return subpatterns;
+    }
+
     function embedSubpatternAfter(raw, subpatternIndex) {
-        return raw + '{{' + subpatternIndex + '}}';
+        return raw + '{{subpattern' + subpatternIndex + '}}';
     }
 
     /**
@@ -83,12 +88,12 @@ module.exports = function(XRegExp) {
      * var minutes = /^[0-5][0-9]$/;
      * var time = XRegExp.tag('x')`^ ${hours} (${minutes}) $`
      * time.test('10:59'); // -> true
-     * XRegExp.exec('10:59', time).minutes; // -> '59'
+     * XRegExp.exec('10:59', time)[1]; // -> '59'
      */
     XRegExp.tag = function(flags) {
         return function(literals /*, ...substitutions */) {
             var substitutions = [].slice.call(arguments, 1);
-            var subpatterns = substitutions.concat('').map(interpolate);
+            var subpatterns = substitutions.concat('').map(interpolate).reduce(reduceToSubpatternsObject, {});
             var pattern = literals.raw.map(embedSubpatternAfter).join('');
             return XRegExp.build(pattern, subpatterns, flags);
         };
