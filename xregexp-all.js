@@ -2486,7 +2486,7 @@ function getContextualTokenSeparator(match, scope, flags) {
     // No need to separate tokens if at the beginning or end of a group
     match.input.charAt(match.index - 1) === '(' || match.input.charAt(match.index + match[0].length) === ')' ||
     // Avoid separating tokens when the following token is a quantifier
-    isPatternNext(match.input, match.index + match[0].length, flags, '[?*+]|{\\d+(?:,\\d*)?}')) {
+    isQuantifierNext(match.input, match.index + match[0].length, flags)) {
         return '';
     }
     // Keep tokens separated. This avoids e.g. inadvertedly changing `\1 1` or `\1(?#)1` to `\11`.
@@ -2554,25 +2554,23 @@ function indexOf(array, value) {
 }
 
 /**
- * Checks whether the next nonignorable token after the specified position matches the
- * `needlePattern`
+ * Checks whether the next nonignorable token after the specified position is a quantifier.
  *
  * @private
  * @param {String} pattern Pattern to search within.
  * @param {Number} pos Index in `pattern` to search at.
  * @param {String} flags Flags used by the pattern.
- * @param {String} needlePattern Pattern to match the next token against.
- * @returns {Boolean} Whether the next nonignorable token matches `needlePattern`
+ * @returns {Boolean} Whether the next nonignorable token is a quantifier.
  */
-function isPatternNext(pattern, pos, flags, needlePattern) {
+function isQuantifierNext(pattern, pos, flags) {
     var inlineCommentPattern = '\\(\\?#[^)]*\\)';
     var lineCommentPattern = '#[^#\\n]*';
-    var patternsToIgnore = flags.indexOf('x') > -1 ?
+    var quantifierPattern = '[?*+]|{\\d+(?:,\\d*)?}';
+    return nativ.test.call(flags.indexOf('x') > -1 ?
     // Ignore any leading whitespace, line comments, and inline comments
-    ['\\s', lineCommentPattern, inlineCommentPattern] :
+    /^(?:\s|#[^#\n]*|\(\?#[^)]*\))*(?:[?*+]|{\d+(?:,\d*)?})/ :
     // Ignore any leading inline comments
-    [inlineCommentPattern];
-    return nativ.test.call(new RegExp('^(?:' + patternsToIgnore.join('|') + ')*(?:' + needlePattern + ')'), pattern.slice(pos));
+    /^(?:\(\?#[^)]*\))*(?:[?*+]|{\d+(?:,\d*)?})/, pattern.slice(pos));
 }
 
 /**
