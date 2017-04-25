@@ -81,7 +81,7 @@ describe('XRegExp.build addon:', function() {
             var minutes = /^[0-5][0-9]$/;
             var time = XRegExp.tag('x')`^ ${hours} (${minutes}) $`
             expect(time.test('10:59')).toBe(true);
-            expect(XRegExp.exec('10:59', time).minutes).toEqual('59');
+            expect(XRegExp.exec('10:59', time)[1]).toEqual('59');
         });
 
     });
