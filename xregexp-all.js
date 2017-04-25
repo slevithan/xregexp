@@ -92,8 +92,11 @@ module.exports = function (XRegExp) {
      * XRegExp.exec('10:59', time).minutes; // -> '59'
      */
     XRegExp.tag = function (flags) {
-        return function (literals /*, ...substitutions */) {
-            var substitutions = [].slice.call(arguments, 1);
+        return function (literals) {
+            for (var _len = arguments.length, substitutions = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+                substitutions[_key - 1] = arguments[_key];
+            }
+
             var subpatterns = substitutions.map(interpolate).reduce(reduceToSubpatternsObject, {});
             var pattern = literals.raw.map(embedSubpatternAfter).join('');
             return XRegExp.build(pattern, subpatterns, flags);
@@ -3708,11 +3711,15 @@ fixed.exec = function (str) {
             // Using `str.slice(match.index)` rather than `match[0]` in case lookahead allowed
             // matching due to characters outside the match
             nativ.replace.call(String(str).slice(match.index), r2, function () {
-                var len = arguments.length;
+                for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+                    args[_key] = arguments[_key];
+                }
+
+                var len = args.length;
                 var i;
                 // Skip index 0 and the last 2
                 for (i = 1; i < len - 2; ++i) {
-                    if (arguments[i] === undefined) {
+                    if (args[i] === undefined) {
                         match[i] = undefined;
                     }
                 }
@@ -3819,10 +3826,14 @@ fixed.replace = function (search, replacement) {
         // Stringifying `this` fixes a bug in IE < 9 where the last argument in replacement
         // functions isn't type-converted to a string
         result = nativ.replace.call(String(this), search, function () {
-            var args = arguments;
             var i;
+
+            for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+                args[_key2] = arguments[_key2];
+            }
+
             if (captureNames) {
-                // Change the `arguments[0]` string primitive to a `String` object that can store
+                // Change the `args[0]` string primitive to a `String` object that can store
                 // properties. This really does need to use `String` as a constructor
                 args[0] = new String(args[0]);
                 // Store named backreferences on the first argument
@@ -3844,8 +3855,10 @@ fixed.replace = function (search, replacement) {
         // Ensure that the last value of `args` will be a string when given nonstring `this`,
         // while still throwing on null or undefined context
         result = nativ.replace.call(this == null ? this : String(this), search, function () {
-            // Keep this function's `arguments` available through closure
-            var args = arguments;
+            for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+                args[_key3] = arguments[_key3];
+            }
+
             return nativ.replace.call(String(replacement), replacementToken, replacer);
 
             function replacer($0, bracketed, angled, dollarToken) {

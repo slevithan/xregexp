@@ -94,8 +94,7 @@ module.exports = function(XRegExp) {
      * XRegExp.exec('10:59', time).minutes; // -> '59'
      */
     XRegExp.tag = function(flags) {
-        return function(literals /*, ...substitutions */) {
-            var substitutions = [].slice.call(arguments, 1);
+        return function(literals, ...substitutions) {
             var subpatterns = substitutions.map(interpolate).reduce(reduceToSubpatternsObject, {});
             var pattern = literals.raw.map(embedSubpatternAfter).join('');
             return XRegExp.build(pattern, subpatterns, flags);
