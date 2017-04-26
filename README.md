@@ -80,7 +80,7 @@ These examples give the flavor of what's possible, but XRegExp has more syntax, 
 
 ## Addons
 
-You can either load addons individually, or bundle all addons with XRegExp by loading `xregexp-all.js`.
+You can either load addons individually, or bundle all addons with XRegExp by loading `xregexp-all.js` from https://unpkg.com/xregexp/xregexp-all.js.
 
 ### Unicode
 
@@ -188,7 +188,7 @@ XRegExp.matchRecursive(str, '<', '>', 'gy');
 In browsers (bundle XRegExp with all of its addons):
 
 ```html
-<script src="xregexp-all.js"></script>
+<script src="https://unpkg.com/xregexp/xregexp-all.js"></script>
 ```
 
 Using [npm](https://www.npmjs.com/):
