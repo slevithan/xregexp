@@ -28,7 +28,8 @@
     "prebuild": "npm run lint && npm run babel",
     "build": "browserify lib/index.js --standalone XRegExp > xregexp-all.js",
     "pretest": "npm run build",
-    "test": "jasmine JASMINE_CONFIG_PATH=tests/jasmine.json"
+    "test": "jasmine JASMINE_CONFIG_PATH=tests/jasmine.json",
+    "prepublish": "npm test"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
