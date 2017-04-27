@@ -51,7 +51,7 @@ module.exports = function(XRegExp) {
         throw new ReferenceError('Unicode Base must be loaded before Unicode Properties');
     }
 
-    var unicodeData = [
+    const unicodeData = [
         {
             name: 'ASCII',
             bmp: '\0-\x7F'
