@@ -1568,7 +1568,7 @@ fixed.replace = function(search, replacement) {
                 search.lastIndex = args[args.length - 2] + args[0].length;
             }
             // ES6 specs the context for replacement functions as `undefined`
-            return replacement.apply(undefined, args);
+            return replacement(...args);
         });
     } else {
         // Ensure that the last value of `args` will be a string when given nonstring `this`,
