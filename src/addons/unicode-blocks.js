@@ -6,7 +6,6 @@
  */
 
 module.exports = function(XRegExp) {
-    'use strict';
 
     /**
      * Adds support for all Unicode blocks. Block names use the prefix 'In'. E.g.,
@@ -1116,5 +1115,4 @@ module.exports = function(XRegExp) {
             bmp: '\u4DC0-\u4DFF'
         }
     ]);
-
 };

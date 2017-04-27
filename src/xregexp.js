@@ -4,8 +4,6 @@
  * Steven Levithan (c) 2007-2017 MIT License
  */
 
-'use strict';
-
 /**
  * XRegExp provides augmented, extensible regular expressions. You get additional regex syntax and
  * flags, beyond what browsers support natively. XRegExp is also a regex utility belt with tools to

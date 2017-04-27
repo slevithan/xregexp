@@ -6,7 +6,6 @@
  */
 
 module.exports = function(XRegExp) {
-    'use strict';
 
     /**
      * Adds support for Unicode's general categories. E.g., `\p{Lu}` or `\p{Uppercase Letter}`. See
@@ -232,5 +231,4 @@ module.exports = function(XRegExp) {
             bmp: '\x20\xA0\u1680\u2000-\u200A\u202F\u205F\u3000'
         }
     ]);
-
 };

@@ -5,8 +5,6 @@
  */
 
 module.exports = function(XRegExp) {
-    'use strict';
-
     const REGEX_DATA = 'xregexp';
     const subParts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*\]/g;
     const parts = XRegExp.union([/\({{([\w$]+)}}\)|{{([\w$]+)}}/, subParts], 'g', {
@@ -234,5 +232,4 @@ module.exports = function(XRegExp) {
 
         return XRegExp(output, flags);
     };
-
 };

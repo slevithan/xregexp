@@ -5,7 +5,6 @@
  */
 
 module.exports = function(XRegExp) {
-    'use strict';
 
     /**
      * Adds base support for Unicode matching:
@@ -256,5 +255,4 @@ module.exports = function(XRegExp) {
         const slug = normalize(name);
         return unicode[slug];
     };
-
 };
