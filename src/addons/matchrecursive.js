@@ -5,7 +5,6 @@
  */
 
 module.exports = function(XRegExp) {
-    'use strict';
 
     /**
      * Returns a match detail object composed of the provided values.
@@ -195,5 +194,4 @@ module.exports = function(XRegExp) {
 
         return output;
     };
-
 };

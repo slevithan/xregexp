@@ -6,7 +6,6 @@
  */
 
 module.exports = function(XRegExp) {
-    'use strict';
 
     /**
      * Adds support for all Unicode scripts. E.g., `\p{Latin}`. Token names are case insensitive,
@@ -582,5 +581,4 @@ module.exports = function(XRegExp) {
             bmp: '\uA000-\uA48C\uA490-\uA4C6'
         }
     ]);
-
 };
