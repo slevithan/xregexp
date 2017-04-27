@@ -375,7 +375,7 @@ function prepareFlags(pattern, flags) {
     }
 
     // Strip and apply a leading mode modifier with any combination of flags except g or y
-    pattern = nativ.replace.call(pattern, /^\(\?([\w$]+)\)/, function($0, $1) {
+    pattern = nativ.replace.call(pattern, /^\(\?([\w$]+)\)/, ($0, $1) => {
         if (nativ.test.call(/[gy]/, $1)) {
             throw new SyntaxError('Cannot use flag g or y in mode modifier ' + $0);
         }
@@ -408,7 +408,7 @@ function prepareOptions(value) {
     const options = {};
 
     if (isType(value, 'String')) {
-        XRegExp.forEach(value, /[^\s,]+/, function(match) {
+        XRegExp.forEach(value, /[^\s,]+/, (match) => {
             options[match] = true;
         });
 
@@ -725,7 +725,7 @@ XRegExp._pad4 = pad4;
  * XRegExp('a+', 'U').exec('aaa')[0]; // -> 'a'
  * XRegExp('a+?', 'U').exec('aaa')[0]; // -> 'aaa'
  */
-XRegExp.addToken = function(regex, handler, options) {
+XRegExp.addToken = (regex, handler, options) => {
     options = options || {};
     let optionalFlags = options.optionalFlags;
     let i;
@@ -774,7 +774,7 @@ XRegExp.addToken = function(regex, handler, options) {
  *   // The regex is compiled once only
  * }
  */
-XRegExp.cache = function(pattern, flags) {
+XRegExp.cache = (pattern, flags) => {
     if (!regexCache[pattern]) {
         regexCache[pattern] = {};
     }
@@ -784,7 +784,7 @@ XRegExp.cache = function(pattern, flags) {
 };
 
 // Intentionally undocumented; used in tests
-XRegExp.cache.flush = function(cacheName) {
+XRegExp.cache.flush = (cacheName) => {
     if (cacheName === 'patterns') {
         // Flush the pattern cache used by the `XRegExp` constructor
         patternCache = {};
@@ -806,9 +806,7 @@ XRegExp.cache.flush = function(cacheName) {
  * XRegExp.escape('Escaped? <.>');
  * // -> 'Escaped\?\ <\.>'
  */
-XRegExp.escape = function(str) {
-    return nativ.replace.call(toObject(str), /[-\[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-};
+XRegExp.escape = (str) => nativ.replace.call(toObject(str), /[-\[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 
 /**
  * Executes a regex search in a specified string. Returns a match array or `null`. If the provided
@@ -839,7 +837,7 @@ XRegExp.escape = function(str) {
  * }
  * // result -> ['2', '3', '4']
  */
-XRegExp.exec = function(str, regex, pos, sticky) {
+XRegExp.exec = (str, regex, pos, sticky) => {
     let cacheKey = 'g';
     let addY = false;
     let fakeY = false;
@@ -912,7 +910,7 @@ XRegExp.exec = function(str, regex, pos, sticky) {
  * });
  * // evens -> [2, 4]
  */
-XRegExp.forEach = function(str, regex, callback) {
+XRegExp.forEach = (str, regex, callback) => {
     let pos = 0;
     let i = -1;
     let match;
@@ -943,9 +941,7 @@ XRegExp.forEach = function(str, regex, callback) {
  * const globalCopy = XRegExp.globalize(/regex/);
  * globalCopy.global; // -> true
  */
-XRegExp.globalize = function(regex) {
-    return copyRegex(regex, {addG: true});
-};
+XRegExp.globalize = (regex) => copyRegex(regex, {addG: true});
 
 /**
  * Installs optional features according to the specified options. Can be undone using
@@ -967,7 +963,7 @@ XRegExp.globalize = function(regex) {
  * // With an options string
  * XRegExp.install('astral natives');
  */
-XRegExp.install = function(options) {
+XRegExp.install = (options) => {
     options = prepareOptions(options);
 
     if (!features.astral && options.astral) {
@@ -991,9 +987,7 @@ XRegExp.install = function(options) {
  *
  * XRegExp.isInstalled('astral');
  */
-XRegExp.isInstalled = function(feature) {
-    return !!(features[feature]);
-};
+XRegExp.isInstalled = (feature) => !!(features[feature]);
 
 /**
  * Returns `true` if an object is a regex; `false` if it isn't. This works correctly for regexes
@@ -1009,10 +1003,7 @@ XRegExp.isInstalled = function(feature) {
  * XRegExp.isRegExp(RegExp('^', 'm')); // -> true
  * XRegExp.isRegExp(XRegExp('(?s).')); // -> true
  */
-XRegExp.isRegExp = function(value) {
-    return toString.call(value) === '[object RegExp]';
-    //return isType(value, 'RegExp');
-};
+XRegExp.isRegExp = (value) => toString.call(value) === '[object RegExp]'; // isType(value, 'RegExp');
 
 /**
  * Returns the first matched string, or in global mode, an array containing all matched strings.
@@ -1041,7 +1032,7 @@ XRegExp.isRegExp = function(value) {
  * XRegExp.match('abc', /\w/, 'all'); // -> ['a', 'b', 'c']
  * XRegExp.match('abc', /x/, 'all'); // -> []
  */
-XRegExp.match = function(str, regex, scope) {
+XRegExp.match = (str, regex, scope) => {
     const global = (regex.global && scope !== 'one') || scope === 'all';
     const cacheKey = ((global ? 'g' : '') + (regex.sticky ? 'y' : '')) || 'noGY';
 
@@ -1097,37 +1088,35 @@ XRegExp.match = function(str, regex, scope) {
  * ]);
  * // -> ['xregexp.com', 'www.google.com']
  */
-XRegExp.matchChain = function(str, chain) {
-    return (function recurseChain(values, level) {
-        const item = chain[level].regex ? chain[level] : {regex: chain[level]};
-        const matches = [];
+XRegExp.matchChain = (str, chain) => (function recurseChain(values, level) {
+    const item = chain[level].regex ? chain[level] : {regex: chain[level]};
+    const matches = [];
 
-        function addMatch(match) {
-            if (item.backref) {
-                // Safari 4.0.5 (but not 5.0.5+) inappropriately uses sparse arrays to hold the
-                // `undefined`s for backreferences to nonparticipating capturing groups. In such
-                // cases, a `hasOwnProperty` or `in` check on its own would inappropriately throw
-                // the exception, so also check if the backreference is a number that is within the
-                // bounds of the array.
-                if (!(match.hasOwnProperty(item.backref) || +item.backref < match.length)) {
-                    throw new ReferenceError('Backreference to undefined group: ' + item.backref);
-                }
-
-                matches.push(match[item.backref] || '');
-            } else {
-                matches.push(match[0]);
+    function addMatch(match) {
+        if (item.backref) {
+            // Safari 4.0.5 (but not 5.0.5+) inappropriately uses sparse arrays to hold the
+            // `undefined`s for backreferences to nonparticipating capturing groups. In such
+            // cases, a `hasOwnProperty` or `in` check on its own would inappropriately throw
+            // the exception, so also check if the backreference is a number that is within the
+            // bounds of the array.
+            if (!(match.hasOwnProperty(item.backref) || +item.backref < match.length)) {
+                throw new ReferenceError('Backreference to undefined group: ' + item.backref);
             }
-        }
 
-        for (let i = 0; i < values.length; ++i) {
-            XRegExp.forEach(values[i], item.regex, addMatch);
+            matches.push(match[item.backref] || '');
+        } else {
+            matches.push(match[0]);
         }
+    }
 
-        return ((level === chain.length - 1) || !matches.length) ?
-            matches :
-            recurseChain(matches, level + 1);
-    }([str], 0));
-};
+    for (let i = 0; i < values.length; ++i) {
+        XRegExp.forEach(values[i], item.regex, addMatch);
+    }
+
+    return ((level === chain.length - 1) || !matches.length) ?
+        matches :
+        recurseChain(matches, level + 1);
+}([str], 0));
 
 /**
  * Returns a new string with one or all matches of a pattern replaced. The pattern can be a string
@@ -1179,7 +1168,7 @@ XRegExp.matchChain = function(str, chain) {
  * XRegExp.replace('RegExp builds RegExps', 'RegExp', 'XRegExp', 'all');
  * // -> 'XRegExp builds XRegExps'
  */
-XRegExp.replace = function(str, search, replacement, scope) {
+XRegExp.replace = (str, search, replacement, scope) => {
     const isRegex = XRegExp.isRegExp(search);
     const global = (search.global && scope !== 'one') || scope === 'all';
     const cacheKey = ((global ? 'g' : '') + (search.sticky ? 'y' : '')) || 'noGY';
@@ -1237,7 +1226,7 @@ XRegExp.replace = function(str, search, replacement, scope) {
  *   }]
  * ]);
  */
-XRegExp.replaceEach = function(str, replacements) {
+XRegExp.replaceEach = (str, replacements) => {
     let i;
     let r;
 
@@ -1275,9 +1264,7 @@ XRegExp.replaceEach = function(str, replacements) {
  * XRegExp.split('..word1..', /([a-z]+)(\d+)/i);
  * // -> ['..', 'word', '1', '..']
  */
-XRegExp.split = function(str, separator, limit) {
-    return fixed.split.call(toObject(str), separator, limit);
-};
+XRegExp.split = (str, separator, limit) => fixed.split.call(toObject(str), separator, limit);
 
 /**
  * Executes a regex search in a specified string. Returns `true` or `false`. Optional `pos` and
@@ -1302,10 +1289,8 @@ XRegExp.split = function(str, separator, limit) {
  * XRegExp.test('abc', /c/, 0, 'sticky'); // -> false
  * XRegExp.test('abc', /c/, 2, 'sticky'); // -> true
  */
-XRegExp.test = function(str, regex, pos, sticky) {
-    // Do this the easy way :-)
-    return !!XRegExp.exec(str, regex, pos, sticky);
-};
+// Do this the easy way :-)
+XRegExp.test = (str, regex, pos, sticky) => !!XRegExp.exec(str, regex, pos, sticky);
 
 /**
  * Uninstalls optional features according to the specified options. All optional features start out
@@ -1327,7 +1312,7 @@ XRegExp.test = function(str, regex, pos, sticky) {
  * // With an options string
  * XRegExp.uninstall('astral natives');
  */
-XRegExp.uninstall = function(options) {
+XRegExp.uninstall = (options) => {
     options = prepareOptions(options);
 
     if (features.astral && options.astral) {
@@ -1360,7 +1345,7 @@ XRegExp.uninstall = function(options) {
  * XRegExp.union([/man/, /bear/, /pig/], 'i', {conjunction: 'none'});
  * // -> /manbearpig/i
  */
-XRegExp.union = function(patterns, flags, options) {
+XRegExp.union = (patterns, flags, options) => {
     options = options || {};
     const conjunction = options.conjunction || 'or';
     let numCaptures = 0;
@@ -1440,7 +1425,7 @@ fixed.exec = function(str) {
             });
             // Using `str.slice(match.index)` rather than `match[0]` in case lookahead allowed
             // matching due to characters outside the match
-            nativ.replace.call(String(str).slice(match.index), r2, function(...args) {
+            nativ.replace.call(String(str).slice(match.index), r2, (...args) => {
                 const len = args.length;
                 // Skip index 0 and the last 2
                 for (let i = 1; i < len - 2; ++i) {
@@ -1548,7 +1533,7 @@ fixed.replace = function(search, replacement) {
     if (isType(replacement, 'Function')) {
         // Stringifying `this` fixes a bug in IE < 9 where the last argument in replacement
         // functions isn't type-converted to a string
-        result = nativ.replace.call(String(this), search, function(...args) {
+        result = nativ.replace.call(String(this), search, (...args) => {
             if (captureNames) {
                 // Change the `args[0]` string primitive to a `String` object that can store
                 // properties. This really does need to use `String` as a constructor
@@ -1571,7 +1556,7 @@ fixed.replace = function(search, replacement) {
     } else {
         // Ensure that the last value of `args` will be a string when given nonstring `this`,
         // while still throwing on null or undefined context
-        result = nativ.replace.call(this == null ? this : String(this), search, function(...args) {
+        result = nativ.replace.call(this == null ? this : String(this), search, (...args) => {
             return nativ.replace.call(String(replacement), replacementToken, replacer);
 
             function replacer($0, bracketed, angled, dollarToken) {
@@ -1682,7 +1667,7 @@ fixed.split = function(separator, limit) {
     // Opera Dragonfly is open (go figure). It works in at least Opera 9.5-10.1 and 11+
     limit = (limit === undefined ? -1 : limit) >>> 0;
 
-    XRegExp.forEach(str, separator, function(match) {
+    XRegExp.forEach(str, separator, (match) => {
         // This condition is not the same as `if (match[0].length)`
         if ((match.index + match[0].length) > lastLastIndex) {
             output.push(str.slice(lastLastIndex, match.index));
@@ -1717,7 +1702,7 @@ fixed.split = function(separator, limit) {
  */
 XRegExp.addToken(
     /\\([ABCE-RTUVXYZaeg-mopqyz]|c(?![A-Za-z])|u(?![\dA-Fa-f]{4}|{[\dA-Fa-f]+})|x(?![\dA-Fa-f]{2}))/,
-    function(match, scope) {
+    (match, scope) => {
         // \B is allowed in default scope only
         if (match[1] === 'B' && scope === defaultScope) {
             return match[0];
@@ -1740,7 +1725,7 @@ XRegExp.addToken(
  */
 XRegExp.addToken(
     /\\u{([\dA-Fa-f]+)}/,
-    function(match, scope, flags) {
+    (match, scope, flags) => {
         const code = dec(match[1]);
         if (code > 0x10FFFF) {
             throw new SyntaxError('Invalid Unicode code point ' + match[0]);
@@ -1769,11 +1754,11 @@ XRegExp.addToken(
  */
 XRegExp.addToken(
     /\[(\^?)\]/,
-    function(match) {
-        // For cross-browser compatibility with ES3, convert [] to \b\B and [^] to [\s\S].
-        // (?!) should work like \b\B, but is unreliable in some versions of Firefox
-        return match[1] ? '[\\s\\S]' : '\\b\\B';
-    },
+    // For cross-browser compatibility with ES3, convert [] to \b\B and [^] to [\s\S].
+    // (?!) should work like \b\B, but is unreliable in some versions of Firefox
+    /* eslint-disable no-confusing-arrow */
+    (match) => (match[1] ? '[\\s\\S]' : '\\b\\B'),
+    /* eslint-enable no-confusing-arrow */
     {leadChar: '['}
 );
 
@@ -1801,9 +1786,7 @@ XRegExp.addToken(
  */
 XRegExp.addToken(
     /\./,
-    function() {
-        return '[\\s\\S]';
-    },
+    () => '[\\s\\S]',
     {
         flag: 's',
         leadChar: '.'

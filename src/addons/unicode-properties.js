@@ -5,7 +5,7 @@
  * Unicode data by Mathias Bynens <mathiasbynens.be>
  */
 
-module.exports = function(XRegExp) {
+module.exports = (XRegExp) => {
 
     /**
      * Adds properties to meet the UTS #18 Level 1 RL1.2 requirements for Unicode regex support. See

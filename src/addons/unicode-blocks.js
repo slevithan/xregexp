@@ -5,7 +5,7 @@
  * Unicode data by Mathias Bynens <mathiasbynens.be>
  */
 
-module.exports = function(XRegExp) {
+module.exports = (XRegExp) => {
 
     /**
      * Adds support for all Unicode blocks. Block names use the prefix 'In'. E.g.,

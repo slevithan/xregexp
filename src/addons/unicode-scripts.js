@@ -5,7 +5,7 @@
  * Unicode data by Mathias Bynens <mathiasbynens.be>
  */
 
-module.exports = function(XRegExp) {
+module.exports = (XRegExp) => {
 
     /**
      * Adds support for all Unicode scripts. E.g., `\p{Latin}`. Token names are case insensitive,
