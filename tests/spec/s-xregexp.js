@@ -181,10 +181,16 @@ describe('XRegExp()', function() {
         }
     });
 
-    it('should allow escaped \\(?:) at end of pattern', function() {
+    it('should allow escaped (?:) at end of pattern', function() {
         // Ensuring that any cleanup routine looking for unneeded regex parts like empty groups does
         // not strip this
         expect(function() {XRegExp('(\\(?:)');}).not.toThrow();
+    });
+
+    it('should allow escaped (?:) at end of group', function() {
+        var regex = XRegExp('((\\(?:))');
+        expect(regex.test(':')).toBe(true);
+        expect(regex.test('(:')).toBe(true);
     });
 
     it('should store named capture data on regex instances', function() {
@@ -787,6 +793,23 @@ describe('XRegExp()', function() {
             it('should separate atoms', function() {
                 expect(XRegExp('^(a)()()()()()()()()()\\1 0$', 'x').test('aa0')).toBe(true);
                 expect(XRegExp('^(a)()()()()()()()()()\\1#\n0$', 'x').test('aa0')).toBe(true);
+            });
+
+            it('should not add atom separator (?:) at the beginning or end of groups in simple cases', function() {
+                expect(XRegExp('( . )', 'x').source).toBe('(.)');
+                expect(XRegExp('(#\n.#\n)', 'x').source).toBe('(.)');
+            });
+
+            it('should allow whitespace between ( and ? for special groups', function() {
+                expect(XRegExp('( ?:)', 'x').source).toBe('(?:)');
+                expect(XRegExp('( ?=)', 'x').source).toBe('(?=)');
+                expect(XRegExp('( ?!)', 'x').source).toBe('(?!)');
+            });
+
+            it('should not allow whitespace between (? and other chars for special groups', function() {
+                expect(function() {XRegExp('(? :)', 'x');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(? =)', 'x');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(? !)', 'x');}).toThrowError(SyntaxError);
             });
 
             it('should not apply within character classes', function() {

@@ -1,5 +1,9 @@
 [
         {
+            name: 'InAdlam',
+            astral: '\uD83A[\uDD00-\uDD5F]'
+        },
+        {
             name: 'InAegean_Numbers',
             astral: '\uD800[\uDD00-\uDD3F]'
         },
@@ -96,6 +100,10 @@
             bmp: '\u0980-\u09FF'
         },
         {
+            name: 'InBhaiksuki',
+            astral: '\uD807[\uDC00-\uDC6F]'
+        },
+        {
             name: 'InBlock_Elements',
             bmp: '\u2580-\u259F'
         },
@@ -173,7 +181,7 @@
         },
         {
             name: 'InCJK_Unified_Ideographs_Extension_C',
-            astral: '\uD86D[\uDC00-\uDF3F]|[\uD86A-\uD86C][\uDC00-\uDFFF]|\uD869[\uDF00-\uDFFF]'
+            astral: '\uD869[\uDF00-\uDFFF]|[\uD86A-\uD86C][\uDC00-\uDFFF]|\uD86D[\uDC00-\uDF3F]'
         },
         {
             name: 'InCJK_Unified_Ideographs_Extension_D',
@@ -181,7 +189,7 @@
         },
         {
             name: 'InCJK_Unified_Ideographs_Extension_E',
-            astral: '[\uD86F-\uD872][\uDC00-\uDFFF]|\uD873[\uDC00-\uDEAF]|\uD86E[\uDC20-\uDFFF]'
+            astral: '\uD86E[\uDC20-\uDFFF]|[\uD86F-\uD872][\uDC00-\uDFFF]|\uD873[\uDC00-\uDEAF]'
         },
         {
             name: 'InCarian',
@@ -274,6 +282,10 @@
         {
             name: 'InCyrillic_Extended_B',
             bmp: '\uA640-\uA69F'
+        },
+        {
+            name: 'InCyrillic_Extended_C',
+            bmp: '\u1C80-\u1C8F'
         },
         {
             name: 'InCyrillic_Supplement',
@@ -376,6 +388,10 @@
             bmp: '\u2C00-\u2C5F'
         },
         {
+            name: 'InGlagolitic_Supplement',
+            astral: '\uD838[\uDC00-\uDC2F]'
+        },
+        {
             name: 'InGothic',
             astral: '\uD800[\uDF30-\uDF4F]'
         },
@@ -454,6 +470,10 @@
         {
             name: 'InIdeographic_Description_Characters',
             bmp: '\u2FF0-\u2FFF'
+        },
+        {
+            name: 'InIdeographic_Symbols_and_Punctuation',
+            astral: '\uD81B[\uDFE0-\uDFFF]'
         },
         {
             name: 'InImperial_Aramaic',
@@ -616,6 +636,10 @@
             astral: '\uD802[\uDEC0-\uDEFF]'
         },
         {
+            name: 'InMarchen',
+            astral: '\uD807[\uDC70-\uDCBF]'
+        },
+        {
             name: 'InMathematical_Alphanumeric_Symbols',
             astral: '\uD835[\uDC00-\uDFFF]'
         },
@@ -665,7 +689,7 @@
         },
         {
             name: 'InMiscellaneous_Symbols_and_Pictographs',
-            astral: '\uD83D[\uDC00-\uDDFF]|\uD83C[\uDF00-\uDFFF]'
+            astral: '\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF]'
         },
         {
             name: 'InMiscellaneous_Technical',
@@ -682,6 +706,10 @@
         {
             name: 'InMongolian',
             bmp: '\u1800-\u18AF'
+        },
+        {
+            name: 'InMongolian_Supplement',
+            astral: '\uD805[\uDE60-\uDE7F]'
         },
         {
             name: 'InMro',
@@ -718,6 +746,10 @@
         {
             name: 'InNew_Tai_Lue',
             bmp: '\u1980-\u19DF'
+        },
+        {
+            name: 'InNewa',
+            astral: '\uD805[\uDC00-\uDC7F]'
         },
         {
             name: 'InNumber_Forms',
@@ -770,6 +802,10 @@
         {
             name: 'InOrnamental_Dingbats',
             astral: '\uD83D[\uDE50-\uDE7F]'
+        },
+        {
+            name: 'InOsage',
+            astral: '\uD801[\uDCB0-\uDCFF]'
         },
         {
             name: 'InOsmanya',
@@ -970,6 +1006,14 @@
         {
             name: 'InTamil',
             bmp: '\u0B80-\u0BFF'
+        },
+        {
+            name: 'InTangut',
+            astral: '[\uD81C-\uD821][\uDC00-\uDFFF]'
+        },
+        {
+            name: 'InTangut_Components',
+            astral: '\uD822[\uDC00-\uDEFF]'
         },
         {
             name: 'InTelugu',

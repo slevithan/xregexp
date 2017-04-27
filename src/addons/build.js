@@ -1,8 +1,7 @@
 /*!
- * XRegExp.build 3.1.1-next
+ * XRegExp.build 3.2.0-next
  * <xregexp.com>
  * Steven Levithan (c) 2012-2017 MIT License
- * Inspired by Lea Verou's RegExp.create <lea.verou.me>
  */
 
 module.exports = function(XRegExp) {
@@ -60,6 +59,52 @@ module.exports = function(XRegExp) {
             // Compile string as XRegExp
             XRegExp(value, flags);
     }
+
+    function interpolate(substitution) {
+        return substitution instanceof RegExp ? substitution : XRegExp.escape(substitution);
+    }
+
+    function reduceToSubpatternsObject(subpatterns, interpolated, subpatternIndex) {
+        subpatterns['subpattern' + subpatternIndex] = interpolated;
+        return subpatterns;
+    }
+
+    function embedSubpatternAfter(raw, subpatternIndex, rawLiterals) {
+        var hasSubpattern = subpatternIndex < rawLiterals.length - 1;
+        return raw + (hasSubpattern ? '{{subpattern' + subpatternIndex + '}}' : '');
+    }
+
+    /**
+     * Provides tagged template literals that create regexes with XRegExp syntax and flags. The
+     * provided pattern is handled as a raw string, so backslashes don't need to be escaped.
+     *
+     * Interpolation of strings and regexes shares the features of `XRegExp.build`. Interpolated
+     * patterns are treated as atomic units when quantified, interpolated strings have their special
+     * characters escaped, a leading `^` and trailing unescaped `$` are stripped from interpolated
+     * regexes if both are present, and any backreferences within an interpolated regex are
+     * rewritten to work within the overall pattern.
+     *
+     * @memberOf XRegExp
+     * @param {String} [flags] Any combination of XRegExp flags.
+     * @returns {Function} Handler for template literals that construct regexes with XRegExp syntax.
+     * @example
+     *
+     * var h12 = /1[0-2]|0?[1-9]/;
+     * var h24 = /2[0-3]|[01][0-9]/;
+     * var hours = XRegExp.tag('x')`${h12} : | ${h24}`;
+     * var minutes = /^[0-5][0-9]$/;
+     * // Note that explicitly naming the 'minutes' group is required for named backreferences
+     * var time = XRegExp.tag('x')`^ ${hours} (?<minutes>${minutes}) $`;
+     * time.test('10:59'); // -> true
+     * XRegExp.exec('10:59', time).minutes; // -> '59'
+     */
+    XRegExp.tag = function(flags) {
+        return function(literals, ...substitutions) {
+            var subpatterns = substitutions.map(interpolate).reduce(reduceToSubpatternsObject, {});
+            var pattern = literals.raw.map(embedSubpatternAfter).join('');
+            return XRegExp.build(pattern, subpatterns, flags);
+        };
+    };
 
     /**
      * Builds regexes using named subpatterns, for readability and pattern reuse. Backreferences in
@@ -126,10 +171,10 @@ module.exports = function(XRegExp) {
         var outerCapsMap = [0];
         var outerCapNames = patternAsRegex[REGEX_DATA].captureNames || [];
         var output = patternAsRegex.source.replace(parts, function($0, $1, $2, $3, $4) {
-            var subName = $1 || $2,
-                capName,
-                intro,
-                localCapIndex;
+            var subName = $1 || $2;
+            var capName;
+            var intro;
+            var localCapIndex;
             // Named subpattern
             if (subName) {
                 if (!data.hasOwnProperty(subName)) {

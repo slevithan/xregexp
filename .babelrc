@@ -1,0 +1,6 @@
+{
+  "plugins": ["transform-xregexp"],
+  "presets": [["env", {
+    "exclude": ["transform-es2015-literals"]
+  }]]
+}

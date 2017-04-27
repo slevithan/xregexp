@@ -1,5 +1,5 @@
 /*!
- * XRegExp.matchRecursive 3.1.1-next
+ * XRegExp.matchRecursive 3.2.0-next
  * <xregexp.com>
  * Steven Levithan (c) 2009-2017 MIT License
  */
@@ -74,22 +74,22 @@ module.exports = function(XRegExp) {
     XRegExp.matchRecursive = function(str, left, right, flags, options) {
         flags = flags || '';
         options = options || {};
-        var global = flags.indexOf('g') > -1,
-            sticky = flags.indexOf('y') > -1,
-            // Flag `y` is controlled internally
-            basicFlags = flags.replace(/y/g, ''),
-            escapeChar = options.escapeChar,
-            vN = options.valueNames,
-            output = [],
-            openTokens = 0,
-            delimStart = 0,
-            delimEnd = 0,
-            lastOuterEnd = 0,
-            outerStart,
-            innerStart,
-            leftMatch,
-            rightMatch,
-            esc;
+        var global = flags.indexOf('g') > -1;
+        var sticky = flags.indexOf('y') > -1;
+        // Flag `y` is controlled internally
+        var basicFlags = flags.replace(/y/g, '');
+        var escapeChar = options.escapeChar;
+        var vN = options.valueNames;
+        var output = [];
+        var openTokens = 0;
+        var delimStart = 0;
+        var delimEnd = 0;
+        var lastOuterEnd = 0;
+        var outerStart;
+        var innerStart;
+        var leftMatch;
+        var rightMatch;
+        var esc;
         left = XRegExp(left, basicFlags);
         right = XRegExp(right, basicFlags);
 

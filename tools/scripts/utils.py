@@ -1,9 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # Based on http://git.io/unicode by @mathias
 
 import math
 import re
-import string
 from collections import defaultdict
 
 # http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
@@ -117,7 +116,7 @@ def parseDatabase(sourceFile, storeAsStrings=False):
 		flag = False
 		first = 0
 		for line in uni:
-			d = string.split(line.strip(), ';')
+			d = line.strip().split(';')
 			val = int(d[0], 16)
 			if flag:
 				if re.compile('<.+, Last>').match(d[1]):
@@ -158,7 +157,7 @@ def parseScriptsOrProps(sourceFile, storeAsStrings=False):
 		for line in uni:
 			if line.startswith('#') or not ' ; ' in line:
 				continue
-			data = string.split(line.strip(), ';')
+			data = line.strip().split(';')
 			charRange = data[0].replace('..', '-').strip()
 			length = len(charRange)
 			script = data[1].split('#')[0].strip()
@@ -178,7 +177,7 @@ def parseBlocks(sourceFile, storeAsStrings=False):
 		for line in uni:
 			if line.startswith('#') or not '; ' in line:
 				continue
-			data = string.split(line.strip(), ';')
+			data = line.strip().split(';')
 			charRange = data[0].replace('..', '-').strip()
 			length = len(charRange)
 			script = data[1].split(';')[0].strip()
