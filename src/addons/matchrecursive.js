@@ -4,7 +4,7 @@
  * Steven Levithan (c) 2009-2017 MIT License
  */
 
-module.exports = function(XRegExp) {
+module.exports = (XRegExp) => {
 
     /**
      * Returns a match detail object composed of the provided values.
@@ -70,7 +70,7 @@ module.exports = function(XRegExp) {
      * XRegExp.matchRecursive(str, '<', '>', 'gy');
      * // -> ['1', '<<2>>', '3']
      */
-    XRegExp.matchRecursive = function(str, left, right, flags, options) {
+    XRegExp.matchRecursive = (str, left, right, flags, options) => {
         flags = flags || '';
         options = options || {};
         const global = flags.indexOf('g') > -1;

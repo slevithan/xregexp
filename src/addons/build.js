@@ -4,7 +4,7 @@
  * Steven Levithan (c) 2012-2017 MIT License
  */
 
-module.exports = function(XRegExp) {
+module.exports = (XRegExp) => {
     const REGEX_DATA = 'xregexp';
     const subParts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*\]/g;
     const parts = XRegExp.union([/\({{([\w$]+)}}\)|{{([\w$]+)}}/, subParts], 'g', {
@@ -96,12 +96,10 @@ module.exports = function(XRegExp) {
      * time.test('10:59'); // -> true
      * XRegExp.exec('10:59', time).minutes; // -> '59'
      */
-    XRegExp.tag = function(flags) {
-        return function(literals, ...substitutions) {
-            const subpatterns = substitutions.map(interpolate).reduce(reduceToSubpatternsObject, {});
-            const pattern = literals.raw.map(embedSubpatternAfter).join('');
-            return XRegExp.build(pattern, subpatterns, flags);
-        };
+    XRegExp.tag = (flags) => (literals, ...substitutions) => {
+        const subpatterns = substitutions.map(interpolate).reduce(reduceToSubpatternsObject, {});
+        const pattern = literals.raw.map(embedSubpatternAfter).join('');
+        return XRegExp.build(pattern, subpatterns, flags);
     };
 
     /**
@@ -129,7 +127,7 @@ module.exports = function(XRegExp) {
      * time.test('10:59'); // -> true
      * XRegExp.exec('10:59', time).minutes; // -> '59'
      */
-    XRegExp.build = function(pattern, subs, flags) {
+    XRegExp.build = (pattern, subs, flags) => {
         flags = flags || '';
         // Used with `asXRegExp` calls for `pattern` and subpatterns in `subs`, to work around how
         // some browsers convert `RegExp('\n')` to a regex that contains the literal characters `\`
@@ -168,7 +166,7 @@ module.exports = function(XRegExp) {
         let numOuterCaps = 0;
         const outerCapsMap = [0];
         const outerCapNames = patternAsRegex[REGEX_DATA].captureNames || [];
-        const output = patternAsRegex.source.replace(parts, function($0, $1, $2, $3, $4) {
+        const output = patternAsRegex.source.replace(parts, ($0, $1, $2, $3, $4) => {
             const subName = $1 || $2;
             let capName;
             let intro;
@@ -189,7 +187,7 @@ module.exports = function(XRegExp) {
                     intro = '(?:';
                 }
                 numPriorCaps = numCaps;
-                return intro + data[subName].pattern.replace(subParts, function(match, paren, backref) {
+                return intro + data[subName].pattern.replace(subParts, (match, paren, backref) => {
                     // Capturing group
                     if (paren) {
                         capName = data[subName].names[numCaps - numPriorCaps];

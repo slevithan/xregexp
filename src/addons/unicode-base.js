@@ -4,7 +4,7 @@
  * Steven Levithan (c) 2008-2017 MIT License
  */
 
-module.exports = function(XRegExp) {
+module.exports = (XRegExp) => {
 
     /**
      * Adds base support for Unicode matching:
@@ -53,7 +53,7 @@ module.exports = function(XRegExp) {
         XRegExp.forEach(
             range,
             /(\\x..|\\u....|\\?[\s\S])(?:-(\\x..|\\u....|\\?[\s\S]))?/,
-            function(m) {
+            (m) => {
                 const start = charCode(m[1]);
                 if (start > (lastEnd + 1)) {
                     output += '\\u' + pad4(hex(lastEnd + 1));
@@ -124,7 +124,7 @@ module.exports = function(XRegExp) {
     XRegExp.addToken(
         // Use `*` instead of `+` to avoid capturing `^` as the token name in `\p{^}`
         /\\([pP])(?:{(\^?)([^}]*)}|([A-Za-z]))/,
-        function(match, scope, flags) {
+        (match, scope, flags) => {
             const ERR_DOUBLE_NEG = 'Invalid double negation ';
             const ERR_UNKNOWN_NAME = 'Unknown Unicode token ';
             const ERR_UNKNOWN_REF = 'Unicode token missing data ';
@@ -206,7 +206,7 @@ module.exports = function(XRegExp) {
      * }]);
      * XRegExp('\\p{XDigit}:\\p{Hexadecimal}+').test('0:3D'); // -> true
      */
-    XRegExp.addUnicodeData = function(data) {
+    XRegExp.addUnicodeData = (data) => {
         const ERR_NO_NAME = 'Unicode token requires name';
         const ERR_NO_DATA = 'Unicode token has no character data ';
         let item;
@@ -251,7 +251,7 @@ module.exports = function(XRegExp) {
      * the future. It is meant for userland code that wishes to reuse the (large) internal Unicode
      * structures set up by XRegExp.
      */
-    XRegExp._getUnicodeProperty = function(name) {
+    XRegExp._getUnicodeProperty = (name) => {
         const slug = normalize(name);
         return unicode[slug];
     };
