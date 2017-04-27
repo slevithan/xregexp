@@ -2,7 +2,6 @@
  * XRegExp.build 3.2.0
  * <xregexp.com>
  * Steven Levithan (c) 2012-2017 MIT License
- * Inspired by Lea Verou's RegExp.create <lea.verou.me>
  */
 
 module.exports = function(XRegExp) {
@@ -76,20 +75,26 @@ module.exports = function(XRegExp) {
     }
 
     /**
-     * Provides a tag function for building regexes using template literals [1]. See GitHub issue
-     * 103 for discussion [2].
+     * Provides tagged template literals that create regexes with XRegExp syntax and flags. The
+     * provided pattern is handled as a raw string, so backslashes don't need to be escaped.
      *
-     * [1]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#Tagged_template_literals
-     * [2]: https://github.com/slevithan/xregexp/issues/103
+     * Interpolation of strings and regexes shares the features of `XRegExp.build`. Interpolated
+     * patterns are treated as atomic units when quantified, interpolated strings have their special
+     * characters escaped, a leading `^` and trailing unescaped `$` are stripped from interpolated
+     * regexes if both are present, and any backreferences within an interpolated regex are
+     * rewritten to work within the overall pattern.
+     *
+     * @memberOf XRegExp
+     * @param {String} [flags] Any combination of XRegExp flags.
+     * @returns {Function} Handler for template literals that construct regexes with XRegExp syntax.
      * @example
      *
      * var h12 = /1[0-2]|0?[1-9]/;
      * var h24 = /2[0-3]|[01][0-9]/;
-     * var hours = XRegExp.tag('x')`${h12} : | ${h24}`
+     * var hours = XRegExp.tag('x')`${h12} : | ${h24}`;
      * var minutes = /^[0-5][0-9]$/;
-     * // Note that explicitly naming the 'minutes' group is required for it to appear in the
-     * // `XRegExp.exec()` return value object.
-     * var time = XRegExp.tag('x')`^ ${hours} (?<minutes>${minutes}) $`
+     * // Note that explicitly naming the 'minutes' group is required for named backreferences
+     * var time = XRegExp.tag('x')`^ ${hours} (?<minutes>${minutes}) $`;
      * time.test('10:59'); // -> true
      * XRegExp.exec('10:59', time).minutes; // -> '59'
      */
