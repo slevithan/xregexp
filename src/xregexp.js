@@ -1,5 +1,5 @@
 /*!
- * XRegExp 3.2.0
+ * XRegExp 3.2.0-next
  * <xregexp.com>
  * Steven Levithan (c) 2007-2017 MIT License
  */
@@ -665,7 +665,7 @@ XRegExp.prototype = new RegExp();
  * @memberOf XRegExp
  * @type String
  */
-XRegExp.version = '3.2.0';
+XRegExp.version = '3.2.0-next';
 
 // ==--------------------------==
 // Public methods

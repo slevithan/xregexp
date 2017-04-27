@@ -1,6 +1,6 @@
 {
   "name": "xregexp",
-  "version": "3.2.0",
+  "version": "3.2.0-next",
   "description": "Extended regular expressions",
   "homepage": "http://xregexp.com/",
   "author": "Steven Levithan <steves_list@hotmail.com>",
