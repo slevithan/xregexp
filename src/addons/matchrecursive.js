@@ -14,10 +14,10 @@ module.exports = function(XRegExp) {
      */
     function row(name, value, start, end) {
         return {
-            name: name,
-            value: value,
-            start: start,
-            end: end
+            name,
+            value,
+            start,
+            end
         };
     }
 
