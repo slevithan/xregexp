@@ -132,7 +132,7 @@ module.exports = (XRegExp) => {
         // Used with `asXRegExp` calls for `pattern` and subpatterns in `subs`, to work around how
         // some browsers convert `RegExp('\n')` to a regex that contains the literal characters `\`
         // and `n`. See more details at <https://github.com/slevithan/xregexp/pull/163>.
-        const addFlagX = flags.indexOf('x') > -1;
+        const addFlagX = flags.includes('x');
         const inlineFlags = /^\(\?([\w$]+)\)/.exec(pattern);
         // Add flags within a leading mode modifier to the overall pattern's flags
         if (inlineFlags) {

@@ -1,5 +1,8 @@
 {
-  "plugins": ["transform-xregexp"],
+  "plugins": [
+    "transform-xregexp",
+    "array-includes"
+  ],
   "presets": [["env", {
     "exclude": ["transform-es2015-literals"]
   }]]

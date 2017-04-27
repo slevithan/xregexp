@@ -133,7 +133,7 @@ module.exports = (XRegExp) => {
             // Negated via \P{..} or \p{^..}
             let isNegated = match[1] === 'P' || !!match[2];
             // Switch from BMP (0-FFFF) to astral (0-10FFFF) mode via flag A
-            const isAstralMode = flags.indexOf('A') > -1;
+            const isAstralMode = flags.includes('A');
             // Token lookup name. Check `[4]` first to avoid passing `undefined` via `\p{}`
             let slug = normalize(match[4] || match[3]);
             // Token data object
