@@ -36,7 +36,7 @@ module.exports = function(XRegExp) {
      * @example
      *
      * // Basic usage
-     * var str = '(t((e))s)t()(ing)';
+     * let str = '(t((e))s)t()(ing)';
      * XRegExp.matchRecursive(str, '\\(', '\\)', 'g');
      * // -> ['t((e))s', '', 'ing']
      *
@@ -74,22 +74,22 @@ module.exports = function(XRegExp) {
     XRegExp.matchRecursive = function(str, left, right, flags, options) {
         flags = flags || '';
         options = options || {};
-        var global = flags.indexOf('g') > -1;
-        var sticky = flags.indexOf('y') > -1;
+        const global = flags.indexOf('g') > -1;
+        const sticky = flags.indexOf('y') > -1;
         // Flag `y` is controlled internally
-        var basicFlags = flags.replace(/y/g, '');
-        var escapeChar = options.escapeChar;
-        var vN = options.valueNames;
-        var output = [];
-        var openTokens = 0;
-        var delimStart = 0;
-        var delimEnd = 0;
-        var lastOuterEnd = 0;
-        var outerStart;
-        var innerStart;
-        var leftMatch;
-        var rightMatch;
-        var esc;
+        const basicFlags = flags.replace(/y/g, '');
+        let escapeChar = options.escapeChar;
+        const vN = options.valueNames;
+        const output = [];
+        let openTokens = 0;
+        let delimStart = 0;
+        let delimEnd = 0;
+        let lastOuterEnd = 0;
+        let outerStart;
+        let innerStart;
+        let leftMatch;
+        let rightMatch;
+        let esc;
         left = XRegExp(left, basicFlags);
         right = XRegExp(right, basicFlags);
 

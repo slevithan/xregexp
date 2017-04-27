@@ -1,4 +1,4 @@
-var XRegExp = require('./xregexp');
+const XRegExp = require('./xregexp');
 
 require('./addons/build')(XRegExp);
 require('./addons/matchrecursive')(XRegExp);
