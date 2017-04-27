@@ -104,7 +104,7 @@ function augment(regex, captureNames, xSource, xFlags, isInternalOnly) {
     let p;
 
     regex[REGEX_DATA] = {
-        captureNames: captureNames
+        captureNames
     };
 
     if (isInternalOnly) {
@@ -394,8 +394,8 @@ function prepareFlags(pattern, flags) {
     }
 
     return {
-        pattern: pattern,
-        flags: flags
+        pattern,
+        flags
     };
 }
 
@@ -750,7 +750,7 @@ XRegExp.addToken = function(regex, handler, options) {
             addY: hasNativeY,
             isInternalOnly: true
         }),
-        handler: handler,
+        handler,
         scope: options.scope || defaultScope,
         flag: options.flag,
         reparse: options.reparse,
@@ -866,7 +866,7 @@ XRegExp.exec = function(str, regex, pos, sticky) {
     const r2 = regex[REGEX_DATA][cacheKey] || (
         regex[REGEX_DATA][cacheKey] = copyRegex(regex, {
             addG: true,
-            addY: addY,
+            addY,
             source: fakeY ? regex.source + '|()' : undefined,
             removeY: sticky === false,
             isInternalOnly: true
