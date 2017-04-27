@@ -73,8 +73,8 @@ module.exports = (XRegExp) => {
     XRegExp.matchRecursive = (str, left, right, flags, options) => {
         flags = flags || '';
         options = options || {};
-        const global = flags.indexOf('g') > -1;
-        const sticky = flags.indexOf('y') > -1;
+        const global = flags.includes('g');
+        const sticky = flags.includes('y');
         // Flag `y` is controlled internally
         const basicFlags = flags.replace(/y/g, '');
         let escapeChar = options.escapeChar;

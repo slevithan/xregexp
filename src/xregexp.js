@@ -322,7 +322,7 @@ function isQuantifierNext(pattern, pos, flags) {
     const lineCommentPattern = '#[^#\\n]*';
     const quantifierPattern = '[?*+]|{\\d+(?:,\\d*)?}';
     return nativ.test.call(
-        flags.indexOf('x') > -1 ?
+        flags.includes('x') ?
             // Ignore any leading whitespace, line comments, and inline comments
             new RegExp('^(?:' + '\\s' + '|' + lineCommentPattern + '|' + inlineCommentPattern + ')*(?:' + quantifierPattern + ')') :
             // Ignore any leading inline comments
@@ -457,7 +457,7 @@ function runTokens(pattern, flags, pos, scope, context) {
         if (
             (t.leadChar && t.leadChar !== leadChar) ||
             (t.scope !== scope && t.scope !== 'all') ||
-            (t.flag && flags.indexOf(t.flag) === -1)
+            (t.flag && !flags.includes(t.flag))
         ) {
             continue;
         }
@@ -572,7 +572,7 @@ function XRegExp(pattern, flags) {
     pattern = pattern === undefined ? '' : String(pattern);
     flags = flags === undefined ? '' : String(flags);
 
-    if (XRegExp.isInstalled('astral') && flags.indexOf('A') === -1) {
+    if (XRegExp.isInstalled('astral') && !flags.includes('A')) {
         // This causes an error to be thrown if the Unicode Base addon is not available
         flags += 'A';
     }
@@ -1736,7 +1736,7 @@ XRegExp.addToken(
             return '\\u' + pad4(hex(code));
         }
         // If `code` is between 0xFFFF and 0x10FFFF, require and defer to native handling
-        if (hasNativeU && flags.indexOf('u') > -1) {
+        if (hasNativeU && flags.includes('u')) {
             return match[0];
         }
         throw new SyntaxError('Cannot use Unicode code point above \\u{FFFF} without flag u');
@@ -1878,7 +1878,7 @@ XRegExp.addToken(
 XRegExp.addToken(
     /\((?!\?)/,
     function(match, scope, flags) {
-        if (flags.indexOf('n') > -1) {
+        if (flags.includes('n')) {
             return '(?:';
         }
         this.captureNames.push(null);
