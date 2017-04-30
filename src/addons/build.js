@@ -63,13 +63,13 @@ export default (XRegExp) => {
     }
 
     function reduceToSubpatternsObject(subpatterns, interpolated, subpatternIndex) {
-        subpatterns['subpattern' + subpatternIndex] = interpolated;
+        subpatterns[`subpattern${subpatternIndex}`] = interpolated;
         return subpatterns;
     }
 
     function embedSubpatternAfter(raw, subpatternIndex, rawLiterals) {
         const hasSubpattern = subpatternIndex < rawLiterals.length - 1;
-        return raw + (hasSubpattern ? '{{subpattern' + subpatternIndex + '}}' : '');
+        return raw + (hasSubpattern ? `{{subpattern${subpatternIndex}}}` : '');
     }
 
     /**
@@ -174,7 +174,7 @@ export default (XRegExp) => {
             // Named subpattern
             if (subName) {
                 if (!data.hasOwnProperty(subName)) {
-                    throw new ReferenceError('Undefined property ' + $0);
+                    throw new ReferenceError(`Undefined property ${$0}`);
                 }
                 // Named subpattern was wrapped in a capturing group
                 if ($1) {
@@ -182,19 +182,19 @@ export default (XRegExp) => {
                     outerCapsMap[++numOuterCaps] = ++numCaps;
                     // If it's a named group, preserve the name. Otherwise, use the subpattern name
                     // as the capture name
-                    intro = '(?<' + (capName || subName) + '>';
+                    intro = `(?<${capName || subName}>`;
                 } else {
                     intro = '(?:';
                 }
                 numPriorCaps = numCaps;
-                return intro + data[subName].pattern.replace(subParts, (match, paren, backref) => {
+                return `${intro + data[subName].pattern.replace(subParts, (match, paren, backref) => {
                     // Capturing group
                     if (paren) {
                         capName = data[subName].names[numCaps - numPriorCaps];
                         ++numCaps;
                         // If the current capture has a name, preserve the name
                         if (capName) {
-                            return '(?<' + capName + '>';
+                            return `(?<${capName}>`;
                         }
                     // Backreference
                     } else if (backref) {
@@ -202,11 +202,11 @@ export default (XRegExp) => {
                         // Rewrite the backreference
                         return data[subName].names[localCapIndex] ?
                             // Need to preserve the backreference name in case using flag `n`
-                            '\\k<' + data[subName].names[localCapIndex] + '>' :
-                            '\\' + (+backref + numPriorCaps);
+                            `\\k<${data[subName].names[localCapIndex]}>` :
+                            `\\${+backref + numPriorCaps}`;
                     }
                     return match;
-                }) + ')';
+                })})`;
             }
             // Capturing group
             if ($3) {
@@ -214,7 +214,7 @@ export default (XRegExp) => {
                 outerCapsMap[++numOuterCaps] = ++numCaps;
                 // If the current capture has a name, preserve the name
                 if (capName) {
-                    return '(?<' + capName + '>';
+                    return `(?<${capName}>`;
                 }
             // Backreference
             } else if ($4) {
@@ -222,8 +222,8 @@ export default (XRegExp) => {
                 // Rewrite the backreference
                 return outerCapNames[localCapIndex] ?
                     // Need to preserve the backreference name in case using flag `n`
-                    '\\k<' + outerCapNames[localCapIndex] + '>' :
-                    '\\' + outerCapsMap[+$4];
+                    `\\k<${outerCapNames[localCapIndex]}>` :
+                    `\\${outerCapsMap[+$4]}`;
             }
             return $0;
         });
