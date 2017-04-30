@@ -1,3 +1,8 @@
+beforeEach(function() {
+    global.disableOptInFeatures();
+    global.addToEqualMatchMatcher();
+});
+
 describe('When overridden, RegExp.prototype.exec()', function() {
 
     beforeEach(function() {

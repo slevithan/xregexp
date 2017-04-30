@@ -1,3 +1,8 @@
+beforeEach(function() {
+    global.disableOptInFeatures();
+    global.addToEqualMatchMatcher();
+});
+
 describe('Unicode Base addon:', function() {
 
     /*

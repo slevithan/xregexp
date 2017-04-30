@@ -1,3 +1,8 @@
+beforeEach(function() {
+    global.disableOptInFeatures();
+    global.addToEqualMatchMatcher();
+});
+
 describe('XRegExp.addToken()', function() {
 
     it('should throw an exception if provided a non-RegExp object as the regex argument', function() {

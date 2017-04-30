@@ -1,3 +1,8 @@
+beforeEach(function() {
+    global.disableOptInFeatures();
+    global.addToEqualMatchMatcher();
+});
+
 describe('XRegExp.build addon:', function() {
 
     describe('XRegExp.tag()', function() {

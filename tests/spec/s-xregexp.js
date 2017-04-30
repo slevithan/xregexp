@@ -1,3 +1,8 @@
+beforeEach(function() {
+    global.disableOptInFeatures();
+    global.addToEqualMatchMatcher();
+});
+
 describe('XRegExp()', function() {
 
     it('should create objects that pass RegExp type checks', function() {
