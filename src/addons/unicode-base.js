@@ -56,9 +56,9 @@ export default (XRegExp) => {
             (m) => {
                 const start = charCode(m[1]);
                 if (start > (lastEnd + 1)) {
-                    output += '\\u' + pad4(hex(lastEnd + 1));
+                    output += `\\u${pad4(hex(lastEnd + 1))}`;
                     if (start > (lastEnd + 2)) {
-                        output += '-\\u' + pad4(hex(start - 1));
+                        output += `-\\u${pad4(hex(start - 1))}`;
                     }
                 }
                 lastEnd = charCode(m[2] || m[1]);
@@ -66,7 +66,7 @@ export default (XRegExp) => {
         );
 
         if (lastEnd < 0xFFFF) {
-            output += '\\u' + pad4(hex(lastEnd + 1));
+            output += `\\u${pad4(hex(lastEnd + 1))}`;
             if (lastEnd < 0xFFFE) {
                 output += '-\\uFFFF';
             }
@@ -90,19 +90,19 @@ export default (XRegExp) => {
         let combined = '';
 
         if (item.bmp && !item.isBmpLast) {
-            combined = '[' + item.bmp + ']' + (item.astral ? '|' : '');
+            combined = `[${item.bmp}]${item.astral ? '|' : ''}`;
         }
         if (item.astral) {
             combined += item.astral;
         }
         if (item.isBmpLast && item.bmp) {
-            combined += (item.astral ? '|' : '') + '[' + item.bmp + ']';
+            combined += `${item.astral ? '|' : ''}[${item.bmp}]`;
         }
 
         // Astral Unicode tokens always match a code point, never a code unit
         return isNegated ?
-            '(?:(?!' + combined + ')(?:[\uD800-\uDBFF][\uDC00-\uDFFF]|[\0-\uFFFF]))' :
-            '(?:' + combined + ')';
+            `(?:(?!${combined})(?:[\uD800-\uDBFF][\uDC00-\uDFFF]|[\0-\uFFFF]))` :
+            `(?:${combined})`;
     }
 
     // Builds a complete astral pattern on first use
@@ -150,7 +150,7 @@ export default (XRegExp) => {
             if (item.inverseOf) {
                 slug = normalize(item.inverseOf);
                 if (!unicode.hasOwnProperty(slug)) {
-                    throw new ReferenceError(ERR_UNKNOWN_REF + match[0] + ' -> ' + item.inverseOf);
+                    throw new ReferenceError(`${ERR_UNKNOWN_REF + match[0]} -> ${item.inverseOf}`);
                 }
                 item = unicode[slug];
                 isNegated = !isNegated;
@@ -169,7 +169,7 @@ export default (XRegExp) => {
 
             return scope === 'class' ?
                 (isNegated ? cacheInvertedBmp(slug) : item.bmp) :
-                (isNegated ? '[^' : '[') + item.bmp + ']';
+                `${(isNegated ? '[^' : '[') + item.bmp}]`;
         },
         {
             scope: 'all',

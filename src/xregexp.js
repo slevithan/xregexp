@@ -174,7 +174,7 @@ function copyRegex(regex, options) {
     if (options.removeG) {flagsToRemove += 'g';}
     if (options.removeY) {flagsToRemove += 'y';}
     if (flagsToRemove) {
-        flags = nativ.replace.call(flags, new RegExp('[' + flagsToRemove + ']+', 'g'), '');
+        flags = nativ.replace.call(flags, new RegExp(`[${flagsToRemove}]+`, 'g'), '');
     }
 
     if (options.addG) {flagsToAdd += 'g';}
@@ -303,9 +303,9 @@ function isQuantifierNext(pattern, pos, flags) {
     return nativ.test.call(
         flags.includes('x') ?
             // Ignore any leading whitespace, line comments, and inline comments
-            new RegExp('^(?:' + '\\s' + '|' + lineCommentPattern + '|' + inlineCommentPattern + ')*(?:' + quantifierPattern + ')') :
+            new RegExp(`^(?:\\s|${lineCommentPattern}|${inlineCommentPattern})*(?:${quantifierPattern})`) :
             // Ignore any leading inline comments
-            new RegExp('^(?:' + inlineCommentPattern + ')*(?:' + quantifierPattern + ')'),
+            new RegExp(`^(?:${inlineCommentPattern})*(?:${quantifierPattern})`),
         pattern.slice(pos)
     );
 }
@@ -319,7 +319,7 @@ function isQuantifierNext(pattern, pos, flags) {
  * @returns {Boolean} Whether the object matches the type.
  */
 function isType(value, type) {
-    return toString.call(value) === '[object ' + type + ']';
+    return toString.call(value) === `[object ${type}]`;
 }
 
 /**
@@ -331,7 +331,7 @@ function isType(value, type) {
  */
 function pad4(str) {
     while (str.length < 4) {
-        str = '0' + str;
+        str = `0${str}`;
     }
     return str;
 }
@@ -350,13 +350,13 @@ function prepareFlags(pattern, flags) {
 
     // Recent browsers throw on duplicate flags, so copy this behavior for nonnative flags
     if (clipDuplicates(flags) !== flags) {
-        throw new SyntaxError('Invalid duplicate regex flag ' + flags);
+        throw new SyntaxError(`Invalid duplicate regex flag ${flags}`);
     }
 
     // Strip and apply a leading mode modifier with any combination of flags except g or y
     pattern = nativ.replace.call(pattern, /^\(\?([\w$]+)\)/, ($0, $1) => {
         if (nativ.test.call(/[gy]/, $1)) {
-            throw new SyntaxError('Cannot use flag g or y in mode modifier ' + $0);
+            throw new SyntaxError(`Cannot use flag g or y in mode modifier ${$0}`);
         }
         // Allow duplicate flags within the mode modifier
         flags = clipDuplicates(flags + $1);
@@ -366,7 +366,7 @@ function prepareFlags(pattern, flags) {
     // Throw on unknown native or nonnative flags
     for (i = 0; i < flags.length; ++i) {
         if (!registeredFlags[flags[i]]) {
-            throw new SyntaxError('Unknown regex flag ' + flags[i]);
+            throw new SyntaxError(`Unknown regex flag ${flags[i]}`);
         }
     }
 
@@ -842,7 +842,7 @@ XRegExp.exec = (str, regex, pos, sticky) => {
         regex[REGEX_DATA][cacheKey] = copyRegex(regex, {
             addG: true,
             addY,
-            source: fakeY ? regex.source + '|()' : undefined,
+            source: fakeY ? `${regex.source}|()` : undefined,
             removeY: sticky === false,
             isInternalOnly: true
         })
@@ -1079,7 +1079,7 @@ XRegExp.matchChain = (str, chain) => (function recurseChain(values, level) {
             // the exception, so also check if the backreference is a number that is within the
             // bounds of the array.
             if (!(match.hasOwnProperty(item.backref) || +item.backref < match.length)) {
-                throw new ReferenceError('Backreference to undefined group: ' + item.backref);
+                throw new ReferenceError(`Backreference to undefined group: ${item.backref}`);
             }
 
             matches.push(match[item.backref] || '');
@@ -1339,12 +1339,12 @@ XRegExp.union = (patterns, flags, options) => {
             ++numCaptures;
             // If the current capture has a name, preserve the name
             if (name) {
-                return '(?<' + name + '>';
+                return `(?<${name}>`;
             }
         // Backreference
         } else if (backref) {
             // Rewrite the backreference
-            return '\\' + (+backref + numPriorCaptures);
+            return `\\${+backref + numPriorCaptures}`;
         }
 
         return match;
@@ -1558,7 +1558,7 @@ fixed.replace = function(search, replacement) {
                     // Groups with the same name is an error, else would need `lastIndexOf`
                     n = captureNames ? captureNames.indexOf(bracketed) : -1;
                     if (n < 0) {
-                        throw new SyntaxError('Backreference to undefined group ' + $0);
+                        throw new SyntaxError(`Backreference to undefined group ${$0}`);
                     }
                     return args[n + 1] || '';
                 }
@@ -1592,12 +1592,12 @@ fixed.replace = function(search, replacement) {
                 // - `$0` is a literal `$0`.
                 if (!isNaN(dollarToken)) {
                     if (dollarToken > args.length - 3) {
-                        throw new SyntaxError('Backreference to undefined group ' + $0);
+                        throw new SyntaxError(`Backreference to undefined group ${$0}`);
                     }
                     return args[dollarToken] || '';
                 }
                 // `$` followed by an unsupported char is an error, unlike native JS
-                throw new SyntaxError('Invalid token ' + $0);
+                throw new SyntaxError(`Invalid token ${$0}`);
             }
         });
     }
@@ -1686,7 +1686,7 @@ XRegExp.addToken(
         if (match[1] === 'B' && scope === defaultScope) {
             return match[0];
         }
-        throw new SyntaxError('Invalid escape ' + match[0]);
+        throw new SyntaxError(`Invalid escape ${match[0]}`);
     },
     {
         scope: 'all',
@@ -1707,12 +1707,12 @@ XRegExp.addToken(
     (match, scope, flags) => {
         const code = dec(match[1]);
         if (code > 0x10FFFF) {
-            throw new SyntaxError('Invalid Unicode code point ' + match[0]);
+            throw new SyntaxError(`Invalid Unicode code point ${match[0]}`);
         }
         if (code <= 0xFFFF) {
             // Converting to \uNNNN avoids needing to escape the literal character and keep it
             // separate from preceding tokens
-            return '\\u' + pad4(hex(code));
+            return `\\u${pad4(hex(code))}`;
         }
         // If `code` is between 0xFFFF and 0x10FFFF, require and defer to native handling
         if (hasNativeU && flags.includes('u')) {
@@ -1783,14 +1783,14 @@ XRegExp.addToken(
         const index = isNaN(match[1]) ? (this.captureNames.indexOf(match[1]) + 1) : +match[1];
         const endIndex = match.index + match[0].length;
         if (!index || index > this.captureNames.length) {
-            throw new SyntaxError('Backreference to undefined group ' + match[0]);
+            throw new SyntaxError(`Backreference to undefined group ${match[0]}`);
         }
         // Keep backreferences separate from subsequent literal numbers. This avoids e.g.
         // inadvertedly changing `(?<n>)\k<n>1` to `()\11`.
-        return '\\' + index + (
+        return `\\${index}${
             endIndex === match.input.length || isNaN(match.input[endIndex]) ?
                 '' : '(?:)'
-        );
+        }`;
     },
     {leadChar: '\\'}
 );
@@ -1811,8 +1811,7 @@ XRegExp.addToken(
             ) &&
             match[1] !== '0'
         ) {
-            throw new SyntaxError('Cannot use octal escape or backreference to undefined group ' +
-                match[0]);
+            throw new SyntaxError(`Cannot use octal escape or backreference to undefined group ${match[0]}`);
         }
         return match[0];
     },
@@ -1835,13 +1834,13 @@ XRegExp.addToken(
         // Disallow bare integers as names because named backreferences are added to match arrays
         // and therefore numeric properties may lead to incorrect lookups
         if (!isNaN(match[1])) {
-            throw new SyntaxError('Cannot use integer as capture name ' + match[0]);
+            throw new SyntaxError(`Cannot use integer as capture name ${match[0]}`);
         }
         if (match[1] === 'length' || match[1] === '__proto__') {
-            throw new SyntaxError('Cannot use reserved word as capture name ' + match[0]);
+            throw new SyntaxError(`Cannot use reserved word as capture name ${match[0]}`);
         }
         if (this.captureNames.includes(match[1])) {
-            throw new SyntaxError('Cannot use same name for multiple groups ' + match[0]);
+            throw new SyntaxError(`Cannot use same name for multiple groups ${match[0]}`);
         }
         this.captureNames.push(match[1]);
         this.hasNamedCapture = true;
