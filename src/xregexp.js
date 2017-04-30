@@ -1890,4 +1890,4 @@ XRegExp.addToken(
     }
 );
 
-module.exports = XRegExp;
+export default XRegExp;

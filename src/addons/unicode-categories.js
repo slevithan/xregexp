@@ -5,7 +5,7 @@
  * Unicode data by Mathias Bynens <mathiasbynens.be>
  */
 
-module.exports = (XRegExp) => {
+export default (XRegExp) => {
 
     /**
      * Adds support for Unicode's general categories. E.g., `\p{Lu}` or `\p{Uppercase Letter}`. See
