@@ -42,7 +42,7 @@ export default (XRegExp) => {
         const esc = /^\\[xu](.+)/.exec(chr);
         return esc ?
             dec(esc[1]) :
-            chr.charCodeAt(chr.charAt(0) === '\\' ? 1 : 0);
+            chr.charCodeAt(chr[0] === '\\' ? 1 : 0);
     }
 
     // Inverts a list of ordered BMP characters and ranges

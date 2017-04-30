@@ -236,8 +236,8 @@ function dec(hex) {
 function getContextualTokenSeparator(match, scope, flags) {
     if (
         // No need to separate tokens if at the beginning or end of a group
-        match.input.charAt(match.index - 1) === '(' ||
-        match.input.charAt(match.index + match[0].length) === ')' ||
+        match.input[match.index - 1] === '(' ||
+        match.input[match.index + match[0].length] === ')' ||
         // Avoid separating tokens when the following token is a quantifier
         isQuantifierNext(match.input, match.index + match[0].length, flags)
     ) {
@@ -365,8 +365,8 @@ function prepareFlags(pattern, flags) {
 
     // Throw on unknown native or nonnative flags
     for (i = 0; i < flags.length; ++i) {
-        if (!registeredFlags[flags.charAt(i)]) {
-            throw new SyntaxError('Unknown regex flag ' + flags.charAt(i));
+        if (!registeredFlags[flags[i]]) {
+            throw new SyntaxError('Unknown regex flag ' + flags[i]);
         }
     }
 
@@ -425,7 +425,7 @@ function registerFlag(flag) {
  */
 function runTokens(pattern, flags, pos, scope, context) {
     let i = tokens.length;
-    const leadChar = pattern.charAt(pos);
+    const leadChar = pattern[pos];
     let result = null;
     let match;
     let t;
@@ -1788,7 +1788,7 @@ XRegExp.addToken(
         // Keep backreferences separate from subsequent literal numbers. This avoids e.g.
         // inadvertedly changing `(?<n>)\k<n>1` to `()\11`.
         return '\\' + index + (
-            endIndex === match.input.length || isNaN(match.input.charAt(endIndex)) ?
+            endIndex === match.input.length || isNaN(match.input[endIndex]) ?
                 '' : '(?:)'
         );
     },
