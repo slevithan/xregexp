@@ -4,7 +4,7 @@
  * Steven Levithan (c) 2012-2017 MIT License
  */
 
-module.exports = (XRegExp) => {
+export default (XRegExp) => {
     const REGEX_DATA = 'xregexp';
     const subParts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*\]/g;
     const parts = XRegExp.union([/\({{([\w$]+)}}\)|{{([\w$]+)}}/, subParts], 'g', {

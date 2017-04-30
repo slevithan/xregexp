@@ -4,7 +4,7 @@
  * Steven Levithan (c) 2008-2017 MIT License
  */
 
-module.exports = (XRegExp) => {
+export default (XRegExp) => {
 
     /**
      * Adds base support for Unicode matching:

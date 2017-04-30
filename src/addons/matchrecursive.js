@@ -4,7 +4,7 @@
  * Steven Levithan (c) 2009-2017 MIT License
  */
 
-module.exports = (XRegExp) => {
+export default (XRegExp) => {
 
     /**
      * Returns a match detail object composed of the provided values.
