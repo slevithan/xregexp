@@ -288,27 +288,6 @@ function hex(dec) {
 }
 
 /**
- * Returns the first index at which a given value can be found in an array.
- *
- * @private
- * @param {Array} array Array to search.
- * @param {*} value Value to locate in the array.
- * @returns {Number} Zero-based index at which the item is found, or -1.
- */
-function indexOf(array, value) {
-    const len = array.length;
-    let i;
-
-    for (i = 0; i < len; ++i) {
-        if (array[i] === value) {
-            return i;
-        }
-    }
-
-    return -1;
-}
-
-/**
  * Checks whether the next nonignorable token after the specified position is a quantifier.
  *
  * @private
@@ -1418,7 +1397,7 @@ fixed.exec = function(str) {
         // Fix browsers whose `exec` methods don't return `undefined` for nonparticipating capturing
         // groups. This fixes IE 5.5-8, but not IE 9's quirks mode or emulation of older IEs. IE 9
         // in standards mode follows the spec.
-        if (!correctExecNpcg && match.length > 1 && indexOf(match, '') > -1) {
+        if (!correctExecNpcg && match.length > 1 && match.includes('')) {
             const r2 = copyRegex(this, {
                 removeG: true,
                 isInternalOnly: true
@@ -1577,7 +1556,7 @@ fixed.replace = function(search, replacement) {
                         return args[n] || '';
                     }
                     // Groups with the same name is an error, else would need `lastIndexOf`
-                    n = captureNames ? indexOf(captureNames, bracketed) : -1;
+                    n = captureNames ? captureNames.indexOf(bracketed) : -1;
                     if (n < 0) {
                         throw new SyntaxError('Backreference to undefined group ' + $0);
                     }
@@ -1801,7 +1780,7 @@ XRegExp.addToken(
     /\\k<([\w$]+)>/,
     function(match) {
         // Groups with the same name is an error, else would need `lastIndexOf`
-        const index = isNaN(match[1]) ? (indexOf(this.captureNames, match[1]) + 1) : +match[1];
+        const index = isNaN(match[1]) ? (this.captureNames.indexOf(match[1]) + 1) : +match[1];
         const endIndex = match.index + match[0].length;
         if (!index || index > this.captureNames.length) {
             throw new SyntaxError('Backreference to undefined group ' + match[0]);
@@ -1861,7 +1840,7 @@ XRegExp.addToken(
         if (match[1] === 'length' || match[1] === '__proto__') {
             throw new SyntaxError('Cannot use reserved word as capture name ' + match[0]);
         }
-        if (indexOf(this.captureNames, match[1]) > -1) {
+        if (this.captureNames.includes(match[1])) {
             throw new SyntaxError('Cannot use same name for multiple groups ' + match[0]);
         }
         this.captureNames.push(match[1]);
