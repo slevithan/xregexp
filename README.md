@@ -1,10 +1,10 @@
-# XRegExp 3.2.0
+# XRegExp 3.2.0-next
 
 [![Build Status](https://travis-ci.org/slevithan/xregexp.svg?branch=master)](https://travis-ci.org/slevithan/xregexp)
 
 XRegExp provides augmented (and extensible) JavaScript regular expressions. You get modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your grepping and parsing easier, while freeing you from regex cross-browser inconsistencies and other annoyances.
 
-XRegExp supports all native ES6 regular expression syntax. It supports Internet Explorer 5.5+, Firefox 1.5+, Chrome, Safari 3+, and Opera 11+. You can use it with Node.js or as a RequireJS module.
+XRegExp supports all native ES6 regular expression syntax. It supports ES5+ browsers, and you can use it with Node.js or as a RequireJS module.
 
 ## Performance
 
@@ -13,29 +13,30 @@ XRegExp compiles to native `RegExp` objects. Therefore regexes built with XRegEx
 ## Usage examples
 
 ```js
-// Using named capture and flag x (free-spacing and line comments)
-var date = XRegExp(`(?<year>  [0-9]{4} ) -?  # year
-                    (?<month> [0-9]{2} ) -?  # month
-                    (?<day>   [0-9]{2} )     # day`, 'x');
+// Using named capture and flag x for free-spacing and line comments
+const date = XRegExp(
+    `(?<year>  [0-9]{4} ) -?  # year
+     (?<month> [0-9]{2} ) -?  # month
+     (?<day>   [0-9]{2} )     # day`, 'x');
 
 // XRegExp.exec gives you named backreferences on the match result
-var match = XRegExp.exec('2017-02-22', date);
+let match = XRegExp.exec('2017-02-22', date);
 match.year; // -> '2017'
 
 // It also includes optional pos and sticky arguments
-var pos = 3;
-var result = [];
-while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d+)>/, pos, 'sticky')) {
+let pos = 3;
+const result = [];
+while (match = XRegExp.exec('<1><2><3>4<5>', /<(\d+)>/, pos, 'sticky')) {
     result.push(match[1]);
     pos = match.index + match[0].length;
 }
-// result -> ['2', '3', '4']
+// result -> ['2', '3']
 
 // XRegExp.replace allows named backreferences in replacements
-XRegExp.replace('2017-02-22', date, '${month}/${day}/${year}');
+XRegExp.replace('2017-02-22', date, '$<month>/$<day>/$<year>');
 // -> '02/22/2017'
 XRegExp.replace('2017-02-22', date, (match) => {
-    return match.month + '/' + match.day + '/' + match.year;
+    return `${match.month}/${match.day}/${match.year}`;
 });
 // -> '02/22/2017'
 
@@ -43,13 +44,13 @@ XRegExp.replace('2017-02-22', date, (match) => {
 date.test('2017-02-22');
 // -> true
 
-// The only caveat is that named captures must be referenced using numbered
-// backreferences if used with native methods
+// The only caveat is that named captures must be referenced using
+// numbered backreferences if used with native methods
 '2017-02-22'.replace(date, '$2/$3/$1');
 // -> '02/22/2017'
 
 // Use XRegExp.forEach to extract every other digit from a string
-var evens = [];
+const evens = [];
 XRegExp.forEach('1a2345', /\d/, (match, i) => {
     if (i % 2) evens.push(+match[0]);
 });
@@ -63,17 +64,18 @@ XRegExp.matchChain('1 <b>2</b> 3 <B>4 \n 56</B>', [
 // -> ['2', '4', '56']
 
 // You can also pass forward and return specific backreferences
-var html = '<a href="http://xregexp.com/">XRegExp</a>' +
-           '<a href="http://www.google.com/">Google</a>';
+const html =
+    `<a href="http://xregexp.com/">XRegExp</a>
+     <a href="http://www.google.com/">Google</a>`;
 XRegExp.matchChain(html, [
     {regex: /<a href="([^"]+)">/i, backref: 1},
     {regex: XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
 ]);
 // -> ['xregexp.com', 'www.google.com']
 
-// Merge strings and regexes into a single pattern with updated backreferences
-XRegExp.union(['a+b*c', /(dog)\1/, /(cat)\1/], 'i', {conjunction: 'or'});
-// -> /a\+b\*c|(dog)\1|(cat)\2/i
+// Merge strings and regexes, with updated backreferences
+XRegExp.union(['m+a*n', /(bear)\1/, /(pig)\1/], 'i', {conjunction: 'or'});
+// -> /m\+a\*n|(bear)\1|(pig)\2/i
 ```
 
 These examples give the flavor of what's possible, but XRegExp has more syntax, flags, methods, options, and browser fixes that aren't shown here. You can also augment XRegExp's regular expression syntax with addons (see below) or write your own. See [xregexp.com](http://xregexp.com/) for details.
@@ -90,7 +92,7 @@ Then you can do this:
 
 ```js
 // Test the Unicode category L (Letter)
-var unicodeWord = XRegExp('^\\pL+$');
+const unicodeWord = XRegExp('^\\pL+$');
 unicodeWord.test('Русский'); // -> true
 unicodeWord.test('日本語'); // -> true
 unicodeWord.test('العربية'); // -> true
@@ -124,7 +126,7 @@ XRegExp uses Unicode 9.0.0.
 Build regular expressions using named subpatterns, for readability and pattern reuse:
 
 ```js
-var time = XRegExp.build('(?x)^ {{hours}} ({{minutes}}) $', {
+const time = XRegExp.build('(?x)^ {{hours}} ({{minutes}}) $', {
     hours: XRegExp.build('{{h12}} : | {{h24}}', {
         h12: /1[0-2]|0?[1-9]/,
         h24: /2[0-3]|[01][0-9]/
@@ -138,20 +140,18 @@ XRegExp.exec('10:59', time).minutes; // -> '59'
 
 Named subpatterns can be provided as strings or regex objects. A leading `^` and trailing unescaped `$` are stripped from subpatterns if both are present, which allows embedding independently-useful anchored patterns. `{{…}}` tokens can be quantified as a single unit. Any backreferences in the outer pattern or provided subpatterns are automatically renumbered to work correctly within the larger combined pattern. The syntax `({{name}})` works as shorthand for named capture via `(?<name>{{name}})`. Named subpatterns cannot be embedded within character classes.
 
-See also: *[Creating Grammatical Regexes Using XRegExp.build](http://blog.stevenlevithan.com/archives/grammatical-patterns-xregexp-build)*.
-
 ### XRegExp.matchRecursive
 
 Match recursive constructs using XRegExp pattern strings as left and right delimiters:
 
 ```js
-var str = '(t((e))s)t()(ing)';
-XRegExp.matchRecursive(str, '\\(', '\\)', 'g');
+const str1 = '(t((e))s)t()(ing)';
+XRegExp.matchRecursive(str1, '\\(', '\\)', 'g');
 // -> ['t((e))s', '', 'ing']
 
 // Extended information mode with valueNames
-str = 'Here is <div> <div>an</div></div> example';
-XRegExp.matchRecursive(str, '<div\\s*>', '</div>', 'gi', {
+const str2 = 'Here is <div> <div>an</div></div> example';
+XRegExp.matchRecursive(str2, '<div\\s*>', '</div>', 'gi', {
     valueNames: ['between', 'left', 'match', 'right']
 });
 /* -> [
@@ -163,8 +163,8 @@ XRegExp.matchRecursive(str, '<div\\s*>', '</div>', 'gi', {
 ] */
 
 // Omitting unneeded parts with null valueNames, and using escapeChar
-str = '...{1}.\\{{function(x,y){return {y:x}}}';
-XRegExp.matchRecursive(str, '{', '}', 'g', {
+const str3 = '...{1}.\\{{function(x,y){return {y:x}}}';
+XRegExp.matchRecursive(str3, '{', '}', 'g', {
     valueNames: ['literal', null, 'value', null],
     escapeChar: '\\'
 });
@@ -176,8 +176,8 @@ XRegExp.matchRecursive(str, '{', '}', 'g', {
 ] */
 
 // Sticky mode via flag y
-str = '<1><<<2>>><3>4<5>';
-XRegExp.matchRecursive(str, '<', '>', 'gy');
+const str4 = '<1><<<2>>><3>4<5>';
+XRegExp.matchRecursive(str4, '<', '>', 'gy');
 // -> ['1', '<<2>>', '3']
 ```
 
@@ -200,7 +200,7 @@ npm install xregexp
 In [Node.js](http://nodejs.org/):
 
 ```js
-var XRegExp = require('xregexp');
+const XRegExp = require('xregexp');
 ```
 
 In an AMD loader like [RequireJS](http://requirejs.org/):
