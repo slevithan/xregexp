@@ -187,7 +187,7 @@ export default (XRegExp) => {
                     intro = '(?:';
                 }
                 numPriorCaps = numCaps;
-                return `${intro + data[subName].pattern.replace(subParts, (match, paren, backref) => {
+                const rewrittenSubpattern = data[subName].pattern.replace(subParts, (match, paren, backref) => {
                     // Capturing group
                     if (paren) {
                         capName = data[subName].names[numCaps - numPriorCaps];
@@ -206,7 +206,8 @@ export default (XRegExp) => {
                             `\\${+backref + numPriorCaps}`;
                     }
                     return match;
-                })})`;
+                });
+                return `${intro}${rewrittenSubpattern})`;
             }
             // Capturing group
             if ($3) {
