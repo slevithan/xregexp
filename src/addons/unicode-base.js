@@ -49,22 +49,13 @@ export default (XRegExp) => {
     function invertBmp(range) {
         let output = '';
         let lastEnd = -1;
+        const bmpPattern = '\\\\x..|\\\\u....|\\\\?[\\s\\S]';
 
         XRegExp.forEach(
             range,
             new RegExp(`
-                (
-                      \\x..
-                    | \\u....
-                    | \\?[\s\S]
-                )
-                (?:
-                    -(
-                          \\x..
-                        | \\u....
-                        | \\?[\s\S]
-                    )
-                )?
+                (${bmpPattern})
+                (?:-(${bmpPattern}))?
             `, 'x'),
             (m) => {
                 const start = charCode(m[1]);
