@@ -4,17 +4,10 @@
  * Steven Levithan (c) 2012-2017 MIT License
  */
 
+import {unionParts as subParts} from '../xregexp';
+
 export default (XRegExp) => {
     const REGEX_DATA = 'xregexp';
-    const subParts = new RegExp(`
-          (\()(?!\?)
-        | \\([1-9]\d*)
-        | \\[\s\S]
-        | \[(?:
-                [^\\\]]
-              | \\[\s\S]
-          )*\]
-    `, 'gx');
     const parts = XRegExp.union([new RegExp(`
           \({{([\w$]+)}}\)
         |   {{([\w$]+)}}

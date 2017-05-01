@@ -1335,6 +1335,16 @@ XRegExp.uninstall = (options) => {
     }
 };
 
+const unionParts = new RegExp(`
+      (\()(?!\?)
+    | \\([1-9]\d*)
+    | \\[\s\S]
+    | \[(?:
+            [^\\\]]
+          | \\[\s\S]
+      )*\]
+`, 'gx');
+
 /**
  * Returns an XRegExp object that is the union of the given patterns. Patterns can be provided as
  * regex objects or strings. Metacharacters are escaped in patterns provided as strings.
@@ -1386,15 +1396,6 @@ XRegExp.union = (patterns, flags, options) => {
         throw new TypeError('Must provide a nonempty array of patterns to merge');
     }
 
-    const parts = new RegExp(`
-          (\()(?!\?)
-        | \\([1-9]\d*)
-        | \\[\s\S]
-        | \[(?:
-                [^\\\]]
-              | \\[\s\S]
-          )*\]
-    `, 'gx');
     const output = [];
     let pattern;
     for (let i = 0; i < patterns.length; ++i) {
@@ -1406,7 +1407,7 @@ XRegExp.union = (patterns, flags, options) => {
 
             // Rewrite backreferences. Passing to XRegExp dies on octals and ensures patterns are
             // independently valid; helps keep this simple. Named captures are put back
-            output.push(nativ.replace.call(XRegExp(pattern.source).source, parts, rewrite));
+            output.push(nativ.replace.call(XRegExp(pattern.source).source, unionParts, rewrite));
         } else {
             output.push(XRegExp.escape(pattern));
         }
@@ -1919,3 +1920,4 @@ XRegExp.addToken(
 );
 
 export default XRegExp;
+export {unionParts};
