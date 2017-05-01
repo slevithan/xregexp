@@ -49,7 +49,7 @@ export default (XRegExp) => {
     function invertBmp(range) {
         let output = '';
         let lastEnd = -1;
-        const bmpPattern = '\\\\x..|\\\\u....|\\\\?[\\s\\S]';
+        const bmpPattern = /\\x..|\\u....|\\?[\s\S]/.source;
 
         XRegExp.forEach(
             range,
