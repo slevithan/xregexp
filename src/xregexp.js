@@ -44,12 +44,51 @@ const classScope = 'class';
 // Regexes that match native regex syntax, including octals
 const nativeTokens = {
     // Any native multicharacter token in default scope, or any single character
-    'default': /\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u(?:[\dA-Fa-f]{4}|{[\dA-Fa-f]+})|c[A-Za-z]|[\s\S])|\(\?(?:[:=!]|<[=!])|[?*+]\?|{\d+(?:,\d*)?}\??|[\s\S]/,
+    'default': new RegExp(`
+          \\(?:
+                0(?:
+                      [0-3][0-7]{0,2}
+                    | [4-7][0-7]?
+                )?
+              | [1-9]\d*
+              | x[\dA-Fa-f]{2}
+              | u(?:
+                     [\dA-Fa-f]{4}
+                  | {[\dA-Fa-f]+}
+                )
+              | c[A-Za-z]
+              | [\s\S]
+          )
+        | \(\?(?:
+            [:=!]
+            | <[=!]
+          )
+        | [?*+]\?
+        | {\d+(?:,\d*)?}\??
+        | [\s\S]
+    `, 'x'),
     // Any native multicharacter token in character class scope, or any single character
-    'class': /\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u(?:[\dA-Fa-f]{4}|{[\dA-Fa-f]+})|c[A-Za-z]|[\s\S])|[\s\S]/
+    'class': new RegExp(`
+          \\(?:
+                [0-3][0-7]{0,2}
+              | [4-7][0-7]?
+              | x[\dA-Fa-f]{2}
+              | u(?:
+                     [\dA-Fa-f]{4}
+                  | {[\dA-Fa-f]+}
+                )
+              | c[A-Za-z]
+              | [\s\S]
+          )
+        | [\s\S]
+    `, 'x')
 };
 // Any backreference or dollar-prefixed character in replacement strings
-const replacementToken = /\$(?:{([\w$]+)}|<([\w$]+)>|(\d\d?|[\s\S]))/g;
+const replacementToken = new RegExp(`\$(?:
+      {([\w$]+)}
+    | <([\w$]+)>
+    | (\d\d?|[\s\S])
+)`, 'gx');
 // Check for correct `exec` handling of nonparticipating capturing groups
 const correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined;
 // Check for ES6 `flags` prop support
@@ -1347,7 +1386,15 @@ XRegExp.union = (patterns, flags, options) => {
         throw new TypeError('Must provide a nonempty array of patterns to merge');
     }
 
-    const parts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*\]/g;
+    const parts = new RegExp(`
+          (\()(?!\?)
+        | \\([1-9]\d*)
+        | \\[\s\S]
+        | \[(?:
+                [^\\\]]
+              | \\[\s\S]
+          )*\]
+    `, 'gx');
     const output = [];
     let pattern;
     for (let i = 0; i < patterns.length; ++i) {
@@ -1673,7 +1720,17 @@ fixed.split = function(separator, limit) {
  * consistency and to reserve their syntax, but lets them be superseded by addons.
  */
 XRegExp.addToken(
-    /\\([ABCE-RTUVXYZaeg-mopqyz]|c(?![A-Za-z])|u(?![\dA-Fa-f]{4}|{[\dA-Fa-f]+})|x(?![\dA-Fa-f]{2}))/,
+    new RegExp(`
+        \\(
+              [ABCE-RTUVXYZaeg-mopqyz]
+            | c(?![A-Za-z])
+            | u(?!
+                     [\dA-Fa-f]{4}
+                  | {[\dA-Fa-f]+}
+              )
+            | x(?![\dA-Fa-f]{2})
+        )
+    `, 'x'),
     (match, scope) => {
         // \B is allowed in default scope only
         if (match[1] === 'B' && scope === defaultScope) {

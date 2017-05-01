@@ -6,8 +6,19 @@
 
 export default (XRegExp) => {
     const REGEX_DATA = 'xregexp';
-    const subParts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*\]/g;
-    const parts = XRegExp.union([/\({{([\w$]+)}}\)|{{([\w$]+)}}/, subParts], 'g', {
+    const subParts = new RegExp(`
+          (\()(?!\?)
+        | \\([1-9]\d*)
+        | \\[\s\S]
+        | \[(?:
+                [^\\\]]
+              | \\[\s\S]
+          )*\]
+    `, 'gx');
+    const parts = XRegExp.union([new RegExp(`
+          \({{([\w$]+)}}\)
+        |   {{([\w$]+)}}
+    `, 'x'), subParts], 'g', {
         conjunction: 'or'
     });
 

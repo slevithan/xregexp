@@ -52,7 +52,20 @@ export default (XRegExp) => {
 
         XRegExp.forEach(
             range,
-            /(\\x..|\\u....|\\?[\s\S])(?:-(\\x..|\\u....|\\?[\s\S]))?/,
+            new RegExp(`
+                (
+                      \\x..
+                    | \\u....
+                    | \\?[\s\S]
+                )
+                (?:
+                    -(
+                          \\x..
+                        | \\u....
+                        | \\?[\s\S]
+                    )
+                )?
+            `, 'x'),
             (m) => {
                 const start = charCode(m[1]);
                 if (start > (lastEnd + 1)) {
@@ -123,7 +136,13 @@ export default (XRegExp) => {
      */
     XRegExp.addToken(
         // Use `*` instead of `+` to avoid capturing `^` as the token name in `\p{^}`
-        /\\([pP])(?:{(\^?)([^}]*)}|([A-Za-z]))/,
+        new RegExp(`
+            \\([pP])
+            (?:
+                  {(\^?)([^}]*)}
+                | ([A-Za-z])
+            )
+        `, 'x'),
         (match, scope, flags) => {
             const ERR_DOUBLE_NEG = 'Invalid double negation ';
             const ERR_UNKNOWN_NAME = 'Unknown Unicode token ';
