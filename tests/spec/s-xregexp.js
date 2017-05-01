@@ -805,6 +805,16 @@ describe('XRegExp()', function() {
                 expect(XRegExp('(?:#\n.#\n)', 'x').source).toBe('(?:.)');
             });
 
+            it('should not add atom separator (?:) at the beginning or end of a lookahead in simple cases', function() {
+                expect(XRegExp('(?= . )', 'x').source).toBe('(?=.)');
+                expect(XRegExp('(?=#\n.#\n)', 'x').source).toBe('(?=.)');
+            });
+
+            it('should not add atom separator (?:) at the beginning or end of a negated lookahead in simple cases', function() {
+                expect(XRegExp('(?! . )', 'x').source).toBe('(?!.)');
+                expect(XRegExp('(?!#\n.#\n)', 'x').source).toBe('(?!.)');
+            });
+
             it('should not add atom separator (?:) at the beginning or end of the pattern in simple cases', function() {
                 expect(XRegExp(' ( . ) ', 'x').source).toBe('(.)');
                 expect(XRegExp(' (#\n.#\n) ', 'x').source).toBe('(.)');
