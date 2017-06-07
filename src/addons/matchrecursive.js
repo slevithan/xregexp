@@ -180,7 +180,14 @@ export default (XRegExp) => {
                     }
                 }
             } else {
-                throw new Error('Unbalanced delimiter found in string');
+                if (output.length === 0) {
+                    throw new Error("string contains unbalanced delimiters");
+                } else {
+                    if (global && !sticky && vN && vN[0] && str.length > lastOuterEnd) {
+                        output.push(row(vN[0], str.slice(lastOuterEnd), lastOuterEnd, str.length));
+                    }
+                    return output;
+                }
             }
             // If the delimiter matched an empty string, avoid an infinite loop
             if (delimStart === delimEnd) {
