@@ -79,7 +79,7 @@ XRegExp = XRegExp || (function (undef) {
         compliantExecNpcg = nativ.exec.call(/()??/, "")[1] === undef,
 
 // Check for flag y support (Firefox 3+)
-        hasNativeY = RegExp.prototype.sticky !== undef,
+        hasNativeY = RegExp.prototype.hasOwnProperty('sticky'),
 
 // Used to kill infinite recursion during XRegExp construction
         isInsideConstructor = false,
