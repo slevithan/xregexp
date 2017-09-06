@@ -23,6 +23,7 @@
     "LICENSE"
   ],
   "scripts": {
+    "postinstall": "browserify src/index.js --standalone XRegExp > xregexp-all.js"
     "lint": "eslint src",
     "babel": "babel src -d lib",
     "prebuild": "npm run lint && npm run babel",
