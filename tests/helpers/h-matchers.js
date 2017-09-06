@@ -1,4 +1,8 @@
-beforeEach(function() {
+if (typeof global === 'undefined') {
+    global = window;
+}
+
+global.addToEqualMatchMatcher = function() {
     jasmine.addMatchers({
         // Similar to toEqual with arrays, but ignores custom properties of arrays. Useful when
         // comparing regex matches with array literals.
@@ -30,4 +34,4 @@ beforeEach(function() {
             };
         }
     });
-});
+}

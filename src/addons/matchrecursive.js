@@ -1,21 +1,22 @@
 /*!
- * XRegExp.matchRecursive 3.1.1-next
+ * XRegExp.matchRecursive 3.2.0-next
  * <xregexp.com>
- * Steven Levithan (c) 2009-2016 MIT License
+ * Steven Levithan (c) 2009-2017 MIT License
  */
 
-module.exports = function(XRegExp) {
-    'use strict';
+export default (XRegExp) => {
 
     /**
      * Returns a match detail object composed of the provided values.
+     *
+     * @private
      */
     function row(name, value, start, end) {
         return {
-            name: name,
-            value: value,
-            start: start,
-            end: end
+            name,
+            value,
+            start,
+            end
         };
     }
 
@@ -24,6 +25,7 @@ module.exports = function(XRegExp) {
      * objects with detailed match parts and position data. An error is thrown if delimiters are
      * unbalanced within the data.
      *
+     * @memberOf XRegExp
      * @param {String} str String to search.
      * @param {String} left Left delimiter as an XRegExp pattern.
      * @param {String} right Right delimiter as an XRegExp pattern.
@@ -33,7 +35,7 @@ module.exports = function(XRegExp) {
      * @example
      *
      * // Basic usage
-     * var str = '(t((e))s)t()(ing)';
+     * let str = '(t((e))s)t()(ing)';
      * XRegExp.matchRecursive(str, '\\(', '\\)', 'g');
      * // -> ['t((e))s', '', 'ing']
      *
@@ -68,25 +70,25 @@ module.exports = function(XRegExp) {
      * XRegExp.matchRecursive(str, '<', '>', 'gy');
      * // -> ['1', '<<2>>', '3']
      */
-    XRegExp.matchRecursive = function(str, left, right, flags, options) {
+    XRegExp.matchRecursive = (str, left, right, flags, options) => {
         flags = flags || '';
         options = options || {};
-        var global = flags.indexOf('g') > -1,
-            sticky = flags.indexOf('y') > -1,
-            // Flag `y` is controlled internally
-            basicFlags = flags.replace(/y/g, ''),
-            escapeChar = options.escapeChar,
-            vN = options.valueNames,
-            output = [],
-            openTokens = 0,
-            delimStart = 0,
-            delimEnd = 0,
-            lastOuterEnd = 0,
-            outerStart,
-            innerStart,
-            leftMatch,
-            rightMatch,
-            esc;
+        const global = flags.includes('g');
+        const sticky = flags.includes('y');
+        // Flag `y` is controlled internally
+        const basicFlags = flags.replace(/y/g, '');
+        let escapeChar = options.escapeChar;
+        const vN = options.valueNames;
+        const output = [];
+        let openTokens = 0;
+        let delimStart = 0;
+        let delimEnd = 0;
+        let lastOuterEnd = 0;
+        let outerStart;
+        let innerStart;
+        let leftMatch;
+        let rightMatch;
+        let esc;
         left = XRegExp(left, basicFlags);
         right = XRegExp(right, basicFlags);
 
@@ -95,11 +97,19 @@ module.exports = function(XRegExp) {
                 throw new Error('Cannot use more than one escape character');
             }
             escapeChar = XRegExp.escape(escapeChar);
-            // Using `XRegExp.union` safely rewrites backreferences in `left` and `right`
+            // Example of concatenated `esc` regex:
+            // `escapeChar`: '%'
+            // `left`: '<'
+            // `right`: '>'
+            // Regex is: /(?:%[\S\s]|(?:(?!<|>)[^%])+)+/
             esc = new RegExp(
-                '(?:' + escapeChar + '[\\S\\s]|(?:(?!' +
-                    XRegExp.union([left, right]).source +
-                    ')[^' + escapeChar + '])+)+',
+                `(?:${escapeChar}[\\S\\s]|(?:(?!${
+                    // Using `XRegExp.union` safely rewrites backreferences in `left` and `right`.
+                    // Intentionally not passing `basicFlags` to `XRegExp.union` since any syntax
+                    // transformation resulting from those flags was already applied to `left` and
+                    // `right` when they were passed through the XRegExp constructor above.
+                    XRegExp.union([left, right], '', {conjunction: 'or'}).source
+                })[^${escapeChar}])+)+`,
                 // Flags `gy` not needed here
                 flags.replace(/[^imu]+/g, '')
             );
@@ -184,5 +194,4 @@ module.exports = function(XRegExp) {
 
         return output;
     };
-
 };

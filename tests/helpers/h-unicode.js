@@ -1,8 +1,11 @@
+if (typeof global === 'undefined') {
+    global = window;
+}
 /*
  * Runs a series of `expect` assertions, given a Unicode token name and arrays of code points that
  * should or should not be matched.
  */
-function testUnicodeToken(name, options) {
+global.testUnicodeToken = function (name, options) {
     var pattern = '^\\p{' + name + '}$';
     var negated = '^\\P{' + name + '}$';
     var astralRegex = XRegExp(pattern, 'A');

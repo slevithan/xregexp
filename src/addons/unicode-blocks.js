@@ -1,19 +1,18 @@
 /*!
- * XRegExp Unicode Blocks 3.1.1-next
+ * XRegExp Unicode Blocks 3.2.0-next
  * <xregexp.com>
- * Steven Levithan (c) 2010-2016 MIT License
+ * Steven Levithan (c) 2010-2017 MIT License
  * Unicode data by Mathias Bynens <mathiasbynens.be>
  */
 
-module.exports = function(XRegExp) {
-    'use strict';
+export default (XRegExp) => {
 
     /**
      * Adds support for all Unicode blocks. Block names use the prefix 'In'. E.g.,
      * `\p{InBasicLatin}`. Token names are case insensitive, and any spaces, hyphens, and
      * underscores are ignored.
      *
-     * Uses Unicode 8.0.0.
+     * Uses Unicode 9.0.0.
      *
      * @requires XRegExp, Unicode Base
      */
@@ -23,6 +22,10 @@ module.exports = function(XRegExp) {
     }
 
     XRegExp.addUnicodeData([
+        {
+            name: 'InAdlam',
+            astral: '\uD83A[\uDD00-\uDD5F]'
+        },
         {
             name: 'InAegean_Numbers',
             astral: '\uD800[\uDD00-\uDD3F]'
@@ -120,6 +123,10 @@ module.exports = function(XRegExp) {
             bmp: '\u0980-\u09FF'
         },
         {
+            name: 'InBhaiksuki',
+            astral: '\uD807[\uDC00-\uDC6F]'
+        },
+        {
             name: 'InBlock_Elements',
             bmp: '\u2580-\u259F'
         },
@@ -197,7 +204,7 @@ module.exports = function(XRegExp) {
         },
         {
             name: 'InCJK_Unified_Ideographs_Extension_C',
-            astral: '\uD86D[\uDC00-\uDF3F]|[\uD86A-\uD86C][\uDC00-\uDFFF]|\uD869[\uDF00-\uDFFF]'
+            astral: '\uD869[\uDF00-\uDFFF]|[\uD86A-\uD86C][\uDC00-\uDFFF]|\uD86D[\uDC00-\uDF3F]'
         },
         {
             name: 'InCJK_Unified_Ideographs_Extension_D',
@@ -205,7 +212,7 @@ module.exports = function(XRegExp) {
         },
         {
             name: 'InCJK_Unified_Ideographs_Extension_E',
-            astral: '[\uD86F-\uD872][\uDC00-\uDFFF]|\uD873[\uDC00-\uDEAF]|\uD86E[\uDC20-\uDFFF]'
+            astral: '\uD86E[\uDC20-\uDFFF]|[\uD86F-\uD872][\uDC00-\uDFFF]|\uD873[\uDC00-\uDEAF]'
         },
         {
             name: 'InCarian',
@@ -298,6 +305,10 @@ module.exports = function(XRegExp) {
         {
             name: 'InCyrillic_Extended_B',
             bmp: '\uA640-\uA69F'
+        },
+        {
+            name: 'InCyrillic_Extended_C',
+            bmp: '\u1C80-\u1C8F'
         },
         {
             name: 'InCyrillic_Supplement',
@@ -400,6 +411,10 @@ module.exports = function(XRegExp) {
             bmp: '\u2C00-\u2C5F'
         },
         {
+            name: 'InGlagolitic_Supplement',
+            astral: '\uD838[\uDC00-\uDC2F]'
+        },
+        {
             name: 'InGothic',
             astral: '\uD800[\uDF30-\uDF4F]'
         },
@@ -478,6 +493,10 @@ module.exports = function(XRegExp) {
         {
             name: 'InIdeographic_Description_Characters',
             bmp: '\u2FF0-\u2FFF'
+        },
+        {
+            name: 'InIdeographic_Symbols_and_Punctuation',
+            astral: '\uD81B[\uDFE0-\uDFFF]'
         },
         {
             name: 'InImperial_Aramaic',
@@ -640,6 +659,10 @@ module.exports = function(XRegExp) {
             astral: '\uD802[\uDEC0-\uDEFF]'
         },
         {
+            name: 'InMarchen',
+            astral: '\uD807[\uDC70-\uDCBF]'
+        },
+        {
             name: 'InMathematical_Alphanumeric_Symbols',
             astral: '\uD835[\uDC00-\uDFFF]'
         },
@@ -689,7 +712,7 @@ module.exports = function(XRegExp) {
         },
         {
             name: 'InMiscellaneous_Symbols_and_Pictographs',
-            astral: '\uD83D[\uDC00-\uDDFF]|\uD83C[\uDF00-\uDFFF]'
+            astral: '\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF]'
         },
         {
             name: 'InMiscellaneous_Technical',
@@ -706,6 +729,10 @@ module.exports = function(XRegExp) {
         {
             name: 'InMongolian',
             bmp: '\u1800-\u18AF'
+        },
+        {
+            name: 'InMongolian_Supplement',
+            astral: '\uD805[\uDE60-\uDE7F]'
         },
         {
             name: 'InMro',
@@ -742,6 +769,10 @@ module.exports = function(XRegExp) {
         {
             name: 'InNew_Tai_Lue',
             bmp: '\u1980-\u19DF'
+        },
+        {
+            name: 'InNewa',
+            astral: '\uD805[\uDC00-\uDC7F]'
         },
         {
             name: 'InNumber_Forms',
@@ -794,6 +825,10 @@ module.exports = function(XRegExp) {
         {
             name: 'InOrnamental_Dingbats',
             astral: '\uD83D[\uDE50-\uDE7F]'
+        },
+        {
+            name: 'InOsage',
+            astral: '\uD801[\uDCB0-\uDCFF]'
         },
         {
             name: 'InOsmanya',
@@ -996,6 +1031,14 @@ module.exports = function(XRegExp) {
             bmp: '\u0B80-\u0BFF'
         },
         {
+            name: 'InTangut',
+            astral: '[\uD81C-\uD821][\uDC00-\uDFFF]'
+        },
+        {
+            name: 'InTangut_Components',
+            astral: '\uD822[\uDC00-\uDEFF]'
+        },
+        {
             name: 'InTelugu',
             bmp: '\u0C00-\u0C7F'
         },
@@ -1072,5 +1115,4 @@ module.exports = function(XRegExp) {
             bmp: '\u4DC0-\u4DFF'
         }
     ]);
-
 };

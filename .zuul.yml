@@ -1,0 +1,40 @@
+ui: jasmine2
+
+scripts:
+  - "tests/vendor/jasmine/jasmine.js"
+  - "tests/vendor/jasmine/jasmine-html.js"
+  - "tests/vendor/jasmine/boot.js"
+
+  - "xregexp-all.js"
+
+  - "tests/helpers/h.js"
+  - "tests/helpers/h-matchers.js"
+  - "tests/helpers/h-unicode.js"
+
+browsers:
+  - name: chrome
+    version: [49, 55..latest]
+
+  - name: firefox
+    version: [45, 50..latest]
+
+  - name: safari
+    version: 9..latest
+
+  - name: opera
+    version: 12..latest
+
+  - name: ie
+    version: 10..latest
+
+  - name: microsoftedge
+    version: 13..latest
+
+  - name: android
+    version: '4.4..latest'
+
+  - name: iphone
+    version: '9.3..latest'
+
+  - name: ipad
+    version: '9.3..latest'

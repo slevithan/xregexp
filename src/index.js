@@ -1,11 +1,19 @@
-var XRegExp = require('./xregexp');
+import XRegExp from './xregexp';
 
-require('./addons/build')(XRegExp);
-require('./addons/matchrecursive')(XRegExp);
-require('./addons/unicode-base')(XRegExp);
-require('./addons/unicode-blocks')(XRegExp);
-require('./addons/unicode-categories')(XRegExp);
-require('./addons/unicode-properties')(XRegExp);
-require('./addons/unicode-scripts')(XRegExp);
+import build from './addons/build';
+import matchrecursive from './addons/matchrecursive';
+import unicodeBase from './addons/unicode-base';
+import unicodeBlocks from './addons/unicode-blocks';
+import unicodeCategories from './addons/unicode-categories';
+import unicodeProperties from './addons/unicode-properties';
+import unicodeScripts from './addons/unicode-scripts';
 
-module.exports = XRegExp;
+build(XRegExp);
+matchrecursive(XRegExp);
+unicodeBase(XRegExp);
+unicodeBlocks(XRegExp);
+unicodeCategories(XRegExp);
+unicodeProperties(XRegExp);
+unicodeScripts(XRegExp);
+
+export default XRegExp;

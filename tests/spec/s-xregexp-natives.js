@@ -1,3 +1,8 @@
+beforeEach(function() {
+    global.disableOptInFeatures();
+    global.addToEqualMatchMatcher();
+});
+
 describe('When overridden, RegExp.prototype.exec()', function() {
 
     beforeEach(function() {
@@ -508,13 +513,16 @@ describe('When overridden, String.prototype.replace()', function() {
 
                 it('should return the named backreference', function() {
                     expect('test'.replace(XRegExp('(?<test>t)', 'g'), ':${test}:')).toBe(':t:es:t:');
+                    expect('test'.replace(XRegExp('(?<test>t)', 'g'), ':$<test>:')).toBe(':t:es:t:');
 
                     // Backreference to a nonparticipating capturing group
                     expect('test'.replace(XRegExp('t|(?<test>t)', 'g'), ':${test}:')).toBe('::es::');
+                    expect('test'.replace(XRegExp('t|(?<test>t)', 'g'), ':$<test>:')).toBe('::es::');
                 });
 
                 it('should throw an exception for backreferences to unknown group names', function() {
                     expect(function() {'test'.replace(XRegExp('(?<test>t)', 'g'), ':${x}:');}).toThrowError(SyntaxError);
+                    expect(function() {'test'.replace(XRegExp('(?<test>t)', 'g'), ':$<x>:');}).toThrowError(SyntaxError);
                 });
 
             });
@@ -523,34 +531,51 @@ describe('When overridden, String.prototype.replace()', function() {
 
                 it('should return the numbered backreference', function() {
                     expect('test'.replace(/(.)./g, '${1}')).toBe('ts');
+                    expect('test'.replace(/(.)./g, '$<1>')).toBe('ts');
 
                     // Backreference to a nonparticipating capturing group
                     expect('test'.replace(/t|(e)/g, '${1}')).toBe('es');
+                    expect('test'.replace(/t|(e)/g, '$<1>')).toBe('es');
                 });
 
                 it('should allow leading zeros', function() {
                     expect('test'.replace(/(.)./g, '${01}')).toBe('ts');
+                    expect('test'.replace(/(.)./g, '$<01>')).toBe('ts');
+
                     expect('test'.replace(/(.)./g, '${001}')).toBe('ts');
+                    expect('test'.replace(/(.)./g, '$<001>')).toBe('ts');
                 });
 
                 it('should return named backreferences by number', function() {
                     expect('test'.replace(XRegExp('(?<name>.).', 'g'), '${1}')).toBe('ts');
+                    expect('test'.replace(XRegExp('(?<name>.).', 'g'), '$<1>')).toBe('ts');
                 });
 
                 it('should separate numbered backreferences from following literal digits', function() {
                     expect('test'.replace(new RegExp('(.).', 'g'), '${1}0')).toBe('t0s0');
+                    expect('test'.replace(new RegExp('(.).', 'g'), '$<1>0')).toBe('t0s0');
+
                     expect('test'.replace(new RegExp('(.).' + repeat('()', 9), 'g'), '${1}0')).toBe('t0s0');
+                    expect('test'.replace(new RegExp('(.).' + repeat('()', 9), 'g'), '$<1>0')).toBe('t0s0');
                 });
 
                 it('should throw an exception for backreferences to unknown group numbers', function() {
                     expect(function() {'test'.replace(/t/, '${1}');}).toThrowError(SyntaxError);
+                    expect(function() {'test'.replace(/t/, '$<1>');}).toThrowError(SyntaxError);
+
                     expect(function() {'test'.replace(/(t)/, '${2}');}).toThrowError(SyntaxError);
+                    expect(function() {'test'.replace(/(t)/, '$<2>');}).toThrowError(SyntaxError);
                 });
 
                 it('should allow ${0} to refer to the entire match', function() {
                     expect('test'.replace(/../g, '${0}:')).toBe('te:st:');
+                    expect('test'.replace(/../g, '$<0>:')).toBe('te:st:');
+
                     expect('test'.replace(/../g, '${00}:')).toBe('te:st:');
+                    expect('test'.replace(/../g, '$<00>:')).toBe('te:st:');
+
                     expect('test'.replace(/../g, '${000}:')).toBe('te:st:');
+                    expect('test'.replace(/../g, '$<000>:')).toBe('te:st:');
                 });
 
                 it('should support backreferences 100 and greater, if the browser does natively', function() {
@@ -567,6 +592,8 @@ describe('When overridden, String.prototype.replace()', function() {
                         ].join(''));
 
                         expect('aabbcd'.replace(lottaGroups, '${0} ${01} ${001} ${0001} ${1} ${10} ${100} ${1000}')).toBe('aabbcd a a a a b c d');
+                        expect('aabbcd'.replace(lottaGroups, '$<0> $<01> $<001> $<0001> $<1> $<10> $<100> $<1000>')).toBe('aabbcd a a a a b c d');
+                        expect('aabbcd'.replace(lottaGroups, '$<0> ${01} $<001> ${0001} $<1> ${10} $<100> ${1000}')).toBe('aabbcd a a a a b c d');
                         // For comparison...
                         expect('aabbcd'.replace(lottaGroups, '$0 $01 $001 $0001 $1 $10 $100 $1000')).toBe('aabbcd a aabbcd1 aabbcd01 a b b0 b00');
                     } catch (err) {
