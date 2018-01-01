@@ -728,11 +728,10 @@ describe('XRegExp.install()', function() {
 
     // NOTE: All optional features are uninstalled before each spec runs
 
-    var features = ['natives', 'astral'];
+    var features = ['astral'];
 
     it('should install all features set as true on an options object', function() {
         XRegExp.install({
-            natives: true,
             astral: true
         });
 
@@ -743,7 +742,6 @@ describe('XRegExp.install()', function() {
 
     it('should not install features set as false on an options object', function() {
         XRegExp.install({
-            natives: false,
             astral: false
         });
 
@@ -753,7 +751,7 @@ describe('XRegExp.install()', function() {
     });
 
     it('should install all features in a space-delimited options string', function() {
-        XRegExp.install('natives astral');
+        XRegExp.install('astral astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(true);
@@ -761,7 +759,7 @@ describe('XRegExp.install()', function() {
     });
 
     it('should install all features in a comma-delimited options string', function() {
-        XRegExp.install('natives,astral');
+        XRegExp.install('astral,astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(true);
@@ -769,7 +767,7 @@ describe('XRegExp.install()', function() {
     });
 
     it('should install all features in a comma+space-delimited options string', function() {
-        XRegExp.install('natives, astral');
+        XRegExp.install('astral, astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(true);
@@ -784,27 +782,27 @@ describe('XRegExp.install()', function() {
 describe('XRegExp.isInstalled()', function() {
 
     it('should not check multiple space-delimited features simultaneously', function() {
-        XRegExp.install('natives astral');
+        XRegExp.install('astral');
 
-        expect(XRegExp.isInstalled('natives astral')).toBe(false);
+        expect(XRegExp.isInstalled('astral astral')).toBe(false);
     });
 
     it('should not check multiple comma-delimited features simultaneously', function() {
-        XRegExp.install('natives astral');
+        XRegExp.install('astral');
 
-        expect(XRegExp.isInstalled('natives,astral')).toBe(false);
+        expect(XRegExp.isInstalled('astral,astral')).toBe(false);
     });
 
     it('should not check multiple comma+space-delimited features simultaneously', function() {
-        XRegExp.install('natives astral');
+        XRegExp.install('astral');
 
-        expect(XRegExp.isInstalled('natives, astral')).toBe(false);
+        expect(XRegExp.isInstalled('astral, astral')).toBe(false);
     });
 
     it('should not check features using an options object', function() {
-        XRegExp.install('natives');
+        XRegExp.install('astral');
 
-        expect(XRegExp.isInstalled({natives: true})).toBe(false);
+        expect(XRegExp.isInstalled({astral: true})).toBe(false);
     });
 
     it('should report unknown features as not installed', function() {
@@ -812,9 +810,9 @@ describe('XRegExp.isInstalled()', function() {
     });
 
     it('should be case sensitive for feature names', function() {
-        XRegExp.install('natives');
+        XRegExp.install('astral');
 
-        expect(XRegExp.isInstalled('Natives')).toBe(false);
+        expect(XRegExp.isInstalled('Astral')).toBe(false);
     });
 
 });
@@ -1584,14 +1582,13 @@ describe('XRegExp.test()', function() {
 describe('XRegExp.uninstall()', function() {
 
     beforeEach(function() {
-        XRegExp.install('natives astral');
+        XRegExp.install('astral');
     });
 
-    var features = ['natives', 'astral'];
+    var features = ['astral'];
 
     it('should uninstall all features set as true on an options object', function() {
         XRegExp.uninstall({
-            natives: true,
             astral: true
         });
 
@@ -1602,7 +1599,6 @@ describe('XRegExp.uninstall()', function() {
 
     it('should not uninstall features set as false on an options object', function() {
         XRegExp.uninstall({
-            natives: false,
             astral: false
         });
 
@@ -1612,7 +1608,7 @@ describe('XRegExp.uninstall()', function() {
     });
 
     it('should uninstall all features in a space-delimited options string', function() {
-        XRegExp.uninstall('natives astral');
+        XRegExp.uninstall('astral astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(false);
@@ -1620,7 +1616,7 @@ describe('XRegExp.uninstall()', function() {
     });
 
     it('should uninstall all features in a comma-delimited options string', function() {
-        XRegExp.uninstall('natives,astral');
+        XRegExp.uninstall('astral,astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(false);
@@ -1628,7 +1624,7 @@ describe('XRegExp.uninstall()', function() {
     });
 
     it('should uninstall all features in a comma+space-delimited options string', function() {
-        XRegExp.uninstall('natives, astral');
+        XRegExp.uninstall('astral, astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(false);
@@ -1636,11 +1632,11 @@ describe('XRegExp.uninstall()', function() {
     });
 
     it('should undo repeated installations with a single uninstall', function() {
-        XRegExp.install('natives');
-        XRegExp.install('natives');
-        XRegExp.uninstall('natives');
+        XRegExp.install('astral');
+        XRegExp.install('astral');
+        XRegExp.uninstall('astral');
 
-        expect(XRegExp.isInstalled('natives')).toBe(false);
+        expect(XRegExp.isInstalled('astral')).toBe(false);
     });
 
     // TODO: Add basic specs that verify whether actual functionality of uninstalled features is
