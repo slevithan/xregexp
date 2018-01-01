@@ -19,8 +19,7 @@
 const REGEX_DATA = 'xregexp';
 // Optional features that can be installed and uninstalled
 const features = {
-    astral: false,
-    natives: false
+    astral: false
 };
 // Native methods to use and restore ('native' is an ES3 reserved keyword)
 const nativ = {
@@ -466,22 +465,6 @@ function runTokens(pattern, flags, pos, scope, context) {
  */
 function setAstral(on) {
     features.astral = on;
-}
-
-/**
- * Enables or disables native method overrides.
- *
- * @private
- * @param {Boolean} on `true` to enable; `false` to disable.
- */
-function setNatives(on) {
-    RegExp.prototype.exec = (on ? fixed : nativ).exec;
-    RegExp.prototype.test = (on ? fixed : nativ).test;
-    String.prototype.match = (on ? fixed : nativ).match;
-    String.prototype.replace = (on ? fixed : nativ).replace;
-    String.prototype.split = (on ? fixed : nativ).split;
-
-    features.natives = on;
 }
 
 /**
@@ -933,24 +916,17 @@ XRegExp.globalize = (regex) => copyRegex(regex, {addG: true});
  * // With an options object
  * XRegExp.install({
  *   // Enables support for astral code points in Unicode addons (implicitly sets flag A)
- *   astral: true,
- *
- *   // DEPRECATED: Overrides native regex methods with fixed/extended versions
- *   natives: true
+ *   astral: true
  * });
  *
  * // With an options string
- * XRegExp.install('astral natives');
+ * XRegExp.install('astral');
  */
 XRegExp.install = (options) => {
     options = prepareOptions(options);
 
     if (!features.astral && options.astral) {
         setAstral(true);
-    }
-
-    if (!features.natives && options.natives) {
-        setNatives(true);
     }
 };
 
@@ -960,7 +936,6 @@ XRegExp.install = (options) => {
  * @memberOf XRegExp
  * @param {String} feature Name of the feature to check. One of:
  *   - `astral`
- *   - `natives`
  * @returns {Boolean} Whether the feature is installed.
  * @example
  *
@@ -1275,24 +1250,17 @@ XRegExp.test = (str, regex, pos, sticky) => !!XRegExp.exec(str, regex, pos, stic
  * // With an options object
  * XRegExp.uninstall({
  *   // Disables support for astral code points in Unicode addons
- *   astral: true,
- *
- *   // DEPRECATED: Restores native regex methods
- *   natives: true
+ *   astral: true
  * });
  *
  * // With an options string
- * XRegExp.uninstall('astral natives');
+ * XRegExp.uninstall('astral');
  */
 XRegExp.uninstall = (options) => {
     options = prepareOptions(options);
 
     if (features.astral && options.astral) {
         setAstral(false);
-    }
-
-    if (features.natives && options.natives) {
-        setNatives(false);
     }
 };
 
@@ -1375,8 +1343,7 @@ XRegExp.union = (patterns, flags, options) => {
 
 /**
  * Adds named capture support (with backreferences returned as `result.name`), and fixes browser
- * bugs in the native `RegExp.prototype.exec`. Calling `XRegExp.install('natives')` uses this to
- * override the native method. Use via `XRegExp.exec` without overriding natives.
+ * bugs in the native `RegExp.prototype.exec`. Use via `XRegExp.exec`.
  *
  * @memberOf RegExp
  * @param {String} str String to search.
@@ -1434,8 +1401,7 @@ fixed.exec = function(str) {
 };
 
 /**
- * Fixes browser bugs in the native `RegExp.prototype.test`. Calling `XRegExp.install('natives')`
- * uses this to override the native method.
+ * Fixes browser bugs in the native `RegExp.prototype.test`.
  *
  * @memberOf RegExp
  * @param {String} str String to search.
@@ -1448,8 +1414,7 @@ fixed.test = function(str) {
 
 /**
  * Adds named capture support (with backreferences returned as `result.name`), and fixes browser
- * bugs in the native `String.prototype.match`. Calling `XRegExp.install('natives')` uses this to
- * override the native method.
+ * bugs in the native `String.prototype.match`.
  *
  * @memberOf String
  * @param {RegExp|*} regex Regex to search with. If not a regex object, it is passed to `RegExp`.
@@ -1476,9 +1441,8 @@ fixed.match = function(regex) {
  * text, and provides named backreferences to replacement functions as `arguments[0].name`. Also
  * fixes browser bugs in replacement text syntax when performing a replacement using a nonregex
  * search value, and the value of a replacement regex's `lastIndex` property during replacement
- * iterations and upon completion. Calling `XRegExp.install('natives')` uses this to override the
- * native method. Note that this doesn't support SpiderMonkey's proprietary third (`flags`)
- * argument. Use via `XRegExp.replace` without overriding natives.
+ * iterations and upon completion. Note that this doesn't support SpiderMonkey's proprietary third
+ * (`flags`) argument. Use via `XRegExp.replace`.
  *
  * @memberOf String
  * @param {RegExp|String} search Search pattern to be replaced.
@@ -1609,8 +1573,7 @@ fixed.replace = function(search, replacement) {
 };
 
 /**
- * Fixes browser bugs in the native `String.prototype.split`. Calling `XRegExp.install('natives')`
- * uses this to override the native method. Use via `XRegExp.split` without overriding natives.
+ * Fixes browser bugs in the native `String.prototype.split`. Use via `XRegExp.split`.
  *
  * @memberOf String
  * @param {RegExp|String} separator Regex or string to use for separating the string.

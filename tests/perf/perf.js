@@ -110,9 +110,7 @@
         var str = Array(30 + 1).join('hello world x ') + 'xx!';
         var pos = 5;
 
-        XRegExp.install('natives');
-        var fixedExec = RegExp.prototype.exec;
-        XRegExp.uninstall('natives');
+        var fixedExec = XRegExp.exec;
 
         suites.push(new Benchmark.Suite('exec', suiteOptions)
             .add('Native exec', function() {
