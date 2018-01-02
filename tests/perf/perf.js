@@ -110,16 +110,10 @@
         var str = Array(30 + 1).join('hello world x ') + 'xx!';
         var pos = 5;
 
-        var fixedExec = XRegExp.exec;
-
         suites.push(new Benchmark.Suite('exec', suiteOptions)
             .add('Native exec', function() {
                 regexG.lastIndex = pos;
                 regexG.exec(str);
-            }, benchmarkOptions)
-            .add('Shimmed exec', function() {
-                regexG.lastIndex = pos;
-                fixedExec.call(regexG, str);
             }, benchmarkOptions)
             .add('XRegExp.exec', function() {
                 XRegExp.exec(str, regexG, pos);
@@ -140,10 +134,6 @@
                 regexG.lastIndex = pos;
                 regexG.exec(strs[++i] || strs[i = 0]);
             }, benchmarkOptions)
-            .add('Shimmed exec', function() {
-                regexG.lastIndex = pos;
-                fixedExec.call(regexG, strs[++i] || strs[i = 0]);
-            }, benchmarkOptions)
             .add('XRegExp.exec', function() {
                 XRegExp.exec(strs[++i] || strs[i = 0], regexG, pos);
             }, benchmarkOptions)
@@ -153,13 +143,6 @@
             .add('Native exec', function() {
                 regexG.lastIndex = pos;
                 var match = regexG.exec(strs[++i] || strs[i = 0]);
-                if (match && match.index !== pos) {
-                    match = null;
-                }
-            }, benchmarkOptions)
-            .add('Shimmed exec', function() {
-                regexG.lastIndex = pos;
-                var match = fixedExec.call(regexG, strs[++i] || strs[i = 0]);
                 if (match && match.index !== pos) {
                     match = null;
                 }
