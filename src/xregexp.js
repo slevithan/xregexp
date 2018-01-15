@@ -1403,12 +1403,17 @@ fixed.exec = function(str) {
         }
 
         // Attach named capture properties
+        let namedCaptureObject = match;
+        if (XRegExp.isInstalled('namespacing')) {
+            match.groups = Object.create(null); // https://tc39.github.io/proposal-regexp-named-groups/#sec-regexpbuiltinexec
+            namedCaptureObject = match.groups;
+        }
         if (this[REGEX_DATA] && this[REGEX_DATA].captureNames) {
             // Skip index 0
             for (let i = 1; i < match.length; ++i) {
                 const name = this[REGEX_DATA].captureNames[i - 1];
                 if (name) {
-                    match[name] = match[i];
+                    namedCaptureObject[name] = match[i];
                 }
             }
         }
