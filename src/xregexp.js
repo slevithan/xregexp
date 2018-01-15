@@ -1403,17 +1403,17 @@ fixed.exec = function(str) {
         }
 
         // Attach named capture properties
-        let namedCaptureObject = match;
+        let groupsObject = match;
         if (XRegExp.isInstalled('namespacing')) {
             match.groups = Object.create(null); // https://tc39.github.io/proposal-regexp-named-groups/#sec-regexpbuiltinexec
-            namedCaptureObject = match.groups;
+            groupsObject = match.groups;
         }
         if (this[REGEX_DATA] && this[REGEX_DATA].captureNames) {
             // Skip index 0
             for (let i = 1; i < match.length; ++i) {
                 const name = this[REGEX_DATA].captureNames[i - 1];
                 if (name) {
-                    namedCaptureObject[name] = match[i];
+                    groupsObject[name] = match[i];
                 }
             }
         }
@@ -1503,22 +1503,22 @@ fixed.replace = function(search, replacement) {
         // functions isn't type-converted to a string
         result = nativ.replace.call(String(this), search, (...args) => {
             if (captureNames) {
-                let namedCaptureObject;
+                let groupsObject;
 
                 if (XRegExp.isInstalled('namespacing')) {
-                    namedCaptureObject = Object.create(null); // https://tc39.github.io/proposal-regexp-named-groups/#sec-regexpbuiltinexec
-                    args.push(namedCaptureObject);
+                    groupsObject = Object.create(null); // https://tc39.github.io/proposal-regexp-named-groups/#sec-regexpbuiltinexec
+                    args.push(groupsObject);
                 } else {
                     // Change the `args[0]` string primitive to a `String` object that can store
                     // properties. This really does need to use `String` as a constructor
                     args[0] = new String(args[0]);
-                    namedCaptureObject = args[0];
+                    groupsObject = args[0];
                 }
 
                 // Store named backreferences
                 for (let i = 0; i < captureNames.length; ++i) {
                     if (captureNames[i]) {
-                        namedCaptureObject[captureNames[i]] = args[i + 1];
+                        groupsObject[captureNames[i]] = args[i + 1];
                     }
                 }
             }
