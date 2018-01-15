@@ -1503,13 +1503,22 @@ fixed.replace = function(search, replacement) {
         // functions isn't type-converted to a string
         result = nativ.replace.call(String(this), search, (...args) => {
             if (captureNames) {
-                // Change the `args[0]` string primitive to a `String` object that can store
-                // properties. This really does need to use `String` as a constructor
-                args[0] = new String(args[0]);
-                // Store named backreferences on the first argument
+                let namedCaptureObject;
+
+                if (XRegExp.isInstalled('namespacing')) {
+                    namedCaptureObject = Object.create(null); // https://tc39.github.io/proposal-regexp-named-groups/#sec-regexpbuiltinexec
+                    args.push(namedCaptureObject);
+                } else {
+                    // Change the `args[0]` string primitive to a `String` object that can store
+                    // properties. This really does need to use `String` as a constructor
+                    args[0] = new String(args[0]);
+                    namedCaptureObject = args[0];
+                }
+
+                // Store named backreferences
                 for (let i = 0; i < captureNames.length; ++i) {
                     if (captureNames[i]) {
-                        args[0][captureNames[i]] = args[i + 1];
+                        namedCaptureObject[captureNames[i]] = args[i + 1];
                     }
                 }
             }
