@@ -802,9 +802,9 @@ describe('XRegExp.isInstalled()', function() {
     });
 
     it('should not check features using an options object', function() {
-        XRegExp.install('namespacing');
+        XRegExp.install('astral');
 
-        expect(XRegExp.isInstalled({namespacing: true})).toBe(false);
+        expect(XRegExp.isInstalled({astral: true})).toBe(false);
     });
 
     it('should report unknown features as not installed', function() {
@@ -812,9 +812,9 @@ describe('XRegExp.isInstalled()', function() {
     });
 
     it('should be case sensitive for feature names', function() {
-        XRegExp.install('namespacing');
+        XRegExp.install('astral');
 
-        expect(XRegExp.isInstalled('Namespacing')).toBe(false);
+        expect(XRegExp.isInstalled('Astral')).toBe(false);
     });
 
 });
@@ -1636,11 +1636,11 @@ describe('XRegExp.uninstall()', function() {
     });
 
     it('should undo repeated installations with a single uninstall', function() {
-        XRegExp.install('namespacing');
-        XRegExp.install('namespacing');
-        XRegExp.uninstall('namespacing');
+        XRegExp.install('astral');
+        XRegExp.install('astral');
+        XRegExp.uninstall('astral');
 
-        expect(XRegExp.isInstalled('namespacing')).toBe(false);
+        expect(XRegExp.isInstalled('astral')).toBe(false);
     });
 
     // TODO: Add basic specs that verify whether actual functionality of uninstalled features is
