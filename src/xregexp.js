@@ -19,7 +19,8 @@
 const REGEX_DATA = 'xregexp';
 // Optional features that can be installed and uninstalled
 const features = {
-    astral: false
+    astral: false,
+    namespacing: false
 };
 // Native methods to use and restore ('native' is an ES3 reserved keyword)
 const nativ = {
@@ -465,6 +466,17 @@ function runTokens(pattern, flags, pos, scope, context) {
  */
 function setAstral(on) {
     features.astral = on;
+}
+
+/**
+ * Enables or disables named capture groups. See here for details:
+ * https://github.com/tc39/proposal-regexp-named-groups
+ *
+ * @private
+ * @param {Boolean} on `true` to enable; `false` to disable.
+ */
+function setNamespacing(on) {
+    features.namespacing = on;
 }
 
 /**
@@ -916,17 +928,24 @@ XRegExp.globalize = (regex) => copyRegex(regex, {addG: true});
  * // With an options object
  * XRegExp.install({
  *   // Enables support for astral code points in Unicode addons (implicitly sets flag A)
- *   astral: true
+ *   astral: true,
+ *
+ *   // Enables named capture groups
+ *   namespacing: true
  * });
  *
  * // With an options string
- * XRegExp.install('astral');
+ * XRegExp.install('astral namespacing');
  */
 XRegExp.install = (options) => {
     options = prepareOptions(options);
 
     if (!features.astral && options.astral) {
         setAstral(true);
+    }
+
+    if (!features.namespacing && options.namespacing) {
+        setNamespacing(true);
     }
 };
 
@@ -936,6 +955,7 @@ XRegExp.install = (options) => {
  * @memberOf XRegExp
  * @param {String} feature Name of the feature to check. One of:
  *   - `astral`
+ *   - `namespacing`
  * @returns {Boolean} Whether the feature is installed.
  * @example
  *
@@ -1250,17 +1270,24 @@ XRegExp.test = (str, regex, pos, sticky) => !!XRegExp.exec(str, regex, pos, stic
  * // With an options object
  * XRegExp.uninstall({
  *   // Disables support for astral code points in Unicode addons
- *   astral: true
+ *   astral: true,
+ *
+ *   // Disables named capture groups
+ *   namespacing: true
  * });
  *
  * // With an options string
- * XRegExp.uninstall('astral');
+ * XRegExp.uninstall('astral namespacing');
  */
 XRegExp.uninstall = (options) => {
     options = prepareOptions(options);
 
     if (features.astral && options.astral) {
         setAstral(false);
+    }
+
+    if (features.namespacing && options.namespacing) {
+        setNamespacing(false);
     }
 };
 
