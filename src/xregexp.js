@@ -1833,7 +1833,7 @@ XRegExp.addToken(
         if (!isNaN(match[1])) {
             throw new SyntaxError(`Cannot use integer as capture name ${match[0]}`);
         }
-        if (match[1] === 'length' || match[1] === '__proto__') {
+        if (!XRegExp.isInstalled('namespacing') && (match[1] === 'length' || match[1] === '__proto__')) {
             throw new SyntaxError(`Cannot use reserved word as capture name ${match[0]}`);
         }
         if (this.captureNames.includes(match[1])) {
