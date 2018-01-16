@@ -239,6 +239,9 @@ function getContextualTokenSeparator(match, scope, flags) {
         match.input[match.index - 1] === '(' ||
         match.input[match.index + match[0].length] === ')' ||
         // No need to separate tokens if at the beginning of a non-capturing group or lookahead
+        //
+        // If `match.index - 3` is negative, the substring will be too short to match, so the test will fail.
+        // For example: '1234'.substr(-1, 3) === '4'
         nativ.test.call(/\(\?[:=!]/, match.input.substr(match.index - 3, 3)) ||
         // No need to separate tokens if before or after a `|`
         match.input[match.index - 1] === '|' ||
