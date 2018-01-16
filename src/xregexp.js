@@ -247,8 +247,8 @@ function getContextualTokenSeparator(match, scope, flags) {
         match.input[match.index - 1] === '|' ||
         match.input[match.index + match[0].length] === '|' ||
         // No need to separate tokens if at the beginning or end of the pattern
-        match.input[match.index - 1] === undefined ||
-        match.input[match.index + match[0].length] === undefined ||
+        match.index - 1 < 0 ||
+        match.index + match[0].length >= match.input.length ||
         // Avoid separating tokens when the following token is a quantifier
         isQuantifierNext(match.input, match.index + match[0].length, flags)
     ) {
