@@ -469,7 +469,7 @@ function setAstral(on) {
 }
 
 /**
- * Enables or disables named capture groups. See here for details:
+ * Adds named capture groups to the `groups` property of match arrays. See here for details:
  * https://github.com/tc39/proposal-regexp-named-groups
  *
  * @private
@@ -930,7 +930,7 @@ XRegExp.globalize = (regex) => copyRegex(regex, {addG: true});
  *   // Enables support for astral code points in Unicode addons (implicitly sets flag A)
  *   astral: true,
  *
- *   // Enables named capture groups
+ *   // Adds named capture groups to the `groups` property of match arrays.
  *   namespacing: true
  * });
  *
@@ -1272,7 +1272,7 @@ XRegExp.test = (str, regex, pos, sticky) => !!XRegExp.exec(str, regex, pos, stic
  *   // Disables support for astral code points in Unicode addons
  *   astral: true,
  *
- *   // Disables named capture groups
+ *   // Don't add named capture groups to the `groups` property of match arrays.
  *   namespacing: true
  * });
  *
