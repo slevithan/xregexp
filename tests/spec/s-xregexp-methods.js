@@ -423,6 +423,7 @@ describe('XRegExp.exec()', function() {
     });
 
     it('should avoid regression on edge cases', function() {
+
         /*
          * From the XRegExp 1.5.1 changelog:
          * Fix: RegExp.prototype.exec no longer throws an error in IE when it is simultaneously
@@ -1105,6 +1106,7 @@ describe('XRegExp.matchChain()', function() {
     });
 
     it('should pass forward and return nonparticipating capturing groups as empty strings', function() {
+
         /* Converting nonparticipating capturing groups that are passed forward in the chain
          * (rather than returned) from undefineds to empty strings, rather than rejecting any match
          * (even if zero-length) within them, is questionable behavior. However, this probably best
@@ -1298,7 +1300,7 @@ describe('XRegExp.split()', function() {
             {str: '.',         separator: /(.?)(.?)/,       expected: ['', '.', '', '']},
             {str: '.',         separator: /(.??)(.??)/,     expected: ['.']},
             {str: '.',         separator: /(.)?(.)?/,       expected: ['', '.', undefined, '']},
-            {str: 'test',      separator: /(.?)/,           expected: ['','t','','e','','s','','t','']},
+            {str: 'test',      separator: /(.?)/,           expected: ['', 't', '', 'e', '', 's', '', 't', '']},
             {str: 'tesst',     separator: /(s)*/,           expected: ['t', undefined, 'e', 's', 't']},
             {str: 'tesst',     separator: /(s)*?/,          expected: ['t', undefined, 'e', undefined, 's', undefined, 's', undefined, 't']},
             {str: 'tesst',     separator: /(s*)/,           expected: ['t', '', 'e', 'ss', 't']},

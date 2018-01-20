@@ -56,9 +56,9 @@ describe('XRegExp()', function() {
         ];
         // XRegExp follows the native RegExp. Chrome 20 follows the spec and converts empty
         // patterns to (?:), but Firefox 14.0.1, Safari 5.1.2, Opera 12, and IE 9 do not
-        var isEmpty = function(regex) {
+        function isEmpty(regex) {
             return regex.source === '(?:)' || regex.source === '';
-        };
+        }
 
         emptyTypes.forEach(function(item) {
             expect(isEmpty(XRegExp(item))).toBe(true);
@@ -281,6 +281,7 @@ describe('XRegExp()', function() {
     describe('fixes regex syntax cross-browser:', function() {
 
         it('should use the correct JavaScript rules for empty character classes', function() {
+
             /* Traditional regex behavior is that a leading, unescaped ] within a character class
              * is treated as a literal character and does not end the character class. However,
              * this is not true for ES3/5, which states that [] is an empty set that will never
