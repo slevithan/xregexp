@@ -5,7 +5,6 @@ module.exports = {
     "globals": {
         "XRegExp": true,
         "disableOptInFeatures": true,
-        "repeat": true,
         "REGEX_DATA": true,
         "hasNativeU": true,
         "hasNativeY": true,

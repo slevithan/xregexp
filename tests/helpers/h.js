@@ -9,11 +9,6 @@ global.disableOptInFeatures = function() {
     XRegExp.uninstall('astral');
 };
 
-// Repeat a string the specified number of times
-global.repeat = function(str, num) {
-    return Array(num + 1).join(str);
-};
-
 // Property name used for extended regex instance data
 global.REGEX_DATA = 'xregexp';
 
