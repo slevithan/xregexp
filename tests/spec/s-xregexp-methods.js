@@ -1141,6 +1141,14 @@ describe('XRegExp.replace()', function() {
      * - Have no corresponding specs for String.prototype.replace.
      */
 
+    it('should pass the `groups` argument when `namespacing` is installed', function() {
+        XRegExp.install('namespacing')
+        var regex = XRegExp('(?s)(?<groupName>.)');
+        XRegExp.replace('test', regex, function (matched, capture1, position, S, groups) {
+            expect(groups).toEqual({groupName: 't'})
+        })
+    })
+
     it('should perform replace-all for string search with scope "all"', function() {
         expect(XRegExp.replace('test', 't', 'x', 'all')).toBe('xesx');
     });
