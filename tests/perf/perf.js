@@ -20,16 +20,16 @@
     }
 
     var suiteOptions = {
-        onStart: function () {
+        onStart: function() {
             log('\n' + this.name + ':');
         },
 
-        onCycle: function (event) {
+        onCycle: function(event) {
             log('\n' + String(event.target));
             scrollToEnd();
         },
 
-        onComplete: function () {
+        onComplete: function() {
             log('\nFastest is ' + this.filter('fastest').map('name') + '\n');
             // Remove current suite from queue
             suites.shift();
@@ -148,7 +148,7 @@
                 }
             }, benchmarkOptions)
             .add('XRegExp.exec', function() {
-                var match = XRegExp.exec(strs[++i] || strs[i = 0], regexG, pos, 'sticky');
+                var match = XRegExp.exec(strs[++i] || strs[i = 0], regexG, pos, 'sticky'); // eslint-disable-line no-unused-vars
             }, benchmarkOptions)
         );
     }());
@@ -192,7 +192,7 @@
                             (r.sticky ? 'y' : '')
                     );
                 }
-                while (match = r.exec(str)) {
+                while (match = r.exec(str)) { // eslint-disable-line no-cond-assign
                     matches.push(match[0]);
                     if (r.lastIndex === match.index) {
                         ++r.lastIndex;
@@ -204,7 +204,7 @@
                 var matches = [];
                 var match;
                 var pos = 0;
-                while (match = XRegExp.exec(str, r, pos)) {
+                while (match = XRegExp.exec(str, r, pos)) { // eslint-disable-line no-cond-assign
                     matches.push(match[0]);
                     pos = match.index + (match[0].length || 1);
                 }
