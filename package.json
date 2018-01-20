@@ -23,7 +23,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "lint": "eslint src tests/spec",
+    "lint": "eslint src tests/spec tests/helpers",
     "babel": "babel src -d lib",
     "prebuild": "npm run lint && npm run babel",
     "build": "browserify lib/index.js --standalone XRegExp > xregexp-all.js",
