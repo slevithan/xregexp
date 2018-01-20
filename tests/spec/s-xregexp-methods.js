@@ -450,6 +450,14 @@ describe('XRegExp.exec()', function() {
         expect(match[1]).toBe('a');
     });
 
+    it('should include named capture properties on the groups object if namespacing is installed', function() {
+        XRegExp.install('namespacing');
+        var match = XRegExp.exec('a', XRegExp('(?<name>a)'));
+
+        expect(match.groups.name).toBe('a');
+        expect(match[1]).toBe('a');
+    });
+
     it('should shaddow array prototype properties with named capture properties', function() {
         expect(XRegExp.exec('a', XRegExp('(?<concat>a)')).concat).toBe('a');
     });
