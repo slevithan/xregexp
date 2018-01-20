@@ -469,6 +469,14 @@ describe('XRegExp.exec()', function() {
         });
     });
 
+    it('should not throw an exception if reserved array properties are used as capture names if namespacing is installed', function() {
+        // Reserved names are 'length', '__proto__'
+        ['length', '__proto__'].forEach(function(name) {
+            XRegExp.install('namespacing');
+            expect(function() {XRegExp.exec('a', XRegExp('(?<' + name + '>a)'));}).not.toThrowError(SyntaxError);
+        });
+    });
+
     it('should allow reserved JavaScript keywords as capture names', function() {
         ['eval', 'for', 'function', 'if', 'throw'].forEach(function(keyword) {
             expect(XRegExp.exec('a', XRegExp('(?<' + keyword + '>a)'))[keyword]).toBe('a');
