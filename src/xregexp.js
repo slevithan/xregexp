@@ -19,7 +19,8 @@
 const REGEX_DATA = 'xregexp';
 // Optional features that can be installed and uninstalled
 const features = {
-    astral: false
+    astral: false,
+    namespacing: false
 };
 // Native methods to use and restore ('native' is an ES3 reserved keyword)
 const nativ = {
@@ -237,6 +238,22 @@ function getContextualTokenSeparator(match, scope, flags) {
         // No need to separate tokens if at the beginning or end of a group
         match.input[match.index - 1] === '(' ||
         match.input[match.index + match[0].length] === ')' ||
+
+        // No need to separate tokens if at the beginning of a noncapturing group or lookahead.
+        // The way this is written relies on two things:
+        // - The search regex matches only 3-char strings.
+        // - The substring will be too short to match and thus the test will fail if the search
+        //   position is less that 3 chars into the input. Note: `'abcd'.substr(-1, 3) === 'd'`
+        nativ.test.call(/^\(\?[:=!]/, match.input.substr(match.index - 3, 3)) ||
+
+        // No need to separate tokens if before or after a `|`
+        match.input[match.index - 1] === '|' ||
+        match.input[match.index + match[0].length] === '|' ||
+
+        // No need to separate tokens if at the beginning or end of the pattern
+        match.index < 1 ||
+        match.index + match[0].length >= match.input.length ||
+
         // Avoid separating tokens when the following token is a quantifier
         isQuantifierNext(match.input, match.index + match[0].length, flags)
     ) {
@@ -465,6 +482,17 @@ function runTokens(pattern, flags, pos, scope, context) {
  */
 function setAstral(on) {
     features.astral = on;
+}
+
+/**
+ * Adds named capture groups to the `groups` property of match arrays. See here for details:
+ * https://github.com/tc39/proposal-regexp-named-groups
+ *
+ * @private
+ * @param {Boolean} on `true` to enable; `false` to disable.
+ */
+function setNamespacing(on) {
+    features.namespacing = on;
 }
 
 /**
@@ -916,17 +944,24 @@ XRegExp.globalize = (regex) => copyRegex(regex, {addG: true});
  * // With an options object
  * XRegExp.install({
  *   // Enables support for astral code points in Unicode addons (implicitly sets flag A)
- *   astral: true
+ *   astral: true,
+ *
+ *   // Adds named capture groups to the `groups` property of matches
+ *   namespacing: true
  * });
  *
  * // With an options string
- * XRegExp.install('astral');
+ * XRegExp.install('astral namespacing');
  */
 XRegExp.install = (options) => {
     options = prepareOptions(options);
 
     if (!features.astral && options.astral) {
         setAstral(true);
+    }
+
+    if (!features.namespacing && options.namespacing) {
+        setNamespacing(true);
     }
 };
 
@@ -936,6 +971,7 @@ XRegExp.install = (options) => {
  * @memberOf XRegExp
  * @param {String} feature Name of the feature to check. One of:
  *   - `astral`
+ *   - `namespacing`
  * @returns {Boolean} Whether the feature is installed.
  * @example
  *
@@ -1250,17 +1286,24 @@ XRegExp.test = (str, regex, pos, sticky) => !!XRegExp.exec(str, regex, pos, stic
  * // With an options object
  * XRegExp.uninstall({
  *   // Disables support for astral code points in Unicode addons
- *   astral: true
+ *   astral: true,
+ *
+ *   // Don't add named capture groups to the `groups` property of matches
+ *   namespacing: true
  * });
  *
  * // With an options string
- * XRegExp.uninstall('astral');
+ * XRegExp.uninstall('astral namespacing');
  */
 XRegExp.uninstall = (options) => {
     options = prepareOptions(options);
 
     if (features.astral && options.astral) {
         setAstral(false);
+    }
+
+    if (features.namespacing && options.namespacing) {
+        setNamespacing(false);
     }
 };
 
@@ -1376,12 +1419,18 @@ fixed.exec = function(str) {
         }
 
         // Attach named capture properties
+        let groupsObject = match;
+        if (XRegExp.isInstalled('namespacing')) {
+            // https://tc39.github.io/proposal-regexp-named-groups/#sec-regexpbuiltinexec
+            match.groups = Object.create(null);
+            groupsObject = match.groups;
+        }
         if (this[REGEX_DATA] && this[REGEX_DATA].captureNames) {
             // Skip index 0
             for (let i = 1; i < match.length; ++i) {
                 const name = this[REGEX_DATA].captureNames[i - 1];
                 if (name) {
-                    match[name] = match[i];
+                    groupsObject[name] = match[i];
                 }
             }
         }
@@ -1471,13 +1520,23 @@ fixed.replace = function(search, replacement) {
         // functions isn't type-converted to a string
         result = nativ.replace.call(String(this), search, (...args) => {
             if (captureNames) {
-                // Change the `args[0]` string primitive to a `String` object that can store
-                // properties. This really does need to use `String` as a constructor
-                args[0] = new String(args[0]);
-                // Store named backreferences on the first argument
+                let groupsObject;
+
+                if (XRegExp.isInstalled('namespacing')) {
+                    // https://tc39.github.io/proposal-regexp-named-groups/#sec-regexpbuiltinexec
+                    groupsObject = Object.create(null);
+                    args.push(groupsObject);
+                } else {
+                    // Change the `args[0]` string primitive to a `String` object that can store
+                    // properties. This really does need to use `String` as a constructor
+                    args[0] = new String(args[0]);
+                    groupsObject = args[0];
+                }
+
+                // Store named backreferences
                 for (let i = 0; i < captureNames.length; ++i) {
                     if (captureNames[i]) {
-                        args[0][captureNames[i]] = args[i + 1];
+                        groupsObject[captureNames[i]] = args[i + 1];
                     }
                 }
             }
@@ -1792,7 +1851,7 @@ XRegExp.addToken(
         if (!isNaN(match[1])) {
             throw new SyntaxError(`Cannot use integer as capture name ${match[0]}`);
         }
-        if (match[1] === 'length' || match[1] === '__proto__') {
+        if (!XRegExp.isInstalled('namespacing') && (match[1] === 'length' || match[1] === '__proto__')) {
             throw new SyntaxError(`Cannot use reserved word as capture name ${match[0]}`);
         }
         if (this.captureNames.includes(match[1])) {
