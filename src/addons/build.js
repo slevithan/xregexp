@@ -1,7 +1,7 @@
 /*!
  * XRegExp.build 4.0.0
  * <xregexp.com>
- * Steven Levithan (c) 2012-2017 MIT License
+ * Steven Levithan (c) 2012-present MIT License
  */
 
 export default (XRegExp) => {

@@ -230,7 +230,7 @@ require({paths: {xregexp: 'xregexp-all'}}, ['xregexp'], (XRegExp) => {
 
 ## About
 
-XRegExp copyright 2007-2017 by [Steven Levithan](http://stevenlevithan.com/). Unicode data generators by [Mathias Bynens](http://mathiasbynens.be/), adapted from [unicode-data](http://git.io/unicode). XRegExp's syntax extensions and flags come from [Perl](http://www.perl.org/), [.NET](http://www.microsoft.com/net), etc.
+XRegExp copyright 2007-present by [Steven Levithan](http://stevenlevithan.com/). Unicode data generators by [Mathias Bynens](http://mathiasbynens.be/), adapted from [unicode-data](http://git.io/unicode). XRegExp's syntax extensions and flags come from [Perl](http://www.perl.org/), [.NET](http://www.microsoft.com/net), etc.
 
 All code, including addons, tools, and tests, is released under the terms of the [MIT License](http://mit-license.org/).
 

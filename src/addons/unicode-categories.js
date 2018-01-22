@@ -1,7 +1,7 @@
 /*!
  * XRegExp Unicode Categories 4.0.0
  * <xregexp.com>
- * Steven Levithan (c) 2010-2017 MIT License
+ * Steven Levithan (c) 2010-present MIT License
  * Unicode data by Mathias Bynens <mathiasbynens.be>
  */
 
