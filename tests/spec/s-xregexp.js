@@ -795,35 +795,29 @@ describe('XRegExp()', function() {
                 expect(XRegExp('^(a)()()()()()()()()()\\1#\n0$', 'x').test('aa0')).toBe(true);
             });
 
-            it('should not add atom separator (?:) at the beginning or end of groups in simple cases', function() {
+            it('should not add atom separator (?:) at the beginning or end of capturing groups', function() {
                 expect(XRegExp('( . )', 'x').source).toBe('(.)');
                 expect(XRegExp('(#\n.#\n)', 'x').source).toBe('(.)');
             });
 
-            it('should not add atom separator (?:) at the beginning or end of non-capturing groups in simple cases', function() {
+            it('should not add atom separator (?:) at the beginning or end of noncapturing groups', function() {
                 expect(XRegExp('(?: . )', 'x').source).toBe('(?:.)');
                 expect(XRegExp('(?:#\n.#\n)', 'x').source).toBe('(?:.)');
-
-                expect(XRegExp(' (?: . )', 'x').source).toBe('(?:.)');
-                expect(XRegExp(' (?:#\n.#\n)', 'x').source).toBe('(?:.)');
             });
 
-            it('should not add atom separator (?:) at the beginning or end of a lookahead in simple cases', function() {
+            it('should not add atom separator (?:) at the beginning or end of lookahead', function() {
                 expect(XRegExp('(?= . )', 'x').source).toBe('(?=.)');
-                expect(XRegExp('(?=#\n.#\n)', 'x').source).toBe('(?=.)');
-            });
-
-            it('should not add atom separator (?:) at the beginning or end of a negated lookahead in simple cases', function() {
                 expect(XRegExp('(?! . )', 'x').source).toBe('(?!.)');
+                expect(XRegExp('(?=#\n.#\n)', 'x').source).toBe('(?=.)');
                 expect(XRegExp('(?!#\n.#\n)', 'x').source).toBe('(?!.)');
             });
 
-            it('should not add atom separator (?:) at the beginning or end of the pattern in simple cases', function() {
+            it('should not add atom separator (?:) at the beginning or end of the pattern', function() {
                 expect(XRegExp(' ( . ) ', 'x').source).toBe('(.)');
                 expect(XRegExp(' (#\n.#\n) ', 'x').source).toBe('(.)');
             });
 
-            it('should not add atom separator (?:) around | in simple cases', function() {
+            it('should not add atom separator (?:) around |', function() {
                 expect(XRegExp('( a | b )', 'x').source).toBe('(a|b)');
                 expect(XRegExp('(#\na#\n|#\nb#\n)', 'x').source).toBe('(a|b)');
             });

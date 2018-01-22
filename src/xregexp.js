@@ -239,11 +239,12 @@ function getContextualTokenSeparator(match, scope, flags) {
         match.input[match.index - 1] === '(' ||
         match.input[match.index + match[0].length] === ')' ||
 
-        // No need to separate tokens if at the beginning of a non-capturing group or lookahead
-        //
-        // If `match.index - 3` is negative, the substring will be too short to match, so the test will fail.
-        // For example: '1234'.substr(-1, 3) === '4'
-        nativ.test.call(/\(\?[:=!]/, match.input.substr(match.index - 3, 3)) ||
+        // No need to separate tokens if at the beginning of a noncapturing group or lookahead.
+        // The way this is written relies on two things:
+        // - The search regex matches only 3-char strings.
+        // - The substring will be too short to match and thus the test will fail if the search
+        //   position is less that 3 chars into the input. Note: `'abcd'.substr(-1, 3) === 'd'`
+        nativ.test.call(/^\(\?[:=!]/, match.input.substr(match.index - 3, 3)) ||
 
         // No need to separate tokens if before or after a `|`
         match.input[match.index - 1] === '|' ||
@@ -945,7 +946,7 @@ XRegExp.globalize = (regex) => copyRegex(regex, {addG: true});
  *   // Enables support for astral code points in Unicode addons (implicitly sets flag A)
  *   astral: true,
  *
- *   // Adds named capture groups to the `groups` property of match arrays.
+ *   // Adds named capture groups to the `groups` property of matches
  *   namespacing: true
  * });
  *
@@ -1287,7 +1288,7 @@ XRegExp.test = (str, regex, pos, sticky) => !!XRegExp.exec(str, regex, pos, stic
  *   // Disables support for astral code points in Unicode addons
  *   astral: true,
  *
- *   // Don't add named capture groups to the `groups` property of match arrays.
+ *   // Don't add named capture groups to the `groups` property of matches
  *   namespacing: true
  * });
  *
@@ -1420,7 +1421,8 @@ fixed.exec = function(str) {
         // Attach named capture properties
         let groupsObject = match;
         if (XRegExp.isInstalled('namespacing')) {
-            match.groups = Object.create(null); // https://tc39.github.io/proposal-regexp-named-groups/#sec-regexpbuiltinexec
+            // https://tc39.github.io/proposal-regexp-named-groups/#sec-regexpbuiltinexec
+            match.groups = Object.create(null);
             groupsObject = match.groups;
         }
         if (this[REGEX_DATA] && this[REGEX_DATA].captureNames) {
@@ -1521,7 +1523,8 @@ fixed.replace = function(search, replacement) {
                 let groupsObject;
 
                 if (XRegExp.isInstalled('namespacing')) {
-                    groupsObject = Object.create(null); // https://tc39.github.io/proposal-regexp-named-groups/#sec-regexpbuiltinexec
+                    // https://tc39.github.io/proposal-regexp-named-groups/#sec-regexpbuiltinexec
+                    groupsObject = Object.create(null);
                     args.push(groupsObject);
                 } else {
                     // Change the `args[0]` string primitive to a `String` object that can store

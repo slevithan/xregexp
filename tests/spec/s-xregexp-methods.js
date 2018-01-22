@@ -473,7 +473,7 @@ describe('XRegExp.exec()', function() {
         // Reserved names are 'length', '__proto__'
         ['length', '__proto__'].forEach(function(name) {
             XRegExp.install('namespacing');
-            expect(function() {XRegExp.exec('a', XRegExp('(?<' + name + '>a)'));}).not.toThrowError(SyntaxError);
+            expect(function() {XRegExp.exec('a', XRegExp('(?<' + name + '>a)'));}).not.toThrow();
         });
     });
 
