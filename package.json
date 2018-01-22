@@ -34,6 +34,7 @@
     "prepublish": "npm test"
   },
   "devDependencies": {
+    "babel-plugin-transform-string-raw": "^0.0.1",
     "babel-cli": "^6.24.1",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-array-includes": "^2.0.3",
