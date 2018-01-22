@@ -6,9 +6,7 @@
 
 import {unionParts as subParts} from '../xregexp';
 
-function xre(callSite, ...substitutions) {
-    return String.raw(callSite, ...substitutions).replace(/\s/g, '');
-}
+import {xre} from '../xre';
 
 export default (XRegExp) => {
     const REGEX_DATA = 'xregexp';

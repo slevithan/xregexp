@@ -15,9 +15,7 @@
 // Private stuff
 // ==--------------------------==
 
-function xre(callSite, ...substitutions) {
-    return String.raw(callSite, ...substitutions).replace(/\s/g, '');
-}
+import {xre} from './xre';
 
 // Property name used for extended regex instance data
 const REGEX_DATA = 'xregexp';

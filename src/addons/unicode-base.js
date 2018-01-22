@@ -4,9 +4,7 @@
  * Steven Levithan (c) 2008-2017 MIT License
  */
 
-function xre(callSite, ...substitutions) {
-    return String.raw(callSite, ...substitutions).replace(/\s/g, '');
-}
+import {xre} from '../xre';
 
 export default (XRegExp) => {
 
