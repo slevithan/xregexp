@@ -1159,11 +1159,21 @@ describe('XRegExp.replace()', function() {
      * - Have no corresponding specs for String.prototype.replace.
      */
 
-    it('should pass the `groups` argument when `namespacing` is installed', function() {
+    it('should pass the `groups` argument to callbacks when `namespacing` is installed', function() {
         XRegExp.install('namespacing');
         var regex = XRegExp('(?s)(?<groupName>.)');
-        XRegExp.replace('test', regex, function(matched, capture1, position, S, groups) {
-            expect(groups).toEqual({groupName: 't'});
+        var groupsObject = Object.create(null);
+        groupsObject.groupName = 't';
+        XRegExp.replace('test', regex, function(match, capture1, pos, str, groups) {
+            expect(groups).toEqual(groupsObject);
+        });
+    });
+
+    it('should not pass the `groups` argument when `namespacing` is not installed', function() {
+        XRegExp.uninstall('namespacing');
+        var regex = XRegExp('(?s)(?<groupName>.)');
+        XRegExp.replace('test', regex, function(match, capture1, pos, str, groups) {
+            expect(groups).toBeUndefined();
         });
     });
 
