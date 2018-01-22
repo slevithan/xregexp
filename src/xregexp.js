@@ -15,6 +15,10 @@
 // Private stuff
 // ==--------------------------==
 
+function xre(callSite, ...substitutions) {
+    return String.raw(callSite, ...substitutions).replace(/\s/g, '');
+}
+
 // Property name used for extended regex instance data
 const REGEX_DATA = 'xregexp';
 // Optional features that can be installed and uninstalled
@@ -44,7 +48,7 @@ const classScope = 'class';
 // Regexes that match native regex syntax, including octals
 const nativeTokens = {
     // Any native multicharacter token in default scope, or any single character
-    'default': new RegExp(String.raw`
+    'default': new RegExp(xre`
           \\(?:
                 0(?:
                       [0-3][0-7]{0,2}
@@ -66,9 +70,9 @@ const nativeTokens = {
         | [?*+]\?
         | {\d+(?:,\d*)?}\??
         | [\s\S]
-    `.replace(/\s/g, '')),
+    `),
     // Any native multicharacter token in character class scope, or any single character
-    'class': new RegExp(String.raw`
+    'class': new RegExp(xre`
           \\(?:
                 [0-3][0-7]{0,2}
               | [4-7][0-7]?
@@ -81,14 +85,14 @@ const nativeTokens = {
               | [\s\S]
           )
         | [\s\S]
-    `.replace(/\s/g, ''))
+    `)
 };
 // Any backreference or dollar-prefixed character in replacement strings
-const replacementToken = new RegExp(String.raw`\$(?:
+const replacementToken = new RegExp(xre`\$(?:
       {([\w$]+)}
     | <([\w$]+)>
     | (\d\d?|[\s\S])
-)`.replace(/\s/g, ''), 'g');
+)`, 'g');
 // Check for correct `exec` handling of nonparticipating capturing groups
 const correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined;
 // Check for ES6 `flags` prop support
@@ -1335,7 +1339,7 @@ XRegExp.uninstall = (options) => {
     }
 };
 
-const unionParts = new RegExp(String.raw`
+const unionParts = new RegExp(xre`
       (\()(?!\?)
     | \\([1-9]\d*)
     | \\[\s\S]
@@ -1343,7 +1347,7 @@ const unionParts = new RegExp(String.raw`
             [^\\\]]
           | \\[\s\S]
       )*\]
-`.replace(/\s/g, ''), 'g');
+`, 'g');
 
 /**
  * Returns an XRegExp object that is the union of the given patterns. Patterns can be provided as
@@ -1721,7 +1725,7 @@ fixed.split = function(separator, limit) {
  * consistency and to reserve their syntax, but lets them be superseded by addons.
  */
 XRegExp.addToken(
-    new RegExp(String.raw`
+    new RegExp(xre`
         \\(
               [ABCE-RTUVXYZaeg-mopqyz]
             | c(?![A-Za-z])
@@ -1731,7 +1735,7 @@ XRegExp.addToken(
               )
             | x(?![\dA-Fa-f]{2})
         )
-    `.replace(/\s/g, '')),
+    `),
     (match, scope) => {
         // \B is allowed in default scope only
         if (match[1] === 'B' && scope === defaultScope) {

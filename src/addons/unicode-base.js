@@ -4,6 +4,10 @@
  * Steven Levithan (c) 2008-2017 MIT License
  */
 
+function xre(callSite, ...substitutions) {
+    return String.raw(callSite, ...substitutions).replace(/\s/g, '');
+}
+
 export default (XRegExp) => {
 
     /**
@@ -53,10 +57,10 @@ export default (XRegExp) => {
 
         XRegExp.forEach(
             range,
-            new RegExp(String.raw`
+            new RegExp(xre`
                 (${bmpPattern})
                 (?:-(${bmpPattern}))?
-            `.replace(/\s/g, '')),
+            `),
             (m) => {
                 const start = charCode(m[1]);
                 if (start > (lastEnd + 1)) {
@@ -127,13 +131,13 @@ export default (XRegExp) => {
      */
     XRegExp.addToken(
         // Use `*` instead of `+` to avoid capturing `^` as the token name in `\p{^}`
-        new RegExp(String.raw`
+        new RegExp(xre`
             \\([pP])
             (?:
                   {(\^?)([^}]*)}
                 | ([A-Za-z])
             )
-        `.replace(/\s/g, '')),
+        `),
         (match, scope, flags) => {
             const ERR_DOUBLE_NEG = 'Invalid double negation ';
             const ERR_UNKNOWN_NAME = 'Unknown Unicode token ';

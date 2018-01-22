@@ -6,12 +6,16 @@
 
 import {unionParts as subParts} from '../xregexp';
 
+function xre(callSite, ...substitutions) {
+    return String.raw(callSite, ...substitutions).replace(/\s/g, '');
+}
+
 export default (XRegExp) => {
     const REGEX_DATA = 'xregexp';
-    const parts = XRegExp.union([new RegExp(String.raw`
+    const parts = XRegExp.union([new RegExp(xre`
           \({{([\w$]+)}}\)
         |   {{([\w$]+)}}
-    `.replace(/\s/g, '')), subParts], 'g', {
+    `), subParts], 'g', {
         conjunction: 'or'
     });
 
