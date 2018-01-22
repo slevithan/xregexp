@@ -53,10 +53,10 @@ export default (XRegExp) => {
 
         XRegExp.forEach(
             range,
-            new RegExp(`
+            new RegExp(String.raw`
                 (${bmpPattern})
                 (?:-(${bmpPattern}))?
-            `, 'x'),
+            `.replace(/\s/g, '')),
             (m) => {
                 const start = charCode(m[1]);
                 if (start > (lastEnd + 1)) {
@@ -127,13 +127,13 @@ export default (XRegExp) => {
      */
     XRegExp.addToken(
         // Use `*` instead of `+` to avoid capturing `^` as the token name in `\p{^}`
-        new RegExp(`
+        new RegExp(String.raw`
             \\([pP])
             (?:
                   {(\^?)([^}]*)}
                 | ([A-Za-z])
             )
-        `, 'x'),
+        `.replace(/\s/g, '')),
         (match, scope, flags) => {
             const ERR_DOUBLE_NEG = 'Invalid double negation ';
             const ERR_UNKNOWN_NAME = 'Unknown Unicode token ';

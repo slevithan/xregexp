@@ -8,10 +8,10 @@ import {unionParts as subParts} from '../xregexp';
 
 export default (XRegExp) => {
     const REGEX_DATA = 'xregexp';
-    const parts = XRegExp.union([new RegExp(`
+    const parts = XRegExp.union([new RegExp(String.raw`
           \({{([\w$]+)}}\)
         |   {{([\w$]+)}}
-    `, 'x'), subParts], 'g', {
+    `.replace(/\s/g, '')), subParts], 'g', {
         conjunction: 'or'
     });
 

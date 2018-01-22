@@ -44,7 +44,7 @@ const classScope = 'class';
 // Regexes that match native regex syntax, including octals
 const nativeTokens = {
     // Any native multicharacter token in default scope, or any single character
-    'default': new RegExp(`
+    'default': new RegExp(String.raw`
           \\(?:
                 0(?:
                       [0-3][0-7]{0,2}
@@ -66,9 +66,9 @@ const nativeTokens = {
         | [?*+]\?
         | {\d+(?:,\d*)?}\??
         | [\s\S]
-    `, 'x'),
+    `.replace(/\s/g, '')),
     // Any native multicharacter token in character class scope, or any single character
-    'class': new RegExp(`
+    'class': new RegExp(String.raw`
           \\(?:
                 [0-3][0-7]{0,2}
               | [4-7][0-7]?
@@ -81,14 +81,14 @@ const nativeTokens = {
               | [\s\S]
           )
         | [\s\S]
-    `, 'x')
+    `.replace(/\s/g, ''))
 };
 // Any backreference or dollar-prefixed character in replacement strings
-const replacementToken = new RegExp(`\$(?:
+const replacementToken = new RegExp(String.raw`\$(?:
       {([\w$]+)}
     | <([\w$]+)>
     | (\d\d?|[\s\S])
-)`, 'gx');
+)`.replace(/\s/g, ''), 'g');
 // Check for correct `exec` handling of nonparticipating capturing groups
 const correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined;
 // Check for ES6 `flags` prop support
@@ -1335,7 +1335,7 @@ XRegExp.uninstall = (options) => {
     }
 };
 
-const unionParts = new RegExp(`
+const unionParts = new RegExp(String.raw`
       (\()(?!\?)
     | \\([1-9]\d*)
     | \\[\s\S]
@@ -1343,7 +1343,7 @@ const unionParts = new RegExp(`
             [^\\\]]
           | \\[\s\S]
       )*\]
-`, 'gx');
+`.replace(/\s/g, ''), 'g');
 
 /**
  * Returns an XRegExp object that is the union of the given patterns. Patterns can be provided as
@@ -1721,7 +1721,7 @@ fixed.split = function(separator, limit) {
  * consistency and to reserve their syntax, but lets them be superseded by addons.
  */
 XRegExp.addToken(
-    new RegExp(`
+    new RegExp(String.raw`
         \\(
               [ABCE-RTUVXYZaeg-mopqyz]
             | c(?![A-Za-z])
@@ -1731,7 +1731,7 @@ XRegExp.addToken(
               )
             | x(?![\dA-Fa-f]{2})
         )
-    `, 'x'),
+    `.replace(/\s/g, '')),
     (match, scope) => {
         // \B is allowed in default scope only
         if (match[1] === 'B' && scope === defaultScope) {
