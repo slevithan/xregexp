@@ -450,6 +450,14 @@ describe('XRegExp.exec()', function() {
         expect(match[1]).toBe('a');
     });
 
+    it('should include named capture properties on the groups object if namespacing is installed', function() {
+        XRegExp.install('namespacing');
+        var match = XRegExp.exec('a', XRegExp('(?<name>a)'));
+
+        expect(match.groups.name).toBe('a');
+        expect(match[1]).toBe('a');
+    });
+
     it('should shaddow array prototype properties with named capture properties', function() {
         expect(XRegExp.exec('a', XRegExp('(?<concat>a)')).concat).toBe('a');
     });
@@ -458,6 +466,14 @@ describe('XRegExp.exec()', function() {
         // Reserved names are 'length', '__proto__', and bare integers
         ['length', '__proto__', '0', '1'].forEach(function(name) {
             expect(function() {XRegExp.exec('a', XRegExp('(?<' + name + '>a)'));}).toThrowError(SyntaxError);
+        });
+    });
+
+    it('should not throw an exception if reserved array properties are used as capture names if namespacing is installed', function() {
+        // Reserved names are 'length', '__proto__'
+        ['length', '__proto__'].forEach(function(name) {
+            XRegExp.install('namespacing');
+            expect(function() {XRegExp.exec('a', XRegExp('(?<' + name + '>a)'));}).not.toThrowError(SyntaxError);
         });
     });
 
@@ -728,10 +744,11 @@ describe('XRegExp.install()', function() {
 
     // NOTE: All optional features are uninstalled before each spec runs
 
-    var features = ['astral'];
+    var features = ['namespacing', 'astral'];
 
     it('should install all features set as true on an options object', function() {
         XRegExp.install({
+            namespacing: true,
             astral: true
         });
 
@@ -742,6 +759,7 @@ describe('XRegExp.install()', function() {
 
     it('should not install features set as false on an options object', function() {
         XRegExp.install({
+            namespacing: false,
             astral: false
         });
 
@@ -751,7 +769,7 @@ describe('XRegExp.install()', function() {
     });
 
     it('should install all features in a space-delimited options string', function() {
-        XRegExp.install('astral astral');
+        XRegExp.install('namespacing astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(true);
@@ -759,7 +777,7 @@ describe('XRegExp.install()', function() {
     });
 
     it('should install all features in a comma-delimited options string', function() {
-        XRegExp.install('astral,astral');
+        XRegExp.install('namespacing,astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(true);
@@ -767,7 +785,7 @@ describe('XRegExp.install()', function() {
     });
 
     it('should install all features in a comma+space-delimited options string', function() {
-        XRegExp.install('astral, astral');
+        XRegExp.install('namespacing, astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(true);
@@ -782,21 +800,21 @@ describe('XRegExp.install()', function() {
 describe('XRegExp.isInstalled()', function() {
 
     it('should not check multiple space-delimited features simultaneously', function() {
-        XRegExp.install('astral');
+        XRegExp.install('namespacing astral');
 
-        expect(XRegExp.isInstalled('astral astral')).toBe(false);
+        expect(XRegExp.isInstalled('namespacing astral')).toBe(false);
     });
 
     it('should not check multiple comma-delimited features simultaneously', function() {
-        XRegExp.install('astral');
+        XRegExp.install('namespacing astral');
 
-        expect(XRegExp.isInstalled('astral,astral')).toBe(false);
+        expect(XRegExp.isInstalled('namespacing,astral')).toBe(false);
     });
 
     it('should not check multiple comma+space-delimited features simultaneously', function() {
-        XRegExp.install('astral');
+        XRegExp.install('namespacing astral');
 
-        expect(XRegExp.isInstalled('astral, astral')).toBe(false);
+        expect(XRegExp.isInstalled('namespacing, astral')).toBe(false);
     });
 
     it('should not check features using an options object', function() {
@@ -1138,6 +1156,14 @@ describe('XRegExp.replace()', function() {
      * The following specs:
      * - Have no corresponding specs for String.prototype.replace.
      */
+
+    it('should pass the `groups` argument when `namespacing` is installed', function() {
+        XRegExp.install('namespacing')
+        var regex = XRegExp('(?s)(?<groupName>.)');
+        XRegExp.replace('test', regex, function (matched, capture1, position, S, groups) {
+            expect(groups).toEqual({groupName: 't'})
+        })
+    })
 
     it('should perform replace-all for string search with scope "all"', function() {
         expect(XRegExp.replace('test', 't', 'x', 'all')).toBe('xesx');
@@ -1582,13 +1608,14 @@ describe('XRegExp.test()', function() {
 describe('XRegExp.uninstall()', function() {
 
     beforeEach(function() {
-        XRegExp.install('astral');
+        XRegExp.install('namespacing astral');
     });
 
-    var features = ['astral'];
+    var features = ['namespacing', 'astral'];
 
     it('should uninstall all features set as true on an options object', function() {
         XRegExp.uninstall({
+            namespacing: true,
             astral: true
         });
 
@@ -1599,6 +1626,7 @@ describe('XRegExp.uninstall()', function() {
 
     it('should not uninstall features set as false on an options object', function() {
         XRegExp.uninstall({
+            namespacing: false,
             astral: false
         });
 
@@ -1608,7 +1636,7 @@ describe('XRegExp.uninstall()', function() {
     });
 
     it('should uninstall all features in a space-delimited options string', function() {
-        XRegExp.uninstall('astral astral');
+        XRegExp.uninstall('namespacing astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(false);
@@ -1616,7 +1644,7 @@ describe('XRegExp.uninstall()', function() {
     });
 
     it('should uninstall all features in a comma-delimited options string', function() {
-        XRegExp.uninstall('astral,astral');
+        XRegExp.uninstall('namespacing,astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(false);
@@ -1624,7 +1652,7 @@ describe('XRegExp.uninstall()', function() {
     });
 
     it('should uninstall all features in a comma+space-delimited options string', function() {
-        XRegExp.uninstall('astral, astral');
+        XRegExp.uninstall('namespacing, astral');
 
         features.forEach(function(feature) {
             expect(XRegExp.isInstalled(feature)).toBe(false);
