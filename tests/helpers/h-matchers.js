@@ -34,4 +34,4 @@ global.addToEqualMatchMatcher = function() {
             };
         }
     });
-}
+};

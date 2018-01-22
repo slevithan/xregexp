@@ -1,11 +1,12 @@
 if (typeof global === 'undefined') {
     global = window;
 }
+
 /*
  * Runs a series of `expect` assertions, given a Unicode token name and arrays of code points that
  * should or should not be matched.
  */
-global.testUnicodeToken = function (name, options) {
+global.testUnicodeToken = function(name, options) {
     var pattern = '^\\p{' + name + '}$';
     var negated = '^\\P{' + name + '}$';
     var astralRegex = XRegExp(pattern, 'A');
@@ -45,7 +46,7 @@ global.testUnicodeToken = function (name, options) {
             }
         });
     }
-}
+};
 
 
 /*!
@@ -71,8 +72,9 @@ global.testUnicodeToken = function (name, options) {
  * // Unlike String.fromCharCode, this correctly handles code points above 0xFFFF
  */
 if (!String.fromCodePoint) {
-    String.fromCodePoint = function () {
-        var chars = [], point, offset, units, i;
+    String.fromCodePoint = function() {
+        var chars = [],
+            i, offset, point, units;
         for (i = 0; i < arguments.length; ++i) {
             point = arguments[i];
             offset = point - 0x10000;

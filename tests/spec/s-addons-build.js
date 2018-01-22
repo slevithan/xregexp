@@ -8,7 +8,7 @@ describe('XRegExp.build addon:', function() {
     describe('XRegExp.tag()', function() {
 
         it('should escape the metacharacters of interpolated strings', function() {
-            var inner = '.html'
+            var inner = '.html';
             var re = XRegExp.tag()`^index${inner}$`;
 
             expect(re.test('index.html')).toBe(true);
@@ -82,9 +82,9 @@ describe('XRegExp.build addon:', function() {
         it('should work as described in the comment @example', function() {
             var h12 = /1[0-2]|0?[1-9]/;
             var h24 = /2[0-3]|[01][0-9]/;
-            var hours = XRegExp.tag('x')`${h12} : | ${h24}`
+            var hours = XRegExp.tag('x')`${h12} : | ${h24}`;
             var minutes = /^[0-5][0-9]$/;
-            var time = XRegExp.tag('x')`^ ${hours} (?<minutes>${minutes}) $`
+            var time = XRegExp.tag('x')`^ ${hours} (?<minutes>${minutes}) $`;
 
             expect(time.test('10:59')).toBe(true);
             expect(XRegExp.exec('10:59', time).minutes).toEqual('59');
