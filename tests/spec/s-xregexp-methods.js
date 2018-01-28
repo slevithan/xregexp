@@ -444,14 +444,27 @@ describe('XRegExp.exec()', function() {
     // NOTE: The remaining specs are for named capture. They are listed separately (as extensions)
     // for the RegExp.prototype.exec and nonglobal String.prototype.match specs...
 
-    it('should include named capture properties on the match array', function() {
+    it('should include named capture properties on the match array if namespacing is not installed', function() {
         var match = XRegExp.exec('a', XRegExp('(?<name>a)'));
 
         expect(match.name).toBe('a');
         expect(match[1]).toBe('a');
     });
 
-    it('should include named capture properties on the groups object if namespacing is installed', function() {
+    it('should not include named capture properties on the match array if namespacing is installed', function() {
+        XRegExp.install('namespacing');
+        var match = XRegExp.exec('a', XRegExp('(?<name>a)'));
+
+        expect(match.name).toBeUndefined();
+    });
+
+    it('should not include named capture properties on a groups object if namespacing is not installed', function() {
+        var match = XRegExp.exec('a', XRegExp('(?<name>a)'));
+
+        expect(match.groups).toBeUndefined();
+    });
+
+    it('should include named capture properties on a groups object if namespacing is installed', function() {
         XRegExp.install('namespacing');
         var match = XRegExp.exec('a', XRegExp('(?<name>a)'));
 
@@ -463,7 +476,7 @@ describe('XRegExp.exec()', function() {
         expect(XRegExp.exec('a', XRegExp('(?<concat>a)')).concat).toBe('a');
     });
 
-    it('should throw an exception if reserved array properties are used as capture names', function() {
+    it('should throw an exception if reserved array properties are used as capture names is namespacing is not installed', function() {
         // Reserved names are 'length', '__proto__', and bare integers
         ['length', '__proto__', '0', '1'].forEach(function(name) {
             expect(function() {XRegExp.exec('a', XRegExp('(?<' + name + '>a)'));}).toThrowError(SyntaxError);
@@ -1106,16 +1119,15 @@ describe('XRegExp.matchChain()', function() {
         ]);}).not.toThrow();
     });
 
-    it('should handle named and numbered backrefs when namespacing is installed', function() {
-        XRegExp.install('namespacing');
+    it('should handle named and numbered backrefs when namespacing is not installed', function() {
         expect(XRegExp.matchChain('test', [
             {regex: /.(..)/, backref: 1},
             {regex: XRegExp('.(?<n>.)'), backref: 'n'}
         ])).toEqual(['s']);
     });
 
-    it('should handle named and numbered backrefs when namespacing is not installed', function() {
-        XRegExp.uninstall('namespacing');
+    it('should handle named and numbered backrefs when namespacing is installed', function() {
+        XRegExp.install('namespacing');
         expect(XRegExp.matchChain('test', [
             {regex: /.(..)/, backref: 1},
             {regex: XRegExp('.(?<n>.)'), backref: 'n'}
@@ -1172,24 +1184,6 @@ describe('XRegExp.replace()', function() {
      * - Have no corresponding specs for String.prototype.replace.
      */
 
-    it('should pass the `groups` argument to callbacks when `namespacing` is installed', function() {
-        XRegExp.install('namespacing');
-        var regex = XRegExp('(?s)(?<groupName>.)');
-        var groupsObject = Object.create(null);
-        groupsObject.groupName = 't';
-        XRegExp.replace('test', regex, function(match, capture1, pos, str, groups) {
-            expect(groups).toEqual(groupsObject);
-        });
-    });
-
-    it('should not pass the `groups` argument when `namespacing` is not installed', function() {
-        XRegExp.uninstall('namespacing');
-        var regex = XRegExp('(?s)(?<groupName>.)');
-        XRegExp.replace('test', regex, function(match, capture1, pos, str, groups) {
-            expect(groups).toBeUndefined();
-        });
-    });
-
     it('should perform replace-all for string search with scope "all"', function() {
         expect(XRegExp.replace('test', 't', 'x', 'all')).toBe('xesx');
     });
@@ -1211,10 +1205,34 @@ describe('XRegExp.replace()', function() {
         expect(XRegExp.replace('test', /t/g, 'x', 'one')).toBe('xest');
     });
 
-    it('should allow accessing named backreferences in a callback function as properties of the first argument', function() {
+    it('should not pass the groups argument to callbacks when namespacing is not installed', function() {
+        var regex = XRegExp('(?s)(?<groupName>.)');
+        XRegExp.replace('test', regex, function(match, capture1, pos, str, groups) {
+            expect(groups).toBeUndefined();
+        });
+    });
+
+    it('should pass the groups argument to callbacks when namespacing is installed', function() {
+        XRegExp.install('namespacing');
+        var regex = XRegExp('(?s)(?<groupName>.)');
+        var groupsObject = Object.create(null);
+        groupsObject.groupName = 't';
+        XRegExp.replace('test', regex, function(match, capture1, pos, str, groups) {
+            expect(groups).toEqual(groupsObject);
+        });
+    });
+
+    it('should allow accessing named backreferences in callbacks as properties of the first argument when namespacing is not installed', function() {
         expect(XRegExp.replace('abc', XRegExp('(?<name>.).'), function(match) {
             return ':' + match.name + ':';
         })).toBe(':a:c');
+    });
+
+    it('should not allow accessing named backreferences in callbacks as properties of the first argument when namespacing is installed', function() {
+        XRegExp.install('namespacing');
+        expect(XRegExp.replace('abc', XRegExp('(?<name>.).'), function(match) {
+            return ':' + match.name + ':';
+        })).toBe(':undefined:c');
     });
 
     describe('supports new replacement text syntax:', function() {
