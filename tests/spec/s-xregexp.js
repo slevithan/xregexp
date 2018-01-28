@@ -418,13 +418,21 @@ describe('XRegExp()', function() {
             it('should throw an exception if bare integers are used as capture names', function() {
                 expect(function() {XRegExp('(?<0>)');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp('(?<1>)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(?<01>)');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp('(?<234>)');}).toThrowError(SyntaxError);
             });
 
-            it('should throw an exception if reserved words are used as capture names', function() {
+            it('should throw an exception if reserved words are used as capture names if namespacing is not installed', function() {
                 // Only these names are reserved
                 ['length', '__proto__'].forEach(function(name) {
                     expect(function() {XRegExp('(?<' + name + '>)');}).toThrowError(SyntaxError);
+                });
+            });
+
+            it('should not throw an exception if reserved words are used as capture names if namespacing is installed', function() {
+                XRegExp.install('namespacing');
+                ['length', '__proto__'].forEach(function(name) {
+                    expect(function() {XRegExp('(?<' + name + '>)');}).not.toThrow();
                 });
             });
 

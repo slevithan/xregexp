@@ -474,27 +474,7 @@ describe('XRegExp.exec()', function() {
 
     it('should shaddow array prototype properties with named capture properties', function() {
         expect(XRegExp.exec('a', XRegExp('(?<concat>a)')).concat).toBe('a');
-    });
-
-    it('should throw an exception if reserved array properties are used as capture names is namespacing is not installed', function() {
-        // Reserved names are 'length', '__proto__', and bare integers
-        ['length', '__proto__', '0', '1'].forEach(function(name) {
-            expect(function() {XRegExp.exec('a', XRegExp('(?<' + name + '>a)'));}).toThrowError(SyntaxError);
-        });
-    });
-
-    it('should not throw an exception if reserved array properties are used as capture names if namespacing is installed', function() {
-        // Reserved names are 'length', '__proto__'
-        ['length', '__proto__'].forEach(function(name) {
-            XRegExp.install('namespacing');
-            expect(function() {XRegExp.exec('a', XRegExp('(?<' + name + '>a)'));}).not.toThrow();
-        });
-    });
-
-    it('should allow reserved JavaScript keywords as capture names', function() {
-        ['eval', 'for', 'function', 'if', 'throw'].forEach(function(keyword) {
-            expect(XRegExp.exec('a', XRegExp('(?<' + keyword + '>a)'))[keyword]).toBe('a');
-        });
+        expect(XRegExp.exec('a', XRegExp('(?<index>a)')).index).toBe('a');
     });
 
 });
