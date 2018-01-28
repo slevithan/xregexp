@@ -1084,16 +1084,23 @@ XRegExp.matchChain = (str, chain) => (function recurseChain(values, level) {
 
     function addMatch(match) {
         if (item.backref) {
-            // Safari 4.0.5 (but not 5.0.5+) inappropriately uses sparse arrays to hold the
-            // `undefined`s for backreferences to nonparticipating capturing groups. In such
-            // cases, a `hasOwnProperty` or `in` check on its own would inappropriately throw
-            // the exception, so also check if the backreference is a number that is within the
-            // bounds of the array.
-            if (!(match.hasOwnProperty(item.backref) || +item.backref < match.length)) {
-                throw new ReferenceError(`Backreference to undefined group: ${item.backref}`);
+            const ERR_UNDEFINED_GROUP = `Backreference to undefined group: ${item.backref}`;
+            const isNamedBackref = isNaN(item.backref);
+
+            if (isNamedBackref && XRegExp.isInstalled('namespacing')) {
+                // `groups` has `null` as prototype, so using `in` instead of `hasOwnProperty`
+                if (!(item.backref in match.groups)) {
+                    throw new ReferenceError(ERR_UNDEFINED_GROUP);
+                }
+            } else if (!match.hasOwnProperty(item.backref)) {
+                throw new ReferenceError(ERR_UNDEFINED_GROUP);
             }
 
-            matches.push(match[item.backref] || '');
+            const backrefValue = isNamedBackref && XRegExp.isInstalled('namespacing') ?
+                match.groups[item.backref] :
+                match[item.backref];
+
+            matches.push(backrefValue || '');
         } else {
             matches.push(match[0]);
         }

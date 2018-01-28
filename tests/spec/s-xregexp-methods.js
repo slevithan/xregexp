@@ -1093,32 +1093,45 @@ describe('XRegExp.matchChain()', function() {
     it('should throw an exception when accessing an undefined backreference', function() {
         expect(function() {XRegExp.matchChain('', [
             {regex: /^/, backref: 'bogus'}
-        ]);}).toThrow();
+        ]);}).toThrowError(ReferenceError);
 
         expect(function() {XRegExp.matchChain('', [
             {regex: /^/, backref: 1}
-        ]);}).toThrow();
+        ]);}).toThrowError(ReferenceError);
+    });
 
-        // This does not throw, because there are no matches upon which to access the backreference
+    it('should not throw when referencing an undefined backreference if there are no matches upon which to access the backreference', function() {
         expect(function() {XRegExp.matchChain('', [
             {regex: /x/, backref: 1}
         ]);}).not.toThrow();
     });
 
-    it('should handle a four-link chain with plain regexes and regex/backref objects, using named and numbered backrefs', function() {
+    it('should handle named and numbered backrefs when namespacing is installed', function() {
+        XRegExp.install('namespacing');
+        expect(XRegExp.matchChain('test', [
+            {regex: /.(..)/, backref: 1},
+            {regex: XRegExp('.(?<n>.)'), backref: 'n'}
+        ])).toEqual(['s']);
+    });
+
+    it('should handle named and numbered backrefs when namespacing is not installed', function() {
+        XRegExp.uninstall('namespacing');
+        expect(XRegExp.matchChain('test', [
+            {regex: /.(..)/, backref: 1},
+            {regex: XRegExp('.(?<n>.)'), backref: 'n'}
+        ])).toEqual(['s']);
+    });
+
+    it('should handle a multi-link chain with plain regexes and regex/backref objects, using named and numbered backrefs', function() {
         var str = '<html><img src="http://x.com/pic.png">' +
             '<script src="http://xregexp.com/path/file.ext">' +
             '<img src="http://xregexp.com/path/to/img.jpg?x">' +
             '<img src="http://xregexp.com/img2.gif"/></html>';
 
         expect(XRegExp.matchChain(str, [
-            // <img> tag attributes
             {regex: /<img\b([^>]+)>/i, backref: 1},
-            // src attribute values
             {regex: XRegExp('(?ix) \\s src=" (?<src> [^"]+ )'), backref: 'src'},
-            // xregexp.com paths
             {regex: XRegExp('^http://xregexp\\.com(/[^#?]+)', 'i'), backref: 1},
-            // Filenames (strip directory paths)
             /[^\/]+$/
         ])).toEqual(['img.jpg', 'img2.gif']);
     });
