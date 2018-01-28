@@ -1211,6 +1211,143 @@ describe('XRegExp.replace()', function() {
         expect(XRegExp.replace('test', /t/g, 'x', 'one')).toBe('xest');
     });
 
+    it('should allow accessing named backreferences in a callback function as properties of the first argument', function() {
+        expect(XRegExp.replace('abc', XRegExp('(?<name>.).'), function(match) {
+            return ':' + match.name + ':';
+        })).toBe(':a:c');
+    });
+
+    describe('supports new replacement text syntax:', function() {
+
+        describe('backreference $0', function() {
+
+            it('should work like $&', function() {
+                expect(XRegExp.replace('xaaa', /aa/, '$0b')).toBe('xaaba');
+                expect(XRegExp.replace('xaaa', 'aa', '$0b')).toBe('xaaba');
+            });
+
+            it('should be allowed as $00', function() {
+                expect(XRegExp.replace('xaaa', /aa/, '$00b')).toBe('xaaba');
+            });
+
+            it('should end after two zeros', function() {
+                expect(XRegExp.replace('xaaa', /aa/, '$000b')).toBe('xaa0ba');
+                expect(XRegExp.replace('xaaa', /aa/, '$001b')).toBe('xaa1ba');
+            });
+
+        });
+
+        describe('named backreferences', function() {
+
+            it('should return the named backreference', function() {
+                expect(XRegExp.replace('test', XRegExp('(?<test>t)', 'g'), ':${test}:')).toBe(':t:es:t:');
+                expect(XRegExp.replace('test', XRegExp('(?<test>t)', 'g'), ':$<test>:')).toBe(':t:es:t:');
+
+                // Backreference to a nonparticipating capturing group
+                expect(XRegExp.replace('test', XRegExp('t|(?<test>t)', 'g'), ':${test}:')).toBe('::es::');
+                expect(XRegExp.replace('test', XRegExp('t|(?<test>t)', 'g'), ':$<test>:')).toBe('::es::');
+            });
+
+            it('should throw an exception for backreferences to unknown group names', function() {
+                expect(function() {XRegExp.replace('test', XRegExp('(?<test>t)', 'g'), ':${x}:');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('test', XRegExp('(?<test>t)', 'g'), ':$<x>:');}).toThrowError(SyntaxError);
+            });
+
+        });
+
+        describe('explicit numbered backreferences', function() {
+
+            it('should return the numbered backreference', function() {
+                expect(XRegExp.replace('test', /(.)./g, '${1}')).toBe('ts');
+                expect(XRegExp.replace('test', /(.)./g, '$<1>')).toBe('ts');
+
+                // Backreference to a nonparticipating capturing group
+                expect(XRegExp.replace('test', /t|(e)/g, '${1}')).toBe('es');
+                expect(XRegExp.replace('test', /t|(e)/g, '$<1>')).toBe('es');
+            });
+
+            it('should allow leading zeros', function() {
+                expect(XRegExp.replace('test', /(.)./g, '${01}')).toBe('ts');
+                expect(XRegExp.replace('test', /(.)./g, '$<01>')).toBe('ts');
+
+                expect(XRegExp.replace('test', /(.)./g, '${001}')).toBe('ts');
+                expect(XRegExp.replace('test', /(.)./g, '$<001>')).toBe('ts');
+            });
+
+            it('should return named backreferences by number', function() {
+                expect(XRegExp.replace('test', XRegExp('(?<name>.).', 'g'), '${1}')).toBe('ts');
+                expect(XRegExp.replace('test', XRegExp('(?<name>.).', 'g'), '$<1>')).toBe('ts');
+            });
+
+            it('should separate numbered backreferences from following literal digits', function() {
+                expect(XRegExp.replace('test', new RegExp('(.).', 'g'), '${1}0')).toBe('t0s0');
+                expect(XRegExp.replace('test', new RegExp('(.).', 'g'), '$<1>0')).toBe('t0s0');
+
+                expect(XRegExp.replace('test', new RegExp('(.).' + '()'.repeat(9), 'g'), '${1}0')).toBe('t0s0');
+                expect(XRegExp.replace('test', new RegExp('(.).' + '()'.repeat(9), 'g'), '$<1>0')).toBe('t0s0');
+            });
+
+            it('should throw an exception for backreferences to unknown group numbers', function() {
+                expect(function() {XRegExp.replace('test', /t/, '${1}');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('test', /t/, '$<1>');}).toThrowError(SyntaxError);
+
+                expect(function() {XRegExp.replace('test', /(t)/, '${2}');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('test', /(t)/, '$<2>');}).toThrowError(SyntaxError);
+            });
+
+            it('should allow ${0} to refer to the entire match', function() {
+                expect(XRegExp.replace('test', /../g, '${0}:')).toBe('te:st:');
+                expect(XRegExp.replace('test', /../g, '$<0>:')).toBe('te:st:');
+
+                expect(XRegExp.replace('test', /../g, '${00}:')).toBe('te:st:');
+                expect(XRegExp.replace('test', /../g, '$<00>:')).toBe('te:st:');
+
+                expect(XRegExp.replace('test', /../g, '${000}:')).toBe('te:st:');
+                expect(XRegExp.replace('test', /../g, '$<000>:')).toBe('te:st:');
+            });
+
+            it('should support backreferences 100 and greater, if the browser does natively', function() {
+                // IE < 9 doesn't allow backreferences greater than \99 *within* a regex, but
+                // XRegExp still allows backreferences to groups 100+ within replacement text
+                try {
+                    // Regex with 1,000 capturing groups. This fails in Firefox 4-6 (but not v3.6
+                    // or v7+) with `InternalError: regular expression too complex`
+                    var lottaGroups = new RegExp([
+                        '^(a)\\1', '()'.repeat(8),
+                        '(b)\\10', '()'.repeat(89),
+                        '(c)', '()'.repeat(899),
+                        '(d)$'
+                    ].join(''));
+
+                    expect(XRegExp.replace('aabbcd', lottaGroups, '${0} ${01} ${001} ${0001} ${1} ${10} ${100} ${1000}')).toBe('aabbcd a a a a b c d');
+                    expect(XRegExp.replace('aabbcd', lottaGroups, '$<0> $<01> $<001> $<0001> $<1> $<10> $<100> $<1000>')).toBe('aabbcd a a a a b c d');
+                    expect(XRegExp.replace('aabbcd', lottaGroups, '$<0> ${01} $<001> ${0001} $<1> ${10} $<100> ${1000}')).toBe('aabbcd a a a a b c d');
+                    // For comparison...
+                    expect(XRegExp.replace('aabbcd', lottaGroups, '$0 $01 $001 $0001 $1 $10 $100 $1000')).toBe('aabbcd a aabbcd1 aabbcd01 a b b0 b00');
+                } catch (err) {
+                    // Keep the assertion count consistent cross-browser
+                    expect(true).toBe(true);
+                    expect(true).toBe(true);
+                    expect(true).toBe(true);
+                    expect(true).toBe(true);
+                }
+            });
+
+        });
+
+        describe('strict error handling', function() {
+
+            it('should throw an exception for backreferences to unknown group numbers', function() {
+                expect(function() {XRegExp.replace('xaaa', /aa/, '$1b');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('xaaa', /aa/, '$01b');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('xaaa', /a(a)/, '$2b');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('xa(a)a', 'a(a)', '$1b');}).toThrowError(SyntaxError);
+            });
+
+        });
+
+    });
+
     /*
      * The following specs:
      * - Are mirrored by String.prototype.replace.
@@ -1218,8 +1355,8 @@ describe('XRegExp.replace()', function() {
 
     // TODO: Copy/update specs from String.prototype.replace here
 
-    // NOTE: The following two specs have already been copied from String.prototype.replace, so
-    // don't copy them again
+    // NOTE: The following two specs have already been copied and adapted from
+    // String.prototype.replace, so don't copy them again
 
     it('should convert any nonstring subject to a string (except null and undefined)', function() {
         var values = [
@@ -1243,12 +1380,6 @@ describe('XRegExp.replace()', function() {
 
         expect(function() {XRegExp.replace();}).toThrowError(TypeError);
     });
-
-    // NOTE: The remaining specs are for named backreferences and replacement text syntax
-    // extensions. They are listed separately (as extensions) for the String.prototype.replace
-    // specs...
-
-    // TODO: Copy/update specs from String.prototype.replace here
 
 });
 
