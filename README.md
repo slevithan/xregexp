@@ -228,10 +228,16 @@ require({paths: {xregexp: 'xregexp-all'}}, ['xregexp'], (XRegExp) => {
 });
 ```
 
+## Collaborators
+
+- [Steven Levithan](http://stevenlevithan.com/)
+- [Joseph Frazier](https://github.com/josephfrazier)
+- [Mathias Bynens](https://mathiasbynens.be/)
+
+Thanks to all contributors and others who have submitted code, provided feedback, reported bugs, and inspired new features.
+
 ## About
 
-XRegExp copyright 2007-present by [Steven Levithan](http://stevenlevithan.com/). Unicode data generators by [Mathias Bynens](http://mathiasbynens.be/), adapted from [unicode-data](http://git.io/unicode). XRegExp's syntax extensions and flags come from [Perl](http://www.perl.org/), [.NET](http://www.microsoft.com/net), etc.
-
-All code, including addons, tools, and tests, is released under the terms of the [MIT License](http://mit-license.org/).
+XRegExp copyright 2007-present by Steven Levithan. All code (including addons, tools, and tests) is released under the [MIT License](https://mit-license.org/).
 
 Learn more at [xregexp.com](http://xregexp.com/).
