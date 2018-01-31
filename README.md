@@ -228,7 +228,9 @@ require({paths: {xregexp: 'xregexp-all'}}, ['xregexp'], (XRegExp) => {
 });
 ```
 
-## Collaborators
+## Credits
+
+XRegExp project collaborators are:
 
 - [Steven Levithan](http://stevenlevithan.com/)
 - [Joseph Frazier](https://github.com/josephfrazier)
@@ -236,8 +238,4 @@ require({paths: {xregexp: 'xregexp-all'}}, ['xregexp'], (XRegExp) => {
 
 Thanks to all contributors and others who have submitted code, provided feedback, reported bugs, and inspired new features.
 
-## About
-
-XRegExp copyright 2007-present by Steven Levithan. All code (including addons, tools, and tests) is released under the [MIT License](https://mit-license.org/).
-
-Learn more at [xregexp.com](http://xregexp.com/).
+XRegExp is released under the [MIT License](https://mit-license.org/). Learn more at [xregexp.com](http://xregexp.com/).
