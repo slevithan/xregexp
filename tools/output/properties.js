@@ -1,4 +1,4 @@
-[
+module.exports = [
         {
             name: 'ASCII',
             bmp: '\0-\x7F'
