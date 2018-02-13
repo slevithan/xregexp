@@ -63,7 +63,7 @@ def main(sourceFile):
 		category = item[0]
 		ranges = createRange(item[1])
 		buf.append(format(category, ranges[0], ranges[1], ranges[2]))
-	print('[\n' + ',\n'.join(buf) + '\n]')
+	print('module.exports = [\n' + ',\n'.join(buf) + '\n]')
 
 if __name__ == '__main__':
 	main(sys.argv[1])

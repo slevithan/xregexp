@@ -42,4 +42,4 @@ if __name__ == '__main__':
 		codePointList = toCodePoints(item[1])
 		ranges = createRange(codePointList)
 		buf.append(format(item[0], ranges[0], ranges[1], ranges[2]))
-	print('[\n' + ',\n'.join(buf) + '\n]')
+	print('module.exports = [\n' + ',\n'.join(buf) + '\n]')

@@ -1,4 +1,4 @@
-[
+module.exports = [
         {
             name: 'InAdlam',
             astral: '\uD83A[\uDD00-\uDD5F]'
