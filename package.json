@@ -23,7 +23,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "lint": "eslint src tests tools/scripts",
+    "lint": "eslint .",
     "babel": "babel src -d lib",
     "build-unicode-data": "node tools/scripts/block-regex.js && node tools/scripts/category-regex.js && node tools/scripts/property-regex.js && node tools/scripts/script-regex.js",
     "prebuild": "npm run lint && npm run babel",
