@@ -1,18 +1,14 @@
 const fs = require('fs');
 const jsesc = require('jsesc');
 
-const package = require('../../package.json');
-const dependencies = Object.keys(package.devDependencies);
-const unicodeVersion = dependencies.find((name) =>/^unicode-\d/.test(name));
+const pkg = require('../../package.json');
+const dependencies = Object.keys(pkg.devDependencies);
+const unicodeVersion = dependencies.find((name) => /^unicode-\d/.test(name));
 
 // https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
-const highSurrogate = (codePoint) => {
-    return Math.floor((codePoint - 0x10000) / 0x400) + 0xD800;
-};
+const highSurrogate = (codePoint) => Math.floor((codePoint - 0x10000) / 0x400) + 0xD800;
 
-const lowSurrogate = (codePoint) => {
-    return (codePoint - 0x10000) % 0x400 + 0xDC00;
-};
+const lowSurrogate = (codePoint) => ((codePoint - 0x10000) % 0x400) + 0xDC00;
 
 const codePointToString = (codePoint) => {
     const string = String.fromCodePoint(codePoint);
@@ -60,7 +56,7 @@ const createRange = (codePoints) => {
     // `supplementaryDictByLowRanges` looks like this:
     // { 'low surrogate range': [list of high surrogates that have this exact low surrogate range] })
 
-    const bmpRange = createBmpRange(bmp, { addBrackets: false });
+    const bmpRange = createBmpRange(bmp, {addBrackets: false});
 
     const buf = [];
     let astralRange = '';
@@ -80,8 +76,8 @@ const createRange = (codePoints) => {
     };
 };
 
-const createBmpRange = (r, { addBrackets } = { addBrackets: true }) => {
-    if (r.length === 0) return '';
+const createBmpRange = (r, {addBrackets} = {addBrackets: true}) => {
+    if (r.length === 0) {return '';}
 
     const buf = [];
     let start = r[0];
@@ -130,9 +126,9 @@ const createBmpRange = (r, { addBrackets } = { addBrackets: true }) => {
     return `[${output}]`;
 };
 
-const assemble = ({ name, alias, codePoints }) => {
-    const { bmp, astral, isBmpLast } = createRange(codePoints);
-    const result = { name };
+const assemble = ({name, alias, codePoints}) => {
+    const {bmp, astral, isBmpLast} = createRange(codePoints);
+    const result = {name};
     if (alias) {
         result.alias = alias;
     }

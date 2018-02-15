@@ -18,12 +18,17 @@ const categories = require(`${unicodeVersion}`).General_Category;
 const aliases = [];
 for (const category of categories) {
     const alias = namesToAliases.get(category);
-    aliases.push({ alias, category });
+    aliases.push({
+        alias,
+        category
+    });
 }
-aliases.sort((a, b) => a.alias < b.alias ? -1 : 1);
+aliases.sort(function(a, b) {
+    return a.alias < b.alias ? -1 : 1;
+});
 
 const result = [];
-for (const { alias, category } of aliases) {
+for (const {alias, category} of aliases) {
     const codePoints = require(`${unicodeVersion}/General_Category/${category}/code-points.js`);
     result.push(assemble({
         name: alias,
