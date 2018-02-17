@@ -1090,5 +1090,10 @@ module.exports = [
     {
         'name': 'InYijing_Hexagram_Symbols',
         'bmp': '\u4DC0-\u4DFF'
+    },
+    {
+        'name': 'Inundefined',
+        'bmp': '\u0860-\u086F',
+        'astral': '\uD806[\uDE00-\uDEAF]|\uD807[\uDD00-\uDD5F]|\uD82C[\uDD00-\uDD2F\uDD70-\uDEFF]|\uD873[\uDEB0-\uDFFF]|[\uD874-\uD879][\uDC00-\uDFFF]|\uD87A[\uDC00-\uDFEF]'
     }
 ];
