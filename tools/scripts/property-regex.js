@@ -5,13 +5,13 @@ const {
 } = require('./utils.js');
 
 // This intentially includes only the binary properties required by UTS 18 Level 1 RL1.2 for Unicode
-// regex support, minus `Assigned` which has special handling since it is the inverse of Unicode
-// category `Unassigned` (`Cn`). To include all binary properties, change this to:
+// regex support. To include all binary properties, change this to:
 // `const properties = require(`${unicodeVersion}`).Binary_Property;`
 const properties = [
     'ASCII',
     'Alphabetic',
     'Any',
+    'Assigned',
     'Default_Ignorable_Code_Point',
     'Lowercase',
     'Noncharacter_Code_Point',
