@@ -52,15 +52,5 @@ export default (XRegExp) => {
         throw new ReferenceError('Unicode Base must be loaded before Unicode Properties');
     }
 
-    const unicodeData = properties;
-
-    // Add non-generated data
-    unicodeData.push({
-        name: 'Assigned',
-        // Since this is defined as the inverse of Unicode category Cn (Unassigned), the Unicode
-        // Categories addon is required to use this property
-        inverseOf: 'Cn'
-    });
-
-    XRegExp.addUnicodeData(unicodeData);
+    XRegExp.addUnicodeData(properties);
 };

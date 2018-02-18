@@ -12,6 +12,7 @@ const properties = [
     'ASCII',
     'Alphabetic',
     'Any',
+    'Assigned',
     'Default_Ignorable_Code_Point',
     'Lowercase',
     'Noncharacter_Code_Point',
