@@ -192,6 +192,10 @@ module.exports = [
         'astral': '\uD86E[\uDC20-\uDFFF]|[\uD86F-\uD872][\uDC00-\uDFFF]|\uD873[\uDC00-\uDEAF]'
     },
     {
+        'name': 'InCJK_Unified_Ideographs_Extension_F',
+        'astral': '\uD873[\uDEB0-\uDFFF]|[\uD874-\uD879][\uDC00-\uDFFF]|\uD87A[\uDC00-\uDFEF]'
+    },
+    {
         'name': 'InCarian',
         'astral': '\uD800[\uDEA0-\uDEDF]'
     },
@@ -496,6 +500,10 @@ module.exports = [
         'astral': '\uD804[\uDC80-\uDCCF]'
     },
     {
+        'name': 'InKana_Extended_A',
+        'astral': '\uD82C[\uDD00-\uDD2F]'
+    },
+    {
         'name': 'InKana_Supplement',
         'astral': '\uD82C[\uDC00-\uDCFF]'
     },
@@ -640,6 +648,10 @@ module.exports = [
         'astral': '\uD807[\uDC70-\uDCBF]'
     },
     {
+        'name': 'InMasaram_Gondi',
+        'astral': '\uD807[\uDD00-\uDD5F]'
+    },
+    {
         'name': 'InMathematical_Alphanumeric_Symbols',
         'astral': '\uD835[\uDC00-\uDFFF]'
     },
@@ -754,6 +766,10 @@ module.exports = [
     {
         'name': 'InNumber_Forms',
         'bmp': '\u2150-\u218F'
+    },
+    {
+        'name': 'InNushu',
+        'astral': '\uD82C[\uDD70-\uDEFF]'
     },
     {
         'name': 'InOgham',
@@ -908,6 +924,10 @@ module.exports = [
         'astral': '\uD804[\uDCD0-\uDCFF]'
     },
     {
+        'name': 'InSoyombo',
+        'astral': '\uD806[\uDE50-\uDEAF]'
+    },
+    {
         'name': 'InSpacing_Modifier_Letters',
         'bmp': '\u02B0-\u02FF'
     },
@@ -970,6 +990,10 @@ module.exports = [
     {
         'name': 'InSyriac',
         'bmp': '\u0700-\u074F'
+    },
+    {
+        'name': 'InSyriac_Supplement',
+        'bmp': '\u0860-\u086F'
     },
     {
         'name': 'InTagalog',
@@ -1090,5 +1114,9 @@ module.exports = [
     {
         'name': 'InYijing_Hexagram_Symbols',
         'bmp': '\u4DC0-\u4DFF'
+    },
+    {
+        'name': 'InZanabazar_Square',
+        'astral': '\uD806[\uDE00-\uDE4F]'
     }
 ];

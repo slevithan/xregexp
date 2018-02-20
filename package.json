@@ -26,7 +26,7 @@
     "lint": "eslint .",
     "babel": "babel src -d lib",
     "build-unicode-data": "node tools/scripts/block-regex.js && node tools/scripts/category-regex.js && node tools/scripts/property-regex.js && node tools/scripts/script-regex.js",
-    "prebuild": "npm run lint && npm run babel",
+    "prebuild": "npm run build-unicode-data && npm run lint && npm run babel",
     "build": "browserify lib/index.js --standalone XRegExp > xregexp-all.js",
     "pretest": "npm run build",
     "test": "jasmine JASMINE_CONFIG_PATH=tests/jasmine.json",
@@ -44,7 +44,7 @@
     "eslint": "^3.19.0",
     "jasmine": "^2.5.3",
     "jsesc": "^2.5.1",
-    "unicode-9.0.0": "^0.7.4",
+    "unicode-10.0.0": "^0.7.5",
     "unicode-property-value-aliases": "^3.0.0",
     "zuul": "^3.11.1"
   }
