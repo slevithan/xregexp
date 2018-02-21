@@ -19,7 +19,7 @@
   "files": [
     "src",
     "lib",
-    "tools",
+    "tools/output",
     "xregexp-all.js"
   ],
   "scripts": {
