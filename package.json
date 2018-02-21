@@ -19,8 +19,8 @@
   "files": [
     "src",
     "lib",
-    "xregexp-all.js",
-    "LICENSE"
+    "tools",
+    "xregexp-all.js"
   ],
   "scripts": {
     "lint": "eslint .",
