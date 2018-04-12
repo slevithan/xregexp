@@ -16,18 +16,38 @@
     "unicode"
   ],
   "main": "./lib",
+  "module": "./dist/index-es.min.js",
   "files": [
+    "dist",
     "src",
     "lib",
     "tools/output",
     "xregexp-all.js"
   ],
+  "babel": {
+    "plugins": [
+      "add-module-exports",
+      "array-includes",
+      "transform-xregexp"
+    ],
+    "presets": [
+      [
+        "env",
+        {
+          "exclude": [
+            "transform-es2015-literals"
+          ]
+        }
+      ]
+    ]
+  },
   "scripts": {
+    "rollup": "rollup -c",
     "lint": "eslint .",
     "babel": "babel src -d lib",
     "build-unicode-data": "node tools/scripts/block-regex.js && node tools/scripts/category-regex.js && node tools/scripts/property-regex.js && node tools/scripts/script-regex.js",
     "prebuild": "npm run build-unicode-data && npm run lint && npm run babel",
-    "build": "browserify lib/index.js --standalone XRegExp > xregexp-all.js",
+    "build": "npm run rollup",
     "pretest": "npm run build",
     "test": "jasmine JASMINE_CONFIG_PATH=tests/jasmine.json",
     "test-saucelabs": "npm run pretest && zuul tests/spec/*.js",
@@ -40,10 +60,16 @@
     "babel-plugin-array-includes": "^2.0.3",
     "babel-plugin-transform-xregexp": "^0.0.6",
     "babel-preset-env": "^1.4.0",
-    "browserify": "^16.2.0",
     "eslint": "^4.19.1",
     "jasmine": "^3.1.0",
     "jsesc": "^2.5.1",
+    "rollup": "^0.58.2",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-commonjs": "^9.1.0",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-re": "^1.0.7",
+    "rollup-plugin-uglify": "^3.0.0",
+    "uglify-es": "^3.3.9",
     "unicode-10.0.0": "^0.7.5",
     "unicode-property-value-aliases": "^3.0.0",
     "zuul": "^3.11.1"

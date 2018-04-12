@@ -1,4 +1,5 @@
 xregexp-all.js
+dist
 lib
 tests/perf/versions
 tests/vendor
