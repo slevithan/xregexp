@@ -16,6 +16,7 @@
     "unicode"
   ],
   "main": "./lib",
+  "module": "./src/index.js",
   "files": [
     "src",
     "lib",
