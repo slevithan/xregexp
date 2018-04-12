@@ -99,8 +99,6 @@ const registeredFlags = {
  * @returns {RegExp} Augmented regex.
  */
 function augment(regex, captureNames, xSource, xFlags, isInternalOnly) {
-    let p;
-
     regex[REGEX_DATA] = {
         captureNames
     };
@@ -113,7 +111,7 @@ function augment(regex, captureNames, xSource, xFlags, isInternalOnly) {
     if (regex.__proto__) {
         regex.__proto__ = XRegExp.prototype;
     } else {
-        for (p in XRegExp.prototype) {
+        for (const p in XRegExp.prototype) {
             // An `XRegExp.prototype.hasOwnProperty(p)` check wouldn't be worth it here, since this
             // is performance sensitive, and enumerable `Object.prototype` or `RegExp.prototype`
             // extensions exist on `regex.prototype` anyway
@@ -362,8 +360,6 @@ function pad4(str) {
  * @returns {Object} Object with properties `pattern` and `flags`.
  */
 function prepareFlags(pattern, flags) {
-    let i;
-
     // Recent browsers throw on duplicate flags, so copy this behavior for nonnative flags
     if (clipDuplicates(flags) !== flags) {
         throw new SyntaxError(`Invalid duplicate regex flag ${flags}`);
@@ -380,7 +376,7 @@ function prepareFlags(pattern, flags) {
     });
 
     // Throw on unknown native or nonnative flags
-    for (i = 0; i < flags.length; ++i) {
+    for (let i = 0; i < flags.length; ++i) {
         if (!registeredFlags[flags[i]]) {
             throw new SyntaxError(`Unknown regex flag ${flags[i]}`);
         }
@@ -717,8 +713,7 @@ XRegExp._pad4 = pad4;
  */
 XRegExp.addToken = (regex, handler, options) => {
     options = options || {};
-    let optionalFlags = options.optionalFlags;
-    let i;
+    let {optionalFlags} = options;
 
     if (options.flag) {
         registerFlag(options.flag);
@@ -726,7 +721,7 @@ XRegExp.addToken = (regex, handler, options) => {
 
     if (optionalFlags) {
         optionalFlags = nativ.split.call(optionalFlags, '');
-        for (i = 0; i < optionalFlags.length; ++i) {
+        for (let i = 0; i < optionalFlags.length; ++i) {
             registerFlag(optionalFlags[i]);
         }
     }
@@ -1217,11 +1212,8 @@ XRegExp.replace = (str, search, replacement, scope) => {
  * ]);
  */
 XRegExp.replaceEach = (str, replacements) => {
-    let i;
-    let r;
-
-    for (i = 0; i < replacements.length; ++i) {
-        r = replacements[i];
+    for (let i = 0; i < replacements.length; ++i) {
+        const r = replacements[i];
         str = XRegExp.replace(str, r[0], r[1], r[2]);
     }
 
@@ -1367,9 +1359,8 @@ XRegExp.union = (patterns, flags, options) => {
 
     const parts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*\]/g;
     const output = [];
-    let pattern;
     for (let i = 0; i < patterns.length; ++i) {
-        pattern = patterns[i];
+        const pattern = patterns[i];
 
         if (XRegExp.isRegExp(pattern)) {
             numPriorCaptures = numCaptures;
