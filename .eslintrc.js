@@ -249,7 +249,7 @@ module.exports = {
             "error",
             {
                 "array": false,
-                "object": false
+                "object": true
             }
         ],
         "prefer-numeric-literals": "error",

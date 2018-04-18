@@ -55,7 +55,7 @@ const correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined;
 // Check for ES6 `flags` prop support
 const hasFlagsProp = /x/.flags !== undefined;
 // Shortcut to `Object.prototype.toString`
-const toString = {}.toString;
+const {toString} = {};
 
 function hasNativeFlag(flag) {
     // Can't check based on the presence of properties/getters since browsers might support such
@@ -1501,7 +1501,7 @@ fixed.replace = function(search, replacement) {
 
     if (isRegex) {
         if (search[REGEX_DATA]) {
-            captureNames = search[REGEX_DATA].captureNames;
+            ({captureNames} = search[REGEX_DATA]);
         }
         // Only needed if `search` is nonglobal
         origLastIndex = search.lastIndex;
