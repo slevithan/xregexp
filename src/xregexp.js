@@ -376,9 +376,9 @@ function prepareFlags(pattern, flags) {
     });
 
     // Throw on unknown native or nonnative flags
-    for (let i = 0; i < flags.length; ++i) {
-        if (!registeredFlags[flags[i]]) {
-            throw new SyntaxError(`Unknown regex flag ${flags[i]}`);
+    for (const flag of flags) {
+        if (!registeredFlags[flag]) {
+            throw new SyntaxError(`Unknown regex flag ${flag}`);
         }
     }
 
@@ -721,8 +721,8 @@ XRegExp.addToken = (regex, handler, options) => {
 
     if (optionalFlags) {
         optionalFlags = nativ.split.call(optionalFlags, '');
-        for (let i = 0; i < optionalFlags.length; ++i) {
-            registerFlag(optionalFlags[i]);
+        for (const flag of optionalFlags) {
+            registerFlag(flag);
         }
     }
 
@@ -1101,8 +1101,8 @@ XRegExp.matchChain = (str, chain) => (function recurseChain(values, level) {
         }
     }
 
-    for (let i = 0; i < values.length; ++i) {
-        XRegExp.forEach(values[i], item.regex, addMatch);
+    for (const value of values) {
+        XRegExp.forEach(value, item.regex, addMatch);
     }
 
     return ((level === chain.length - 1) || !matches.length) ?
@@ -1212,8 +1212,7 @@ XRegExp.replace = (str, search, replacement, scope) => {
  * ]);
  */
 XRegExp.replaceEach = (str, replacements) => {
-    for (let i = 0; i < replacements.length; ++i) {
-        const r = replacements[i];
+    for (const r of replacements) {
         str = XRegExp.replace(str, r[0], r[1], r[2]);
     }
 
@@ -1359,9 +1358,7 @@ XRegExp.union = (patterns, flags, options) => {
 
     const parts = /(\()(?!\?)|\\([1-9]\d*)|\\[\s\S]|\[(?:[^\\\]]|\\[\s\S])*\]/g;
     const output = [];
-    for (let i = 0; i < patterns.length; ++i) {
-        const pattern = patterns[i];
-
+    for (const pattern of patterns) {
         if (XRegExp.isRegExp(pattern)) {
             numPriorCaptures = numCaptures;
             captureNames = (pattern[REGEX_DATA] && pattern[REGEX_DATA].captureNames) || [];
