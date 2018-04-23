@@ -602,7 +602,7 @@ function XRegExp(pattern, flags) {
                 pos += (result.matchLength || 1);
             } else {
                 // Get the native token at the current position
-                const token = XRegExp.exec(appliedPattern, nativeTokens[scope], pos, 'sticky')[0];
+                const [token] = XRegExp.exec(appliedPattern, nativeTokens[scope], pos, 'sticky');
                 output += token;
                 pos += token.length;
                 if (token === '[' && scope === defaultScope) {
@@ -1525,7 +1525,7 @@ fixed.replace = function(search, replacement) {
                     // Change the `args[0]` string primitive to a `String` object that can store
                     // properties. This really does need to use `String` as a constructor
                     args[0] = new String(args[0]);
-                    groupsObject = args[0];
+                    [groupsObject] = args;
                 }
 
                 // Store named backreferences
