@@ -315,7 +315,7 @@ describe('XRegExp()', function() {
                 expect(regexIM.multiline).toBe(true);
             });
 
-             // These properties are `undefined`, but future ES may define them with value `false`
+            // These properties are `undefined`, but future ES may define them with value `false`
             it('should not set properties for nonnative flags', function() {
                 expect(XRegExp('(?n)').explicitCapture).toBeFalsy();
                 expect(XRegExp('(?s)').singleline).toBeFalsy();
