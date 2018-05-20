@@ -7,7 +7,12 @@ import resolve from 'rollup-plugin-node-resolve';
 import uglify from 'rollup-plugin-uglify';
 
 const babelConfig = pkg.babel;
-babelConfig.presets[0][1].modules = false;
+babelConfig.presets = babelConfig.presets.map(([name, options]) => {
+    if (name !== "env") {
+        return [name, options];
+    }
+    return [name, Object.assign(options, {modules: false})];
+});
 babelConfig.plugins = babelConfig.plugins.filter((p) => p !== 'add-module-exports');
 
 function getRollupObject({file, minifying = false, format = 'umd'} = {}) {
