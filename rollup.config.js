@@ -8,7 +8,7 @@ import uglify from 'rollup-plugin-uglify';
 
 const babelConfig = pkg.babel;
 babelConfig.presets[0][1].modules = false;
-babelConfig.plugins.splice(0, 1); // Get rid of add-module-exports
+babelConfig.plugins = babelConfig.plugins.filter((p) => p !== 'add-module-exports');
 
 function getRollupObject({file, minifying = false, format = 'umd'} = {}) {
     const nonMinified = {
