@@ -44,7 +44,7 @@
     "eslint": "^4.19.1",
     "jasmine": "^3.1.0",
     "jsesc": "^2.5.1",
-    "unicode-10.0.0": "^0.7.5",
+    "unicode-11.0.0": "^0.7.6",
     "unicode-property-value-aliases": "^3.0.0",
     "zuul": "^3.11.1"
   }
