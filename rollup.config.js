@@ -1,7 +1,6 @@
 import babel from 'rollup-plugin-babel';
 import commonjs from 'rollup-plugin-commonjs';
 import pkg from './package.json';
-import replace from 'rollup-plugin-re';
 import resolve from 'rollup-plugin-node-resolve';
 
 const babelConfig = pkg.babel;
@@ -25,15 +24,6 @@ function getRollupObject({file, format = 'umd'} = {}) {
             file: file || `dist/index-${format}.js`
         },
         plugins: [
-            replace({
-                patterns: [
-                    {
-                        match: /tools\/output/,
-                        test: 'module.exports = [',
-                        replace: 'export default ['
-                    }
-                ]
-            }),
             babel(
                 Object.assign(
                     {
