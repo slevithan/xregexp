@@ -1,10 +1,8 @@
 import babel from 'rollup-plugin-babel';
 import commonjs from 'rollup-plugin-commonjs';
-import {minify} from 'uglify-es';
 import pkg from './package.json';
 import replace from 'rollup-plugin-re';
 import resolve from 'rollup-plugin-node-resolve';
-import uglify from 'rollup-plugin-uglify';
 
 const babelConfig = pkg.babel;
 babelConfig.presets = babelConfig.presets.map(([name, options]) => {
@@ -18,14 +16,13 @@ babelConfig.plugins = [
     ...babelConfig.plugins.filter((p) => p !== 'add-module-exports')
 ];
 
-function getRollupObject({file, minifying = false, format = 'umd'} = {}) {
-    const nonMinified = {
+function getRollupObject({file, format = 'umd'} = {}) {
+    return {
         input: 'src/index.js',
         output: {
             format,
-            sourcemap: minifying,
             name: 'XRegExp',
-            file: file || `dist/index-${format}${minifying ? '.min' : ''}.js`
+            file: file || `dist/index-${format}.js`
         },
         plugins: [
             replace({
@@ -49,23 +46,11 @@ function getRollupObject({file, minifying = false, format = 'umd'} = {}) {
             commonjs()
         ]
     };
-    if (minifying) {
-        nonMinified.plugins.push(uglify(null, minify));
-    }
-    return nonMinified;
 }
 
 export default [
     getRollupObject({file: 'xregexp-all.js'}),
-    getRollupObject(),
     getRollupObject({
-        minifying: true
-    }),
-    getRollupObject({
-        format: 'es'
-    }),
-    getRollupObject({
-        minifying: true,
         format: 'es'
     })
 ];

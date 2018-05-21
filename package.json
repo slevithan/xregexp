@@ -16,7 +16,7 @@
     "unicode"
   ],
   "main": "./lib",
-  "module": "./dist/index-es.min.js",
+  "module": "./dist/index-es.js",
   "files": [
     "dist",
     "src",
@@ -69,8 +69,6 @@
     "rollup-plugin-commonjs": "^9.1.0",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-re": "^1.0.7",
-    "rollup-plugin-uglify": "^3.0.0",
-    "uglify-es": "^3.3.9",
     "unicode-10.0.0": "^0.7.5",
     "unicode-property-value-aliases": "^3.0.0",
     "zuul": "^3.11.1"
