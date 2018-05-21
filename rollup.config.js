@@ -8,12 +8,15 @@ import uglify from 'rollup-plugin-uglify';
 
 const babelConfig = pkg.babel;
 babelConfig.presets = babelConfig.presets.map(([name, options]) => {
-    if (name !== "env") {
+    if (name !== 'env') {
         return [name, options];
     }
     return [name, Object.assign(options, {modules: false})];
 });
-babelConfig.plugins = babelConfig.plugins.filter((p) => p !== 'add-module-exports');
+babelConfig.plugins = [
+    'external-helpers',
+    ...babelConfig.plugins.filter((p) => p !== 'add-module-exports')
+];
 
 function getRollupObject({file, minifying = false, format = 'umd'} = {}) {
     const nonMinified = {
