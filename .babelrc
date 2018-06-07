@@ -4,7 +4,7 @@
     "transform-xregexp",
     "array-includes"
   ],
-  "presets": [["env", {
-    "exclude": ["transform-es2015-literals"]
+  "presets": [["@babel/env", {
+    "exclude": ["transform-literals"]
   }]]
 }
