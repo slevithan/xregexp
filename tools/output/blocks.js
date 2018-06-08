@@ -220,6 +220,10 @@ module.exports = [
         'bmp': '\uAB70-\uABBF'
     },
     {
+        'name': 'InChess_Symbols',
+        'astral': '\uD83E[\uDE00-\uDE6F]'
+    },
+    {
         'name': 'InCombining_Diacritical_Marks',
         'bmp': '\u0300-\u036F'
     },
@@ -312,6 +316,10 @@ module.exports = [
         'bmp': '\u2700-\u27BF'
     },
     {
+        'name': 'InDogra',
+        'astral': '\uD806[\uDC00-\uDC4F]'
+    },
+    {
         'name': 'InDomino_Tiles',
         'astral': '\uD83C[\uDC30-\uDC9F]'
     },
@@ -384,6 +392,10 @@ module.exports = [
         'bmp': '\u10A0-\u10FF'
     },
     {
+        'name': 'InGeorgian_Extended',
+        'bmp': '\u1C90-\u1CBF'
+    },
+    {
         'name': 'InGeorgian_Supplement',
         'bmp': '\u2D00-\u2D2F'
     },
@@ -416,6 +428,10 @@ module.exports = [
         'bmp': '\u0A80-\u0AFF'
     },
     {
+        'name': 'InGunjala_Gondi',
+        'astral': '\uD807[\uDD60-\uDDAF]'
+    },
+    {
         'name': 'InGurmukhi',
         'bmp': '\u0A00-\u0A7F'
     },
@@ -442,6 +458,10 @@ module.exports = [
     {
         'name': 'InHangul_Syllables',
         'bmp': '\uAC00-\uD7AF'
+    },
+    {
+        'name': 'InHanifi_Rohingya',
+        'astral': '\uD803[\uDD00-\uDD3F]'
     },
     {
         'name': 'InHanunoo',
@@ -482,6 +502,10 @@ module.exports = [
     {
         'name': 'InImperial_Aramaic',
         'astral': '\uD802[\uDC40-\uDC5F]'
+    },
+    {
+        'name': 'InIndic_Siyaq_Numbers',
+        'astral': '\uD83B[\uDC70-\uDCBF]'
     },
     {
         'name': 'InInscriptional_Pahlavi',
@@ -632,6 +656,10 @@ module.exports = [
         'astral': '\uD83C[\uDC00-\uDC2F]'
     },
     {
+        'name': 'InMakasar',
+        'astral': '\uD807[\uDEE0-\uDEFF]'
+    },
+    {
         'name': 'InMalayalam',
         'bmp': '\u0D00-\u0D7F'
     },
@@ -658,6 +686,14 @@ module.exports = [
     {
         'name': 'InMathematical_Operators',
         'bmp': '\u2200-\u22FF'
+    },
+    {
+        'name': 'InMayan_Numerals',
+        'astral': '\uD834[\uDEE0-\uDEFF]'
+    },
+    {
+        'name': 'InMedefaidrin',
+        'astral': '\uD81B[\uDE40-\uDE9F]'
     },
     {
         'name': 'InMeetei_Mayek',
@@ -800,6 +836,10 @@ module.exports = [
         'astral': '\uD800[\uDFA0-\uDFDF]'
     },
     {
+        'name': 'InOld_Sogdian',
+        'astral': '\uD803[\uDF00-\uDF2F]'
+    },
+    {
         'name': 'InOld_South_Arabian',
         'astral': '\uD802[\uDE60-\uDE7F]'
     },
@@ -918,6 +958,10 @@ module.exports = [
     {
         'name': 'InSmall_Form_Variants',
         'bmp': '\uFE50-\uFE6F'
+    },
+    {
+        'name': 'InSogdian',
+        'astral': '\uD803[\uDF30-\uDF6F]'
     },
     {
         'name': 'InSora_Sompeng',
