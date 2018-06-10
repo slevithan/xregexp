@@ -24,6 +24,7 @@
             var match = /[?&]version=([^&]+)/.exec(location.search);
             var version = match ? match[1] : null;
             var knownVersion = {
+                '4.2.0': true,
                 '4.1.1': true,
                 '4.0.0': true,
                 '3.2.0': true,
