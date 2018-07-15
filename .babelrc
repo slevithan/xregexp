@@ -1,5 +1,6 @@
 {
   "plugins": [
+    "@babel/plugin-transform-runtime",
     "add-module-exports",
     "transform-xregexp",
     "array-includes"
