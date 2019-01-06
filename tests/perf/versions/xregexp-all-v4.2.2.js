@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /*!
- * XRegExp.build 4.2.1
+ * XRegExp.build 4.2.2
  * <xregexp.com>
  * Steven Levithan (c) 2012-present MIT License
  */
@@ -251,7 +251,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /*!
- * XRegExp.matchRecursive 4.2.1
+ * XRegExp.matchRecursive 4.2.2
  * <xregexp.com>
  * Steven Levithan (c) 2009-present MIT License
  */
@@ -472,7 +472,7 @@ exports.default = void 0;
 var _getIterator2 = _interopRequireDefault(require("@babel/runtime/core-js/get-iterator"));
 
 /*!
- * XRegExp Unicode Base 4.2.1
+ * XRegExp Unicode Base 4.2.2
  * <xregexp.com>
  * Steven Levithan (c) 2008-present MIT License
  */
@@ -750,7 +750,7 @@ exports.default = void 0;
 var _blocks = _interopRequireDefault(require("../../tools/output/blocks"));
 
 /*!
- * XRegExp Unicode Blocks 4.2.1
+ * XRegExp Unicode Blocks 4.2.2
  * <xregexp.com>
  * Steven Levithan (c) 2010-present MIT License
  * Unicode data by Mathias Bynens <mathiasbynens.be>
@@ -787,7 +787,7 @@ exports.default = void 0;
 var _categories = _interopRequireDefault(require("../../tools/output/categories"));
 
 /*!
- * XRegExp Unicode Categories 4.2.1
+ * XRegExp Unicode Categories 4.2.2
  * <xregexp.com>
  * Steven Levithan (c) 2010-present MIT License
  * Unicode data by Mathias Bynens <mathiasbynens.be>
@@ -824,7 +824,7 @@ exports.default = void 0;
 var _properties = _interopRequireDefault(require("../../tools/output/properties"));
 
 /*!
- * XRegExp Unicode Properties 4.2.1
+ * XRegExp Unicode Properties 4.2.2
  * <xregexp.com>
  * Steven Levithan (c) 2012-present MIT License
  * Unicode data by Mathias Bynens <mathiasbynens.be>
@@ -898,7 +898,7 @@ exports.default = void 0;
 var _scripts = _interopRequireDefault(require("../../tools/output/scripts"));
 
 /*!
- * XRegExp Unicode Scripts 4.2.1
+ * XRegExp Unicode Scripts 4.2.2
  * <xregexp.com>
  * Steven Levithan (c) 2010-present MIT License
  * Unicode data by Mathias Bynens <mathiasbynens.be>
@@ -974,7 +974,7 @@ var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/sli
 var _getIterator2 = _interopRequireDefault(require("@babel/runtime/core-js/get-iterator"));
 
 /*!
- * XRegExp 4.2.1
+ * XRegExp 4.2.2
  * <xregexp.com>
  * Steven Levithan (c) 2007-present MIT License
  */
@@ -1641,7 +1641,7 @@ XRegExp.prototype = /(?:)/; // ==--------------------------==
  * @type String
  */
 
-XRegExp.version = '4.2.1'; // ==--------------------------==
+XRegExp.version = '4.2.2'; // ==--------------------------==
 // Public methods
 // ==--------------------------==
 // Intentionally undocumented; used in tests and addons
