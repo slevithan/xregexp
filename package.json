@@ -37,7 +37,7 @@
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.47",
     "@babel/core": "^7.0.0-beta.47",
-    "@babel/plugin-transform-runtime": "^7.0.0-beta.53",
+    "@babel/plugin-transform-runtime": "7.0.0-beta.53",
     "@babel/preset-env": "^7.0.0-beta.47",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-array-includes": "^2.0.3",
@@ -51,6 +51,6 @@
     "zuul": "^3.11.1"
   },
   "dependencies": {
-    "@babel/runtime": "^7.0.0-beta.53"
+    "@babel/runtime": "7.0.0-beta.53"
   }
 }
