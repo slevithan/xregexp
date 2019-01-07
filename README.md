@@ -1,4 +1,4 @@
-# XRegExp 4.2.2
+# XRegExp 4.2.3
 
 [![Build Status](https://travis-ci.org/slevithan/xregexp.svg?branch=master)](https://travis-ci.org/slevithan/xregexp)
 

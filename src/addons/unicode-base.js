@@ -1,5 +1,5 @@
 /*!
- * XRegExp Unicode Base 4.2.2
+ * XRegExp Unicode Base 4.2.3
  * <xregexp.com>
  * Steven Levithan (c) 2008-present MIT License
  */
