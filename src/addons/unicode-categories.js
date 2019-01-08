@@ -1,5 +1,5 @@
 /*!
- * XRegExp Unicode Categories 4.2.3
+ * XRegExp Unicode Categories 4.2.4
  * <xregexp.com>
  * Steven Levithan (c) 2010-present MIT License
  * Unicode data by Mathias Bynens <mathiasbynens.be>
