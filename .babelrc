@@ -3,7 +3,7 @@
     [
       "@babel/plugin-transform-runtime",
       {
-        "corejs": 2,
+        "helpers": false,
       },
     ],
     "add-module-exports",

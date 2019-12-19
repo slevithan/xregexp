@@ -35,22 +35,19 @@
     "prepublish": "npm test"
   },
   "devDependencies": {
-    "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.2.2",
-    "@babel/plugin-transform-runtime": "^7.2.0",
-    "@babel/preset-env": "^7.2.3",
-    "babel-plugin-add-module-exports": "^0.2.1",
+    "@babel/cli": "^7.7.7",
+    "@babel/core": "^7.7.7",
+    "@babel/plugin-transform-runtime": "^7.7.6",
+    "@babel/preset-env": "^7.7.7",
+    "babel-plugin-add-module-exports": "^1.0.2",
     "babel-plugin-array-includes": "^2.0.3",
-    "babel-plugin-transform-xregexp": "^0.0.6",
-    "browserify": "^16.2.0",
+    "babel-plugin-transform-xregexp": "^1.0.0",
+    "browserify": "^16.5.0",
     "eslint": "^4.19.1",
     "jasmine": "^3.1.0",
     "jsesc": "^2.5.1",
     "unicode-11.0.0": "^0.7.7",
     "unicode-property-value-aliases": "^3.0.0",
     "zuul": "^3.11.1"
-  },
-  "dependencies": {
-    "@babel/runtime-corejs2": "^7.2.0"
   }
 }
