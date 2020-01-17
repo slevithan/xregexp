@@ -13,6 +13,7 @@ const properties = [
     'Alphabetic',
     'Any',
     'Default_Ignorable_Code_Point',
+    'Emoji',
     'Lowercase',
     'Noncharacter_Code_Point',
     'Uppercase',
