@@ -1162,5 +1162,9 @@ module.exports = [
     {
         'name': 'InZanabazar_Square',
         'astral': '\uD806[\uDE00-\uDE4F]'
+    },
+    {
+        'name': 'Inundefined',
+        'astral': '\uD803[\uDFE0-\uDFFF]|\uD806[\uDDA0-\uDDFF]|\uD807[\uDFC0-\uDFFF]|\uD80D[\uDC30-\uDC3F]|\uD82C[\uDD30-\uDD6F]|\uD838[\uDD00-\uDD4F\uDEC0-\uDEFF]|\uD83B[\uDD00-\uDD4F]|\uD83E[\uDE70-\uDEFF]'
     }
 ];
