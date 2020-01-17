@@ -47,6 +47,7 @@
     "jasmine": "^3.1.0",
     "jsesc": "^2.5.1",
     "unicode-11.0.0": "^0.7.7",
+    "unicode-12.1.0": "^0.8.0",
     "unicode-property-value-aliases": "^3.0.0",
     "zuul": "^3.11.1"
   },
