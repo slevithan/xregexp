@@ -1,6 +1,7 @@
 language: node_js
+# the build environnement does not relate to the target supported environments, so just use the current stable
 node_js:
-  - 9
+  - node
 script:
   - npm test
   - '[ -z "$SAUCE_USERNAME" ] || [ -z "$SAUCE_ACCESS_KEY" ] || npm run test-saucelabs'
