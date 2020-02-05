@@ -1,5 +1,5 @@
 /*!
- * XRegExp Unicode Properties 4.2.4
+ * XRegExp Unicode Properties 4.3.0
  * <xregexp.com>
  * Steven Levithan (c) 2012-present MIT License
  * Unicode data by Mathias Bynens <mathiasbynens.be>
