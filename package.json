@@ -15,7 +15,8 @@
     "regular expression",
     "unicode"
   ],
-  "main": "./lib",
+  "main": "./lib/index.js",
+  "module": "./src/index.js",
   "files": [
     "src",
     "lib",
