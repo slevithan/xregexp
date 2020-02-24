@@ -21,10 +21,12 @@
     "src",
     "lib",
     "tools/output",
-    "xregexp-all.js"
+    "xregexp-all.js",
+    "types/index.d.ts"
   ],
   "scripts": {
-    "lint": "eslint .",
+    "lint": "eslint . && npm run dtslint",
+    "dtslint": "dtslint types",
     "babel": "babel src -d lib",
     "build-unicode-data": "node tools/scripts/block-regex.js && node tools/scripts/category-regex.js && node tools/scripts/property-regex.js && node tools/scripts/script-regex.js",
     "prebuild": "npm run build-unicode-data && npm run lint && npm run babel",
@@ -35,6 +37,7 @@
     "test-browser": "npm run test-saucelabs -- --local --open",
     "prepublish": "npm test"
   },
+  "types": "types",
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.2.2",
@@ -44,6 +47,7 @@
     "babel-plugin-array-includes": "^2.0.3",
     "babel-plugin-transform-xregexp": "^0.0.6",
     "browserify": "^16.2.0",
+    "dtslint": "^2.0.5",
     "eslint": "^4.19.1",
     "jasmine": "^3.1.0",
     "jsesc": "^2.5.1",
