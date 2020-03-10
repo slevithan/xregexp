@@ -96,7 +96,7 @@ const registeredFlags = {
  * @param {Boolean} [isInternalOnly=false] Whether the regex will be used only for internal
  *   operations, and never exposed to users. For internal-only regexes, we can improve perf by
  *   skipping some operations like attaching `XRegExp.prototype` properties.
- * @returns {RegExp} Augmented regex.
+ * @returns {!RegExp} Augmented regex.
  */
 function augment(regex, captureNames, xSource, xFlags, isInternalOnly) {
     regex[REGEX_DATA] = {
@@ -131,7 +131,7 @@ function augment(regex, captureNames, xSource, xFlags, isInternalOnly) {
  *
  * @private
  * @param {String} str String to remove duplicate characters from.
- * @returns {String} String with any duplicate characters removed.
+ * @returns {string} String with any duplicate characters removed.
  */
 function clipDuplicates(str) {
     return nativ.replace.call(str, /([\s\S])(?=[\s\S]*\1)/g, '');
@@ -214,7 +214,7 @@ function copyRegex(regex, options) {
  *
  * @private
  * @param {String} hex
- * @returns {Number}
+ * @returns {number}
  */
 function dec(hex) {
     return parseInt(hex, 16);
@@ -229,7 +229,7 @@ function dec(hex) {
  * @param {String} match Match arg of `XRegExp.addToken` handler
  * @param {String} scope Scope arg of `XRegExp.addToken` handler
  * @param {String} flags Flags arg of `XRegExp.addToken` handler
- * @returns {String} Either '' or '(?:)', depending on which is needed in the context of the match.
+ * @returns {string} Either '' or '(?:)', depending on which is needed in the context of the match.
  */
 function getContextualTokenSeparator(match, scope, flags) {
     if (
@@ -268,7 +268,7 @@ function getContextualTokenSeparator(match, scope, flags) {
  *
  * @private
  * @param {RegExp} regex Regex to check.
- * @returns {String} Native flags in use.
+ * @returns {string} Native flags in use.
  */
 function getNativeFlags(regex) {
     return hasFlagsProp ?
@@ -284,7 +284,7 @@ function getNativeFlags(regex) {
  *
  * @private
  * @param {RegExp} regex Regex to check.
- * @returns {Boolean} Whether the regex uses named capture.
+ * @returns {boolean} Whether the regex uses named capture.
  */
 function hasNamedCapture(regex) {
     return !!(regex[REGEX_DATA] && regex[REGEX_DATA].captureNames);
@@ -295,7 +295,7 @@ function hasNamedCapture(regex) {
  *
  * @private
  * @param {Number|String} dec
- * @returns {String}
+ * @returns {string}
  */
 function hex(dec) {
     return parseInt(dec, 10).toString(16);
@@ -330,7 +330,7 @@ function isQuantifierNext(pattern, pos, flags) {
  * @private
  * @param {*} value Object to check.
  * @param {String} type Type to check for, in TitleCase.
- * @returns {Boolean} Whether the object matches the type.
+ * @returns {boolean} Whether the object matches the type.
  */
 function isType(value, type) {
     return toString.call(value) === `[object ${type}]`;
@@ -341,7 +341,7 @@ function isType(value, type) {
  *
  * @private
  * @param {String} str
- * @returns {String}
+ * @returns {string}
  */
 function pad4(str) {
     while (str.length < 4) {
@@ -357,7 +357,7 @@ function pad4(str) {
  * @private
  * @param {String} pattern Regex pattern, possibly with a leading mode modifier.
  * @param {String} flags Any combination of flags.
- * @returns {Object} Object with properties `pattern` and `flags`.
+ * @returns {!Object} Object with properties `pattern` and `flags`.
  */
 function prepareFlags(pattern, flags) {
     // Recent browsers throw on duplicate flags, so copy this behavior for nonnative flags
@@ -785,7 +785,7 @@ XRegExp.cache.flush = (cacheName) => {
  *
  * @memberOf XRegExp
  * @param {String} str String to escape.
- * @returns {String} String with regex metacharacters escaped.
+ * @returns {string} String with regex metacharacters escaped.
  * @example
  *
  * XRegExp.escape('Escaped? <.>');
@@ -967,7 +967,7 @@ XRegExp.install = (options) => {
  * @param {String} feature Name of the feature to check. One of:
  *   - `astral`
  *   - `namespacing`
- * @returns {Boolean} Whether the feature is installed.
+ * @returns {boolean} Whether the feature is installed.
  * @example
  *
  * XRegExp.isInstalled('astral');
@@ -980,7 +980,7 @@ XRegExp.isInstalled = (feature) => !!(features[feature]);
  *
  * @memberOf XRegExp
  * @param {*} value Object to check.
- * @returns {Boolean} Whether the object is a `RegExp` object.
+ * @returns {boolean} Whether the object is a `RegExp` object.
  * @example
  *
  * XRegExp.isRegExp('string'); // -> false
@@ -1260,7 +1260,7 @@ XRegExp.split = (str, separator, limit) => fixed.split.call(toObject(str), separ
  * @param {Number} [pos=0] Zero-based index at which to start the search.
  * @param {Boolean|String} [sticky=false] Whether the match must start at the specified position
  *   only. The string `'sticky'` is accepted as an alternative to `true`.
- * @returns {Boolean} Whether the regex matched the provided value.
+ * @returns {boolean} Whether the regex matched the provided value.
  * @example
  *
  * // Basic use
@@ -1449,7 +1449,7 @@ fixed.exec = function(str) {
  *
  * @memberOf RegExp
  * @param {String} str String to search.
- * @returns {Boolean} Whether the regex matched the provided value.
+ * @returns {boolean} Whether the regex matched the provided value.
  */
 fixed.test = function(str) {
     // Do this the easy way :-)
@@ -1491,7 +1491,7 @@ fixed.match = function(regex) {
  * @memberOf String
  * @param {RegExp|String} search Search pattern to be replaced.
  * @param {String|Function} replacement Replacement string or a function invoked to create it.
- * @returns {String} New string with one or all matches replaced.
+ * @returns {string} New string with one or all matches replaced.
  */
 fixed.replace = function(search, replacement) {
     const isRegex = XRegExp.isRegExp(search);
@@ -1632,7 +1632,7 @@ fixed.replace = function(search, replacement) {
  * @memberOf String
  * @param {RegExp|String} separator Regex or string to use for separating the string.
  * @param {Number} [limit] Maximum number of items to include in the result array.
- * @returns {Array} Array of substrings.
+ * @returns {!Array} Array of substrings.
  */
 fixed.split = function(separator, limit) {
     if (!XRegExp.isRegExp(separator)) {
