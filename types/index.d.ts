@@ -131,7 +131,7 @@ declare namespace XRegExp {
      *     - {XRegExp.NamedGroups} args[n+3]  - If the `namespacing` feature is turned on, the last parameter is the groups object. If the
      *       `namespacing` feature is off, then this argument is not present.
      */
-    type ReplacementFunction = ((substring: MatchSubString, ...args: (string | number | NamedGroupsArray)[]) => string);
+    type ReplacementFunction = ((substring: MatchSubString, ...args: Array<string | number | NamedGroupsArray>) => string);
 
     /**
      *   Replacement strings can include special replacement syntax:
@@ -503,7 +503,7 @@ declare namespace XRegExp {
      * }]);
      * XRegExp('\\p{XDigit}:\\p{Hexadecimal}+').test('0:3D'); // -> true
      */
-    function addUnicodeData(data: Array<UnicodeCharacterRange>): void;
+    function addUnicodeData(data: UnicodeCharacterRange[]): void;
 
     /**
      * Builds regexes using named subpatterns, for readability and pattern reuse. Backreferences in
@@ -702,8 +702,8 @@ declare namespace XRegExp {
      * XRegExp.match('abc', /x/, 'all'); // -> []
      */
     function match(str: string, regex: RegExp, scope: MatchScopeOne): string | null;
-    function match(str: string, regex: RegExp, scope: MatchScopeAll): Array<string>;
-    function match(str: string, regex: RegExp, scope?: MatchScope): string | Array<string> | null;
+    function match(str: string, regex: RegExp, scope: MatchScopeAll): string[];
+    function match(str: string, regex: RegExp, scope?: MatchScope): string | string[] | null;
 
     /**
      * Retrieves the matches from searching a string using a chain of regexes that successively search
@@ -783,9 +783,9 @@ declare namespace XRegExp {
      * XRegExp.matchRecursive(str, '<', '>', 'gy');
      * // -> ['1', '<<2>>', '3']
      */
-    function matchRecursive(str: string, left: string, right: string, flags?: string | null): Array<string>;
+    function matchRecursive(str: string, left: string, right: string, flags?: string | null): string[];
     function matchRecursive<T extends (MatchRecursiveOptions | null | undefined)>(str: string, left: string, right: string, flags?: string | null, options?: T)
-        : T extends Required<Pick<MatchRecursiveOptions, 'valueNames'>> ? Array<MatchRecursiveValueNameMatch> : Array<string>;
+        : T extends Required<Pick<MatchRecursiveOptions, 'valueNames'>> ? MatchRecursiveValueNameMatch[] : string[];
 
     /**
      * Returns a new string with one or all matches of a pattern replaced. The pattern can be a string
@@ -840,7 +840,7 @@ declare namespace XRegExp {
      *   [/f/g, ($0) => $0.toUpperCase()]
      * ]);
      */
-    function replaceEach(str: string, replacements: Array<ReplacementDetail>): string;
+    function replaceEach(str: string, replacements: ReplacementDetail[]): string;
 
     /**
      * Splits a string into an array of strings using a regex or string separator. Matches of the
@@ -867,7 +867,7 @@ declare namespace XRegExp {
      * XRegExp.split('..word1..', /([a-z]+)(\d+)/i);
      * // -> ['..', 'word', '1', '..']
      */
-    function split(str: string, separator: Pattern, limit?: number): Array<string>;
+    function split(str: string, separator: Pattern, limit?: number): string[];
 
     /**
      * Provides tagged template literals that create regexes with XRegExp syntax and flags. The
@@ -958,7 +958,7 @@ declare namespace XRegExp {
      * XRegExp.union([/man/, /bear/, /pig/], 'i', {conjunction: 'none'});
      * // -> /manbearpig/i
      */
-    function union(patterns: Array<Pattern>, flags?: string | null, options?: UnionOptions): RegExp;
+    function union(patterns: Pattern[], flags?: string | null, options?: UnionOptions): RegExp;
 
     //#endregion
 }
