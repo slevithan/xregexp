@@ -79,7 +79,7 @@ const ng_str1: string = ng['name'] + ng['val'];
 
 // MatchArray
 class XRegExpMatchArrayImpl extends Array<string> implements XRegExp.MatchArray {
-    constructor(...items: Array<string>) {
+    constructor(...items: string[]) {
         super(...items);
         Object.setPrototypeOf(this, Object.create(XRegExpMatchArrayImpl.prototype));
     }
@@ -96,7 +96,7 @@ const ma_str1: string | undefined = ma['namedMatch'] as string;
 
 // ExecArray
 class XRegExpExecArrayImpl extends Array<string> implements XRegExp.ExecArray {
-    constructor(...items: Array<string>) {
+    constructor(...items: string[]) {
         super(...items);
         Object.setPrototypeOf(this, Object.create(XRegExpExecArrayImpl.prototype));
     }
@@ -225,17 +225,17 @@ ire_bool = XRegExp.isRegExp({});
 
 // match
 const m_str: string|null = XRegExp.match('asdf', /a/gi, 'one');
-const m_strarr: Array<string> = XRegExp.match('asdf', /a/gi, 'all');
-const m_any: string|null|Array<string> = XRegExp.match('asdf', /a/gi);
+const m_strarr: string[] = XRegExp.match('asdf', /a/gi, 'all');
+const m_any: string|null|string[] = XRegExp.match('asdf', /a/gi);
 
 // matchChain
 ma = XRegExp.matchChain('asdf', mca);
 
 // matchRecursive
-let mr1: Array<string>
+let mr1: string[]
     = XRegExp.matchRecursive('asdf', 'a', 'f');
 mr1 = XRegExp.matchRecursive('asdf', 'a', 'f', 'gi');
-let mr2: Array<XRegExp.MatchRecursiveValueNameMatch>
+let mr2: XRegExp.MatchRecursiveValueNameMatch[]
     = XRegExp.matchRecursive('asdf', 'a', 'f', null, { valueNames: [ 'a', 'b', 'c', 'd' ] });
 mr2 = XRegExp.matchRecursive('asdf', 'a', 'f', 'gi', { valueNames: [ 'a', 'b', 'c', 'd' ] });
 
@@ -248,7 +248,7 @@ r_str = XRegExp.replace('asdf', /a/gi, (s, args) => 'a', 'one');
 const re_str: string = XRegExp.replaceEach('asdf', [ rd ]);
 
 // split
-let s_strarr: Array<string> = XRegExp.split('asdf', '/a/');
+let s_strarr: string[] = XRegExp.split('asdf', '/a/');
 s_strarr = XRegExp.split('asdf', /a/gi, 2);
 
 // tag
