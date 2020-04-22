@@ -31,7 +31,7 @@ export default (XRegExp) => {
      * @param {String} right Right delimiter as an XRegExp pattern.
      * @param {String} [flags] Any native or XRegExp flags, used for the left and right delimiters.
      * @param {Object} [options] Lets you specify `valueNames` and `escapeChar` options.
-     * @returns {Array} Array of matches, or an empty array.
+     * @returns {!Array} Array of matches, or an empty array.
      * @example
      *
      * // Basic usage
