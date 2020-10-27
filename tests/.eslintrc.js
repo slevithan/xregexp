@@ -23,6 +23,6 @@ module.exports = {
         "no-template-curly-in-string": 0,
         "no-useless-call": 0,
         "no-warning-comments": 0,
-        "object-property-newline": 0,
+        "object-property-newline": 0
     }
-}
+};
