@@ -70,6 +70,13 @@ function hasNativeFlag(flag) {
     } catch (exception) {
         isSupported = false;
     }
+    // Work around a broken/incomplete IE11 polyfill for sticky introduced in core-js 3.6.0
+    if (flag === 'y') {
+        const incompleteY = '.a'.replace(new RegExp('a', 'gy'), '.') === '..';
+        if (incompleteY) {
+            isSupported = false;
+        }
+    }
     return isSupported;
 }
 // Check for ES6 `u` flag support
