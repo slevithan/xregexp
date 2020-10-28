@@ -67,15 +67,18 @@ function hasNativeFlag(flag) {
         // Can't use regex literals for testing even in a `try` because regex literals with
         // unsupported flags cause a compilation error in IE
         new RegExp('', flag);
+
+        // Work around a broken/incomplete IE11 polyfill for sticky introduced in core-js 3.6.0
+        if (flag === 'y') {
+            // Using function to avoid babel transform to regex literal
+            const gy = (() => 'gy')();
+            const incompleteY = '.a'.replace(new RegExp('a', gy), '.') === '..';
+            if (incompleteY) {
+                isSupported = false;
+            }
+        }
     } catch (exception) {
         isSupported = false;
-    }
-    // Work around a broken/incomplete IE11 polyfill for sticky introduced in core-js 3.6.0
-    if (flag === 'y') {
-        const incompleteY = '.a'.replace(new RegExp('a', 'gy'), '.') === '..';
-        if (incompleteY) {
-            isSupported = false;
-        }
     }
     return isSupported;
 }
