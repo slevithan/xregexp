@@ -14,7 +14,7 @@ export default (XRegExp) => {
      * `\p{InBasicLatin}`. Token names are case insensitive, and any spaces, hyphens, and
      * underscores are ignored.
      *
-     * Uses Unicode 12.1.0.
+     * Uses Unicode 13.0.0.
      *
      * @requires XRegExp, Unicode Base
      */
