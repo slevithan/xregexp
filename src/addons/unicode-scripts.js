@@ -1,5 +1,5 @@
 /*!
- * XRegExp Unicode Scripts 4.3.1
+ * XRegExp Unicode Scripts 4.4.0
  * <xregexp.com>
  * Steven Levithan (c) 2010-present MIT License
  * Unicode data by Mathias Bynens <mathiasbynens.be>

@@ -1,5 +1,5 @@
 /*!
- * XRegExp.matchRecursive 4.3.1
+ * XRegExp.matchRecursive 4.4.0
  * <xregexp.com>
  * Steven Levithan (c) 2009-present MIT License
  */
