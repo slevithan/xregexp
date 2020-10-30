@@ -1545,11 +1545,6 @@ fixed.replace = function(search, replacement) {
                     }
                 }
             }
-            // Update `lastIndex` before calling `replacement`. Fixes IE, Chrome, Firefox, Safari
-            // bug (last tested IE 9, Chrome 17, Firefox 11, Safari 5.1)
-            if (isRegex && search.global) {
-                search.lastIndex = args[args.length - 2] + args[0].length;
-            }
             // ES6 specs the context for replacement functions as `undefined`
             return replacement(...args);
         });
