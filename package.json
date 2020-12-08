@@ -15,6 +15,7 @@
     "regular expression",
     "unicode"
   ],
+  "browser": "./lib/index.js",
   "main": "./lib/index.js",
   "module": "./src/index.js",
   "files": [
