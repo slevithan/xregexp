@@ -1,6 +1,6 @@
 # XRegExp 4.4.0
 
-[![Build Status](https://travis-ci.org/slevithan/xregexp.svg?branch=master)](https://travis-ci.org/slevithan/xregexp)
+[![Build Status](https://github.com/slevithan/xregexp/workflows/.github/workflows/build.yml/badge.svg)](https://github.com/slevithan/xregexp/actions)
 
 XRegExp provides augmented (and extensible) JavaScript regular expressions. You get modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your grepping and parsing easier, while freeing you from regex cross-browser inconsistencies and other annoyances.
 
