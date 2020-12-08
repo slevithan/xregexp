@@ -1,4 +1,4 @@
-# XRegExp 4.4.0
+# XRegExp 4.4.1
 
 [![Build Status](https://github.com/slevithan/xregexp/workflows/Node.js%20CI/badge.svg)](https://github.com/slevithan/xregexp/actions)
 
