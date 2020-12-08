@@ -1,6 +1,0 @@
-language: node_js
-node_js:
-  - node
-script:
-  - npm test
-  - '[ -z "$SAUCE_USERNAME" ] || [ -z "$SAUCE_ACCESS_KEY" ] || npm run test-saucelabs'
