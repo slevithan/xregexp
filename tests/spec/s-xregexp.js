@@ -402,7 +402,7 @@ describe('XRegExp()', function() {
                 expect(XRegExp('(?<日本語>x)').test('x')).toBe(true);
             });
 
-            it('should throw an exception if characters other than A-Z, a-z, 0-9, $, and _ are used in capture names', function() {
+            it('should throw an exception if non-RegExpIdentifierName characters are used in capture names', function() {
                 expect(function() {XRegExp('(?<?>)');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp('(?<.>)');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp('(?<<>)');}).toThrowError(SyntaxError);
