@@ -15,28 +15,26 @@
     "regular expression",
     "unicode"
   ],
-  "browser": "./lib/index.js",
-  "main": "./lib/index.js",
-  "module": "./src/index.js",
+  "browser": "./xregexp-all.js",
+  "main": "./xregexp-all.js",
+  "module": "./index.mjs",
   "files": [
-    "src",
-    "lib",
+    "index.mjs",
     "tools/output",
-    "xregexp-all.js",
-    "types/index.d.ts"
+    "types/index.d.ts",
+    "xregexp-all.js"
   ],
   "scripts": {
     "lint": "eslint . && npm run dtslint",
     "dtslint": "dtslint types",
-    "babel": "babel src -d lib",
     "build-unicode-data": "node tools/scripts/block-regex.js && node tools/scripts/category-regex.js && node tools/scripts/property-regex.js && node tools/scripts/script-regex.js",
-    "prebuild": "npm run build-unicode-data && npm run lint && npm run babel",
-    "build": "browserify lib/index.js --standalone XRegExp > xregexp-all.js",
+    "prebuild": "npm run build-unicode-data",
+    "build": "rollup -c rollup.config.js",
     "pretest": "npm run build",
     "test": "jasmine JASMINE_CONFIG_PATH=tests/jasmine.json",
-    "test-saucelabs": "npm run pretest && zuul tests/spec/*.js",
-    "test-browser": "npm run test-saucelabs -- --local --open",
-    "prepublish": "npm test"
+    "test-saucelabs": "npm run pretest && npx zuul tests/spec/*.js",
+    "test-browser": "npm run test-saucelabs -- --disable-tunnel --local --open",
+    "prepack": "npm test"
   },
   "types": "types",
   "devDependencies": {
@@ -44,19 +42,19 @@
     "@babel/core": "^7.12.3",
     "@babel/plugin-transform-runtime": "^7.12.1",
     "@babel/preset-env": "^7.12.1",
+    "@rollup/plugin-commonjs": "^14.0.0",
     "@unicode/unicode-13.0.0": "^1.0.2",
     "babel-plugin-add-module-exports": "^1.0.4",
     "babel-plugin-array-includes": "^2.0.3",
     "babel-plugin-transform-xregexp": "^1.0.0",
-    "browserify": "^17.0.0",
     "dtslint": "^2.0.5",
     "eslint": "^7.12.1",
     "jasmine": "^3.6.2",
     "jsesc": "^3.0.1",
-    "unicode-property-value-aliases": "^3.5.0",
-    "zuul": "^3.12.0"
-  },
-  "dependencies": {
-    "@babel/runtime-corejs3": "^7.12.1"
+    "rollup": "^2.23.0",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-eslint": "^7.0.0",
+    "typescript": "^3.9.7",
+    "unicode-property-value-aliases": "^3.5.0"
   }
 }

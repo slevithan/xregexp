@@ -1,12 +1,5 @@
 {
   "plugins": [
-    [
-      "@babel/plugin-transform-runtime",
-      {
-        "corejs": 3,
-      },
-    ],
-    "add-module-exports",
     "transform-xregexp",
     "array-includes"
   ],

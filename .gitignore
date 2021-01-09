@@ -1,5 +1,5 @@
-lib
 xregexp-all.js
+/index.mjs
 
 # Compiled Python files
 *.pyc
