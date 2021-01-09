@@ -493,7 +493,17 @@ describe('XRegExp.forEach()', function() {
         });
     });
 
-    it('should provide named backreferences on the match array', function() {
+    it('should provide named backreferences on the match array\'s groups property', function() {
+        var result = [];
+        XRegExp.forEach('abc 123 def', XRegExp('(?<first>\\w)\\w*'), function(m) {
+            result.push(m.groups.first);
+        });
+
+        expect(result).toEqual(['a', '1', 'd']);
+    });
+
+    it('should provide named backreferences on the match array if namespacing is not installed', function() {
+        XRegExp.uninstall('namespacing');
         var result = [];
         XRegExp.forEach('abc 123 def', XRegExp('(?<first>\\w)\\w*'), function(m) {
             result.push(m.first);
