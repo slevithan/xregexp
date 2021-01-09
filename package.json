@@ -33,7 +33,7 @@
     "prebuild": "npm run build-unicode-data && npm run lint && npm run babel",
     "build": "browserify lib/index.js --standalone XRegExp > xregexp-all.js",
     "pretest": "npm run build",
-    "test": "jasmine JASMINE_CONFIG_PATH=tests/jasmine.json",
+    "test": "nyc --reporter=lcov --reporter=text-summary jasmine JASMINE_CONFIG_PATH=tests/jasmine.json",
     "test-saucelabs": "npm run pretest && zuul tests/spec/*.js",
     "test-browser": "npm run test-saucelabs -- --local --open",
     "prepublish": "npm test"

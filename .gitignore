@@ -1,5 +1,7 @@
 lib
 xregexp-all.js
+.nyc_output
+coverage
 
 # Compiled Python files
 *.pyc
