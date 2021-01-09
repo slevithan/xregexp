@@ -49,7 +49,7 @@ const nativeTokens = {
     'class': /\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u(?:[\dA-Fa-f]{4}|{[\dA-Fa-f]+})|c[A-Za-z]|[\s\S])|[\s\S]/
 };
 // Any backreference or dollar-prefixed character in replacement strings
-const replacementToken = /\$(?:\{([\p{ID_Start}$_][\p{ID_Continue}$_\u200C\u200D]*)\}|<([\p{ID_Start}$_][\p{ID_Continue}$_\u200C\u200D]*)>|(\d\d?|[\s\S]))/gu;
+const replacementToken = /\$(?:\{([^\}]+)\}|<([^>]+)>|(\d\d?|[\s\S]))/g;
 // Check for correct `exec` handling of nonparticipating capturing groups
 const correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined;
 // Check for ES6 `flags` prop support
