@@ -393,27 +393,24 @@ describe('XRegExp()', function() {
             // Named capture *functionality* is tested by the specs for named backreference syntax,
             // XRegExp.exec, XRegExp.replace, etc.
 
-            it('should allow the characters A-Z, a-z, 0-9, $, and _ to be used in capture names', function() {
+            it('should allow the RegExpIdentifierName characters to be used in capture names', function() {
                 expect(XRegExp('(?<Az>x)').test('x')).toBe(true);
                 expect(XRegExp('(?<_09>x)').test('x')).toBe(true);
                 expect(XRegExp('(?<$>x)').test('x')).toBe(true);
+                expect(XRegExp('(?<naïve>x)').test('x')).toBe(true);
+                expect(XRegExp('(?<Русский>)x').test('x')).toBe(true);
+                expect(XRegExp('(?<日本語>x)').test('x')).toBe(true);
             });
 
-            it('should throw an exception if characters other than A-Z, a-z, 0-9, $, and _ are used in capture names', function() {
+            it('should throw an exception if non-RegExpIdentifierName characters are used in capture names', function() {
                 expect(function() {XRegExp('(?<?>)');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp('(?<.>)');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp('(?<<>)');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp('(?<->)');}).toThrowError(SyntaxError);
-                // Native named capture uses different allowed chars that XRegExp should be updated to handle
-                //expect(function() {XRegExp('(?<naïve>)');}).toThrowError(SyntaxError);
-                //expect(function() {XRegExp('(?<Русский>)');}).toThrowError(SyntaxError);
-                //expect(function() {XRegExp('(?<日本語>)');}).toThrowError(SyntaxError);
             });
 
-            it('should allow capture names to start with digits', function() {
-                expect(XRegExp('(?<0a>x)').test('x')).toBe(true);
-                expect(XRegExp('(?<1_1>x)').test('x')).toBe(true);
-                expect(XRegExp('(?<234$>x)').test('x')).toBe(true);
+            it('should not allow capture names to start with digits', function() {
+                expect(function() {XRegExp('(?<0a>x)');}).toThrowError(SyntaxError);
             });
 
             it('should throw an exception if bare integers are used as capture names', function() {
