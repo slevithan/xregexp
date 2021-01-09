@@ -1788,8 +1788,8 @@ XRegExp.addToken(
 );
 
 /*
- * Named backreference: `\k<name>`. Backreference names can use the characters A-Z, a-z, 0-9, _,
- * and $ only. Also allows numbered backreferences as `\k<n>`.
+ * Named backreference: `\k<name>`. Backreference names can use RegExpIdentifierName characters
+ * only. Also allows numbered backreferences as `\k<n>`.
  */
 XRegExp.addToken(
     /\\k<([^>]+)>/,
@@ -1838,7 +1838,7 @@ XRegExp.addToken(
 
 /*
  * Named capturing group; match the opening delimiter only: `(?<name>`. Capture names can use the
- * characters A-Z, a-z, 0-9, _, and $ only. Names can't be integers. Supports Python-style
+ * RegExpIdentifierName characters only. Names can't be integers. Supports Python-style
  * `(?P<name>` as an alternate syntax to avoid issues in some older versions of Opera which natively
  * supported the Python-style syntax. Otherwise, XRegExp might treat numbered backreferences to
  * Python-style named capture as octals.
