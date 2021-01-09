@@ -1,5 +1,5 @@
 /*!
- * XRegExp Unicode Properties 4.3.0
+ * XRegExp Unicode Properties 4.4.1
  * <xregexp.com>
  * Steven Levithan (c) 2012-present MIT License
  * Unicode data by Mathias Bynens <mathiasbynens.be>
@@ -43,7 +43,7 @@ export default (XRegExp) => {
      *
      * Token names are case insensitive, and any spaces, hyphens, and underscores are ignored.
      *
-     * Uses Unicode 12.1.0.
+     * Uses Unicode 13.0.0.
      *
      * @requires XRegExp, Unicode Base
      */

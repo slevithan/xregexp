@@ -1,5 +1,5 @@
 /*!
- * XRegExp Unicode Categories 4.3.0
+ * XRegExp Unicode Categories 4.4.1
  * <xregexp.com>
  * Steven Levithan (c) 2010-present MIT License
  * Unicode data by Mathias Bynens <mathiasbynens.be>
@@ -14,7 +14,7 @@ export default (XRegExp) => {
      * category descriptions in UAX #44 <http://unicode.org/reports/tr44/#GC_Values_Table>. Token
      * names are case insensitive, and any spaces, hyphens, and underscores are ignored.
      *
-     * Uses Unicode 12.1.0.
+     * Uses Unicode 13.0.0.
      *
      * @requires XRegExp, Unicode Base
      */

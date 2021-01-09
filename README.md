@@ -1,6 +1,6 @@
-# XRegExp 4.3.0
+# XRegExp 4.4.1
 
-[![Build Status](https://travis-ci.org/slevithan/xregexp.svg?branch=master)](https://travis-ci.org/slevithan/xregexp)
+[![Build Status](https://github.com/slevithan/xregexp/workflows/Node.js%20CI/badge.svg)](https://github.com/slevithan/xregexp/actions)
 
 XRegExp provides augmented (and extensible) JavaScript regular expressions. You get modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your grepping and parsing easier, while freeing you from regex cross-browser inconsistencies and other annoyances.
 
@@ -119,7 +119,7 @@ XRegExp('^\\pS$').test('💩'); // -> true
 
 Opting in to astral mode disables the use of `\p{…}` and `\P{…}` within character classes. In astral mode, use e.g. `(\pL|[0-9_])+` instead of `[\pL0-9_]+`.
 
-XRegExp uses Unicode 12.1.0.
+XRegExp uses Unicode 13.0.0.
 
 ### XRegExp.build
 
