@@ -19,9 +19,9 @@ const date = XRegExp(
      (?<month> [0-9]{2} ) -?  # month
      (?<day>   [0-9]{2} )     # day`, 'x');
 
-// XRegExp.exec gives you named backreferences on the match result
+// XRegExp.exec gives you named backreferences on the match result's groups property
 let match = XRegExp.exec('2017-02-22', date);
-match.year; // -> '2017'
+match.groups.year; // -> '2017'
 
 // It also includes optional pos and sticky arguments
 let pos = 3;
@@ -36,7 +36,7 @@ while (match = XRegExp.exec('<1><2><3>4<5>', /<(\d+)>/, pos, 'sticky')) {
 XRegExp.replace('2017-02-22', date, '$<month>/$<day>/$<year>');
 // -> '02/22/2017'
 XRegExp.replace('2017-02-22', date, (match) => {
-    return `${match.month}/${match.day}/${match.year}`;
+    return `${match.groups.month}/${match.groups.day}/${match.groups.year}`;
 });
 // -> '02/22/2017'
 
@@ -135,7 +135,7 @@ const time = XRegExp.build('(?x)^ {{hours}} ({{minutes}}) $', {
 });
 
 time.test('10:59'); // -> true
-XRegExp.exec('10:59', time).minutes; // -> '59'
+XRegExp.exec('10:59', time).groups.minutes; // -> '59'
 ```
 
 Named subpatterns can be provided as strings or regex objects. A leading `^` and trailing unescaped `$` are stripped from subpatterns if both are present, which allows embedding independently-useful anchored patterns. `{{…}}` tokens can be quantified as a single unit. Any backreferences in the outer pattern or provided subpatterns are automatically renumbered to work correctly within the larger combined pattern. The syntax `({{name}})` works as shorthand for named capture via `(?<name>{{name}})`. Named subpatterns cannot be embedded within character classes.
@@ -152,7 +152,7 @@ const minutes = /^[0-5][0-9]$/;
 // Note that explicitly naming the 'minutes' group is required for named backreferences
 const time = XRegExp.tag('x')`^ ${hours} (?<minutes>${minutes}) $`;
 time.test('10:59'); // -> true
-XRegExp.exec('10:59', time).minutes; // -> '59'
+XRegExp.exec('10:59', time).groups.minutes; // -> '59'
 ```
 
 XRegExp.tag does more than just basic interpolation. For starters, you get all the XRegExp syntax and flags. Even better, since `XRegExp.tag` uses your pattern as a raw string, you no longer need to escape all your backslashes. And since it relies on `XRegExp.build` under the hood, you get all of its extras for free. Leading `^` and trailing unescaped `$` are stripped from interpolated patterns if both are present (to allow embedding independently useful anchored regexes), interpolating into a character class is an error (to avoid unintended meaning in edge cases), interpolated patterns are treated as atomic units when quantified, interpolated strings have their special characters escaped, and any backreferences within an interpolated regex are rewritten to work within the overall pattern.

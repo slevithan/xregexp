@@ -577,13 +577,13 @@ declare namespace XRegExp {
      *
      * // Basic use, with named capture groups
      * let match = XRegExp.exec('U+2620', XRegExp('U\\+(?<hex>[0-9A-F]{4})'));
-     * match.hex; // -> '2620'
+     * match.groups.hex; // -> '2620'
      *
      * // With pos and sticky, in a loop
      * let pos = 2, result = [], match;
      * while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d)>/, pos, 'sticky')) {
      *   result.push(match[1]);
-     *   pos = match.index + match[0].length;
+     *   pos = match.groups.index + match[0].length;
      * }
      * // result -> ['2', '3', '4']
      */
@@ -809,7 +809,7 @@ declare namespace XRegExp {
      * // -> 'Smith, John'
      *
      * // Regex search, using named backreferences in replacement function
-     * XRegExp.replace('John Smith', name, (match) => `${match.last as string}, ${match.first as string}`);
+     * XRegExp.replace('John Smith', name, (match) => `${match.groups.last as string}, ${match.groups.first as string}`);
      * // -> 'Smith, John'
      *
      * // String search, with replace-all
