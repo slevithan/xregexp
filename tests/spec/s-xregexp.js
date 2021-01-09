@@ -393,10 +393,13 @@ describe('XRegExp()', function() {
             // Named capture *functionality* is tested by the specs for named backreference syntax,
             // XRegExp.exec, XRegExp.replace, etc.
 
-            it('should allow the characters A-Z, a-z, 0-9, $, and _ to be used in capture names', function() {
+            it('should allow the characters A-Z, a-z, 0-9, $, _, and RegExpIdentifierName characters to be used in capture names', function() {
                 expect(XRegExp('(?<Az>x)').test('x')).toBe(true);
                 expect(XRegExp('(?<_09>x)').test('x')).toBe(true);
                 expect(XRegExp('(?<$>x)').test('x')).toBe(true);
+                expect(function() {XRegExp('(?<naïve>)');}).not.toThrow();
+                expect(function() {XRegExp('(?<Русский>)');}).not.toThrow();
+                expect(function() {XRegExp('(?<日本語>)');}).not.toThrow();
             });
 
             it('should throw an exception if characters other than A-Z, a-z, 0-9, $, and _ are used in capture names', function() {
@@ -404,16 +407,10 @@ describe('XRegExp()', function() {
                 expect(function() {XRegExp('(?<.>)');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp('(?<<>)');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp('(?<->)');}).toThrowError(SyntaxError);
-                // Native named capture uses different allowed chars that XRegExp should be updated to handle
-                //expect(function() {XRegExp('(?<naïve>)');}).toThrowError(SyntaxError);
-                //expect(function() {XRegExp('(?<Русский>)');}).toThrowError(SyntaxError);
-                //expect(function() {XRegExp('(?<日本語>)');}).toThrowError(SyntaxError);
             });
 
-            it('should allow capture names to start with digits', function() {
-                expect(XRegExp('(?<0a>x)').test('x')).toBe(true);
-                expect(XRegExp('(?<1_1>x)').test('x')).toBe(true);
-                expect(XRegExp('(?<234$>x)').test('x')).toBe(true);
+            it('should not allow capture names to start with digits', function() {
+                expect(function() {XRegExp('(?<0a>x)');}).toThrowError(SyntaxError);
             });
 
             it('should throw an exception if bare integers are used as capture names', function() {
@@ -488,6 +485,10 @@ describe('XRegExp()', function() {
                 expect(function() {XRegExp('\\k<`>');}).toThrowError(SyntaxError);
             });
 
+            it('should not allow leading digits', function() {
+                expect(function() {XRegExp('(.)\\k<01>');}).toThrowError(SyntaxError);
+            });
+
             it('should separate backreferences from following literal digits', function() {
                 expect(XRegExp('(?<$1>A1)(2)(3)(4)(5)(6)(7)(8)(9)(B10)\\k<$1>0').test('A123456789B10A10')).toBe(true);
                 expect(XRegExp('(?<$1>A)\\k<$1>2').test('AA2')).toBe(true);
@@ -502,49 +503,6 @@ describe('XRegExp()', function() {
                 expect(function() {XRegExp('\\k<n>(?<n>)');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp('(?<n1>)\\k<n2>(?<n2>)');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp('(?<n>\\k<n>)');}).not.toThrow();
-            });
-
-        });
-
-        describe('explicit numbered backreferences', function() {
-
-            it('should match the numbered backreference', function() {
-                expect(XRegExp('(.)\\k<1>').test('aa')).toBe(true);
-                expect(XRegExp('(.)\\k<1>').test('ab')).toBe(false);
-                expect(XRegExp('(.)\\k<1>\\k<1>').test('aaa')).toBe(true);
-            });
-
-            it('should allow leading zeros', function() {
-                expect(XRegExp('(.)\\k<01>').test('aa')).toBe(true);
-                expect(XRegExp('(.)\\k<001>').test('aa')).toBe(true);
-            });
-
-            it('should match named backreferences by number', function() {
-                expect(XRegExp('(?<A>.)\\k<1>').test('aa')).toBe(true);
-                expect(XRegExp('(?<A>.)\\k<1>').test('ab')).toBe(false);
-                expect(XRegExp('(?<A>.)\\k<1>\\k<1>').test('aaa')).toBe(true);
-            });
-
-            it('should separate numbered backreferences from following literal digits', function() {
-                expect(XRegExp('(A1)(2)(3)(4)(5)(6)(7)(8)(9)(B10)\\k<1>0').test('A123456789B10A10')).toBe(true);
-                expect(XRegExp('(A)\\k<1>2').test('AA2')).toBe(true);
-            });
-
-            it('should throw an exception for backreferences to unknown groups', function() {
-                expect(function() {XRegExp('\\k<1>');}).toThrowError(SyntaxError);
-                expect(function() {XRegExp('()\\k<2>');}).toThrowError(SyntaxError);
-            });
-
-            it('should throw an exception for backreferences to capturing groups not opened to the left', function() {
-                expect(function() {XRegExp('\\k<1>()');}).toThrowError(SyntaxError);
-                expect(function() {XRegExp('()\\k<2>()');}).toThrowError(SyntaxError);
-                expect(function() {XRegExp('(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)\\k<11>(11)');}).toThrowError(SyntaxError);
-                expect(function() {XRegExp('(\\k<1>)');}).not.toThrow();
-            });
-
-            it('should not allow \\k<0> to refer to the entire match', function() {
-                expect(function() {XRegExp('\\k<0>');}).toThrowError(SyntaxError);
-                expect(function() {XRegExp('\\k<00>');}).toThrowError(SyntaxError);
             });
 
         });
