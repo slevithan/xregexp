@@ -472,7 +472,8 @@ describe('XRegExp.exec()', function() {
         expect(match[1]).toBe('a');
     });
 
-    it('should shaddow array prototype properties with named capture properties', function() {
+    it('should shadow array prototype properties with named capture properties if namespacing is not installed', function() {
+        XRegExp.uninstall('namespacing');
         expect(XRegExp.exec('a', XRegExp('(?<concat>a)')).concat).toBe('a');
         expect(XRegExp.exec('a', XRegExp('(?<index>a)')).index).toBe('a');
     });
