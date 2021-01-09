@@ -397,9 +397,9 @@ describe('XRegExp()', function() {
                 expect(XRegExp('(?<Az>x)').test('x')).toBe(true);
                 expect(XRegExp('(?<_09>x)').test('x')).toBe(true);
                 expect(XRegExp('(?<$>x)').test('x')).toBe(true);
-                expect(function() {XRegExp('(?<naïve>)');}).not.toThrow();
-                expect(function() {XRegExp('(?<Русский>)');}).not.toThrow();
-                expect(function() {XRegExp('(?<日本語>)');}).not.toThrow();
+                expect(XRegExp('(?<naïve>x)').test('x')).toBe(true);
+                expect(XRegExp('(?<Русский>)x').test('x')).toBe(true);
+                expect(XRegExp('(?<日本語>x)').test('x')).toBe(true);
             });
 
             it('should throw an exception if characters other than A-Z, a-z, 0-9, $, and _ are used in capture names', function() {
