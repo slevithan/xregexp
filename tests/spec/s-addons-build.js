@@ -1,5 +1,5 @@
 beforeEach(function() {
-    global.disableOptInFeatures();
+    global.resetFeatures();
     global.addToEqualMatchMatcher();
 });
 

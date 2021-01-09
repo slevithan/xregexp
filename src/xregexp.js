@@ -20,7 +20,7 @@ const REGEX_DATA = 'xregexp';
 // Optional features that can be installed and uninstalled
 const features = {
     astral: false,
-    namespacing: false
+    namespacing: true
 };
 // Native methods to use and restore ('native' is an ES3 reserved keyword)
 const nativ = {
