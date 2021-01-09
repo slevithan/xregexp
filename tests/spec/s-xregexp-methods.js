@@ -719,7 +719,14 @@ describe('XRegExp.globalize()', function() {
         expect(XRegExp.globalize(XRegExp('', 'Aix'))[REGEX_DATA].flags).toBe('Agix');
     });
 
-    it('should retain named capture capabilities', function() {
+    it('should retain named capture capabilities when namespacing is not installed', function() {
+        var regex = XRegExp('(?<name>x)\\k<name>');
+
+        expect(XRegExp.exec('xx', XRegExp.globalize(regex)).groups.name).toBe('x');
+    });
+
+    it('should retain named capture capabilities when namespacing is not installed', function() {
+        XRegExp.uninstall('namespacing');
         var regex = XRegExp('(?<name>x)\\k<name>');
 
         expect(XRegExp.exec('xx', XRegExp.globalize(regex)).name).toBe('x');
