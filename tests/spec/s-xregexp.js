@@ -393,7 +393,7 @@ describe('XRegExp()', function() {
             // Named capture *functionality* is tested by the specs for named backreference syntax,
             // XRegExp.exec, XRegExp.replace, etc.
 
-            it('should allow the characters A-Z, a-z, 0-9, $, _, and RegExpIdentifierName characters to be used in capture names', function() {
+            it('should allow the RegExpIdentifierName characters to be used in capture names', function() {
                 expect(XRegExp('(?<Az>x)').test('x')).toBe(true);
                 expect(XRegExp('(?<_09>x)').test('x')).toBe(true);
                 expect(XRegExp('(?<$>x)').test('x')).toBe(true);
