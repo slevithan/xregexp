@@ -53,6 +53,7 @@
     "eslint": "^7.12.1",
     "jasmine": "^3.6.2",
     "jsesc": "^3.0.1",
+    "nyc": "^15.1.0",
     "unicode-property-value-aliases": "^3.5.0",
     "zuul": "^3.12.0"
   },
