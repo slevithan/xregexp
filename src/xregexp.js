@@ -1792,7 +1792,7 @@ XRegExp.addToken(
  * and $ only. Also allows numbered backreferences as `\k<n>`.
  */
 XRegExp.addToken(
-    /\\k<([\p{ID_Start}$_][\p{ID_Continue}$_\u200C\u200D]*)>/u,
+    /\\k<([^>]+)>/,
     function(match) {
         // Groups with the same name is an error, else would need `lastIndexOf`
         const index = isNaN(match[1]) ? (this.captureNames.indexOf(match[1]) + 1) : +match[1];
