@@ -1846,11 +1846,6 @@ XRegExp.addToken(
 XRegExp.addToken(
     /\(\?P?<([\p{ID_Start}$_][\p{ID_Continue}$_\u200C\u200D]*)>/u,
     function(match) {
-        // Disallow bare integers as names because named backreferences are added to match arrays
-        // and therefore numeric properties may lead to incorrect lookups
-        if (!isNaN(match[1])) {
-            throw new SyntaxError(`Cannot use integer as capture name ${match[0]}`);
-        }
         if (!XRegExp.isInstalled('namespacing') && (match[1] === 'length' || match[1] === '__proto__')) {
             throw new SyntaxError(`Cannot use reserved word as capture name ${match[0]}`);
         }
