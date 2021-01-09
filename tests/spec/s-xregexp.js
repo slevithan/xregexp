@@ -503,6 +503,49 @@ describe('XRegExp()', function() {
 
         });
 
+        describe('explicit numbered backreferences', function() {
+
+            it('should match the numbered backreference', function() {
+                expect(XRegExp('(.)\\k<1>').test('aa')).toBe(true);
+                expect(XRegExp('(.)\\k<1>').test('ab')).toBe(false);
+                expect(XRegExp('(.)\\k<1>\\k<1>').test('aaa')).toBe(true);
+            });
+
+            it('should allow leading zeros', function() {
+                expect(XRegExp('(.)\\k<01>').test('aa')).toBe(true);
+                expect(XRegExp('(.)\\k<001>').test('aa')).toBe(true);
+            });
+
+            it('should match named backreferences by number', function() {
+                expect(XRegExp('(?<A>.)\\k<1>').test('aa')).toBe(true);
+                expect(XRegExp('(?<A>.)\\k<1>').test('ab')).toBe(false);
+                expect(XRegExp('(?<A>.)\\k<1>\\k<1>').test('aaa')).toBe(true);
+            });
+
+            it('should separate numbered backreferences from following literal digits', function() {
+                expect(XRegExp('(A1)(2)(3)(4)(5)(6)(7)(8)(9)(B10)\\k<1>0').test('A123456789B10A10')).toBe(true);
+                expect(XRegExp('(A)\\k<1>2').test('AA2')).toBe(true);
+            });
+
+            it('should throw an exception for backreferences to unknown groups', function() {
+                expect(function() {XRegExp('\\k<1>');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('()\\k<2>');}).toThrowError(SyntaxError);
+            });
+
+            it('should throw an exception for backreferences to capturing groups not opened to the left', function() {
+                expect(function() {XRegExp('\\k<1>()');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('()\\k<2>()');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)\\k<11>(11)');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('(\\k<1>)');}).not.toThrow();
+            });
+
+            it('should not allow \\k<0> to refer to the entire match', function() {
+                expect(function() {XRegExp('\\k<0>');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp('\\k<00>');}).toThrowError(SyntaxError);
+            });
+
+        });
+
         describe('strict error handling', function() {
 
             it('should throw an exception for octals except \\0 not followed by 0-9', function() {
