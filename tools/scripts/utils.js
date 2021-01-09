@@ -3,7 +3,7 @@ const jsesc = require('jsesc');
 
 const pkg = require('../../package.json');
 const dependencies = Object.keys(pkg.devDependencies);
-const unicodeVersion = dependencies.find((name) => /^unicode-\d/.test(name));
+const unicodeVersion = dependencies.find((name) => /^@unicode\/unicode-\d/.test(name));
 
 // https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
 const highSurrogate = (codePoint) => Math.floor((codePoint - 0x10000) / 0x400) + 0xD800;

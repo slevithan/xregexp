@@ -6,7 +6,7 @@ module.exports = {
         "func-style": [
             "error",
             "declaration",
-            { "allowArrowFunctions": true }
-        ],
+            {"allowArrowFunctions": true}
+        ]
     }
-}
+};
