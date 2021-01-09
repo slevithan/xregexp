@@ -87,7 +87,7 @@ describe('XRegExp.build addon:', function() {
             var time = XRegExp.tag('x')`^ ${hours} (?<minutes>${minutes}) $`;
 
             expect(time.test('10:59')).toBe(true);
-            expect(XRegExp.exec('10:59', time).minutes).toEqual('59');
+            expect(XRegExp.exec('10:59', time).groups.minutes).toEqual('59');
         });
 
     });
@@ -169,7 +169,7 @@ describe('XRegExp.build addon:', function() {
             });
 
             expect(time.test('10:59')).toBe(true);
-            expect(XRegExp.exec('10:59', time).minutes).toBe('59');
+            expect(XRegExp.exec('10:59', time).groups.minutes).toBe('59');
         });
 
         it('should pass a series of complex backreference rewrites', function() {
@@ -181,11 +181,11 @@ describe('XRegExp.build addon:', function() {
             var match = XRegExp.exec('aaaabbbbaabbbb', built);
 
             expect(match).toBeTruthy();
-            expect(match.n1).toBe('aa');
-            expect(match.n2).toBeUndefined();
-            expect(match.nX).toBe('bb');
-            expect(match.yo).toBe('a');
-            expect(match.yo2).toBe('b');
+            expect(match.groups.n1).toBe('aa');
+            expect(match.groups.n2).toBeUndefined();
+            expect(match.groups.nX).toBe('bb');
+            expect(match.groups.yo).toBe('a');
+            expect(match.groups.yo2).toBe('b');
         });
 
     });
