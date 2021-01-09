@@ -1,5 +1,5 @@
 /*!
- * XRegExp 4.3.0
+ * XRegExp 4.4.1
  * <xregexp.com>
  * Steven Levithan (c) 2007-present MIT License
  */
@@ -67,6 +67,16 @@ function hasNativeFlag(flag) {
         // Can't use regex literals for testing even in a `try` because regex literals with
         // unsupported flags cause a compilation error in IE
         new RegExp('', flag);
+
+        // Work around a broken/incomplete IE11 polyfill for sticky introduced in core-js 3.6.0
+        if (flag === 'y') {
+            // Using function to avoid babel transform to regex literal
+            const gy = (() => 'gy')();
+            const incompleteY = '.a'.replace(new RegExp('a', gy), '.') === '..';
+            if (incompleteY) {
+                isSupported = false;
+            }
+        }
     } catch (exception) {
         isSupported = false;
     }
@@ -649,7 +659,7 @@ XRegExp.prototype = new RegExp();
  * @memberOf XRegExp
  * @type String
  */
-XRegExp.version = '4.3.0';
+XRegExp.version = '4.4.1';
 
 // ==--------------------------==
 // Public methods
@@ -1534,11 +1544,6 @@ fixed.replace = function(search, replacement) {
                         groupsObject[captureNames[i]] = args[i + 1];
                     }
                 }
-            }
-            // Update `lastIndex` before calling `replacement`. Fixes IE, Chrome, Firefox, Safari
-            // bug (last tested IE 9, Chrome 17, Firefox 11, Safari 5.1)
-            if (isRegex && search.global) {
-                search.lastIndex = args[args.length - 2] + args[0].length;
             }
             // ES6 specs the context for replacement functions as `undefined`
             return replacement(...args);

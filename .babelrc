@@ -3,7 +3,14 @@
     "transform-xregexp",
     "array-includes"
   ],
-  "presets": [["@babel/env", {
-    "exclude": ["transform-literals"]
-  }]]
+  "presets": [
+    [
+      "@babel/env", {
+        "exclude": [
+          "transform-literals",
+          "transform-sticky-regex"
+        ]
+      }
+    ]
+  ]
 }

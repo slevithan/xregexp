@@ -1,5 +1,5 @@
 module.exports = {
     "globals": {
-        "Benchmark": true,
+        "Benchmark": true
     }
-}
+};
