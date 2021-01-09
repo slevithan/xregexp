@@ -502,16 +502,6 @@ describe('XRegExp.forEach()', function() {
         expect(result).toEqual(['a', '1', 'd']);
     });
 
-    it('should provide named backreferences on the match array if namespacing is not installed', function() {
-        XRegExp.uninstall('namespacing');
-        var result = [];
-        XRegExp.forEach('abc 123 def', XRegExp('(?<first>\\w)\\w*'), function(m) {
-            result.push(m.first);
-        });
-
-        expect(result).toEqual(['a', '1', 'd']);
-    });
-
     it('should provide match start indexes on the match array', function() {
         var result = [];
         XRegExp.forEach('abc 123 def', /\w+/, function(m) {
@@ -719,17 +709,10 @@ describe('XRegExp.globalize()', function() {
         expect(XRegExp.globalize(XRegExp('', 'Aix'))[REGEX_DATA].flags).toBe('Agix');
     });
 
-    it('should retain named capture capabilities when namespacing is not installed', function() {
+    it('should retain named capture capabilities', function() {
         var regex = XRegExp('(?<name>x)\\k<name>');
 
         expect(XRegExp.exec('xx', XRegExp.globalize(regex)).groups.name).toBe('x');
-    });
-
-    it('should retain named capture capabilities when namespacing is not installed', function() {
-        XRegExp.uninstall('namespacing');
-        var regex = XRegExp('(?<name>x)\\k<name>');
-
-        expect(XRegExp.exec('xx', XRegExp.globalize(regex)).name).toBe('x');
     });
 
     it('should throw an exception if not given a RegExp object', function() {
