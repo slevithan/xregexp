@@ -20,7 +20,7 @@ const REGEX_DATA = 'xregexp';
 // Optional features that can be installed and uninstalled
 const features = {
     astral: false,
-    namespacing: false
+    namespacing: true
 };
 // Native methods to use and restore ('native' is an ES3 reserved keyword)
 const nativ = {
@@ -822,7 +822,7 @@ XRegExp.escape = (str) => nativ.replace.call(toObject(str), /[-\[\]{}()*+?.,\\^$
  *
  * // Basic use, with named backreference
  * let match = XRegExp.exec('U+2620', XRegExp('U\\+(?<hex>[0-9A-F]{4})'));
- * match.hex; // -> '2620'
+ * match.groups.hex; // -> '2620'
  *
  * // With pos and sticky, in a loop
  * let pos = 2, result = [], match;
@@ -1158,7 +1158,7 @@ XRegExp.matchChain = (str, chain) => (function recurseChain(values, level) {
  * // -> 'Smith, John'
  *
  * // Regex search, using named backreferences in replacement function
- * XRegExp.replace('John Smith', name, (match) => `${match.last}, ${match.first}`);
+ * XRegExp.replace('John Smith', name, (match) => `${match.groups.last}, ${match.groups.first}`);
  * // -> 'Smith, John'
  *
  * // String search, with replace-all

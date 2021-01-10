@@ -1,5 +1,5 @@
 beforeEach(function() {
-    global.disableOptInFeatures();
+    global.resetFeatures();
     global.addToEqualMatchMatcher();
 });
 
@@ -421,6 +421,7 @@ describe('XRegExp()', function() {
             });
 
             it('should throw an exception if reserved words are used as capture names if namespacing is not installed', function() {
+                XRegExp.uninstall('namespacing');
                 // Only these names are reserved
                 ['length', '__proto__'].forEach(function(name) {
                     expect(function() {XRegExp('(?<' + name + '>)');}).toThrowError(SyntaxError);
@@ -428,7 +429,6 @@ describe('XRegExp()', function() {
             });
 
             it('should not throw an exception if reserved words are used as capture names if namespacing is installed', function() {
-                XRegExp.install('namespacing');
                 ['length', '__proto__'].forEach(function(name) {
                     expect(function() {XRegExp('(?<' + name + '>)');}).not.toThrow();
                 });
