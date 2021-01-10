@@ -46,8 +46,6 @@ const replacementToken = /\$(?:\{([^\}]+)\}|<([^>]+)>|(\d\d?|[\s\S]?))/g;
 const correctExecNpcg = /()??/.exec('')[1] === undefined;
 // Check for ES6 `flags` prop support
 const hasFlagsProp = /x/.flags !== undefined;
-// Shortcut to `Object.prototype.toString`
-const {toString} = {};
 
 function hasNativeFlag(flag) {
     // Can't check based on the presence of properties/getters since browsers might support such
@@ -327,7 +325,24 @@ function isQuantifierNext(pattern, pos, flags) {
  * @returns {boolean} Whether the object matches the type.
  */
 function isType(value, type) {
-    return toString.call(value) === `[object ${type}]`;
+    return Object.prototype.toString.call(value) === `[object ${type}]`;
+}
+
+/**
+ * Returns the object, or throws an error if it is `null` or `undefined`. This is used to follow
+ * the ES5 abstract operation `ToObject`.
+ *
+ * @private
+ * @param {*} value Object to check and return.
+ * @returns {*} The provided object.
+ */
+function nullThrows(value) {
+    // null or undefined
+    if (value == null) {
+        throw new TypeError('Cannot convert null or undefined to object');
+    }
+
+    return value;
 }
 
 /**
@@ -483,23 +498,6 @@ function setAstral(on) {
  */
 function setNamespacing(on) {
     features.namespacing = on;
-}
-
-/**
- * Returns the object, or throws an error if it is `null` or `undefined`. This is used to follow
- * the ES5 abstract operation `ToObject`.
- *
- * @private
- * @param {*} value Object to check and return.
- * @returns {*} The provided object.
- */
-function toObject(value) {
-    // null or undefined
-    if (value == null) {
-        throw new TypeError('Cannot convert null or undefined to object');
-    }
-
-    return value;
 }
 
 // ==--------------------------==
@@ -785,7 +783,7 @@ XRegExp.cache.flush = (cacheName) => {
  * XRegExp.escape('Escaped? <.>');
  * // -> 'Escaped\?\ <\.>'
  */
-XRegExp.escape = (str) => String(toObject(str)).replace(/[-\[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+XRegExp.escape = (str) => String(nullThrows(str)).replace(/[-\[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 
 /**
  * Executes a regex search in a specified string. Returns a match array or `null`. If the provided
@@ -982,7 +980,7 @@ XRegExp.isInstalled = (feature) => !!(features[feature]);
  * XRegExp.isRegExp(RegExp('^', 'm')); // -> true
  * XRegExp.isRegExp(XRegExp('(?s).')); // -> true
  */
-XRegExp.isRegExp = (value) => toString.call(value) === '[object RegExp]'; // isType(value, 'RegExp');
+XRegExp.isRegExp = (value) => isType(value, 'RegExp');
 
 /**
  * Returns the first matched string, or in global mode, an array containing all matched strings.
@@ -1026,7 +1024,7 @@ XRegExp.match = (str, regex, scope) => {
         })
     );
 
-    const result = String(toObject(str)).match(r2);
+    const result = String(nullThrows(str)).match(r2);
 
     if (regex.global) {
         regex.lastIndex = (
@@ -1172,7 +1170,7 @@ XRegExp.replace = (str, search, replacement, scope) => {
     }
 
     // Fixed `replace` required for named backreferences, etc.
-    const result = fixed.replace.call(toObject(str), s2, replacement);
+    const result = fixed.replace.call(nullThrows(str), s2, replacement);
 
     if (isRegex && search.global) {
         // Fixes IE, Safari bug (last tested IE 9, Safari 5.1)
@@ -1239,7 +1237,7 @@ XRegExp.replaceEach = (str, replacements) => {
  * XRegExp.split('..word1..', /([a-z]+)(\d+)/i);
  * // -> ['..', 'word', '1', '..']
  */
-XRegExp.split = (str, separator, limit) => fixed.split.call(toObject(str), separator, limit);
+XRegExp.split = (str, separator, limit) => fixed.split.call(nullThrows(str), separator, limit);
 
 /**
  * Executes a regex search in a specified string. Returns `true` or `false`. Optional `pos` and
@@ -1471,7 +1469,7 @@ fixed.match = function(regex) {
         return result;
     }
 
-    return fixed.exec.call(regex, toObject(this));
+    return fixed.exec.call(regex, nullThrows(this));
 };
 
 /**
@@ -1535,7 +1533,7 @@ fixed.replace = function(search, replacement) {
     } else {
         // Ensure that the last value of `args` will be a string when given nonstring `this`,
         // while still throwing on null or undefined context
-        result = String(toObject(this)).replace(search, (...args) => {
+        result = String(nullThrows(this)).replace(search, (...args) => {
             return String(replacement).replace(replacementToken, replacer);
 
             function replacer($0, bracketed, angled, dollarToken) {
