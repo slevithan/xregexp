@@ -1758,21 +1758,6 @@ XRegExp.addToken(
 );
 
 /*
- * Empty character class: `[]` or `[^]`. This fixes a critical cross-browser syntax inconsistency.
- * Unless this is standardized (per the ES spec), regex syntax can't be accurately parsed because
- * character class endings can't be determined.
- */
-XRegExp.addToken(
-    /\[(\^?)\]/,
-    // For cross-browser compatibility with ES3, convert [] to \b\B and [^] to [\s\S].
-    // (?!) should work like \b\B, but is unreliable in some versions of Firefox
-    /* eslint-disable no-confusing-arrow */
-    (match) => (match[1] ? '[\\s\\S]' : '\\b\\B'),
-    /* eslint-enable no-confusing-arrow */
-    {leadChar: '['}
-);
-
-/*
  * Comment pattern: `(?# )`. Inline comments are an alternative to the line comments allowed in
  * free-spacing mode (flag x).
  */

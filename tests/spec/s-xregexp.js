@@ -278,30 +278,6 @@ describe('XRegExp()', function() {
         expect(XRegExp(XRegExp(/./im))[REGEX_DATA].flags).toBeNull();
     });
 
-    describe('fixes regex syntax cross-browser:', function() {
-
-        it('should use the correct JavaScript rules for empty character classes', function() {
-
-            /* Traditional regex behavior is that a leading, unescaped ] within a character class
-             * is treated as a literal character and does not end the character class. However,
-             * this is not true for ES3/5, which states that [] is an empty set that will never
-             * match (similar to (?!)) and [^] matches any single character (like [\s\S] or
-             * [\0-\uFFFF]). IE < 9 and older versions of Safari use the traditional behavior,
-             * rather than the correct ES3/5 behavior. Older versions of Opera reverse the correct
-             * ES3/5 behavior, so that [] matches any character and [^] never matches. Regexes
-             * created by XRegExp follow the ES3/5 standard behavior cross-browser.
-             */
-
-            expect(XRegExp('[]').test('a')).toBe(false);
-            expect(XRegExp('[]]').test('a]')).toBe(false);
-            expect(XRegExp('[]]').test(']')).toBe(false);
-
-            expect(XRegExp('[^]').test('a')).toBe(true);
-            expect(XRegExp('[^]]').test('a]')).toBe(true);
-        });
-
-    });
-
     describe('supports new regex syntax:', function() {
 
         describe('leading mode modifier', function() {
