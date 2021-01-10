@@ -1078,7 +1078,7 @@ XRegExp.matchChain = (str, chain) => (function recurseChain(values, level) {
 
             if (isNamedBackref && XRegExp.isInstalled('namespacing')) {
                 // `groups` has `null` as prototype, so using `in` instead of `hasOwnProperty`
-                if (!(item.backref in match.groups)) {
+                if (!(match.groups && item.backref in match.groups)) {
                     throw new ReferenceError(ERR_UNDEFINED_GROUP);
                 }
             } else if (!match.hasOwnProperty(item.backref)) {
@@ -1408,13 +1408,16 @@ fixed.exec = function(str) {
         }
 
         // Attach named capture properties
-        let groupsObject = match;
         if (XRegExp.isInstalled('namespacing')) {
-            // https://tc39.github.io/proposal-regexp-named-groups/#sec-regexpbuiltinexec
-            match.groups = Object.create(null);
-            groupsObject = match.groups;
+            match.groups = undefined;
         }
         if (this[REGEX_DATA] && this[REGEX_DATA].captureNames) {
+            let groupsObject = match;
+            if (XRegExp.isInstalled('namespacing')) {
+                // https://tc39.github.io/proposal-regexp-named-groups/#sec-regexpbuiltinexec
+                match.groups = Object.create(null);
+                groupsObject = match.groups;
+            }
             // Skip index 0
             for (let i = 1; i < match.length; ++i) {
                 const name = this[REGEX_DATA].captureNames[i - 1];

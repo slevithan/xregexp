@@ -472,6 +472,13 @@ describe('XRegExp.exec()', function() {
         expect(match[1]).toBe('a');
     });
 
+    it('should set the groups property as undefined when there are no named captures if namespacing is installed', function() {
+        var match = XRegExp.exec('a', XRegExp('(a)'));
+
+        expect(match.groups).toBeUndefined();
+        expect(match.hasOwnProperty('groups')).toBe(true);
+    });
+
     it('should shadow array prototype properties with named capture properties if namespacing is not installed', function() {
         XRegExp.uninstall('namespacing');
         expect(XRegExp.exec('a', XRegExp('(?<concat>a)')).concat).toBe('a');
