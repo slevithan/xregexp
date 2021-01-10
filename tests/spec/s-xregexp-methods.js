@@ -1294,11 +1294,8 @@ describe('XRegExp.replace()', function() {
             });
 
             it('should throw an exception for backreferences to unknown group numbers when using named capture', function() {
-                expect(function() {XRegExp.replace('test', XRegExp('(?<n>t)'), '$2');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp.replace('test', XRegExp('(?<n>t)'), '$<2>');}).toThrowError(SyntaxError);
-
                 // Native named capture introduced in ES2018
-                expect(function() {XRegExp.replace('test', /(?<n>t)/, '$2');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp.replace('test', /(?<n>t)/, '$<2>');}).toThrowError(SyntaxError);
             });
 
@@ -1349,6 +1346,12 @@ describe('XRegExp.replace()', function() {
                 expect(function() {XRegExp.replace('xaaa', /aa/, '$01b');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp.replace('xaaa', /a(a)/, '$2b');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp.replace('xa(a)a', 'a(a)', '$1b');}).toThrowError(SyntaxError);
+            });
+
+            it('should throw an exception for backreferences to unknown group numbers when using named capture', function() {
+                expect(function() {XRegExp.replace('test', XRegExp('(?<n>t)'), '$2');}).toThrowError(SyntaxError);
+                // Native named capture introduced in ES2018
+                expect(function() {XRegExp.replace('test', /(?<n>t)/, '$2');}).toThrowError(SyntaxError);
             });
 
         });
