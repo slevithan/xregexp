@@ -49,7 +49,7 @@ const nativeTokens = {
     'class': /\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u(?:[\dA-Fa-f]{4}|{[\dA-Fa-f]+})|c[A-Za-z]|[\s\S])|[\s\S]/
 };
 // Any backreference or dollar-prefixed character in replacement strings
-const replacementToken = /\$(?:\{([^\}]+)\}|<([^>]+)>|(\d\d?|[\s\S]))/g;
+const replacementToken = /\$(?:\{([^\}]+)\}|<([^>]+)>|(\d\d?|[\s\S]?))/g;
 // Check for correct `exec` handling of nonparticipating capturing groups
 const correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined;
 // Check for ES6 `flags` prop support
@@ -1562,34 +1562,41 @@ fixed.replace = function(search, replacement) {
                 const numNonCaptureArgs = isType(args[args.length - 1], 'Object') ? 4 : 3;
                 const numCaptures = args.length - numNonCaptureArgs;
 
-                // Named or numbered backreference with curly or angled braces
+                // Handle named or numbered backreference with curly or angled braces: ${n}, $<n>
                 if (bracketed) {
-                    // XRegExp behavior for `${n}` or `$<n>`:
-                    // 1. Backreference to numbered capture, if `n` is an integer. Use `0` for the
-                    //    entire match. Any number of leading zeros may be used.
-                    // 2. Backreference to named capture `n`, if it exists and is not an integer
-                    //    overridden by numbered capture. In practice, this does not overlap with
-                    //    numbered capture since XRegExp does not allow named capture to use a bare
-                    //    integer as the name.
-                    // 3. If the name or number does not refer to an existing capturing group, it's
-                    //    an error.
-                    let n = +bracketed; // Type-convert; drop leading zeros
-                    if (n <= numCaptures) {
-                        return args[n] || '';
+                    // Handle backreference to numbered capture, if `bracketed` is an integer. Use
+                    // `0` for the entire match. Any number of leading zeros may be used.
+                    if (/^\d+$/.test(bracketed)) {
+                        // Type-convert and drop leading zeros
+                        const n = +bracketed;
+                        if (n <= numCaptures) {
+                            return args[n] || '';
+                        }
                     }
-                    // Groups with the same name is an error, else would need `lastIndexOf`
-                    n = captureNames ? captureNames.indexOf(bracketed) : -1;
+
+                    // Handle backreference to named capture. If the name does not refer to an
+                    // existing capturing group, it's an error. Also handles the error for numbered
+                    // backference that does not refer to an existing group.
+                    // Using `indexOf` since having groups with the same name is already an error,
+                    // otherwise would need `lastIndexOf`.
+                    const n = captureNames ? captureNames.indexOf(bracketed) : -1;
                     if (n < 0) {
                         throw new SyntaxError(`Backreference to undefined group ${$0}`);
                     }
                     return args[n + 1] || '';
                 }
-                // Else, special variable or numbered backreference without curly braces
-                if (dollarToken === '$') { // $$
-                    return '$';
+
+                // Handle `$`-prefixed variable
+                // Handle space/blank first because type conversion with `+` drops space padding
+                // and converts spaces and empty strings to `0`
+                if (dollarToken === '' || dollarToken === ' ') {
+                    throw new SyntaxError(`Invalid token ${$0}`);
                 }
                 if (dollarToken === '&' || +dollarToken === 0) { // $&, $0 (not followed by 1-9), $00
                     return args[0];
+                }
+                if (dollarToken === '$') { // $$
+                    return '$';
                 }
                 if (dollarToken === '`') { // $` (left context)
                     return args[args.length - 1].slice(0, args[args.length - 2]);
@@ -1597,8 +1604,10 @@ fixed.replace = function(search, replacement) {
                 if (dollarToken === "'") { // $' (right context)
                     return args[args.length - 1].slice(args[args.length - 2] + args[0].length);
                 }
-                // Else, numbered backreference without braces
-                dollarToken = +dollarToken; // Type-convert; drop leading zero
+
+                // Handle numbered backreference without braces
+                // Type-convert and drop leading zero
+                dollarToken = +dollarToken;
                 // XRegExp behavior for `$n` and `$nn`:
                 // - Backrefs end after 1 or 2 digits. Use `${..}` or `$<..>` for more digits.
                 // - `$1` is an error if no capturing groups.
@@ -1618,6 +1627,7 @@ fixed.replace = function(search, replacement) {
                     }
                     return args[dollarToken] || '';
                 }
+
                 // `$` followed by an unsupported char is an error, unlike native JS
                 throw new SyntaxError(`Invalid token ${$0}`);
             }

@@ -1251,6 +1251,11 @@ describe('XRegExp.replace()', function() {
                 expect(function() {XRegExp.replace('test', XRegExp('(?<test>t)', 'g'), ':$<x>:');}).toThrowError(SyntaxError);
             });
 
+            it('should throw an exception for backreferences with leading or trailing spaces', function() {
+                expect(function() {XRegExp.replace('test', /(?<test>)/, '$< test>');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('test', /(?<test>)/, '$<test >');}).toThrowError(SyntaxError);
+            });
+
         });
 
         describe('explicit numbered backreferences', function() {
@@ -1297,6 +1302,11 @@ describe('XRegExp.replace()', function() {
                 expect(function() {XRegExp.replace('test', XRegExp('(?<n>t)'), '$<2>');}).toThrowError(SyntaxError);
                 // Native named capture introduced in ES2018
                 expect(function() {XRegExp.replace('test', /(?<n>t)/, '$<2>');}).toThrowError(SyntaxError);
+            });
+
+            it('should throw an exception for backreferences with leading or trailing spaces', function() {
+                expect(function() {XRegExp.replace('test', /()/, '$< 1>');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('test', /()/, '$<1 >');}).toThrowError(SyntaxError);
             });
 
             it('should allow ${0} to refer to the entire match', function() {
@@ -1352,6 +1362,14 @@ describe('XRegExp.replace()', function() {
                 expect(function() {XRegExp.replace('test', XRegExp('(?<n>t)'), '$2');}).toThrowError(SyntaxError);
                 // Native named capture introduced in ES2018
                 expect(function() {XRegExp.replace('test', /(?<n>t)/, '$2');}).toThrowError(SyntaxError);
+            });
+
+            it('should throw an exception for unrecognized tokens', function() {
+                expect(function() {XRegExp.replace('test', /./, '$');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('test', /./, '$ ');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('test', /./, '${');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('test', /./, '$<');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('test', /./, '$.');}).toThrowError(SyntaxError);
             });
 
         });
