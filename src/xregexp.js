@@ -246,17 +246,16 @@ function getContextualTokenSeparator(match, scope, flags) {
     const precedingChar = match.input[match.index - 1];
     const followingChar = match.input[matchEndPos];
     if (
-        // No need to separate tokens if at the beginning or end of a group
-        precedingChar === '(' ||
-        followingChar === ')' ||
-        // No need to separate tokens if before or after a `|`
-        precedingChar === '|' ||
-        followingChar === '|' ||
+        // No need to separate tokens if at the beginning or end of a group, before or after a
+        // group, or before or after a `|`
+        /^[()|]$/.test(precedingChar) ||
+        /^[()|]$/.test(followingChar) ||
         // No need to separate tokens if at the beginning or end of the pattern
         match.index === 0 ||
         matchEndPos === match.input.length ||
-        // No need to separate tokens if at the beginning of a noncapturing group or lookaround
-        nativ.test.call(/\(\?(?:[:=!]|<[=!])$/, match.input.substring(0, match.index)) ||
+        // No need to separate tokens if at the beginning of a noncapturing group or lookaround.
+        // Looks only at the last 4 chars (at most) for perf when constructing long regexes.
+        /\(\?(?:[:=!]|<[=!])$/.test(match.input.substring(match.index - 4, match.index)) ||
         // Avoid separating tokens when the following token is a quantifier
         isQuantifierNext(match.input, matchEndPos, flags)
     ) {
