@@ -4,9 +4,10 @@ if (typeof global === 'undefined') {
     global.XRegExp = require('../../xregexp-all');
 }
 
-// Ensure that all opt-in features are disabled when each spec starts
-global.disableOptInFeatures = function() {
-    XRegExp.uninstall('namespacing astral');
+// Ensure that all features are reset to default when each spec starts
+global.resetFeatures = function() {
+    XRegExp.uninstall('astral');
+    XRegExp.install('namespacing');
 };
 
 // Property name used for extended regex instance data
