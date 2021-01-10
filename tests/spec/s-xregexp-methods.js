@@ -1293,6 +1293,15 @@ describe('XRegExp.replace()', function() {
                 expect(function() {XRegExp.replace('test', /(t)/, '$<2>');}).toThrowError(SyntaxError);
             });
 
+            it('should throw an exception for backreferences to unknown group numbers when using named capture', function() {
+                expect(function() {XRegExp.replace('test', XRegExp('(?<n>t)'), '$2');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('test', XRegExp('(?<n>t)'), '$<2>');}).toThrowError(SyntaxError);
+
+                // Native named capture introduced in ES2018
+                expect(function() {XRegExp.replace('test', /(?<n>t)/, '$2');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('test', /(?<n>t)/, '$<2>');}).toThrowError(SyntaxError);
+            });
+
             it('should allow ${0} to refer to the entire match', function() {
                 expect(XRegExp.replace('test', /../g, '${0}:')).toBe('te:st:');
                 expect(XRegExp.replace('test', /../g, '$<0>:')).toBe('te:st:');

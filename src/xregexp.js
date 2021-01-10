@@ -1556,6 +1556,12 @@ fixed.replace = function(search, replacement) {
 
             function replacer($0, bracketed, angled, dollarToken) {
                 bracketed = bracketed || angled;
+
+                // ES2018 added a new trailing `groups` arg that's passed to replacement functions
+                // when the search regex uses native named capture
+                const numNonCaptureArgs = isType(args[args.length - 1], 'Object') ? 4 : 3;
+                const numCaptures = args.length - numNonCaptureArgs;
+
                 // Named or numbered backreference with curly or angled braces
                 if (bracketed) {
                     // XRegExp behavior for `${n}` or `$<n>`:
@@ -1568,7 +1574,7 @@ fixed.replace = function(search, replacement) {
                     // 3. If the name or number does not refer to an existing capturing group, it's
                     //    an error.
                     let n = +bracketed; // Type-convert; drop leading zeros
-                    if (n <= args.length - 3) {
+                    if (n <= numCaptures) {
                         return args[n] || '';
                     }
                     // Groups with the same name is an error, else would need `lastIndexOf`
@@ -1607,7 +1613,7 @@ fixed.replace = function(search, replacement) {
                 // - `$01` is `$1` if at least one capturing group, else it's a literal `$01`.
                 // - `$0` is a literal `$0`.
                 if (!isNaN(dollarToken)) {
-                    if (dollarToken > args.length - 3) {
+                    if (dollarToken > numCaptures) {
                         throw new SyntaxError(`Backreference to undefined group ${$0}`);
                     }
                     return args[dollarToken] || '';
