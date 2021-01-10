@@ -980,7 +980,9 @@ XRegExp.isInstalled = (feature) => !!(features[feature]);
  * XRegExp.isRegExp(RegExp('^', 'm')); // -> true
  * XRegExp.isRegExp(XRegExp('(?s).')); // -> true
  */
-XRegExp.isRegExp = (value) => isType(value, 'RegExp');
+XRegExp.isRegExp = (value) => Object.prototype.toString.call(value) === '[object RegExp]';
+// Same as `isType(value, 'RegExp')`, but avoiding that function call here for perf since
+// `isRegExp` is used heavily by internals including regex construction
 
 /**
  * Returns the first matched string, or in global mode, an array containing all matched strings.
