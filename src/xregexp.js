@@ -242,34 +242,29 @@ function dec(hex) {
  * @returns {string} Either '' or '(?:)', depending on which is needed in the context of the match.
  */
 function getContextualTokenSeparator(match, scope, flags) {
+    const matchEndPos = match.index + match[0].length;
+    const precedingChar = match.input[match.index - 1];
+    const followingChar = match.input[matchEndPos];
     if (
         // No need to separate tokens if at the beginning or end of a group
-        match.input[match.index - 1] === '(' ||
-        match.input[match.index + match[0].length] === ')' ||
-
+        precedingChar === '(' ||
+        followingChar === ')' ||
         // No need to separate tokens if before or after a `|`
-        match.input[match.index - 1] === '|' ||
-        match.input[match.index + match[0].length] === '|' ||
-
+        precedingChar === '|' ||
+        followingChar === '|' ||
         // No need to separate tokens if at the beginning or end of the pattern
-        match.index < 1 ||
-        match.index + match[0].length >= match.input.length ||
-
-        // No need to separate tokens if at the beginning of a noncapturing group or lookahead.
-        // The way this is written relies on:
-        // - The search regex matching only 3-char strings.
-        // - Although `substr` gives chars from the end of the string if given a negative index,
-        //   the resulting substring will be too short to match. Ex: `'abcd'.substr(-1, 3) === 'd'`
-        nativ.test.call(/^\(\?[:=!]/, match.input.substr(match.index - 3, 3)) ||
-
+        match.index === 0 ||
+        matchEndPos === match.input.length ||
+        // No need to separate tokens if at the beginning of a noncapturing group or lookaround
+        nativ.test.call(/\(\?(?:[:=!]|<[=!])$/, match.input.substring(0, match.index)) ||
         // Avoid separating tokens when the following token is a quantifier
-        isQuantifierNext(match.input, match.index + match[0].length, flags)
+        isQuantifierNext(match.input, matchEndPos, flags)
     ) {
         return '';
     }
     // Keep tokens separated. This avoids e.g. inadvertedly changing `\1 1` or `\1(?#)1` to `\11`.
-    // This also ensures all tokens remain as discrete atoms, e.g. it avoids converting the syntax
-    // error `(? :` into `(?:`.
+    // This also ensures all tokens remain as discrete atoms, e.g. it prevents converting the
+    // syntax error `(? :` into `(?:`.
     return '(?:)';
 }
 
