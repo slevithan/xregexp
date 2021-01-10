@@ -1408,9 +1408,6 @@ fixed.exec = function(str) {
         }
 
         // Attach named capture properties
-        if (XRegExp.isInstalled('namespacing')) {
-            match.groups = undefined;
-        }
         if (this[REGEX_DATA] && this[REGEX_DATA].captureNames) {
             let groupsObject = match;
             if (XRegExp.isInstalled('namespacing')) {
@@ -1425,6 +1422,9 @@ fixed.exec = function(str) {
                     groupsObject[name] = match[i];
                 }
             }
+        // Preserve any existing `groups` obj that came from native ES2018 named capture
+        } else if (!match.groups && XRegExp.isInstalled('namespacing')) {
+            match.groups = undefined;
         }
 
         // Fix browsers that increment `lastIndex` after zero-length matches
