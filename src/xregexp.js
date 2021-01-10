@@ -22,14 +22,6 @@ const features = {
     astral: false,
     namespacing: true
 };
-// Native methods to use and restore ('native' is an ES3 reserved keyword)
-const nativ = {
-    exec: RegExp.prototype.exec,
-    test: RegExp.prototype.test,
-    match: String.prototype.match,
-    replace: String.prototype.replace,
-    split: String.prototype.split
-};
 // Storage for fixed/extended native methods
 const fixed = {};
 // Storage for regexes cached by `XRegExp.cache`
@@ -51,7 +43,7 @@ const nativeTokens = {
 // Any backreference or dollar-prefixed character in replacement strings
 const replacementToken = /\$(?:\{([^\}]+)\}|<([^>]+)>|(\d\d?|[\s\S]?))/g;
 // Check for correct `exec` handling of nonparticipating capturing groups
-const correctExecNpcg = nativ.exec.call(/()??/, '')[1] === undefined;
+const correctExecNpcg = /()??/.exec('')[1] === undefined;
 // Check for ES6 `flags` prop support
 const hasFlagsProp = /x/.flags !== undefined;
 // Shortcut to `Object.prototype.toString`
@@ -144,7 +136,7 @@ function augment(regex, captureNames, xSource, xFlags, isInternalOnly) {
  * @returns {string} String with any duplicate characters removed.
  */
 function clipDuplicates(str) {
-    return nativ.replace.call(str, /([\s\S])(?=[\s\S]*\1)/g, '');
+    return str.replace(/([\s\S])(?=[\s\S]*\1)/g, '');
 }
 
 /**
@@ -182,7 +174,7 @@ function copyRegex(regex, options) {
     if (options.removeG) {flagsToRemove += 'g';}
     if (options.removeY) {flagsToRemove += 'y';}
     if (flagsToRemove) {
-        flags = nativ.replace.call(flags, new RegExp(`[${flagsToRemove}]+`, 'g'), '');
+        flags = flags.replace(new RegExp(`[${flagsToRemove}]+`, 'g'), '');
     }
 
     if (options.addG) {flagsToAdd += 'g';}
@@ -280,7 +272,7 @@ function getNativeFlags(regex) {
         // Explicitly using `RegExp.prototype.toString` (rather than e.g. `String` or concatenation
         // with an empty string) allows this to continue working predictably when
         // `XRegExp.proptotype.toString` is overridden
-        nativ.exec.call(/\/([a-z]*)$/i, RegExp.prototype.toString.call(regex))[1];
+        /\/([a-z]*)$/i.exec(RegExp.prototype.toString.call(regex))[1];
 }
 
 /**
@@ -318,14 +310,12 @@ function isQuantifierNext(pattern, pos, flags) {
     const inlineCommentPattern = '\\(\\?#[^)]*\\)';
     const lineCommentPattern = '#[^#\\n]*';
     const quantifierPattern = '[?*+]|{\\d+(?:,\\d*)?}';
-    return nativ.test.call(
-        flags.includes('x') ?
-            // Ignore any leading whitespace, line comments, and inline comments
-            new RegExp(`^(?:\\s|${lineCommentPattern}|${inlineCommentPattern})*(?:${quantifierPattern})`) :
-            // Ignore any leading inline comments
-            new RegExp(`^(?:${inlineCommentPattern})*(?:${quantifierPattern})`),
-        pattern.slice(pos)
-    );
+    const regex = flags.includes('x') ?
+        // Ignore any leading whitespace, line comments, and inline comments
+        new RegExp(`^(?:\\s|${lineCommentPattern}|${inlineCommentPattern})*(?:${quantifierPattern})`) :
+        // Ignore any leading inline comments
+        new RegExp(`^(?:${inlineCommentPattern})*(?:${quantifierPattern})`);
+    return regex.test(pattern.slice(pos));
 }
 
 /**
@@ -370,8 +360,8 @@ function prepareFlags(pattern, flags) {
     }
 
     // Strip and apply a leading mode modifier with any combination of flags except g or y
-    pattern = nativ.replace.call(pattern, /^\(\?([\w$]+)\)/, ($0, $1) => {
-        if (nativ.test.call(/[gy]/, $1)) {
+    pattern = pattern.replace(/^\(\?([\w$]+)\)/, ($0, $1) => {
+        if (/[gy]/.test($1)) {
             throw new SyntaxError(`Cannot use flag g or y in mode modifier ${$0}`);
         }
         // Allow duplicate flags within the mode modifier
@@ -621,9 +611,9 @@ function XRegExp(pattern, flags) {
             // Use basic cleanup to collapse repeated empty groups like `(?:)(?:)` to `(?:)`. Empty
             // groups are sometimes inserted during regex transpilation in order to keep tokens
             // separated. However, more than one empty group in a row is never needed.
-            pattern: nativ.replace.call(output, /(?:\(\?:\))+/g, '(?:)'),
+            pattern: output.replace(/(?:\(\?:\))+/g, '(?:)'),
             // Strip all but native flags
-            flags: nativ.replace.call(appliedFlags, /[^gimuy]+/g, ''),
+            flags: appliedFlags.replace(/[^gimuy]+/g, ''),
             // `context.captureNames` has an item for each capturing group, even if unnamed
             captures: context.hasNamedCapture ? context.captureNames : null
         };
@@ -724,7 +714,7 @@ XRegExp.addToken = (regex, handler, options) => {
     }
 
     if (optionalFlags) {
-        optionalFlags = nativ.split.call(optionalFlags, '');
+        optionalFlags = optionalFlags.split('');
         for (const flag of optionalFlags) {
             registerFlag(flag);
         }
@@ -795,7 +785,7 @@ XRegExp.cache.flush = (cacheName) => {
  * XRegExp.escape('Escaped? <.>');
  * // -> 'Escaped\?\ <\.>'
  */
-XRegExp.escape = (str) => nativ.replace.call(toObject(str), /[-\[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+XRegExp.escape = (str) => String(toObject(str)).replace(/[-\[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 
 /**
  * Executes a regex search in a specified string. Returns a match array or `null`. If the provided
@@ -1036,7 +1026,7 @@ XRegExp.match = (str, regex, scope) => {
         })
     );
 
-    const result = nativ.match.call(toObject(str), r2);
+    const result = String(toObject(str)).match(r2);
 
     if (regex.global) {
         regex.lastIndex = (
@@ -1369,7 +1359,7 @@ XRegExp.union = (patterns, flags, options) => {
 
             // Rewrite backreferences. Passing to XRegExp dies on octals and ensures patterns are
             // independently valid; helps keep this simple. Named captures are put back
-            output.push(nativ.replace.call(XRegExp(pattern.source).source, parts, rewrite));
+            output.push(XRegExp(pattern.source).source.replace(parts, rewrite));
         } else {
             output.push(XRegExp.escape(pattern));
         }
@@ -1393,7 +1383,7 @@ XRegExp.union = (patterns, flags, options) => {
  */
 fixed.exec = function(str) {
     const origLastIndex = this.lastIndex;
-    const match = nativ.exec.apply(this, arguments);
+    const match = RegExp.prototype.exec.apply(this, arguments);
 
     if (match) {
         // Fix browsers whose `exec` methods don't return `undefined` for nonparticipating capturing
@@ -1406,7 +1396,7 @@ fixed.exec = function(str) {
             });
             // Using `str.slice(match.index)` rather than `match[0]` in case lookahead allowed
             // matching due to characters outside the match
-            nativ.replace.call(String(str).slice(match.index), r2, (...args) => {
+            String(str).slice(match.index).replace(r2, (...args) => {
                 const len = args.length;
                 // Skip index 0 and the last 2
                 for (let i = 1; i < len - 2; ++i) {
@@ -1474,7 +1464,7 @@ fixed.match = function(regex) {
         // Use the native `RegExp` rather than `XRegExp`
         regex = new RegExp(regex);
     } else if (regex.global) {
-        const result = nativ.match.apply(this, arguments);
+        const result = String.prototype.match.apply(this, arguments);
         // Fixes IE bug
         regex.lastIndex = 0;
 
@@ -1517,7 +1507,7 @@ fixed.replace = function(search, replacement) {
     if (isType(replacement, 'Function')) {
         // Stringifying `this` fixes a bug in IE < 9 where the last argument in replacement
         // functions isn't type-converted to a string
-        result = nativ.replace.call(String(this), search, (...args) => {
+        result = String(this).replace(search, (...args) => {
             if (captureNames) {
                 let groupsObject;
 
@@ -1545,8 +1535,8 @@ fixed.replace = function(search, replacement) {
     } else {
         // Ensure that the last value of `args` will be a string when given nonstring `this`,
         // while still throwing on null or undefined context
-        result = nativ.replace.call(this == null ? this : String(this), search, (...args) => {
-            return nativ.replace.call(String(replacement), replacementToken, replacer);
+        result = String(toObject(this)).replace(search, (...args) => {
+            return String(replacement).replace(replacementToken, replacer);
 
             function replacer($0, bracketed, angled, dollarToken) {
                 bracketed = bracketed || angled;
@@ -1652,7 +1642,7 @@ fixed.replace = function(search, replacement) {
 fixed.split = function(separator, limit) {
     if (!XRegExp.isRegExp(separator)) {
         // Browsers handle nonregex split correctly, so use the faster native method
-        return nativ.split.apply(this, arguments);
+        return String.prototype.split.apply(this, arguments);
     }
 
     const str = String(this);
@@ -1684,7 +1674,7 @@ fixed.split = function(separator, limit) {
     });
 
     if (lastLastIndex === str.length) {
-        if (!nativ.test.call(separator, '') || lastLength) {
+        if (!separator.test('') || lastLength) {
             output.push('');
         }
     } else {
