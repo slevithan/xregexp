@@ -1,10 +1,16 @@
-# XRegExp 4.4.1
+# XRegExp 4.4.1-next
 
 [![Build Status](https://github.com/slevithan/xregexp/workflows/Node.js%20CI/badge.svg)](https://github.com/slevithan/xregexp/actions)
 
 XRegExp provides augmented (and extensible) JavaScript regular expressions. You get modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your grepping and parsing easier, while freeing you from regex cross-browser inconsistencies and other annoyances.
 
 XRegExp supports all native ES6 regular expression syntax. It supports ES5+ browsers, and you can use it with Node.js or as a RequireJS module.
+
+**NOTE:** XRegExp 5 introduced a breaking change where named backreference properties now appear in the result's `groups` object (following ES2018), rather than directly on the result. See the usage axamples below for reference. To restore the old handling so you don't have to update old code, you can run the following line after importing XRegExp:
+
+```js
+XRegExp.uninstall('namespacing');
+```
 
 ## Performance
 
@@ -58,7 +64,7 @@ XRegExp.forEach('1a2345', /\d/, (match, i) => {
 
 // Use XRegExp.matchChain to get numbers within <b> tags
 XRegExp.matchChain('1 <b>2</b> 3 <B>4 \n 56</B>', [
-    XRegExp('(?is)<b>.*?</b>'),
+    XRegExp('<b>.*?</b>', 'is'),
     /\d+/
 ]);
 // -> ['2', '4', '56']
@@ -91,15 +97,15 @@ If not using `xregexp-all.js`, first include the Unicode Base script and then on
 Then you can do this:
 
 ```js
-// Test the Unicode category L (Letter)
-const unicodeWord = XRegExp('^\\pL+$');
-unicodeWord.test('Русский'); // -> true
-unicodeWord.test('日本語'); // -> true
-unicodeWord.test('العربية'); // -> true
-
 // Test some Unicode scripts
 XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
 XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
+
+// Test the Unicode categories L (Letter) and M (Mark)
+const unicodeWord = XRegExp.tag()`^\pL[\pL\pM]*$`;
+unicodeWord.test('Русский'); // -> true
+unicodeWord.test('日本語'); // -> true
+unicodeWord.test('العربية'); // -> true
 ```
 
 By default, `\p{…}` and `\P{…}` support the Basic Multilingual Plane (i.e. code points up to `U+FFFF`). You can opt-in to full 21-bit Unicode support (with code points up to `U+10FFFF`) on a per-regex basis by using flag `A`. This is called *astral mode*. You can automatically add flag `A` for all new regexes by running `XRegExp.install('astral')`. When in astral mode, `\p{…}` and `\P{…}` always match a full code point rather than a code unit, using surrogate pairs for code points above `U+FFFF`.
@@ -145,12 +151,16 @@ Named subpatterns can be provided as strings or regex objects. A leading `^` and
 Provides tagged template literals that create regexes with XRegExp syntax and flags:
 
 ```js
+XRegExp.match('word', XRegExp.tag()`\w\b`);
+// -> 'd'
+
 const h12 = /1[0-2]|0?[1-9]/;
 const h24 = /2[0-3]|[01][0-9]/;
 const hours = XRegExp.tag('x')`${h12} : | ${h24}`;
 const minutes = /^[0-5][0-9]$/;
 // Note that explicitly naming the 'minutes' group is required for named backreferences
 const time = XRegExp.tag('x')`^ ${hours} (?<minutes>${minutes}) $`;
+
 time.test('10:59'); // -> true
 XRegExp.exec('10:59', time).groups.minutes; // -> '59'
 ```
