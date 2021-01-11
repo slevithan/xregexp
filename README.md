@@ -35,8 +35,9 @@ while (match = XRegExp.exec('<1><2><3>4<5>', /<(\d+)>/, pos, 'sticky')) {
 // XRegExp.replace allows named backreferences in replacements
 XRegExp.replace('2017-02-22', date, '$<month>/$<day>/$<year>');
 // -> '02/22/2017'
-XRegExp.replace('2017-02-22', date, (match) => {
-    return `${match.groups.month}/${match.groups.day}/${match.groups.year}`;
+XRegExp.replace('2017-02-22', date, (...args) => {
+    const groups = args.pop();
+    return `${groups.month}/${groups.day}/${groups.year}`;
 });
 // -> '02/22/2017'
 
