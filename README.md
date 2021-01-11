@@ -19,7 +19,7 @@ const date = XRegExp(
      (?<month> [0-9]{2} ) -?  # month
      (?<day>   [0-9]{2} )     # day`, 'x');
 
-// XRegExp.exec gives you named backreferences on the match result's groups property
+// XRegExp.exec provides named backreferences on the result's groups property
 let match = XRegExp.exec('2017-02-22', date);
 match.groups.year; // -> '2017'
 
@@ -41,12 +41,11 @@ XRegExp.replace('2017-02-22', date, (...args) => {
 });
 // -> '02/22/2017'
 
-// XRegExps compile to RegExps and work perfectly with native methods
+// XRegExps compile to RegExps and work with native methods
 date.test('2017-02-22');
 // -> true
-
-// The only caveat is that named captures must be referenced using
-// numbered backreferences if used with native methods
+// However, named captures must be referenced using numbered backreferences
+// if used with native methods
 '2017-02-22'.replace(date, '$2/$3/$1');
 // -> '02/22/2017'
 
