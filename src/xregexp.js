@@ -787,11 +787,11 @@ XRegExp.escape = (str) => String(nullThrows(str)).replace(/[-\[\]{}()*+?.,\\^$|#
 
 /**
  * Executes a regex search in a specified string. Returns a match array or `null`. If the provided
- * regex uses named capture, named backreference properties are included on the match array.
- * Optional `pos` and `sticky` arguments specify the search start position, and whether the match
- * must start at the specified position only. The `lastIndex` property of the provided regex is not
- * used, but is updated for compatibility. Also fixes browser bugs compared to the native
- * `RegExp.prototype.exec` and can be used reliably cross-browser.
+ * regex uses named capture, named capture properties are included on the match array's `groups`
+ * property. Optional `pos` and `sticky` arguments specify the search start position, and whether
+ * the match must start at the specified position only. The `lastIndex` property of the provided
+ * regex is not used, but is updated for compatibility. Also fixes browser bugs compared to the
+ * native `RegExp.prototype.exec` and can be used reliably cross-browser.
  *
  * @memberOf XRegExp
  * @param {String} str String to search.
@@ -799,10 +799,11 @@ XRegExp.escape = (str) => String(nullThrows(str)).replace(/[-\[\]{}()*+?.,\\^$|#
  * @param {Number} [pos=0] Zero-based index at which to start the search.
  * @param {Boolean|String} [sticky=false] Whether the match must start at the specified position
  *   only. The string `'sticky'` is accepted as an alternative to `true`.
- * @returns {Array} Match array with named backreference properties, or `null`.
+ * @returns {Array} Match array with named capture properties on the `groups` object, or `null`. If
+ *   the `namespacing` feature is off, named capture properties are directly on the match array.
  * @example
  *
- * // Basic use, with named backreference
+ * // Basic use, with named capturing group
  * let match = XRegExp.exec('U+2620', XRegExp('U\\+(?<hex>[0-9A-F]{4})'));
  * match.groups.hex; // -> '2620'
  *
@@ -1109,8 +1110,8 @@ XRegExp.matchChain = (str, chain) => (function recurseChain(values, level) {
  * or regex, and the replacement can be a string or a function to be called for each match. To
  * perform a global search and replace, use the optional `scope` argument or include flag g if using
  * a regex. Replacement strings can use `${n}` or `$<n>` for named and numbered backreferences.
- * Replacement functions can use named backreferences via `arguments[0].name`. Also fixes browser
- * bugs compared to the native `String.prototype.replace` and can be used reliably cross-browser.
+ * Replacement functions can use named backreferences via the last argument. Also fixes browser bugs
+ * compared to the native `String.prototype.replace` and can be used reliably cross-browser.
  *
  * @memberOf XRegExp
  * @param {String} str String to search.
@@ -1121,18 +1122,22 @@ XRegExp.matchChain = (str, chain) => (function recurseChain(values, level) {
  *     - $&, $0 - Inserts the matched substring.
  *     - $` - Inserts the string that precedes the matched substring (left context).
  *     - $' - Inserts the string that follows the matched substring (right context).
- *     - $n, $nn - Where n/nn are digits referencing an existent capturing group, inserts
+ *     - $n, $nn - Where n/nn are digits referencing an existing capturing group, inserts
  *       backreference n/nn.
- *     - ${n}, $<n> - Where n is a name or any number of digits that reference an existent capturing
+ *     - $<n>, ${n} - Where n is a name or any number of digits that reference an existing capturing
  *       group, inserts backreference n.
  *   Replacement functions are invoked with three or more arguments:
- *     - The matched substring (corresponds to $& above). Named backreferences are accessible as
- *       properties of this first argument.
- *     - 0..n arguments, one for each backreference (corresponding to $1, $2, etc. above).
- *     - The zero-based index of the match within the total search string.
- *     - The total string being searched.
- * @param {String} [scope='one'] Use 'one' to replace the first match only, or 'all'. If not
- *   explicitly specified and using a regex with flag g, `scope` is 'all'.
+ *     - args[0] - The matched substring (corresponds to `$&`` above). If the `namespacing` feature
+ *       is off, named backreferences are accessible as properties of this argument.
+ *     - args[1..n] - One argument for each backreference (corresponding to `$1`, `$2`, etc. above).
+ *       If the regex has no capturing groups, no arguments appear in this position.
+ *     - args[n+1] - The zero-based index of the match within the entire search string.
+ *     - args[n+2] - The total string being searched.
+ *     - args[n+3] - If the the search pattern is a regex with named capturing groups, the last
+ *       argument is the groups object. Its keys are the backreference names and its values are the
+ *       backreference values. If the `namespacing` feature is off, this argument is not present.
+ * @param {String} [scope] Use 'one' to replace the first match only, or 'all'. Defaults to 'one'.
+ *   Defaults to 'all' if using a regex with flag g.
  * @returns {String} New string with one or all matches replaced.
  * @example
  *
@@ -1142,7 +1147,10 @@ XRegExp.matchChain = (str, chain) => (function recurseChain(values, level) {
  * // -> 'Smith, John'
  *
  * // Regex search, using named backreferences in replacement function
- * XRegExp.replace('John Smith', name, (match) => `${match.groups.last}, ${match.groups.first}`);
+ * XRegExp.replace('John Smith', name, (...args) => {
+ *   const groups = args[args.length - 1];
+ *   return `${groups.last}, ${groups.first}`;
+ * });
  * // -> 'Smith, John'
  *
  * // String search, with replace-all
