@@ -6,7 +6,7 @@ XRegExp provides augmented (and extensible) JavaScript regular expressions. You 
 
 XRegExp supports all native ES6 regular expression syntax. It supports ES5+ browsers, and you can use it with Node.js or as a RequireJS module.
 
-**NOTE:** XRegExp 5 introduced a breaking change where named backreference properties now appear in the result's `groups` object (following ES2018), rather than directly on the result. See the usage axamples below for reference. To restore the old handling so you don't have to update old code, you can run the following line after importing XRegExp:
+**NOTE:** XRegExp 5 introduced a breaking change where named backreference properties now appear in the result's `groups` object (following ES2018), rather than directly on the result. See the usage examples below for reference. To restore the old handling so you don't have to update old code, you can run the following line after importing XRegExp:
 
 ```js
 XRegExp.uninstall('namespacing');
@@ -165,7 +165,7 @@ time.test('10:59'); // -> true
 XRegExp.exec('10:59', time).groups.minutes; // -> '59'
 ```
 
-XRegExp.tag does more than just basic interpolation. For starters, you get all the XRegExp syntax and flags. Even better, since `XRegExp.tag` uses your pattern as a raw string, you no longer need to escape all your backslashes. And since it relies on `XRegExp.build` under the hood, you get all of its extras for free. Leading `^` and trailing unescaped `$` are stripped from interpolated patterns if both are present (to allow embedding independently useful anchored regexes), interpolating into a character class is an error (to avoid unintended meaning in edge cases), interpolated patterns are treated as atomic units when quantified, interpolated strings have their special characters escaped, and any backreferences within an interpolated regex are rewritten to work within the overall pattern.
+`XRegExp.tag` does more than just basic interpolation. For starters, you get all the XRegExp syntax and flags. Even better, since `XRegExp.tag` uses your pattern as a raw string, you no longer need to escape all your backslashes. And since it relies on `XRegExp.build` under the hood, you get all of its extras for free. Leading `^` and trailing unescaped `$` are stripped from interpolated patterns if both are present (to allow embedding independently useful anchored regexes), interpolating into a character class is an error (to avoid unintended meaning in edge cases), interpolated patterns are treated as atomic units when quantified, interpolated strings have their special characters escaped, and any backreferences within an interpolated regex are rewritten to work within the overall pattern.
 
 ### XRegExp.matchRecursive
 
