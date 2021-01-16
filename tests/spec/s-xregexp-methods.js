@@ -1257,13 +1257,13 @@ describe('XRegExp.replace()', function() {
             });
 
             it('should throw an exception for backreferences to unknown group names', function() {
-                expect(function() {XRegExp.replace('test', XRegExp('(?<test>t)', 'g'), ':${x}:');}).toThrowError(SyntaxError);
-                expect(function() {XRegExp.replace('test', XRegExp('(?<test>t)', 'g'), ':$<x>:');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('test', XRegExp('(?<test>)'), ':${x}:');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('test', XRegExp('(?<test>)'), ':$<x>:');}).toThrowError(SyntaxError);
             });
 
             it('should throw an exception for backreferences with leading or trailing spaces', function() {
-                expect(function() {XRegExp.replace('test', /(?<test>)/, '$< test>');}).toThrowError(SyntaxError);
-                expect(function() {XRegExp.replace('test', /(?<test>)/, '$<test >');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('test', XRegExp('(?<test>)'), '$< test>');}).toThrowError(SyntaxError);
+                expect(function() {XRegExp.replace('test', XRegExp('(?<test>)'), '$<test >');}).toThrowError(SyntaxError);
             });
 
         });
@@ -1310,8 +1310,8 @@ describe('XRegExp.replace()', function() {
 
             it('should throw an exception for backreferences to unknown group numbers when using named capture', function() {
                 expect(function() {XRegExp.replace('test', XRegExp('(?<n>t)'), '$<2>');}).toThrowError(SyntaxError);
-                // Native named capture introduced in ES2018
-                expect(function() {XRegExp.replace('test', /(?<n>t)/, '$<2>');}).toThrowError(SyntaxError);
+                // Native ES2018 named capture
+                //expect(function() {XRegExp.replace('test', /(?<n>t)/, '$<2>');}).toThrowError(SyntaxError);
             });
 
             it('should throw an exception for backreferences with leading or trailing spaces', function() {
@@ -1370,8 +1370,8 @@ describe('XRegExp.replace()', function() {
 
             it('should throw an exception for backreferences to unknown group numbers when using named capture', function() {
                 expect(function() {XRegExp.replace('test', XRegExp('(?<n>t)'), '$2');}).toThrowError(SyntaxError);
-                // Native named capture introduced in ES2018
-                expect(function() {XRegExp.replace('test', /(?<n>t)/, '$2');}).toThrowError(SyntaxError);
+                // Native ES2018 named capture
+                //expect(function() {XRegExp.replace('test', /(?<n>t)/, '$2');}).toThrowError(SyntaxError);
             });
 
             it('should throw an exception for unrecognized tokens', function() {
