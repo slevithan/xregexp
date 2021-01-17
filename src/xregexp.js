@@ -72,6 +72,8 @@ function hasNativeFlag(flag) {
     }
     return isSupported;
 }
+// Check for ES2018 `s` flag support
+const hasNativeS = hasNativeFlag('s');
 // Check for ES6 `u` flag support
 const hasNativeU = hasNativeFlag('u');
 // Check for ES6 `y` flag support
@@ -81,9 +83,12 @@ const registeredFlags = {
     g: true,
     i: true,
     m: true,
+    s: hasNativeS,
     u: hasNativeU,
     y: hasNativeY
 };
+// Flags to remove when passing to native `RegExp` constructor
+const nonnativeFlags = hasNativeS ? /[^gimsuy]+/g : /[^gimuy]+/g;
 
 /**
  * Attaches extended data and `XRegExp.prototype` properties to a regex object.
@@ -521,7 +526,7 @@ function setNamespacing(on) {
  *     - `y` - sticky (Firefox 3+, ES6)
  *   Additional XRegExp flags:
  *     - `n` - explicit capture
- *     - `s` - dot matches all (aka singleline)
+ *     - `s` - dot matches all (aka singleline) - works even when not natively supported
  *     - `x` - free-spacing and line comments (aka extended)
  *     - `A` - astral (requires the Unicode Base addon)
  *   Flags cannot be provided when constructing one `RegExp` from another.
@@ -611,7 +616,7 @@ function XRegExp(pattern, flags) {
             // separated. However, more than one empty group in a row is never needed.
             pattern: output.replace(/(?:\(\?:\))+/g, '(?:)'),
             // Strip all but native flags
-            flags: appliedFlags.replace(/[^gimuy]+/g, ''),
+            flags: appliedFlags.replace(nonnativeFlags, ''),
             // `context.captureNames` has an item for each capturing group, even if unnamed
             captures: context.hasNamedCapture ? context.captureNames : null
         };
@@ -1772,16 +1777,18 @@ XRegExp.addToken(
 );
 
 /*
- * Dot, in dotall mode (aka singleline mode, flag s) only.
+ * Dot, in dotAll mode (aka singleline mode, flag s) only.
  */
-XRegExp.addToken(
-    /\./,
-    () => '[\\s\\S]',
-    {
-        flag: 's',
-        leadChar: '.'
-    }
-);
+if (!hasNativeS) {
+    XRegExp.addToken(
+        /\./,
+        () => '[\\s\\S]',
+        {
+            flag: 's',
+            leadChar: '.'
+        }
+    );
+}
 
 /*
  * Named backreference: `\k<name>`. Backreference names can use RegExpIdentifierName characters

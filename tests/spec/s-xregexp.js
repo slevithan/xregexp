@@ -121,10 +121,10 @@ describe('XRegExp()', function() {
 
     // These properties are `undefined`, but future ES may define them with value `false`
     it('should not set properties for nonnative flags', function() {
+        if (!hasNativeS) {
+            expect(XRegExp('', 's').dotAll).toBeFalsy();
+        }
         expect(XRegExp('', 'n').explicitCapture).toBeFalsy();
-        expect(XRegExp('', 's').singleline).toBeFalsy();
-        expect(XRegExp('', 's').dotall).toBeFalsy();
-        expect(XRegExp('', 's').dotAll).toBeFalsy();
         expect(XRegExp('', 'x').extended).toBeFalsy();
         // Flag A is added by Unicode Base
         //expect(XRegExp('', 'A').astral).toBeFalsy();
@@ -293,10 +293,10 @@ describe('XRegExp()', function() {
 
             // These properties are `undefined`, but future ES may define them with value `false`
             it('should not set properties for nonnative flags', function() {
+                if (!hasNativeS) {
+                    expect(XRegExp('(?s)').dotAll).toBeFalsy();
+                }
                 expect(XRegExp('(?n)').explicitCapture).toBeFalsy();
-                expect(XRegExp('(?s)').singleline).toBeFalsy();
-                expect(XRegExp('(?s)').dotall).toBeFalsy();
-                expect(XRegExp('(?s)').dotAll).toBeFalsy();
                 expect(XRegExp('(?x)').extended).toBeFalsy();
                 // Flag A is added by Unicode Base
                 //expect(XRegExp('(?A)').astral).toBeFalsy();
@@ -332,8 +332,11 @@ describe('XRegExp()', function() {
                 expect(regex.ignoreCase).toBe(true);
                 expect(regex.global).toBe(true);
                 expect(regex.multiline).toBe(true);
-                // Test nonnative flag s
-                expect(regex.test('\n')).toBe(true);
+                if (hasNativeS) {
+                    expect(regex.dotAll).toBe(true);
+                } else {
+                    expect(regex.test('\n')).toBe(true);
+                }
             });
 
             it('should throw an exception if unknown flags are used', function() {

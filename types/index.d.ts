@@ -24,7 +24,7 @@ export = XRegExp;
  *
  *   Additional XRegExp flags:
  *     - `n` - explicit capture
- *     - `s` - dot matches all (aka singleline)
+ *     - `s` - dot matches all (aka singleline) - works even when not natively supported
  *     - `x` - free-spacing and line comments (aka extended)
  *     - `A` - astral (requires the Unicode Base addon)
  *
