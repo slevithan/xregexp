@@ -4,13 +4,27 @@
 
 XRegExp provides augmented (and extensible) JavaScript regular expressions. You get modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your grepping and parsing easier, while freeing you from regex cross-browser inconsistencies and other annoyances.
 
-XRegExp supports all native ES6 regular expression syntax. It supports ES5+ browsers, and you can use it with Node.js or as a RequireJS module.
+XRegExp supports all native ES6 regular expression syntax. It supports ES5+ browsers, and you can use it with Node.js or as a RequireJS module. Over the years, many of XRegExp's features have been adopted by more recent JavaScript standards (named capturing, Unicode properties/scripts/categories, dotAll mode, sticky matching, etc.), so using XRegExp can be a way to extend these features into older browsers.
 
-**NOTE:** XRegExp 5 introduced a breaking change where named backreference properties now appear in the result's `groups` object (following ES2018), rather than directly on the result. See the usage examples below for reference. To restore the old handling so you don't have to update old code, you can run the following line after importing XRegExp:
+**NOTE:** XRegExp 5 introduced a breaking change where named backreference properties now appear in the result's `groups` object (following ES2018), rather than directly on the result. To restore the old handling so you don't have to update old code, you can run the following line after importing XRegExp:
 
 ```js
 XRegExp.uninstall('namespacing');
 ```
+
+You can also run `XRegExp.install('namespacing')` in XRegExp 4.1.0 and later to introduce the new behavior prior to upgrading to XRegExp 5.
+
+To update your code for the new behavior, following is the most commonly needed change:
+
+```js
+// Change this
+const name = XRegExp.exec(str, regexWithNamedCapture).name;
+
+// To this
+const name = XRegExp.exec(str, regexWithNamedCapture).groups.name;
+```
+
+See below for more examples of using named capture with `XRegExp.exec` and `XRegExp.replace`.
 
 ## Performance
 
@@ -26,8 +40,8 @@ const date = XRegExp(
      (?<day>   [0-9]{2} )     # day`, 'x');
 
 // XRegExp.exec provides named backreferences on the result's groups property
-let match = XRegExp.exec('2017-02-22', date);
-match.groups.year; // -> '2017'
+let match = XRegExp.exec('2021-02-22', date);
+match.groups.year; // -> '2021'
 
 // It also includes optional pos and sticky arguments
 let pos = 3;
@@ -39,21 +53,22 @@ while (match = XRegExp.exec('<1><2><3>4<5>', /<(\d+)>/, pos, 'sticky')) {
 // result -> ['2', '3']
 
 // XRegExp.replace allows named backreferences in replacements
-XRegExp.replace('2017-02-22', date, '$<month>/$<day>/$<year>');
-// -> '02/22/2017'
-XRegExp.replace('2017-02-22', date, (...args) => {
+XRegExp.replace('2021-02-22', date, '$<month>/$<day>/$<year>');
+// -> '02/22/2021'
+XRegExp.replace('2021-02-22', date, (...args) => {
+    // Named backreferences are on the last argument
     const groups = args.pop();
     return `${groups.month}/${groups.day}/${groups.year}`;
 });
-// -> '02/22/2017'
+// -> '02/22/2021'
 
 // XRegExps compile to RegExps and work with native methods
-date.test('2017-02-22');
+date.test('2021-02-22');
 // -> true
 // However, named captures must be referenced using numbered backreferences
 // if used with native methods
-'2017-02-22'.replace(date, '$2/$3/$1');
-// -> '02/22/2017'
+'2021-02-22'.replace(date, '$2/$3/$1');
+// -> '02/22/2021'
 
 // Use XRegExp.forEach to extract every other digit from a string
 const evens = [];
