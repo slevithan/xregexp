@@ -12,7 +12,7 @@ XRegExp compiles to native `RegExp` objects. Therefore regexes built with XRegEx
 
 ## Named Capture Breaking Change in XRegExp 5
 
-**NOTE:** XRegExp 5 introduced a breaking change where named backreference properties now appear in the result's `groups` object (following ES2018), rather than directly on the result. To restore the old handling so you don't have to update old code, you can run the following line after importing XRegExp:
+XRegExp 5 introduced a breaking change where named backreference properties now appear in the result's `groups` object (following ES2018), rather than directly on the result. To restore the old handling so you don't need to update old code, run the following line after importing XRegExp:
 
 ```js
 XRegExp.uninstall('namespacing');
