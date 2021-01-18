@@ -4,7 +4,7 @@
 
 XRegExp provides augmented (and extensible) JavaScript regular expressions. You get modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your grepping and parsing easier, while freeing you from regex cross-browser inconsistencies and other annoyances.
 
-XRegExp supports all native ES6 regular expression syntax. It supports ES5+ browsers, and you can use it with Node.js or as a RequireJS module. Over the years, many of XRegExp's features have been adopted by more recent JavaScript standards (named capturing, Unicode properties/scripts/categories, dotAll mode, sticky matching, etc.), so using XRegExp can be a way to extend these features into older browsers.
+XRegExp supports all native ES6 regular expression syntax. It supports ES5+ browsers, and you can use it with Node.js or as a RequireJS module. Over the years, many of XRegExp's features have been adopted by new JavaScript standards (named capturing, Unicode properties/scripts/categories, flag `s`, sticky matching, etc.), so using XRegExp can be a way to extend these features into older browsers.
 
 ## Performance
 
@@ -12,7 +12,7 @@ XRegExp compiles to native `RegExp` objects. Therefore regexes built with XRegEx
 
 ## Named Capture Breaking Change in XRegExp 5
 
-XRegExp 5 introduced a breaking change where named backreference properties now appear in the result's `groups` object (following ES2018), rather than directly on the result. To restore the old handling so you don't need to update old code, run the following line after importing XRegExp:
+XRegExp 5 introduced a breaking change where named backreference properties now appear on the result's `groups` object (following ES2018), rather than directly on the result. To restore the old handling so you don't need to update old code, run the following line after importing XRegExp:
 
 ```js
 XRegExp.uninstall('namespacing');
