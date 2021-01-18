@@ -29,7 +29,7 @@
     "lint": "eslint . && npm run dtslint",
     "dtslint": "dtslint types",
     "babel": "babel src -d lib",
-    "build-unicode-data": "node tools/scripts/block-regex.js && node tools/scripts/category-regex.js && node tools/scripts/property-regex.js && node tools/scripts/script-regex.js",
+    "build-unicode-data": "node tools/scripts/category-regex.js && node tools/scripts/property-regex.js && node tools/scripts/script-regex.js",
     "prebuild": "npm run build-unicode-data && npm run lint && npm run babel",
     "build": "browserify lib/index.js --standalone XRegExp > xregexp-all.js",
     "pretest": "npm run build",

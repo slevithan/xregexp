@@ -92,7 +92,7 @@ You can either load addons individually, or bundle all addons with XRegExp by lo
 
 ### Unicode
 
-If not using `xregexp-all.js`, first include the Unicode Base script and then one or more of the addons for Unicode blocks, categories, properties, or scripts.
+If not using `xregexp-all.js`, first include the Unicode Base script and then one or more of the addons for Unicode categories, properties, or scripts.
 
 Then you can do this:
 

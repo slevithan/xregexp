@@ -407,34 +407,6 @@ describe('Unicode Base addon:', function() {
 
 });
 
-describe('Unicode Blocks addon:', function() {
-
-    it('should require the "In" prefix for block names (unprefixed names are not allowed)', function() {
-        expect(function() {XRegExp('\\p{InBasic_Latin}');}).not.toThrow();
-        expect(function() {XRegExp('\\p{Basic_Latin}');}).toThrowError(SyntaxError);
-    });
-
-    it('should not allow the "Is" prefix for block names', function() {
-        expect(function() {XRegExp('\\p{IsBasic_Latin}');}).toThrowError(SyntaxError);
-    });
-
-    it('should handle \\p{InBasic_Latin}', function() {
-        testUnicodeToken('InBasic_Latin', {
-            valid: ['A']
-        });
-    });
-
-    it('should handle astral-only \\p{InAegean_Numbers}', function() {
-        testUnicodeToken('InAegean_Numbers', {
-            isAstralOnly: true,
-            valid: [String.fromCodePoint(0x10100)]
-        });
-    });
-
-    // TODO: Add complete specs
-
-});
-
 describe('Unicode Categories addon:', function() {
 
     it('should not allow the "In" prefix for category names', function() {
@@ -579,6 +551,13 @@ describe('Unicode Scripts addon:', function() {
     it('should handle \\p{Common}', function() {
         testUnicodeToken('Common', {
             valid: ['\u20BA']
+        });
+    });
+
+    it('should handle astral-only \\p{Anatolian_Hieroglyphs}', function() {
+        testUnicodeToken('Anatolian_Hieroglyphs', {
+            isAstralOnly: true,
+            valid: [String.fromCodePoint(0x14400)]
         });
     });
 
