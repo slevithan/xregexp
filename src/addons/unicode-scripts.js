@@ -22,5 +22,5 @@ export default (XRegExp) => {
         throw new ReferenceError('Unicode Base must be loaded before Unicode Scripts');
     }
 
-    XRegExp.addUnicodeData(scripts);
+    XRegExp.addUnicodeData(scripts, 'Script');
 };

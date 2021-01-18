@@ -26,6 +26,7 @@ export default (XRegExp) => {
 
     // Storage for Unicode data
     const unicode = {};
+    const unicodeTypes = {};
 
     // Reuse utils
     const dec = XRegExp._dec;
@@ -123,41 +124,56 @@ export default (XRegExp) => {
      */
     XRegExp.addToken(
         // Use `*` instead of `+` to avoid capturing `^` as the token name in `\p{^}`
-        /\\([pP])(?:{(\^?)([^}]*)}|([A-Za-z]))/,
+        /\\([pP])(?:{(\^?)(?:(Script|sc)=)?([^}]*)}|([A-Za-z]))/,
         (match, scope, flags) => {
             const ERR_DOUBLE_NEG = 'Invalid double negation ';
             const ERR_UNKNOWN_NAME = 'Unknown Unicode token ';
             const ERR_UNKNOWN_REF = 'Unicode token missing data ';
             const ERR_ASTRAL_ONLY = 'Astral mode required for Unicode token ';
             const ERR_ASTRAL_IN_CLASS = 'Astral mode does not support Unicode tokens within character classes';
+            const [
+                fullToken,
+                pPrefix,
+                caretNegation,
+                typePrefix,
+                tokenName,
+                tokenSingleCharName
+            ] = match;
             // Negated via \P{..} or \p{^..}
-            let isNegated = match[1] === 'P' || !!match[2];
+            let isNegated = pPrefix === 'P' || !!caretNegation;
             // Switch from BMP (0-FFFF) to astral (0-10FFFF) mode via flag A
             const isAstralMode = flags.includes('A');
-            // Token lookup name. Check `[4]` first to avoid passing `undefined` via `\p{}`
-            let slug = normalize(match[4] || match[3]);
+            // Token lookup name. Check `tokenSingleCharName` first to avoid passing `undefined`
+            // via `\p{}`
+            let slug = normalize(tokenSingleCharName || tokenName);
             // Token data object
             let item = unicode[slug];
 
-            if (match[1] === 'P' && match[2]) {
-                throw new SyntaxError(ERR_DOUBLE_NEG + match[0]);
+            if (pPrefix === 'P' && caretNegation) {
+                throw new SyntaxError(ERR_DOUBLE_NEG + fullToken);
             }
             if (!unicode.hasOwnProperty(slug)) {
-                throw new SyntaxError(ERR_UNKNOWN_NAME + match[0]);
+                throw new SyntaxError(ERR_UNKNOWN_NAME + fullToken);
+            }
+
+            if (typePrefix) {
+                if (!(unicodeTypes[typePrefix] && unicodeTypes[typePrefix][slug])) {
+                    throw new SyntaxError(ERR_UNKNOWN_NAME + fullToken);
+                }
             }
 
             // Switch to the negated form of the referenced Unicode token
             if (item.inverseOf) {
                 slug = normalize(item.inverseOf);
                 if (!unicode.hasOwnProperty(slug)) {
-                    throw new ReferenceError(`${ERR_UNKNOWN_REF + match[0]} -> ${item.inverseOf}`);
+                    throw new ReferenceError(`${ERR_UNKNOWN_REF + fullToken} -> ${item.inverseOf}`);
                 }
                 item = unicode[slug];
                 isNegated = !isNegated;
             }
 
             if (!(item.bmp || isAstralMode)) {
-                throw new SyntaxError(ERR_ASTRAL_ONLY + match[0]);
+                throw new SyntaxError(ERR_ASTRAL_ONLY + fullToken);
             }
             if (isAstralMode) {
                 if (scope === 'class') {
@@ -196,6 +212,9 @@ export default (XRegExp) => {
      *   character classes and alternation, and should use surrogate pairs to represent astral code
      *   points. `inverseOf` can be used to avoid duplicating character data if a Unicode token is
      *   defined as the exact inverse of another token.
+     * @param {String} [typePrefix] Enables optionally using this type as a prefix for all of the
+     *   provided Unicode tokens, e.g. if given `'Type'`, then `\p{TokenName}` can also be written
+     *   as `\p{Type=TokenName}`.
      * @example
      *
      * // Basic use
@@ -206,9 +225,14 @@ export default (XRegExp) => {
      * }]);
      * XRegExp('\\p{XDigit}:\\p{Hexadecimal}+').test('0:3D'); // -> true
      */
-    XRegExp.addUnicodeData = (data) => {
+    XRegExp.addUnicodeData = (data, typePrefix) => {
         const ERR_NO_NAME = 'Unicode token requires name';
         const ERR_NO_DATA = 'Unicode token has no character data ';
+
+        if (typePrefix) {
+            // Case sensitive to match ES2018
+            unicodeTypes[typePrefix] = {};
+        }
 
         for (const item of data) {
             if (!item.name) {
@@ -217,9 +241,19 @@ export default (XRegExp) => {
             if (!(item.inverseOf || item.bmp || item.astral)) {
                 throw new Error(ERR_NO_DATA + item.name);
             }
-            unicode[normalize(item.name)] = item;
+
+            const normalizedName = normalize(item.name);
+            unicode[normalizedName] = item;
+            if (typePrefix) {
+                unicodeTypes[typePrefix][normalizedName] = true;
+            }
+
             if (item.alias) {
-                unicode[normalize(item.alias)] = item;
+                const normalizedAlias = normalize(item.alias);
+                unicode[normalizedAlias] = item;
+                if (typePrefix) {
+                    unicodeTypes[typePrefix][normalizedAlias] = true;
+                }
             }
         }
 

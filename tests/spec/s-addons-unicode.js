@@ -417,6 +417,10 @@ describe('Unicode Categories addon:', function() {
         expect(function() {XRegExp('\\p{IsP}');}).toThrowError(SyntaxError);
     });
 
+    it('should not allow the "Script=" prefix for category names', function() {
+        expect(function() {XRegExp('\\p{Script=P}');}).toThrowError(SyntaxError);
+    });
+
     it('should handle \\p{Cn}', function() {
         testUnicodeToken('Cn', {
             invalid: ['\u20BA']
@@ -489,6 +493,10 @@ describe('Unicode Properties addon:', function() {
         expect(function() {XRegExp('\\p{IsASCII}');}).toThrowError(SyntaxError);
     });
 
+    it('should not allow the "Script=" prefix for property names', function() {
+        expect(function() {XRegExp('\\p{Script=ASCII}');}).toThrowError(SyntaxError);
+    });
+
     it('should handle \\p{Alphabetic}', function() {
         testUnicodeToken('Alphabetic', {
             valid: ['A', 'a', 'Å', 'å', '日', 'ي'],
@@ -527,6 +535,21 @@ describe('Unicode Scripts addon:', function() {
 
     it('should not allow the "Is" prefix for script names', function() {
         expect(function() {XRegExp('\\p{IsLatin}');}).toThrowError(SyntaxError);
+    });
+
+    it('should allow the "Script=" prefix for script names', function() {
+        expect(function() {XRegExp('\\p{Script=Latin}');}).not.toThrow();
+        testUnicodeToken('Script=Latin', {
+            valid: ['A', 'B', 'C'],
+            invalid: ['カ', 'タ', 'ナ']
+        });
+    });
+
+    it('should handle \\p{Latin}', function() {
+        testUnicodeToken('Latin', {
+            valid: ['A', 'B', 'C'],
+            invalid: ['カ', 'タ', 'ナ']
+        });
     });
 
     it('should handle \\p{Katakana}', function() {

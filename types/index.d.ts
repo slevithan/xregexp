@@ -497,6 +497,9 @@ declare namespace XRegExp {
      *   character classes and alternation, and should use surrogate pairs to represent astral code
      *   points. `inverseOf` can be used to avoid duplicating character data if a Unicode token is
      *   defined as the exact inverse of another token.
+     * @param typePrefix - Enables optionally using this type as a prefix for all of the
+     *   provided Unicode tokens, e.g. if given `'Type'`, then `\p{TokenName}` can also be written
+     *   as `\p{Type=TokenName}`.
      * @example
      *
      * // Basic use
@@ -507,7 +510,7 @@ declare namespace XRegExp {
      * }]);
      * XRegExp('\\p{XDigit}:\\p{Hexadecimal}+').test('0:3D'); // -> true
      */
-    function addUnicodeData(data: UnicodeCharacterRange[]): void;
+    function addUnicodeData(data: UnicodeCharacterRange[], typePrefix?: string): void;
 
     /**
      * Builds regexes using named subpatterns, for readability and pattern reuse. Backreferences in
