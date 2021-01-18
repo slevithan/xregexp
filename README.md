@@ -6,15 +6,21 @@ XRegExp provides augmented (and extensible) JavaScript regular expressions. You 
 
 XRegExp supports all native ES6 regular expression syntax. It supports ES5+ browsers, and you can use it with Node.js or as a RequireJS module. Over the years, many of XRegExp's features have been adopted by more recent JavaScript standards (named capturing, Unicode properties/scripts/categories, dotAll mode, sticky matching, etc.), so using XRegExp can be a way to extend these features into older browsers.
 
+## Performance
+
+XRegExp compiles to native `RegExp` objects. Therefore regexes built with XRegExp perform just as fast as native regular expressions. There is a tiny extra cost when compiling a pattern for the first time.
+
+## Named Capture Breaking Change in XRegExp 5
+
 **NOTE:** XRegExp 5 introduced a breaking change where named backreference properties now appear in the result's `groups` object (following ES2018), rather than directly on the result. To restore the old handling so you don't have to update old code, you can run the following line after importing XRegExp:
 
 ```js
 XRegExp.uninstall('namespacing');
 ```
 
-You can also run `XRegExp.install('namespacing')` in XRegExp 4.1.0 and later to introduce the new behavior prior to upgrading to XRegExp 5.
+XRegExp 4.1.0 and later allow introducing the new behavior without upgrading to XRegExp 5 by running `XRegExp.install('namespacing')`.
 
-To update your code for the new behavior, following is the most commonly needed change:
+Following is the most commonly needed change to update code for the new behavior:
 
 ```js
 // Change this
@@ -25,10 +31,6 @@ const name = XRegExp.exec(str, regexWithNamedCapture).groups.name;
 ```
 
 See below for more examples of using named capture with `XRegExp.exec` and `XRegExp.replace`.
-
-## Performance
-
-XRegExp compiles to native `RegExp` objects. Therefore regexes built with XRegExp perform just as fast as native regular expressions. There is a tiny extra cost when compiling a pattern for the first time.
 
 ## Usage examples
 
