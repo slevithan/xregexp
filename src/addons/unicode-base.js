@@ -124,7 +124,7 @@ export default (XRegExp) => {
      */
     XRegExp.addToken(
         // Use `*` instead of `+` to avoid capturing `^` as the token name in `\p{^}`
-        /\\([pP])(?:{(\^?)(?:(Script|sc)=)?([^}]*)}|([A-Za-z]))/,
+        /\\([pP])(?:{(\^?)(?:(\w+)=)?([^}]*)}|([A-Za-z]))/,
         (match, scope, flags) => {
             const ERR_DOUBLE_NEG = 'Invalid double negation ';
             const ERR_UNKNOWN_NAME = 'Unknown Unicode token ';
