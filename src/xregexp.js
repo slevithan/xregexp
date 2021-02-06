@@ -788,7 +788,13 @@ XRegExp.cache.flush = (cacheName) => {
  * XRegExp.escape('Escaped? <.>');
  * // -> 'Escaped\?\ <\.>'
  */
-XRegExp.escape = (str) => String(nullThrows(str)).replace(/[-\[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+XRegExp.escape = (str) => String(nullThrows(str)).replace(/[-\[\]{}()*+?.,\\^$|#\s]/g, (match) => {
+    if (/\s/.test(match)) {
+        // Converting to \uNNNN since whitespace can't be escaped when used with ES6 flag `u`
+        return `\\u${pad4(hex(match.charCodeAt(0)))}`;
+    }
+    return `\\${match}`;
+});
 
 /**
  * Executes a regex search in a specified string. Returns a match array or `null`. If the provided

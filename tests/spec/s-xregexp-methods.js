@@ -219,12 +219,22 @@ describe('XRegExp.cache()', function() {
 
 describe('XRegExp.escape()', function() {
 
-    it('should escape metacharacters', function() {
+    it('should escape standard metacharacters', function() {
         expect(XRegExp.escape('[()*+?.\\^$|')).toBe('\\[\\(\\)\\*\\+\\?\\.\\\\\\^\\$\\|');
     });
 
-    it('should escape context-aware metacharacters', function() {
-        expect(XRegExp.escape(']{}-, \n#')).toBe('\\]\\{\\}\\-\\,\\ \\\n\\#');
+    it('should escape context-sensitive metacharacters, excluding whitespace', function() {
+        expect(XRegExp.escape(']{}-,#')).toBe('\\]\\{\\}\\-\\,\\#');
+    });
+
+    it('should escape context-sensitive whitespace', function() {
+        // Don't want to explicitly check the escape pattern like this since there are multiple
+        // valid representations of escaped whitespace
+        //expect(XRegExp.escape('\t\n\f\r\x20\u2028\u2029')).toBe('\\u0009\\u000a\\u000c\\u000d\\u0020\\u2028\\u2029');
+
+        var whitespace = '\t\n\f\r\x20\u2028\u2029';
+        expect(new RegExp('^' + XRegExp.escape(whitespace) + '$').test(whitespace)).toBe(true);
+        expect(XRegExp.escape(whitespace)).not.toBe(whitespace);
     });
 
     it('should not escape nonmetacharacters', function() {
@@ -232,7 +242,11 @@ describe('XRegExp.escape()', function() {
     });
 
     it('should escape a nonstring pattern after type converting to a string', function() {
-        expect(XRegExp.escape({})).toBe('\\[object\\ Object\\]');
+        // Don't want to explicitly check the escape pattern like this since there are multiple
+        // valid representations of escaped whitespace
+        //expect(XRegExp.escape({})).toBe('\\[object\\ Object\\]');
+
+        expect(new RegExp('^' + XRegExp.escape({}) + '$').test('[object Object]')).toBe(true);
     });
 
     it('should throw an exception when given a null or undefined pattern', function() {
