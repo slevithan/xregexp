@@ -247,14 +247,6 @@ In [Node.js](http://nodejs.org/):
 const XRegExp = require('xregexp');
 ```
 
-In an AMD loader like [RequireJS](http://requirejs.org/):
-
-```js
-require({paths: {xregexp: 'xregexp-all'}}, ['xregexp'], (XRegExp) => {
-    console.log(XRegExp.version);
-});
-```
-
 ## Credits
 
 XRegExp project collaborators are:
