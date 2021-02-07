@@ -180,7 +180,9 @@ export default (XRegExp) => {
                     }
                 }
             } else {
-                throw new Error('Unbalanced delimiter found in string');
+                const delimSide = rightMatch ? 'right' : 'left';
+                const errorPos = rightMatch ? delimStart : outerStart;
+                throw new Error(`Unbalanced ${delimSide} delimiter found in string at position ${errorPos}`);
             }
             // If the delimiter matched an empty string, avoid an infinite loop
             if (delimStart === delimEnd) {

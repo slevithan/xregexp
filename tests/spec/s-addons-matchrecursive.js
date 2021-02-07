@@ -47,6 +47,36 @@ describe('XRegExp.matchRecursive addon:', function() {
             expect(XRegExp.matchRecursive(str, '<', '>', 'gy')).toEqual(['1', '<<2>>', '3']);
         });
 
+        it('should throw for unbalanced left delimiter in first match without flag g', function() {
+            expect(function() {XRegExp.matchRecursive('<', '<', '>');}).toThrow();
+            expect(function() {XRegExp.matchRecursive('<<>', '<', '>');}).toThrow();
+        });
+
+        it('should not throw for unbalanced left delimiter after first match without flag g', function() {
+            expect(function() {XRegExp.matchRecursive('<><', '<', '>');}).not.toThrow();
+        });
+
+        it('should throw for unbalanced left delimiter anywhere in string with flag g', function() {
+            expect(function() {XRegExp.matchRecursive('<', '<', '>', 'g');}).toThrow();
+            expect(function() {XRegExp.matchRecursive('<<>', '<', '>', 'g');}).toThrow();
+            expect(function() {XRegExp.matchRecursive('<><', '<', '>', 'g');}).toThrow();
+            expect(function() {XRegExp.matchRecursive('.<.<>><', '<', '>', 'g');}).toThrow();
+        });
+
+        it('should throw for unbalanced right delimiter in first match without flag g', function() {
+            expect(function() {XRegExp.matchRecursive('>', '<', '>');}).toThrow();
+        });
+
+        it('should not throw for unbalanced right delimiter after first match without flag g', function() {
+            expect(function() {XRegExp.matchRecursive('<>>', '<', '>');}).not.toThrow();
+        });
+
+        it('should throw for unbalanced right delimiter anywhere in string with flag g', function() {
+            expect(function() {XRegExp.matchRecursive('>', '<', '>', 'g');}).toThrow();
+            expect(function() {XRegExp.matchRecursive('<>>', '<', '>', 'g');}).toThrow();
+            expect(function() {XRegExp.matchRecursive('.<.<>>>', '<', '>', 'g');}).toThrow();
+        });
+
         // TODO: Add complete specs
 
     });
