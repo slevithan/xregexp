@@ -111,7 +111,7 @@ export default (XRegExp) => {
                     XRegExp.union([left, right], '', {conjunction: 'or'}).source
                 })[^${escapeChar}])+)+`,
                 // Flags `gy` not needed here
-                flags.replace(/[^imu]+/g, '')
+                flags.replace(XRegExp._hasNativeFlag('s') ? /[^imsu]/g : /[^imu]/g, '')
             );
         }
 
