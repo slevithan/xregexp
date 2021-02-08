@@ -752,7 +752,8 @@ XRegExp.addToken = (regex, handler, options) => {
  * @returns {RegExp} Cached XRegExp object.
  * @example
  *
- * while (match = XRegExp.cache('.', 'gs').exec(str)) {
+ * let match;
+ * while (match = XRegExp.cache('.', 'gs').exec('abc')) {
  *   // The regex is compiled once only
  * }
  */
@@ -778,7 +779,7 @@ XRegExp.cache.flush = (cacheName) => {
 
 /**
  * Escapes any regular expression metacharacters, for use when matching literal strings. The result
- * can safely be used at any point within a regex that uses any flags.
+ * can safely be used at any position within a regex that uses any flags.
  *
  * @memberOf XRegExp
  * @param {String} str String to escape.
@@ -786,7 +787,7 @@ XRegExp.cache.flush = (cacheName) => {
  * @example
  *
  * XRegExp.escape('Escaped? <.>');
- * // -> 'Escaped\?\ <\.>'
+ * // -> 'Escaped\?\u0020<\.>'
  */
 XRegExp.escape = (str) => String(nullThrows(str)).replace(/[-\[\]{}()*+?.,\\^$|#\s]/g, (match) => {
     if (/\s/.test(match)) {
@@ -1071,8 +1072,8 @@ XRegExp.match = (str, regex, scope) => {
  * // -> ['2', '4', '56']
  *
  * // Passing forward and returning specific backreferences
- * html = '<a href="http://xregexp.com/api/">XRegExp</a>\
- *         <a href="http://www.google.com/">Google</a>';
+ * const html = `<a href="http://xregexp.com/api/">XRegExp</a>
+ *               <a href="http://www.google.com/">Google</a>`;
  * XRegExp.matchChain(html, [
  *   {regex: /<a href="([^"]+)">/i, backref: 1},
  *   {regex: XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
@@ -1120,7 +1121,7 @@ XRegExp.matchChain = (str, chain) => (function recurseChain(values, level) {
  * Returns a new string with one or all matches of a pattern replaced. The pattern can be a string
  * or regex, and the replacement can be a string or a function to be called for each match. To
  * perform a global search and replace, use the optional `scope` argument or include flag g if using
- * a regex. Replacement strings can use `${n}` or `$<n>` for named and numbered backreferences.
+ * a regex. Replacement strings can use `$<n>` or `${n}` for named and numbered backreferences.
  * Replacement functions can use named backreferences via the last argument. Also fixes browser bugs
  * compared to the native `String.prototype.replace` and can be used reliably cross-browser.
  *
@@ -1138,7 +1139,7 @@ XRegExp.matchChain = (str, chain) => (function recurseChain(values, level) {
  *     - $<n>, ${n} - Where n is a name or any number of digits that reference an existing capturing
  *       group, inserts backreference n.
  *   Replacement functions are invoked with three or more arguments:
- *     - args[0] - The matched substring (corresponds to `$&`` above). If the `namespacing` feature
+ *     - args[0] - The matched substring (corresponds to `$&` above). If the `namespacing` feature
  *       is off, named backreferences are accessible as properties of this argument.
  *     - args[1..n] - One argument for each backreference (corresponding to `$1`, `$2`, etc. above).
  *       If the regex has no capturing groups, no arguments appear in this position.
@@ -1206,8 +1207,8 @@ XRegExp.replace = (str, search, replacement, scope) => {
  * array of replacement details. Later replacements operate on the output of earlier replacements.
  * Replacement details are accepted as an array with a regex or string to search for, the
  * replacement string or function, and an optional scope of 'one' or 'all'. Uses the XRegExp
- * replacement text syntax, which supports named backreference properties via `${name}` or
- * `$<name>`.
+ * replacement text syntax, which supports named backreference properties via `$<name>` or
+ * `${name}`.
  *
  * @memberOf XRegExp
  * @param {String} str String to search.
@@ -1216,12 +1217,12 @@ XRegExp.replace = (str, search, replacement, scope) => {
  * @example
  *
  * str = XRegExp.replaceEach(str, [
- *   [XRegExp('(?<name>a)'), 'z${name}'],
+ *   [XRegExp('(?<name>a)'), 'z$<name>'],
  *   [/b/gi, 'y'],
  *   [/c/g, 'x', 'one'], // scope 'one' overrides /g
  *   [/d/, 'w', 'all'],  // scope 'all' overrides lack of /g
  *   ['e', 'v', 'all'],  // scope 'all' allows replace-all for strings
- *   [/f/g, ($0) => $0.toUpperCase()]
+ *   [/f/g, (match) => match.toUpperCase()]
  * ]);
  */
 XRegExp.replaceEach = (str, replacements) => {
@@ -1287,8 +1288,8 @@ XRegExp.split = (str, separator, limit) => fixed.split.call(nullThrows(str), sep
 XRegExp.test = (str, regex, pos, sticky) => !!XRegExp.exec(str, regex, pos, sticky);
 
 /**
- * Uninstalls optional features according to the specified options. All optional features start out
- * uninstalled, so this is used to undo the actions of `XRegExp.install`.
+ * Uninstalls optional features according to the specified options. Used to undo the actions of
+ * `XRegExp.install`.
  *
  * @memberOf XRegExp
  * @param {Object|String} options Options object or string.
@@ -1296,7 +1297,7 @@ XRegExp.test = (str, regex, pos, sticky) => !!XRegExp.exec(str, regex, pos, stic
  *
  * // With an options object
  * XRegExp.uninstall({
- *   // Disables support for astral code points in Unicode addons
+ *   // Disables support for astral code points in Unicode addons (unless enabled per regex)
  *   astral: true,
  *
  *   // Don't add named capture groups to the `groups` property of matches

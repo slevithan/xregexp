@@ -29,7 +29,7 @@ export default (XRegExp) => {
      * @param {String} str String to search.
      * @param {String} left Left delimiter as an XRegExp pattern.
      * @param {String} right Right delimiter as an XRegExp pattern.
-     * @param {String} [flags] Any native or XRegExp flags, used for the left and right delimiters.
+     * @param {String} [flags] Any combination of XRegExp flags, used for the left and right delimiters.
      * @param {Object} [options] Lets you specify `valueNames` and `escapeChar` options.
      * @returns {!Array} Array of matches, or an empty array.
      * @example

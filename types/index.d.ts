@@ -534,7 +534,7 @@ declare namespace XRegExp {
      *   minutes: /^[0-5][0-9]$/
      * });
      * time.test('10:59'); // -> true
-     * XRegExp.exec('10:59', time).minutes; // -> '59'
+     * XRegExp.exec('10:59', time).groups.minutes; // -> '59'
      */
     function build(pattern: string, subs: Record<string, Pattern>, flags?: string): RegExp;
 
@@ -547,7 +547,8 @@ declare namespace XRegExp {
      * @returns Cached XRegExp object.
      * @example
      *
-     * while (match = XRegExp.cache('.', 'gs').exec(str)) {
+     * let match;
+     * while (match = XRegExp.cache('.', 'gs').exec('abc')) {
      *   // The regex is compiled once only
      * }
      */
@@ -555,14 +556,14 @@ declare namespace XRegExp {
 
     /**
      * Escapes any regular expression metacharacters, for use when matching literal strings. The result
-     * can safely be used at any point within a regex that uses any flags.
+     * can safely be used at any position within a regex that uses any flags.
      *
      * @param str - String to escape.
      * @returns String with regex metacharacters escaped.
      * @example
      *
      * XRegExp.escape('Escaped? <.>');
-     * // -> 'Escaped\?\ <\.>'
+     * // -> 'Escaped\?\u0020<\.>'
      */
     function escape(str: string): string;
 
@@ -732,8 +733,8 @@ declare namespace XRegExp {
      * // -> ['2', '4', '56']
      *
      * // Passing forward and returning specific backreferences
-     * html = '<a href="http://xregexp.com/api/">XRegExp</a>\
-     *         <a href="http://www.google.com/">Google</a>';
+     * const html = `<a href="http://xregexp.com/api/">XRegExp</a>
+     *               <a href="http://www.google.com/">Google</a>`;
      * XRegExp.matchChain(html, [
      *   {regex: /<a href="([^"]+)">/i, backref: 1},
      *   {regex: XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
@@ -750,7 +751,7 @@ declare namespace XRegExp {
      * @param str - String to search.
      * @param left - Left delimiter as an XRegExp pattern.
      * @param right - Right delimiter as an XRegExp pattern.
-     * @param flags - Any native or XRegExp flags, used for the left and right delimiters.
+     * @param flags - Any combination of XRegExp flags, used for the left and right delimiters.
      * @param options - Lets you specify `valueNames` and `escapeChar` options.
      * @returns Array of matches, or an empty array.
      * @example
@@ -799,7 +800,7 @@ declare namespace XRegExp {
      * Returns a new string with one or all matches of a pattern replaced. The pattern can be a string
      * or regex, and the replacement can be a string or a function to be called for each match. To
      * perform a global search and replace, use the optional `scope` argument or include flag g if using
-     * a regex. Replacement strings can use `${n}` or `$<n>` for named and numbered backreferences.
+     * a regex. Replacement strings can use `$<n>` or `${n}` for named and numbered backreferences.
      * Replacement functions can use named backreferences via the last argument. Also fixes browser bugs
      * compared to the native `String.prototype.replace` and can be used reliably cross-browser.
      *
@@ -834,8 +835,8 @@ declare namespace XRegExp {
      * array of replacement details. Later replacements operate on the output of earlier replacements.
      * Replacement details are accepted as an array with a regex or string to search for, the
      * replacement string or function, and an optional scope of 'one' or 'all'. Uses the XRegExp
-     * replacement text syntax, which supports named backreference properties via `${name}` or
-     * `$<name>`.
+     * replacement text syntax, which supports named backreference properties via `$<name>` or
+     * `${name}`.
      *
      * @param str - String to search.
      * @param replacements - Array of replacement detail arrays.
@@ -843,12 +844,12 @@ declare namespace XRegExp {
      * @example
      *
      * str = XRegExp.replaceEach(str, [
-     *   [XRegExp('(?<name>a)'), 'z${name}'],
+     *   [XRegExp('(?<name>a)'), 'z$<name>'],
      *   [/b/gi, 'y'],
      *   [/c/g, 'x', 'one'], // scope 'one' overrides /g
      *   [/d/, 'w', 'all'],  // scope 'all' overrides lack of /g
      *   ['e', 'v', 'all'],  // scope 'all' allows replace-all for strings
-     *   [/f/g, ($0) => $0.toUpperCase()]
+     *   [/f/g, (match) => match.toUpperCase()]
      * ]);
      */
     function replaceEach(str: string, replacements: ReplacementDetail[]): string;
@@ -894,14 +895,17 @@ declare namespace XRegExp {
      * @returns Handler for template literals that construct regexes with XRegExp syntax.
      * @example
      *
-     * const h12 = /1[0-2]|0?[1-9]/;
-     * const h24 = /2[0-3]|[01][0-9]/;
-     * const hours = XRegExp.tag('x')`${h12} : | ${h24}`;
-     * const minutes = /^[0-5][0-9]$/;
-     * // Note that explicitly naming the 'minutes' group is required for named backreferences
-     * const time = XRegExp.tag('x')`^ ${hours} (?<minutes>${minutes}) $`;
+     * XRegExp.tag()`\b\w+\b`.test('word'); // -> true
+     *
+     * const hours = /1[0-2]|0?[1-9]/;
+     * const minutes = /(?<minutes>[0-5][0-9])/;
+     * const time = XRegExp.tag('x')`\b ${hours} : ${minutes} \b`;
      * time.test('10:59'); // -> true
-     * XRegExp.exec('10:59', time).minutes; // -> '59'
+     * XRegExp.exec('10:59', time).groups.minutes; // -> '59'
+     *
+     * const backref1 = /(a)\1/;
+     * const backref2 = /(b)\1/;
+     * XRegExp.tag()`${backref1}${backref2}`.test('aabb'); // -> true
      */
     function tag(flags?: string | null): (literals: TemplateStringsArray, ...substitutions: any[]) => RegExp;
 
@@ -930,15 +934,15 @@ declare namespace XRegExp {
     function test(str: string, regex: Pattern, pos?: number, sticky?: boolean | 'sticky'): boolean;
 
     /**
-     * Uninstalls optional features according to the specified options. All optional features start out
-     * uninstalled, so this is used to undo the actions of `XRegExp.install`.
+     * Uninstalls optional features according to the specified options. Used to undo the actions of
+     * `XRegExp.install`.
      *
      * @param options - Options object or string.
      * @example
      *
      * // With an options object
      * XRegExp.uninstall({
-     *   // Disables support for astral code points in Unicode addons
+     *   // Disables support for astral code points in Unicode addons (unless enabled per regex)
      *   astral: true,
      *
      *   // Don't add named capture groups to the `groups` property of matches

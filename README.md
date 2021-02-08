@@ -115,11 +115,13 @@ Then you can do this:
 
 ```js
 // Test some Unicode scripts
+// Can also use the Script= prefix to match ES2018: \p{Script=Hiragana}
 XRegExp('^\\p{Hiragana}+$').test('ひらがな'); // -> true
 XRegExp('^[\\p{Latin}\\p{Common}]+$').test('Über Café.'); // -> true
 
-// Test the Unicode categories L (Letter) and M (Mark)
-const unicodeWord = XRegExp.tag()`^\pL[\pL\pM]*$`;
+// Test the Unicode categories Letter and Mark
+// Can also use the short names \p{L} and \p{M}
+const unicodeWord = XRegExp.tag()`^\p{Letter}[\p{Letter}\p{Mark}]*$`;
 unicodeWord.test('Русский'); // -> true
 unicodeWord.test('日本語'); // -> true
 unicodeWord.test('العربية'); // -> true
@@ -129,15 +131,14 @@ By default, `\p{…}` and `\P{…}` support the Basic Multilingual Plane (i.e. c
 
 ```js
 // Using flag A to match astral code points
-XRegExp('^\\pS$').test('💩'); // -> false
-XRegExp('^\\pS$', 'A').test('💩'); // -> true
-XRegExp('(?A)^\\pS$').test('💩'); // -> true
+XRegExp('^\\p{S}$').test('💩'); // -> false
+XRegExp('^\\p{S}$', 'A').test('💩'); // -> true
 // Using surrogate pair U+D83D U+DCA9 to represent U+1F4A9 (pile of poo)
-XRegExp('(?A)^\\pS$').test('\uD83D\uDCA9'); // -> true
+XRegExp('^\\p{S}$', 'A').test('\uD83D\uDCA9'); // -> true
 
 // Implicit flag A
 XRegExp.install('astral');
-XRegExp('^\\pS$').test('💩'); // -> true
+XRegExp('^\\p{S}$').test('💩'); // -> true
 ```
 
 Opting in to astral mode disables the use of `\p{…}` and `\P{…}` within character classes. In astral mode, use e.g. `(\pL|[0-9_])+` instead of `[\pL0-9_]+`.
@@ -168,21 +169,20 @@ Named subpatterns can be provided as strings or regex objects. A leading `^` and
 Provides tagged template literals that create regexes with XRegExp syntax and flags:
 
 ```js
-XRegExp.match('word', XRegExp.tag()`\w\b`);
-// -> 'd'
+XRegExp.tag()`\b\w+\b`.test('word'); // -> true
 
-const h12 = /1[0-2]|0?[1-9]/;
-const h24 = /2[0-3]|[01][0-9]/;
-const hours = XRegExp.tag('x')`${h12} : | ${h24}`;
-const minutes = /^[0-5][0-9]$/;
-// Note that explicitly naming the 'minutes' group is required for named backreferences
-const time = XRegExp.tag('x')`^ ${hours} (?<minutes>${minutes}) $`;
-
+const hours = /1[0-2]|0?[1-9]/;
+const minutes = /(?<minutes>[0-5][0-9])/;
+const time = XRegExp.tag('x')`\b ${hours} : ${minutes} \b`;
 time.test('10:59'); // -> true
 XRegExp.exec('10:59', time).groups.minutes; // -> '59'
+
+const backref1 = /(a)\1/;
+const backref2 = /(b)\1/;
+XRegExp.tag()`${backref1}${backref2}`.test('aabb'); // -> true
 ```
 
-`XRegExp.tag` does more than just basic interpolation. For starters, you get all the XRegExp syntax and flags. Even better, since `XRegExp.tag` uses your pattern as a raw string, you no longer need to escape all your backslashes. And since it relies on `XRegExp.build` under the hood, you get all of its extras for free. Leading `^` and trailing unescaped `$` are stripped from interpolated patterns if both are present (to allow embedding independently useful anchored regexes), interpolating into a character class is an error (to avoid unintended meaning in edge cases), interpolated patterns are treated as atomic units when quantified, interpolated strings have their special characters escaped, and any backreferences within an interpolated regex are rewritten to work within the overall pattern.
+`XRegExp.tag` does more than just interpolation. You get all the XRegExp syntax and flags, and since it reads patterns as raw strings, you no longer need to escape all your backslashes. `XRegExp.tag` also uses `XRegExp.build` under the hood, so you get all of its extras for free. Leading `^` and trailing unescaped `$` are stripped from interpolated patterns if both are present (to allow embedding independently useful anchored regexes), interpolating into a character class is an error (to avoid unintended meaning in edge cases), interpolated patterns are treated as atomic units when quantified, interpolated strings have their special characters escaped, and any backreferences within an interpolated regex are rewritten to work within the overall pattern.
 
 ### XRegExp.matchRecursive
 

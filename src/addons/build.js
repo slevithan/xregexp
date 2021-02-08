@@ -87,14 +87,17 @@ export default (XRegExp) => {
      * @returns {Function} Handler for template literals that construct regexes with XRegExp syntax.
      * @example
      *
-     * const h12 = /1[0-2]|0?[1-9]/;
-     * const h24 = /2[0-3]|[01][0-9]/;
-     * const hours = XRegExp.tag('x')`${h12} : | ${h24}`;
-     * const minutes = /^[0-5][0-9]$/;
-     * // Note that explicitly naming the 'minutes' group is required for named backreferences
-     * const time = XRegExp.tag('x')`^ ${hours} (?<minutes>${minutes}) $`;
+     * XRegExp.tag()`\b\w+\b`.test('word'); // -> true
+     *
+     * const hours = /1[0-2]|0?[1-9]/;
+     * const minutes = /(?<minutes>[0-5][0-9])/;
+     * const time = XRegExp.tag('x')`\b ${hours} : ${minutes} \b`;
      * time.test('10:59'); // -> true
-     * XRegExp.exec('10:59', time).minutes; // -> '59'
+     * XRegExp.exec('10:59', time).groups.minutes; // -> '59'
+     *
+     * const backref1 = /(a)\1/;
+     * const backref2 = /(b)\1/;
+     * XRegExp.tag()`${backref1}${backref2}`.test('aabb'); // -> true
      */
     XRegExp.tag = (flags) => (literals, ...substitutions) => {
         const subpatterns = substitutions.map(interpolate).reduce(reduceToSubpatternsObject, {});
@@ -125,7 +128,7 @@ export default (XRegExp) => {
      *   minutes: /^[0-5][0-9]$/
      * });
      * time.test('10:59'); // -> true
-     * XRegExp.exec('10:59', time).minutes; // -> '59'
+     * XRegExp.exec('10:59', time).groups.minutes; // -> '59'
      */
     XRegExp.build = (pattern, subs, flags) => {
         flags = flags || '';
