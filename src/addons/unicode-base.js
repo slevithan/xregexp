@@ -15,7 +15,7 @@ export default (XRegExp) => {
      * - Adds the `XRegExp.addUnicodeData` method used by other addons to provide character data.
      *
      * Unicode Base relies on externally provided Unicode character data. Official addons are
-     * available to provide data for Unicode categories, scripts, blocks, and properties.
+     * available to provide data for Unicode categories, scripts, and properties.
      *
      * @requires XRegExp
      */
