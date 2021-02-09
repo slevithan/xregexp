@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>XRegExp</title>
+	<link href="./assets/index.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="header">
+	<h1><a href="./index.html"><span id="logoX">X</span>RegExp</a></h1>
+	<h1 class="subtitle">The one of a kind JavaScript regular expression library</h1>
+</div>
+<div id="body">
+	<div id="navBar">
+		<div class="menu">
+			<ul>
+				<li><a href="./index.html" class="selected">Home</a></li>
+				<li><a href="./api/index.html">API</a></li>
+				<li><a href="./syntax/index.html">New syntax</a></li>
+				<li><a href="./flags/index.html">New flags</a></li>
+				<li><a href="./unicode/index.html">Unicode</a></li>
+			</ul>
+		</div>
+	</div>
+	<div id="main">
+
+
+
+
+
+    <div id="tocContainer">
+      <div id="toc">
+        <ul style="margin-bottom:5px;">
+          <li><a href="#what">What is it?</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#performance">Performance</a></li>
+          <li><a href="#installation">Installation and usage</a></li>
+          <li><a href="#v5-breaking">v5 breaking change</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <h2 id="what">What is it?</h2>
+
+    <p>XRegExp provides augmented (and extensible) JavaScript regular expressions. You get modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your grepping and parsing easier, while freeing you from regex cross-browser inconsistencies and other annoyances.</p>
+
+    <p>XRegExp supports all native ES6 regular expression syntax. It supports ES5+ browsers (including Internet Explorer 9+), and you can use it with Node.js or as a RequireJS module. Over the years, many of XRegExp's features have been adopted by new JavaScript standards (named capturing, Unicode properties/scripts/categories, flag <code>s</code>, sticky matching, etc.), so using XRegExp can be a way to extend these features into older browsers. It's released under the <a href="http://mit-license.org/">MIT License</a>.</p>
+
+    <p><strong>XRegExp lets you write regexes like this:</strong></p>
+
+<pre class="sh_javascript">// Using named capture and flag x (free-spacing and line comments)
+const date = XRegExp(`(?&lt;year>  [0-9]{4} ) -?  # year
+                      (?&lt;month> [0-9]{2} ) -?  # month
+                      (?&lt;day>   [0-9]{2} )     # day`, 'x');
+</pre>
+
+    <p><strong>And do cool stuff like this:</strong></p>
+
+<pre class="sh_javascript">// Using named backreferences...
+XRegExp.exec('2021-02-23', date).groups.year;
+// -> '2021'
+XRegExp.replace('2021-02-23', date, '$&lt;month&gt;/$&lt;day&gt;/$&lt;year&gt;');
+// -> '02/23/2021'
+
+// Finding matches within matches, while passing forward and returning specific backreferences
+const html = `&lt;a href="http://xregexp.com/api/">XRegExp&lt;/a>
+              &lt;a href="http://www.google.com/">Google&lt;/a>`;
+XRegExp.matchChain(html, [
+  {regex: /&lt;a href="([^"]+)">/i, backref: 1},
+  {regex: XRegExp('(?i)^https?://(?&lt;domain>[^/?#]+)'), backref: 'domain'}
+]);
+// -> ['xregexp.com', 'www.google.com']
+</pre>
+
+    <p><strong>Check out more <a href="https://github.com/slevithan/xregexp/blob/master/README.md#usage-examples">usage examples on GitHub &#x21E8;</a>.</strong></p>
+
+    <h2 id="features">Features</h2>
+
+    <ul>
+    	<li>Adds <a href="./syntax/index.html"><strong>new regex and replacement text syntax</strong></a>, including comprehensive support for <a href="./syntax/index.html#namedCapture"><strong>named capture</strong></a>.</li>
+    	<li>Adds <a href="./flags/index.html"><strong>new regex flags</strong></a>: <code>s</code>, to make <a href="./flags/index.html#singleline"><strong>dot match all</strong></a> characters; <code>x</code>, for <a href="./flags/index.html#extended"><strong>free-spacing</strong></a> and line comments; <code>n</code>, for <a href="./flags/index.html#explicitCapture"><strong>explicit capture</strong></a> mode; and <code>A</code>, for <a href="./flags/index.html#astral"><strong>astral</strong></a> mode (full 21-bit Unicode matching).</li>
+    	<li>Provides a <a href="./api/index.html"><strong>suite of functions</strong></a> that make complex regex processing easier.</li>
+    	<li>Supports addons that add even more new regex syntax, flags, and methods. Offical addons support <a href="./unicode/index.html"><strong>Unicode</strong></a>, <a href="./api/index.html#matchRecursive"><strong>recursive matching</strong></a>, and <a href="./api/index.html#build"><strong>grammatical patterns</strong></a>.</li>
+    </ul>
+
+    <h2 id="performance">Performance</h2>
+
+    <p>XRegExp compiles to native <code>RegExp</code> objects. Therefore regexes built with XRegExp perform just as fast as native regular expressions. There is a tiny extra cost when compiling a pattern for the first time.</p>
+
+    <h2 id="installation">Installation and usage</h2>
+
+    <p>In browsers (bundle XRegExp with all of its addons):</p>
+
+<pre class="sh_html">&lt;script src="https://unpkg.com/xregexp/xregexp-all.js">&lt;/script>
+</pre>
+
+    <p>Using <a href="http://npmjs.org/">npm</a>:</p>
+
+<pre class="sh_html">npm install xregexp
+</pre>
+
+    <p>In <a href="http://nodejs.org/">Node.js</a>:</p>
+
+<pre class="sh_javascript">const XRegExp = require('xregexp');
+</pre>
+
+    <h2 id="v5-breaking">Named Capture Breaking Change in XRegExp 5</h2>
+
+    <p>XRegExp 5 introduced a breaking change where named backreference properties now appear on the result's <code>groups</code> object (following ES2018), rather than directly on the result. To restore the old handling so you don't need to update old code, run the following line after importing XRegExp:</p>
+
+<pre class="sh_javascript">XRegExp.uninstall('namespacing');
+</pre>
+
+    <p>XRegExp 4.1.0 and later allow introducing the new behavior without upgrading to XRegExp 5 by running <code>XRegExp.install('namespacing')</code>.</p>
+
+    <p>Following is the most commonly needed change to update code for the new behavior:</p>
+
+<pre class="sh_javascript">// Change this
+const name = XRegExp.exec(str, regexWithNamedCapture).name;
+
+// To this
+const name = XRegExp.exec(str, regexWithNamedCapture).groups.name;
+</pre>
+
+    <p>See <a href="https://github.com/slevithan/xregexp/blob/master/README.md#usage-examples">the README on GitHub &#x21E8;</a> for more examples of using named capture with <code>XRegExp.exec</code> and <code>XRegExp.replace</code>.</p>
+
+
+
+
+
+	</div>
+</div>
+<div id="footer">
+	<p>&copy; <a href="http://stevenlevithan.com">Steven Levithan</a> :: <a href="https://github.com/slevithan/xregexp">GitHub</a> :: <a href="http://xregexp.com/">XRegExp.com</a></p>
+</div>
+</body>
+</html>

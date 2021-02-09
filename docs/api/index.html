@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>API :: XRegExp</title>
+  <link href="../assets/index.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="header">
+  <h1><a href="../index.html"><span id="logoX">X</span>RegExp</a></h1>
+  <h1 class="subtitle">The one of a kind JavaScript regular expression library</h1>
+</div>
+<div id="body">
+  <div id="navBar">
+    <div class="menu">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../api/index.html" class="selected">API</a></li>
+        <li><a href="../syntax/index.html">New syntax</a></li>
+        <li><a href="../flags/index.html">New flags</a></li>
+        <li><a href="../unicode/index.html">Unicode</a></li>
+      </ul>
+    </div>
+  </div>
+  <div id="main">
+
+
+
+
+
+    <div id="tocContainer" style="width: 250px;">
+      <div id="toc">
+        <h2>Table of contents</h2>
+        <ul>
+          <li><a href="#XRegExp">XRegExp</a></li>
+          <li><a href="#addToken">XRegExp.addToken</a></li>
+          <li><a href="#build">XRegExp.build</a></li>
+          <li><a href="#cache">XRegExp.cache</a></li>
+          <li><a href="#escape">XRegExp.escape</a></li>
+          <li><a href="#exec">XRegExp.exec</a></li>
+          <li><a href="#forEach">XRegExp.forEach</a></li>
+          <li><a href="#globalize">XRegExp.globalize</a></li>
+          <li><a href="#install">XRegExp.install</a></li>
+          <li><a href="#isInstalled">XRegExp.isInstalled</a></li>
+          <li><a href="#isRegExp">XRegExp.isRegExp</a></li>
+          <li><a href="#match">XRegExp.match</a></li>
+          <li><a href="#matchChain">XRegExp.matchChain</a></li>
+          <li><a href="#matchRecursive">XRegExp.matchRecursive</a></li>
+          <li><a href="#replace">XRegExp.replace</a></li>
+          <li><a href="#replaceEach">XRegExp.replaceEach</a></li>
+          <li><a href="#split">XRegExp.split</a></li>
+          <li><a href="#tag">XRegExp.tag</a></li>
+          <li><a href="#test">XRegExp.test</a></li>
+          <li><a href="#uninstall">XRegExp.uninstall</a></li>
+          <li><a href="#union">XRegExp.union</a></li>
+          <li><a href="#version">XRegExp.version</a></li>
+        </ul>
+        <h3>XRegExp instance properties</h3>
+        <ul>
+          <li><a href="#dot-source">&lt;regexp>.xregexp.source</a></li>
+          <li><a href="#dot-flags">&lt;regexp>.xregexp.flags</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <h1>API</h1>
+
+    <h2 id="XRegExp"><code>XRegExp(<span class="plain">pattern, [flags]</span>)</code></h2>
+
+    <p>Creates an extended regular expression object for matching text with a pattern. Differs from a
+    native regular expression in that additional syntax and flags are supported. The returned object
+    is in fact a native <code>RegExp</code> and works with all native methods.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td>
+            <ul>
+              <li><code>pattern</code> {<code>String</code>|<code>RegExp</code>}<br/>
+                Regex pattern string, or an existing regex object to copy.
+              </li>
+              <li>[<code>flags</code>] {<code>String</code>}<br/>
+                Any combination of flags.<br/>
+                Native flags:
+                <ul>
+                  <li><code>g</code> - global</li>
+                  <li><code>i</code> - ignore case</li>
+                  <li><code>m</code> - multiline anchors</li>
+                  <li><code>u</code> - unicode (ES6)</li>
+                  <li><code>y</code> - sticky (Firefox 3+, ES6)</li>
+                </ul>
+                Additional XRegExp flags:
+                <ul>
+                  <li><code>n</code> - explicit capture</li>
+                  <li><code>s</code> - dot matches all (aka singleline) - works even when not natively supported</li>
+                  <li><code>x</code> - free-spacing and line comments (aka extended)</li>
+                  <li><code>A</code> - astral (requires the Unicode Base addon)</li>
+                </ul>
+                Flags cannot be provided when constructing one <code>RegExp</code> from another.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>RegExp</code>}<br/>
+            Extended regular expression object.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">// With named capture and flag x
+XRegExp(`(?&lt;year>  [0-9]{4} ) [-\\s]?  # year
+         (?&lt;month> [0-9]{2} ) [-\\s]?  # month
+         (?&lt;day>   [0-9]{2} )          # day`, 'x');
+
+// Providing a regex object copies it. Native regexes are recompiled using native (not
+// XRegExp) syntax. Copies maintain extended data, are augmented with `XRegExp.prototype`
+// properties, and have fresh `lastIndex` properties (set to zero).
+XRegExp(/regex/);
+</pre>
+
+    <p>For details about the regular expression just shown, see <a href="../syntax/index.html#namedCapture">Syntax: Named capture</a> and <a href="../flags/index.html#extended">Flags: Free-spacing</a>.</p>
+
+    <h3>Regexes, strings, and backslashes</h3>
+    <p>JavaScript string literals (as opposed to, e.g., user input or text extracted from the DOM) use a backslash as an escape character. The string literal <code>'\\'</code> therefore contains a single backslash, and its <code>length</code> property's value is <code>1</code>. However, a backslash is also an escape character in regular expression syntax, where the pattern <code>\\</code> matches a single backslash. When providing string literals to the <code>RegExp</code> or <code>XRegExp</code> constructor functions, four backslashes are therefore needed to match a single backslash&mdash;e.g., <code>XRegExp('\\\\')</code>. Only two of those backslashes are actually passed into the constructor function. The other two are used to escape the backslashes in the string before the function ever sees the string. The exception is when using ES6 raw strings via <code>String.raw</code> or <code>XRegExp.tag</code>.</p>
+
+    <p>The same issue is at play with the <code>\\s</code> sequences in the example code just shown. <code>XRegExp</code> is provided with the two characters <code>\s</code>, which it in turn recognizes as the metasequence used to match a whitespace character. <!--<code>\n</code> (used at the end of the first two lines) is another metasequence in JavaScript string literals and inserts actual line feed characters into the string, which terminate the <a href="../flags/index.html#extended">free-spacing mode</a> line comments that start with <code>#</code>. The backslashes at the very end of the first two lines allow the string to continue to the next line, which avoids the need to concatenate multiple strings when extending a string beyond one line of code. These line feed characters are not needed when using ES6 backtick (<code>`</code>) delimited strings.--></p>
+
+
+    <h2 id="addToken"><code>XRegExp.addToken(<span class="plain">regex, handler, [options]</span>)</code></h2>
+    <p>Extends XRegExp syntax and allows custom flags. This is used internally and can be used to create XRegExp addons. If more than one token can match the same string, the last added wins.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>regex</code> {<code>RegExp</code>}<br/>
+                Regex object that matches the new token.
+              </li>
+              <li><code>handler</code> {<code>Function</code>}<br/>
+                Function that returns a new pattern string (using native regex syntax)
+                to replace the matched token within all future XRegExp regexes. Has access to persistent
+                properties of the regex being built, through <code>this</code>. Invoked with three arguments:
+                <ol>
+                  <li>The match array, with named backreference properties.</li>
+                  <li>The regex scope where the match was found: <code>'default'</code> or <code>'class'</code>.</li>
+                  <li>The flags used by the regex, including any flags in a leading mode modifier.</li>
+                </ol>
+                The handler function becomes part of the XRegExp construction process, so be careful not to
+                construct XRegExps within the function or you will trigger infinite recursion.
+              </li>
+              <li>[<code>options</code>] {<code>Object</code>}<br/>
+                Options object with optional properties:
+                <ul>
+                  <li><code>scope</code> {<code>String</code>} Scopes where the token applies: <code>'default'</code>, <code>'class'</code>, or <code>'all'</code>.</li>
+                  <li><code>flag</code> {<code>String</code>} Single-character flag that triggers the token. This also registers the
+                    flag, which prevents XRegExp from throwing an 'unknown flag' error when the flag is used.</li>
+                  <li><code>optionalFlags</code> {<code>String</code>} Any custom flags checked for within the token <code>handler</code> that are
+                    not required to trigger the token. This registers the flags, to prevent XRegExp from
+                    throwing an 'unknown flag' error when any of the flags are used.</li>
+                  <li><code>reparse</code> {<code>Boolean</code>} Whether the <code>handler</code> function's output should not be treated as
+                    final, and instead be reparseable by other tokens (including the current token). Allows
+                    token chaining or deferring.</li>
+                  <li><code>leadChar</code> {<code>String</code>} Single character that occurs at the beginning of any successful match
+                    of the token (not always applicable). This doesn't change the behavior of the token unless
+                    you provide an erroneous value. However, providing it can increase the token's performance
+                    since the token can be skipped at any positions where this character doesn't appear.</li>
+                </ul>
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>undefined</code>}<br/>
+            Does not return a value.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">// Basic usage: Add \a for the ALERT control code
+XRegExp.addToken(
+  /\\a/,
+  () => '\\x07',
+  {scope: 'all'}
+);
+XRegExp('\\a[\\a-\\n]+').test('\x07\n\x07'); // -> true
+</pre>
+
+    <p><strong><a href="#" onclick="document.getElementById('more_eg_addtoken').style.display='block'; this.style.display='none'; return false;">Show more <code>XRegExp.addToken</code> examples. &darr;</a></strong></p>
+
+<pre id="more_eg_addtoken" style="display:none;" class="sh_javascript">// Add escape sequences: \Q..\E and \Q..
+XRegExp.addToken(
+  /\\Q([\s\S]*?)(?:\\E|$)/,
+  (match) => XRegExp.escape(match[1]),
+  {scope: 'all'}
+);
+XRegExp('^\\Q(?*+)').test('(?*+)'); // -> true
+
+// Add the U (ungreedy) flag from PCRE and RE2, which reverses greedy and lazy quantifiers.
+// Since `scope` is not specified, it uses 'default' (i.e., transformations apply outside of
+// character classes only)
+XRegExp.addToken(
+  /([?*+]|{\d+(?:,\d*)?})(\??)/,
+  (match) => match[1] + (match[2] ? '' : '?'),
+  {flag: 'U'}
+);
+XRegExp('a+', 'U').exec('aaa')[0]; // -> 'a'
+XRegExp('a+?', 'U').exec('aaa')[0]; // -> 'aaa'
+
+// Add \R for matching any line separator (CRLF, CR, LF, etc.)
+XRegExp.addToken(
+  /\\R/,
+  () => '(?:\\r\\n|[\\n-\\r\\x85\\u2028\\u2029])'
+);
+
+// Add Ruby/Oniguruma's \h for hexadecimal digits, and \H for the inverse
+XRegExp.addToken(
+  /\\([hH])/,
+  (match, scope) => {
+    const inv = (match[1] === 'H'); // Uppercase for inverted
+    if (scope === 'class') {
+      return inv ? '\\0-/:-@G-`g-\\uffff' : '0-9A-Fa-f';
+    }
+    return '[' + (inv ? '^' : '') + '0-9A-Fa-f]';
+  },
+  {scope: 'all'}
+);
+
+// Add POSIX character classes like [[:alpha:]] (ASCII-only)
+XRegExp.addToken(
+  /\[:([a-z\d]+):]/i,
+  (function() {
+    const posix = {
+      alnum : 'A-Za-z0-9',
+      alpha : 'A-Za-z',
+      ascii : '\\0-\\x7F',
+      blank : ' \\t',
+      cntrl : '\\0-\\x1F\\x7F',
+      digit : '0-9',
+      graph : '\\x21-\\x7E',
+      lower : 'a-z',
+      print : '\\x20-\\x7E',
+      punct : '!"#$%& \'()*+,\\-./:;<=>?@[\\\\\\]^_`{|}~',
+      space : ' \\t\\r\\n\\v\\f',
+      upper : 'A-Z',
+      word  : 'A-Za-z0-9_',
+      xdigit: 'A-Fa-f0-9'
+    };
+    return (match) => {
+      if (!posix[match[1]]) {
+        throw new SyntaxError(match[1] + ' is not a valid POSIX character class');
+      }
+      return posix[match[1]];
+    };
+  }()),
+  {scope: 'class'}
+);
+XRegExp('^[[:xdigit:][:space:]]+$').test('00A9 1B7F'); // -> true
+</pre>
+
+
+    <h2 id="build"><code>XRegExp.build(<span class="plain">pattern, subs, [flags]</span>)</code></h2>
+
+    <p><strong>Requires the XRegExp.build addon</strong>, which is bundled in <code>xregexp-all.js</code>.</p>
+
+    <p>Builds regexes using named subpatterns, for readability and pattern reuse. Backreferences in the
+    outer pattern and provided subpatterns are automatically renumbered to work correctly. Native
+    flags used by provided subpatterns are ignored in favor of the <code>flags</code> argument.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>pattern</code> {<code>String</code>}<br/>
+                XRegExp pattern using <code>{{name}}</code> for embedded subpatterns. Allows <code>({{name}})</code> as shorthand for <code>(?&lt;name>{{name}})</code>. Patterns cannot be embedded within character classes.
+              </li>
+              <li><code>subs</code> {<code>Object</code>}<br/>
+                Lookup object for named subpatterns. Values can be strings or regexes. A leading <code>^</code> and trailing unescaped <code>$</code> are stripped from subpatterns, if both are present.
+              </li>
+              <li>[<code>flags</code>] {<code>String</code>}<br/>
+                Any combination of XRegExp flags.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td><ul>
+              <li>{<code>RegExp</code>}<br/>
+                Regex with interpolated subpatterns.
+              </li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">const time = XRegExp.build('(?x)^ {{hours}} ({{minutes}}) $', {
+  hours: XRegExp.build('{{h12}} : | {{h24}}', {
+    h12: /1[0-2]|0?[1-9]/,
+    h24: /2[0-3]|[01][0-9]/
+  }, 'x'),
+  minutes: /^[0-5][0-9]$/
+});
+
+time.test('10:59'); // -> true
+XRegExp.exec('10:59', time).groups.minutes; // -> '59'
+</pre>
+
+    <p>See also: <em><a href="http://blog.stevenlevithan.com/archives/grammatical-patterns-xregexp-build">Creating Grammatical Regexes Using XRegExp.build</a></em>.</p>
+
+
+    <h2 id="cache"><code>XRegExp.cache(<span class="plain">pattern, [flags]</span>)</code></h2>
+
+    <p>Caches and returns the result of calling <code>XRegExp(pattern, flags)</code>. On any subsequent call with
+    the same pattern and flag combination, the cached copy of the regex is returned.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>pattern</code> {<code>String</code>}<br/>
+                Regex pattern string.
+              </li>
+              <li>[<code>flags</code>] {<code>String</code>}<br/>
+                Any combination of XRegExp flags.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>RegExp</code>}<br/>
+            Cached XRegExp object.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">let match;
+while (match = XRegExp.cache('.', 'gs').exec('abc')) {
+  // The regex is compiled once only
+}
+
+const regex1 = XRegExp.cache('.', 's'),
+const regex2 = XRegExp.cache('.', 's');
+// regex1 and regex2 are references to the same regex object
+</pre>
+
+
+    <h2 id="escape"><code>XRegExp.escape(<span class="plain">str</span>)</code></h2>
+
+    <p>Escapes any regular expression metacharacters, for use when matching literal strings. The result
+    can safely be used at any position within a regex that uses any flags.</p>
+
+    <p>The escaped characters are <code>[</code>, <code>]</code>, <code>{</code>, <code>}</code>, <code>(</code>, <code>)</code>, <code>-</code>, <code>*</code>, <code>+</code>, <code>?</code>, <code>.</code>, <code>\</code>, <code>^</code>, <code>$</code>, <code>|</code>, <code>,</code>, <code>#</code>, and <em>whitespace</em> (see <a href="../flags/index.html#extended">free-spacing</a> for the list of whitespace characters).</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>str</code> {<code>String</code>}<br/>
+                String to escape.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>String</code>}<br/>
+            String with regex metacharacters escaped.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">XRegExp.escape('Escaped? &lt;.>');
+// -> 'Escaped\?\u0020&lt;\.>'
+</pre>
+
+
+    <h2 id="exec"><code>XRegExp.exec(<span class="plain">str, regex, [pos], [sticky]</span>)</code></h2>
+
+    <p>Executes a regex search in a specified string. Returns a match array or <code>null</code>. If the provided
+    regex uses named capture, named capture properties are included on the match array's <code>groups</code>
+    property. Optional <code>pos</code> and <code>sticky</code> arguments specify the search start position, and whether
+    the match must start at the specified position only. The <code>lastIndex</code> property of the provided
+    regex is not used, but is updated for compatibility. Also fixes browser bugs compared to the
+    native <code>RegExp.prototype.exec</code> and can be used reliably cross-browser.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>str</code> {<code>String</code>}<br/>
+                String to search.
+              </li>
+              <li><code>regex</code> {<code>RegExp</code>}<br/>
+                Regex to search with.
+              </li>
+              <li>[<code>pos</code>=<code>0</code>] {<code>Number</code>}<br/>
+                Zero-based index at which to start the search.
+              </li>
+              <li>[<code>sticky</code>=<code>false</code>] {<code>Boolean</code>|<code>String</code>}<br/>
+                Whether the match must start at the specified position only. The string <code>'sticky'</code> is accepted as an alternative to <code>true</code>.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>Array</code>}<br/>
+            Match array with named capture properties on the <code>groups</code> object, or <code>null</code>. If the <code>namespacing</code> feature is off, named capture properties are directly on the match array.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">// Basic use, with named backreference
+let match = XRegExp.exec('U+2620', XRegExp('U\\+(?<hex>[0-9A-F]{4})'));
+match.groups.hex; // -> '2620'
+
+// With pos and sticky, in a loop
+let pos = 2, result = [], match;
+while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d)>/, pos, 'sticky')) {
+  result.push(match[1]);
+  pos = match.index + match[0].length;
+}
+// result -> ['2', '3', '4']
+</pre>
+
+
+    <h2 id="forEach"><code>XRegExp.forEach(<span class="plain">str, regex, callback</span>)</code></h2>
+
+    <p>Executes a provided function once per regex match. Searches always start at the beginning of the string and continue until the end, regardless of the state of the regex's <code>global</code> property and initial <code>lastIndex</code>.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>str</code> {<code>String</code>}<br/>
+                String to search.
+              </li>
+              <li><code>regex</code> {<code>RegExp</code>}<br/>
+                Regex to search with.
+              </li>
+              <li><code>callback</code> {<code>Function</code>}<br/>
+                Function to execute for each match. Invoked with four arguments:
+                <ol>
+                  <li>The match array, with named backreference properties.</li>
+                  <li>The zero-based match index.</li>
+                  <li>The string being traversed.</li>
+                  <li>The regex object being used to traverse the string.</li>
+                </ol>
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>undefined</code>}<br/>
+            Does not return a value.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">// Extracts every other digit from a string
+const evens = [];
+XRegExp.forEach('1a2345', /\d/, function (match, i) {
+  if (i % 2) evens.push(+match[0]);
+});
+// evens -> [2, 4]
+</pre>
+
+
+    <h2 id="globalize"><code>XRegExp.globalize(<span class="plain">regex</span>)</code></h2>
+
+    <p>Copies a regex object and adds flag <code>g</code>. The copy maintains extended data,
+    is augmented with <code>XRegExp.prototype</code> properties, and has a fresh <code>lastIndex</code> property (set to
+    zero). Native regexes are not recompiled using XRegExp syntax.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>regex</code> {<code>RegExp</code>}<br/>
+                Regex to globalize.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>RegExp</code>}<br/>
+            Copy of the provided regex with flag <code>g</code> added.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">const globalCopy = XRegExp.globalize(/regex/);
+globalCopy.global; // -> true
+
+function parse(str, regex) {
+  regex = XRegExp.globalize(regex);
+  let match;
+  while (match = regex.exec(str)) {
+    // ...
+  }
+}
+</pre>
+
+
+    <h2 id="install"><code>XRegExp.install(<span class="plain">options</span>)</code></h2>
+
+    <p>Installs optional features according to the specified options. Can be undone using <code><a href="#uninstall">XRegExp.uninstall</a></code>.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>options</code> {<code>Object</code>|<code>String</code>}<br/>
+                Options object or string.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>undefined</code>}<br/>
+            Does not return a value.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">// With an options object
+XRegExp.install({
+  // Enables support for astral code points in Unicode addons (implicitly sets flag A)
+  astral: true,
+
+  // Adds named capture groups to the `groups` property of matches
+  // On by default in XRegExp 5
+  namespacing: true
+});
+
+// With an options string
+XRegExp.install('astral namespacing');
+</pre>
+
+
+    <h2 id="isInstalled"><code>XRegExp.isInstalled(<span class="plain">feature</span>)</code></h2>
+
+    <p>Checks whether an individual optional feature is installed.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>feature</code> {<code>String</code>}<br/>
+                Name of the feature to check. One of:
+                <ul>
+                  <li><code>astral</code></li>
+                  <li><code>namespacing</code></li>
+                </ul>
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>Boolean</code>}<br/>
+            Whether the feature is installed.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">XRegExp.isInstalled('astral');
+</pre>
+
+
+    <h2 id="isRegExp"><code>XRegExp.isRegExp(<span class="plain">value</span>)</code></h2>
+
+    <p>Returns <code>true</code> if an object is a regex; <code>false</code> if it isn't. This works correctly for regexes
+    created in another frame, when <code>instanceof</code> and <code>constructor</code> checks would fail.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>value</code> {<code>*</code>}<br/>
+                Object to check.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>Boolean</code>}<br/>
+            Whether the object is a <code>RegExp</code> object.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">XRegExp.isRegExp('string'); // -> false
+XRegExp.isRegExp(/regex/i); // -> true
+XRegExp.isRegExp(RegExp('^', 'm')); // -> true
+XRegExp.isRegExp(XRegExp('(?s).')); // -> true
+</pre>
+
+
+    <h2 id="match"><code>XRegExp.match(<span class="plain">str, regex, [scope]</span>)</code></h2>
+
+    <p>Returns the first matched string, or in global mode, an array containing all matched strings.
+    This is essentially a more convenient re-implementation of <code>String.prototype.match</code> that gives
+    the result types you actually want (string instead of <code>exec</code>-style array in match-first mode,
+    and an empty array instead of <code>null</code> when no matches are found in match-all mode). It also lets
+    you override flag <code>g</code> and ignore <code>lastIndex</code>, and fixes browser bugs.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>str</code> {<code>String</code>}<br/>
+                String to search.
+              </li>
+              <li><code>regex</code> {<code>RegExp</code>}<br/>
+                Regex to search with.
+              </li>
+              <li>[<code>scope</code>=<code>'one'</code>] {<code>String</code>}<br/>
+                Use <code>'one'</code> to return the first match as a string. Use <code>'all'</code> to
+                return an array of all matched strings. If not explicitly specified and <code>regex</code> uses flag <code>g</code>,
+                <code>scope</code> is <code>all</code>.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>String</code>|<code>Array</code>}<br/>
+            In match-first mode: First match as a string, or <code>null</code>. In match-all
+            mode: Array of all matched strings, or an empty array.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">// Match first
+XRegExp.match('abc', /\w/); // -> 'a'
+XRegExp.match('abc', /\w/g, 'one'); // -> 'a'
+XRegExp.match('abc', /x/g, 'one'); // -> null
+
+// Match all
+XRegExp.match('abc', /\w/g); // -> ['a', 'b', 'c']
+XRegExp.match('abc', /\w/, 'all'); // -> ['a', 'b', 'c']
+XRegExp.match('abc', /x/, 'all'); // -> []
+</pre>
+
+
+    <h2 id="matchChain"><code>XRegExp.matchChain(<span class="plain">str, chain</span>)</code></h2>
+
+    <p>Retrieves the matches from searching a string using a chain of regexes that successively search
+    within previous matches. The provided <code>chain</code> array can contain regexes and or objects with <code>regex</code>
+    and <code>backref</code> properties. When a backreference is specified, the named or numbered backreference
+    is passed forward to the next regex or returned.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>str</code> {<code>String</code>}<br/>
+                String to search.
+              </li>
+              <li><code>chain</code> {<code>Array</code>}<br/>
+                Regexes that each search for matches within preceding results.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>Array</code>}<br/>
+            Matches by the last regex in the chain, or an empty array.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">// Basic usage; matches numbers within &lt;b> tags
+XRegExp.matchChain('1 &lt;b>2&lt;/b> 3 &lt;b>4 a 56&lt;/b>', [
+  XRegExp('(?is)&lt;b>.*?&lt;/b>'),
+  /\d+/
+]);
+// -> ['2', '4', '56']
+
+// Passing forward and returning specific backreferences
+const html = `&lt;a href="http://xregexp.com/api/">XRegExp&lt;/a>
+              &lt;a href="http://www.google.com/">Google&lt;/a>`;
+XRegExp.matchChain(html, [
+  {regex: /&lt;a href="([^"]+)">/i, backref: 1},
+  {regex: XRegExp('(?i)^https?://(?&lt;domain>[^/?#]+)'), backref: 'domain'}
+]);
+// -> ['xregexp.com', 'www.google.com']
+</pre>
+
+
+    <h2 id="matchRecursive"><code>XRegExp.matchRecursive(<span class="plain">str, left, right, [flags], [options]</span>)</code></h2>
+
+    <p><strong>Requires the XRegExp.matchRecursive addon</strong>, which is bundled in <code>xregexp-all.js</code>.</p>
+
+    <p>Returns an array of match strings between outermost left and right delimiters, or an array of
+    objects with detailed match parts and position data. An error is thrown if delimiters are
+    unbalanced within the data.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>str</code> {<code>String</code>}<br/>
+                String to search.
+              </li>
+              <li><code>left</code> {<code>String</code>}<br/>
+                Left delimiter as an XRegExp pattern.
+              </li>
+              <li><code>right</code> {<code>String</code>}<br/>
+                Right delimiter as an XRegExp pattern.
+              </li>
+              <li>[<code>flags</code>] {<code>String</code>}<br/>
+                Any combination of XRegExp flags, used for the left and right delimiters.
+              </li>
+              <li>[<code>options</code>] {<code>Object</code>}<br/>
+                Lets you specify <code>valueNames</code> and <code>escapeChar</code> options.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td><ul>
+              <li>{<code>Array</code>}<br/>
+                Array of matches, or an empty array.
+              </li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">// Basic usage
+let str = '(t((e))s)t()(ing)';
+XRegExp.matchRecursive(str, '\\(', '\\)', 'g');
+// -> ['t((e))s', '', 'ing']
+
+// Extended information mode with valueNames
+str = 'Here is &lt;div> &lt;div>an&lt;/div>&lt;/div> example';
+XRegExp.matchRecursive(str, '&lt;div\\s*>', '&lt;/div>', 'gi', {
+  valueNames: ['between', 'left', 'match', 'right']
+});
+/* -> [
+{name: 'between', value: 'Here is ',       start: 0,  end: 8},
+{name: 'left',    value: '&lt;div>',          start: 8,  end: 13},
+{name: 'match',   value: ' &lt;div>an&lt;/div>', start: 13, end: 27},
+{name: 'right',   value: '&lt;/div>',         start: 27, end: 33},
+{name: 'between', value: ' example',       start: 33, end: 41}
+] */
+
+// Omitting unneeded parts with null valueNames, and using escapeChar
+str = '...{1}.\\{{function(x,y){return {y:x}}}';
+XRegExp.matchRecursive(str, '{', '}', 'g', {
+  valueNames: ['literal', null, 'value', null],
+  escapeChar: '\\'
+});
+/* -> [
+{name: 'literal', value: '...',  start: 0, end: 3},
+{name: 'value',   value: '1',    start: 4, end: 5},
+{name: 'literal', value: '.\\{', start: 6, end: 9},
+{name: 'value',   value: 'function(x,y){return {y:x}}', start: 10, end: 37}
+] */
+
+// Sticky mode via flag y
+str = '&lt;1>&lt;&lt;&lt;2>>>&lt;3>4&lt;5>';
+XRegExp.matchRecursive(str, '&lt;', '>', 'gy');
+// -> ['1', '&lt;&lt;2>>', '3']
+</pre>
+
+
+    <h2 id="replace"><code>XRegExp.replace(<span class="plain">str, search, replacement, [scope]</span>)</code></h2>
+
+    <p>Returns a new string with one or all matches of a pattern replaced. The pattern can be a string
+    or regex, and the replacement can be a string or a function to be called for each match. To
+    perform a global search and replace, use the optional <code>scope</code> argument or include flag <code>g</code> if
+    using a regex. Replacement strings can use <code>$&lt;n&gt;</code> or <code>${n}</code> for named and numbered backreferences.
+    Replacement functions can use named backreferences via the last argument. Also fixes browser
+    bugs compared to the native <code>String.prototype.replace</code> and can be used reliably cross-browser.</p>
+
+    <p>For the full details of XRegExp's replacement text syntax, see <a href="../syntax/index.html#replacementText">Syntax: Replacement text</a>.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>str</code> {<code>String</code>}<br/>
+                String to search.
+              </li>
+              <li><code>search</code> {<code>RegExp</code>|<code>String</code>}<br/>
+                Search pattern to be replaced.
+              </li>
+              <li><code>replacement</code> {<code>String</code>|<code>Function</code>}<br/>
+                Replacement string or a function invoked to create it.<br/>
+                Replacement strings can include special replacement syntax:
+                <ul>
+                  <li><code>$$</code> - Inserts a literal <code>$</code> character.</li>
+                  <li><code>$&amp;</code>, <code>$0</code> - Inserts the matched substring.</li>
+                  <li><code>$`</code> - Inserts the string that precedes the matched substring (left context).</li>
+                  <li><code>$'</code> - Inserts the string that follows the matched substring (right context).</li>
+                  <li><code>$n</code>, <code>$nn</code> - Where n/nn are digits referencing an existent capturing group, inserts
+                    backreference n/nn.</li>
+                  <li><code>$&lt;n&gt;</code>, <code>${n}</code> - Where n is a name or any number of digits that reference an existing capturing
+                    group, inserts backreference n.</li>
+                </ul>
+                Replacement functions are invoked with three or more arguments:
+                <ul>
+                  <li><code>args[0]</code> - The matched substring (corresponds to <code>$&amp;</code> above). If the <code>namespacing</code> feature is off, named backreferences are accessible as properties of this argument.</li>
+                  <li><code>args[1..n]</code> - One argument for each backreference (corresponding to <code>$1</code>, <code>$2</code>, etc. above). If the regex has no capturing groups, no arguments appear in this position.</li>
+                  <li><code>args[n+1]</code> - The zero-based index of the match within the entire search string.</li>
+                  <li><code>args[n+2]</code> - The total string being searched.</li>
+                  <li><code>args[n+3]</code> - If the the search pattern is a regex with named capturing groups, the last argument is the groups object. Its keys are the backreference names and its values are the backreference values. If the <code>namespacing</code> feature is off, this argument is not present.</li>
+                </ul>
+              </li>
+              <li>[<code>scope</code>] {<code>String</code>}<br/>
+                Use <code>'one'</code> to replace the first match only, or <code>'all'</code>. Defaults to <code>'one'</code>. Defaults to <code>'all'</code> if using a regex with flag <code>g</code>.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>String</code>}<br/>
+            New string with one or all matches replaced.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">// Regex search, using named backreferences in replacement string
+const name = XRegExp('(?&lt;first>\\w+) (?&lt;last>\\w+)');
+XRegExp.replace('John Smith', name, '$&lt;last>, $&lt;first>');
+// -> 'Smith, John'
+
+// Regex search, using named backreferences in replacement function
+XRegExp.replace('John Smith', name, (...args) => {
+  const groups = args[args.length - 1];
+  return `${groups.last}, ${groups.first}`;
+});
+// -> 'Smith, John'
+
+// String search, with replace-all
+XRegExp.replace('RegExp builds RegExps', 'RegExp', 'XRegExp', 'all');
+// -> 'XRegExp builds XRegExps'
+</pre>
+
+
+    <h2 id="replaceEach"><code>XRegExp.replaceEach(<span class="plain">str, replacements</span>)</code></h2>
+
+    <p>Performs batch processing of string replacements. Used like <code><a href="#replace">XRegExp.replace</a></code>, but
+    accepts an array of replacement details. Later replacements operate on the output of earlier
+    replacements. Replacement details are accepted as an array with a regex or string to search for,
+    the replacement string or function, and an optional scope of <code>'one'</code> or <code>'all'</code>. Uses the XRegExp
+    replacement text syntax, which supports named backreference properties via <code>$&lt;name&gt;</code> or <code>${name}</code>.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>str</code> {<code>String</code>}<br/>
+                String to search.
+              </li>
+              <li><code>replacements</code> {<code>Array</code>}<br/>
+                Array of replacement detail arrays.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>String</code>}<br/>
+            New string with all replacements.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">str = XRegExp.replaceEach(str, [
+  [XRegExp('(?&lt;name>a)'), 'z$&lt;name>'],
+  [/b/gi, 'y'],
+  [/c/g, 'x', 'one'], // scope 'one' overrides /g
+  [/d/, 'w', 'all'],  // scope 'all' overrides lack of /g
+  ['e', 'v', 'all'],  // scope 'all' allows replace-all for strings
+  [/f/g, (match) => match.toUpperCase()]
+]);
+</pre>
+
+
+    <h2 id="split"><code>XRegExp.split(<span class="plain">str, separator, [limit]</span>)</code></h2>
+
+    <p>Splits a string into an array of strings using a regex or string separator. Matches of the
+    separator are not included in the result array. However, if <code>separator</code> is a regex that contains
+    capturing groups, backreferences are spliced into the result each time <code>separator</code> is matched.
+    Fixes browser bugs compared to the native <code>String.prototype.split</code> and can be used reliably
+    cross-browser.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>str</code> {<code>String</code>}<br/>
+                String to split.
+              </li>
+              <li><code>separator</code> {<code>RegExp</code>|<code>String</code>}<br/>
+                Regex or string to use for separating the string.
+              </li>
+              <li>[<code>limit</code>] {<code>Number</code>}<br/>
+                Maximum number of items to include in the result array.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>Array</code>}<br/>
+            Array of substrings.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">// Basic use
+XRegExp.split('a b c', ' ');
+// -> ['a', 'b', 'c']
+
+// With limit
+XRegExp.split('a b c', ' ', 2);
+// -> ['a', 'b']
+
+// Backreferences in result array
+XRegExp.split('..word1..', /([a-z]+)(\d+)/i);
+// -> ['..', 'word', '1', '..']
+</pre>
+
+
+    <h2 id="tag"><code>XRegExp.tag(<span class="plain">[flags]</span>)`<span class="plain">pattern</span>`</code></h2>
+
+    <p><strong>Requires the XRegExp.build addon</strong>, which is bundled in <code>xregexp-all.js</code>.</p>
+
+    <p>Provides tagged template literals that create regexes with XRegExp syntax and flags. The
+    provided pattern is handled as a raw string, so backslashes don't need to be escaped.</p>
+
+    <p>Interpolation of strings and regexes shares the features of <code>XRegExp.build</code>. Interpolated
+    patterns are treated as atomic units when quantified, interpolated strings have their special
+    characters escaped, a leading <code>^</code> and trailing unescaped <code>$</code> are stripped from interpolated
+    regexes if both are present, and any backreferences within an interpolated regex are
+    rewritten to work within the overall pattern.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td>
+            <ul>
+              <li>[<code>flags</code>] {<code>String</code>}<br/>
+                Any combination of XRegExp flags.
+              </li>
+              <li><code>pattern</code> {<code>String</code>}<br/>
+                Regex pattern as a raw string, optionally with interpolation.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>RegExp</code>}<br/>
+            Extended regular expression object.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">XRegExp.tag()`\b\w+\b`.test('word'); // -> true
+
+const hours = /1[0-2]|0?[1-9]/;
+const minutes = /(?&lt;minutes>[0-5][0-9])/;
+const time = XRegExp.tag('x')`\b ${hours} : ${minutes} \b`;
+time.test('10:59'); // -> true
+XRegExp.exec('10:59', time).groups.minutes; // -> '59'
+
+const backref1 = /(a)\1/;
+const backref2 = /(b)\1/;
+XRegExp.tag()`${backref1}${backref2}`.test('aabb'); // -> true
+</pre>
+
+
+    <h2 id="test"><code>XRegExp.test(<span class="plain">str, regex, [pos], [sticky]</span>)</code></h2>
+
+    <p>Executes a regex search in a specified string. Returns <code>true</code> or <code>false</code>. Optional <code>pos</code> and
+    <code>sticky</code> arguments specify the search start position, and whether the match must start at the
+    specified position only. The <code>lastIndex</code> property of the provided regex is not used, but is
+    updated for compatibility. Also fixes browser bugs compared to the native
+    <code>RegExp.prototype.test</code> and can be used reliably cross-browser.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>str</code> {<code>String</code>}<br/>
+                String to search.
+              </li>
+              <li><code>regex</code> {<code>RegExp</code>}<br/>
+                Regex to search with.
+              </li>
+              <li>[<code>pos</code>=<code>0</code>] {<code>Number</code>}<br/>
+                Zero-based index at which to start the search.
+              </li>
+              <li>[<code>sticky</code>=<code>false</code>] {<code>Boolean</code>|<code>String</code>}<br/>
+                Whether the match must start at the specified position only. The string <code>'sticky'</code> is accepted as an alternative to <code>true</code>.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>Boolean</code>}<br/>
+            Whether the regex matched the provided value.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">// Basic use
+XRegExp.test('abc', /c/); // -> true
+
+// With pos and sticky
+XRegExp.test('abc', /c/, 0, 'sticky'); // -> false
+XRegExp.test('abc', /c/, 2, 'sticky'); // -> true
+</pre>
+
+
+    <h2 id="uninstall"><code>XRegExp.uninstall(<span class="plain">options</span>)</code></h2>
+
+    <p>Uninstalls optional features according to the specified options. Used to undo the actions of <code><a href="#install">XRegExp.install</a></code>.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>options</code> {<code>Object</code>|<code>String</code>}<br/>
+                Options object or string.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>undefined</code>}<br/>
+            Does not return a value.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">// With an options object
+XRegExp.uninstall({
+  // Disables support for astral code points in Unicode addons (unless enabled per regex)
+  astral: true,
+
+  // Don't add named capture groups to the `groups` property of matches
+  namespacing: true
+});
+
+// With an options string
+XRegExp.uninstall('astral namespacing');
+</pre>
+
+
+    <h2 id="union"><code>XRegExp.union(<span class="plain">patterns, [flags]</span>)</code></h2>
+
+    <p>Returns an XRegExp object that is the union of the given patterns. Patterns can be provided as
+    regex objects or strings. Metacharacters are escaped in patterns provided as strings.
+    Backreferences in provided regex objects are automatically renumbered to work correctly within the larger combined pattern. Native
+    flags used by provided regexes are ignored in favor of the <code>flags</code> argument.</p>
+
+    <table cellspacing="0" class="api">
+      <tbody>
+        <tr>
+          <th>Parameters:</th>
+          <td><ul>
+              <li><code>patterns</code> {<code>Array</code>}<br/>
+                Regexes and strings to combine.
+              </li>
+              <li>[<code>flags</code>] {<code>String</code>}<br/>
+                Any combination of XRegExp flags.
+              </li>
+              <li>[<code>options</code>] {<code>Object</code>}<br/>
+                Options object with optional properties:
+                <ul>
+                  <li><code>conjunction</code> {<code>String</code>} Type of conjunction to use: <code>'or'</code> (default) or <code>'none'</code>.</li>
+                </ul>
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="alt">
+          <th>Returns:</th>
+          <td>
+            {<code>RegExp</code>}<br/>
+            Union of the provided regexes and strings.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">XRegExp.union(['a+b*c', /(dogs)\1/, /(cats)\1/], 'i');
+// -> /a\+b\*c|(dogs)\1|(cats)\2/i
+
+XRegExp.union([/man/, /bear/, /pig/], 'i', {conjunction: 'none'});
+// -> /manbearpig/i
+</pre>
+
+
+    <h2 id="version"><code>XRegExp.version</code></h2>
+
+    <p>The XRegExp version number as a string containing three dot-separated parts. For example, <code>'2.0.0-beta-3'</code>.</p>
+
+
+    <h2 id="dot-source"><code>&lt;regexp>.xregexp.source</code></h2>
+
+    <p>The original pattern provided to the <code>XRegExp</code> constructor. Note that this differs from the <code>&lt;regexp>.source</code> property which holds the transpiled source in native <code>RegExp</code> syntax and therefore can't be used to reconstruct the regex (e.g. <code>&lt;regexp>.source</code> holds no knowledge of capture names). This property is available only for regexes originally constructed by <code>XRegExp</code>. It is <code>null</code> for native regexes copied using the <code>XRegExp</code> constructor or <code>XRegExp.globalize</code>.</p>
+
+
+    <h2 id="dot-flags"><code>&lt;regexp>.xregexp.flags</code></h2>
+
+    <p>The original flags provided to the <code>XRegExp</code> constructor. Differs from the ES6 <code>&lt;regexp>.flags</code> property in that it includes XRegExp's non-native flags and is accessible even in pre-ES6 browsers. This property is available only for regexes originally constructed by <code>XRegExp</code>. It is <code>null</code> for native regexes copied using the <code>XRegExp</code> constructor or <code>XRegExp.globalize</code>. When regexes originally constructed by <code>XRegExp</code> are copied using <code>XRegExp.globalize</code>, the value of this property is augmented with <code>'g'</code> if not already present. Flags are listed in alphabetical order.</p>
+
+
+
+
+
+  </div>
+</div>
+<div id="footer">
+  <p>&copy; <a href="http://stevenlevithan.com">Steven Levithan</a> :: <a href="https://github.com/slevithan/xregexp">GitHub</a> :: <a href="http://xregexp.com/">XRegExp.com</a></p>
+</div>
+</body>
+</html>

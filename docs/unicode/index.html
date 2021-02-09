@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Unicode :: XRegExp</title>
+  <link href="../assets/index.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="header">
+  <h1><a href="../index.html"><span id="logoX">X</span>RegExp</a></h1>
+  <h1 class="subtitle">The one of a kind JavaScript regular expression library</h1>
+</div>
+<div id="body">
+  <div id="navBar">
+    <div class="menu">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../api/index.html">API</a></li>
+        <li><a href="../syntax/index.html">New syntax</a></li>
+        <li><a href="../flags/index.html">New flags</a></li>
+        <li><a href="../unicode/index.html" class="selected">Unicode</a></li>
+      </ul>
+    </div>
+  </div>
+  <div id="main">
+
+
+
+
+
+    <h1>Unicode</h1>
+
+    <p><strong>Requires the Unicode addons</strong>, which are bundled in <a href="https://unpkg.com/xregexp/xregexp-all.js"><code>xregexp-all.js</code></a>. Alternatively, you can download the individual addon scripts from GutHub. XRegExp's <a href="https://www.npmjs.com/package/xregexp">npm package</a> uses <code>xregexp-all.js</code>.</p>
+
+    <p>The Unicode Base script adds base support for Unicode matching via the <code>\p{&hellip;}</code> syntax. &#192; la carte token addon packages add support for Unicode categories, scripts, and other properties. All Unicode tokens can be inverted using <code>\P{&hellip;}</code> or <code>\p{^&hellip;}</code>. Token names are case insensitive, and any spaces, hyphens, and underscores are ignored. You can omit the braces for token names that are a single letter.</p>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">// Categories
+XRegExp('\\p{Sc}\\pN+'); // Sc = currency symbol, N = number
+// Can also use the full names \p{Currency_Symbol} and \p{Number}
+
+// Scripts
+XRegExp('\\p{Cyrillic}');
+XRegExp('[\\p{Latin}\\p{Common}]');
+// Can also use the Script= prefix to match ES2018: \p{Script=Cyrillic}
+
+// Properties
+XRegExp('\\p{ASCII}');
+XRegExp('\\p{Assigned}');
+
+// In action...
+
+const unicodeWord = XRegExp("^\\pL+$"); // L = letter
+unicodeWord.test("&#x0420;&#x0443;&#x0441;&#x0441;&#x043A;&#x0438;&#x0439;"); <span class="sh_comment">// true</span>
+unicodeWord.test("&#x65E5;&#x672C;&#x8A9E;"); <span class="sh_comment">// true</span>
+unicodeWord.test("&#x0627;&#x0644;&#x0639;&#x0631;&#x0628;&#x064A;&#x0629;"); <span class="sh_comment">// true</span>
+
+XRegExp("^\\p{Katakana}+$").test("&#x30AB;&#x30BF;&#x30AB;&#x30CA;"); <span class="sh_comment">// true</span>
+</pre>
+
+    <p>By default, <code>\p{&hellip;}</code> and <code>\P{&hellip;}</code> support the Basic Multilingual Plane (i.e. code points up to <code>U+FFFF</code>). You can opt-in to full 21-bit Unicode support (with code points up to <code>U+10FFFF</code>) on a per-regex basis by using flag <code>A</code>. In XRegExp, this is called <em>astral mode</em>. You can automatically add flag <code>A</code> for all new regexes by running <code>XRegExp.install('astral')</code>. When in astral mode, <code>\p{&hellip;}</code> and <code>\P{&hellip;}</code> always match a full code point rather than a code unit, using surrogate pairs for code points above <code>U+FFFF</code>.</p>
+
+<pre class="sh_javascript">// Using flag A to match astral code points
+XRegExp('^\\pS$').test('💩'); // -> false
+XRegExp('^\\pS$', 'A').test('💩'); // -> true
+// Using surrogate pair U+D83D U+DCA9 to represent U+1F4A9 (pile of poo)
+XRegExp('^\\pS$', 'A').test('\uD83D\uDCA9'); // -> true
+
+// Implicit flag A
+XRegExp.install('astral');
+XRegExp('^\\pS$').test('💩'); // -> true
+</pre>
+
+    <p>Opting in to astral mode disables the use of <code>\p{&hellip;}</code> and <code>\P{&hellip;}</code> within character classes. In astral mode, use e.g. <code>(\pL|[0-9_])+</code> instead of <code>[\pL0-9_]+</code>.</p>
+
+
+
+
+
+  </div>
+</div>
+<div id="footer">
+  <p>&copy; <a href="http://stevenlevithan.com">Steven Levithan</a> :: <a href="https://github.com/slevithan/xregexp">GitHub</a> :: <a href="http://xregexp.com/">XRegExp.com</a></p>
+</div>
+</body>
+</html>

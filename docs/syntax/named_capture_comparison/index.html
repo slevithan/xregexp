@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Named capture comparison :: XRegExp</title>
+  <link href="../../assets/index.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="header">
+  <h1><a href="../../index.html"><span id="logoX">X</span>RegExp</a></h1>
+  <h1 class="subtitle">The one of a kind JavaScript regular expression library</h1>
+</div>
+<div id="body">
+  <div id="navBar">
+    <div class="menu">
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../../api/index.html">API</a></li>
+        <li><a href="../../syntax/index.html" class="selected">New syntax</a></li>
+        <li><a href="../../flags/index.html">New flags</a></li>
+        <li><a href="../../unicode/index.html">Unicode</a></li>
+      </ul>
+    </div>
+  </div>
+  <div id="main">
+
+
+
+
+
+    <h1><a href="../index.html">New syntax</a> &raquo; Named capture comparison</h1>
+
+    <p>There are several different syntaxes used for named capture. Although Python was the first to implement the feature, most libraries have adopted .NET's alternative syntax.</p>
+
+    <table summary="Named capture in various libraries" cellspacing="0" border="1">
+      <thead>
+        <tr>
+          <th>Library</th>
+          <th style="width:120px;">Capture</th>
+          <th style="width:100px;">Backref in regex</th>
+          <th>Backref in replacement</th>
+          <th>Stored at</th>
+          <th>Backref numbering</th>
+          <th>Multiple groups with same name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight">
+          <td>XRegExp <!--0.5--></td>
+          <td>
+            <ul>
+              <li><code>(?&lt;<em>name</em>&gt;&hellip;)</code></li>
+              <li><code>(?P&lt;<em>name</em>&gt;&hellip;)</code><sup>1</sup></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>\k&lt;<em>name</em>&gt;</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>$&lt;<em>name</em>&gt;</code><sup>2</sup></li>
+              <li><code>${<em>name</em>}</code></li>
+            </ul>
+          </td>
+          <td>
+            <code><em>result</em>.groups.<em>name</em></code><sup>3</sup>
+          </td>
+          <td>Sequential</td>
+          <td>Error<sup>4</sup></td>
+        </tr>
+        <tr>
+          <td>EcmaScript 2018</td>
+          <td>
+            <ul>
+              <li><code>(?&lt;<em>name</em>&gt;&hellip;)</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>\k&lt;<em>name</em>&gt;</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>$&lt;<em>name</em>&gt;</code></li>
+            </ul>
+          </td>
+          <td>
+            <code><em>result</em>.groups.<em>name</em></code>
+          </td>
+          <td>Sequential</td>
+          <td>Error</td>
+        </tr>
+        <tr class="alt">
+          <td>.NET</td>
+          <td>
+            <ul>
+              <li><code>(?&lt;<em>name</em>&gt;&hellip;)</code></li>
+              <li><code>(?'<em>name</em>'&hellip;)</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>\k&lt;<em>name</em>&gt;</code></li>
+              <li><code>\k'<em>name</em>'</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>${<em>name</em>}</code></li>
+            </ul>
+          </td>
+          <td><code><em>matcher</em>.Groups('<em>name</em>')</code></td>
+          <td>Unnamed first, then named</td>
+          <td>Backref to last executed participating group</td>
+        </tr>
+        <tr>
+          <td>Perl 5.10</td>
+          <td>
+            <ul>
+              <li><code>(?&lt;<em>name</em>&gt;&hellip;)</code></li>
+              <li><code>(?'<em>name</em>'&hellip;)</code></li>
+              <li><code>(?P&lt;<em>name</em>&gt;&hellip;)</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>\k&lt;<em>name</em>&gt;</code></li>
+              <li><code>\k'<em>name</em>'</code></li>
+              <li><code>\k{<em>name</em>}</code></li>
+              <li><code>\g{<em>name</em>}</code></li>
+              <li><code>(?P=<em>name</em>)</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>$+{<em>name</em>}</code></li>
+            </ul>
+          </td>
+          <td><code>$+{<em>name</em>}</code></td>
+          <td>Sequential</td>
+          <td>Backref to leftmost participating group</td>
+        </tr>
+        <tr class="alt">
+          <td>PCRE 7</td>
+          <td>
+            <ul>
+              <li><code>(?&lt;<em>name</em>&gt;&hellip;)</code></li>
+              <li><code>(?'<em>name</em>'&hellip;)</code></li>
+              <li><code>(?P&lt;<em>name</em>&gt;&hellip;)</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>\k&lt;<em>name</em>&gt;</code></li>
+              <li><code>\k'<em>name</em>'</code></li>
+              <li><code>\k{<em>name</em>}</code><sup>5</sup></li>
+              <li><code>\g{<em>name</em>}</code><sup>5</sup></li>
+              <li><code>(?P=<em>name</em>)</code></li>
+            </ul>
+          </td>
+          <td colspan="2">N/A</td>
+          <td>Sequential</td>
+          <td>Error</td>
+        </tr>
+        <tr>
+          <td>PCRE 4</td>
+          <td>
+            <ul>
+              <li><code>(?P&lt;<em>name</em>&gt;&hellip;)</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>(?P=<em>name</em>)</code></li>
+            </ul>
+          </td>
+          <td colspan="2">N/A</td>
+          <td>Sequential</td>
+          <td>Error</td>
+        </tr>
+        <tr class="alt">
+          <td>Python</td>
+          <td>
+            <ul>
+              <li><code>(?P&lt;<em>name</em>&gt;&hellip;)</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>(?P=<em>name</em>)</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>\g&lt;<em>name</em>&gt;</code></li>
+            </ul>
+          </td>
+          <td><code><em>result</em>.group('<em>name</em>')</code></td>
+          <td>Sequential</td>
+          <td>Error</td>
+        </tr>
+        <tr>
+          <td>Oniguruma <!--1.8.4--></td>
+          <td>
+            <ul>
+              <li><code>(?&lt;<em>name</em>&gt;&hellip;)</code></li>
+              <li><code>(?'<em>name</em>'&hellip;)</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>\k&lt;<em>name</em>&gt;</code></li>
+              <li><code>\k'<em>name</em>'</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>\k&lt;<em>name</em>&gt;</code></li>
+              <li><code>\k'<em>name</em>'</code></li>
+            </ul>
+          </td>
+          <td>N/A</td>
+          <td>Unnamed groups default to noncapturing when mixed with named groups</td>
+          <td>Backref to rightmost participating group. Backrefs within a regex work as alternation of matches of all preceding groups with the same name, in reverse order.</td>
+        </tr>
+        <tr class="alt">
+          <td>Java 7</td>
+          <td>
+            <ul>
+              <li><code>(?&lt;<em>name</em>&gt;&hellip;)</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>\k&lt;<em>name</em>&gt;</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>${<em>name</em>}</code></li>
+            </ul>
+          </td>
+          <td><code><em>matcher</em>.group('<em>name</em>')</code></td>
+          <td>Sequential</td>
+          <td>Error</td>
+        </tr>
+        <tr>
+          <td>JGsoft</td>
+          <td>
+            <ul>
+              <li><code>(?&lt;<em>name</em>&gt;&hellip;)</code></li>
+              <li><code>(?'<em>name</em>'&hellip;)</code></li>
+              <li><code>(?P&lt;<em>name</em>&gt;&hellip;)</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>\k&lt;<em>name</em>&gt;</code></li>
+              <li><code>\k'<em>name</em>'</code></li>
+              <li><code>(?P=<em>name</em>)</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>${<em>name</em>}</code></li>
+              <li><code>\g&lt;<em>name</em>&gt;</code></li>
+            </ul>
+          </td>
+          <td>N/A</td>
+          <td>.NET and Python styles, depending on capture syntax</td>
+          <td>Same as .NET</td>
+        </tr>
+        <tr class="alt">
+          <td>Boost.Regex</td>
+          <td>
+            <ul>
+              <li><code>(?&lt;<em>name</em>&gt;&hellip;)</code></li>
+              <li><code>(?'<em>name</em>'&hellip;)</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>\k&lt;<em>name</em>&gt;</code></li>
+              <li><code>\g{<em>name</em>}</code></li>
+            </ul>
+          </td>
+          <td>?</td>
+          <td>?</td>
+          <td>?</td>
+          <td>?</td>
+        </tr>
+        <tr>
+          <td>RE2</td>
+          <td>
+            <ul>
+              <li><code>(?P&lt;<em>name</em>&gt;&hellip;)</code></li>
+            </ul>
+          </td>
+          <td>N/A</td>
+          <td>?</td>
+          <td>?</td>
+          <td>?</td>
+          <td>?</td>
+        </tr>
+        <tr class="alt">
+          <td>JRegex</td>
+          <td>
+            <ul>
+              <li><code>({<em>name</em>}&hellip;)</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>{\<em>name</em>}</code></li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>${<em>name</em>}</code></li>
+            </ul>
+          </td>
+          <td><code><em>matcher</em>.group('<em>name</em>')</code></td>
+          <td>?</td>
+          <td>?</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><sup>1</sup> As of XRegExp 2. Not recommended for use, because support for the <code>(?P&lt;<em>name</em>&gt;&hellip;)</code> syntax may be removed in future versions of XRegExp. It is currently supported only to avoid an octal escape versus backreference issue in old Opera. Opera supported the Python named capture syntax natively, but did not provide full named capture functionality.</p>
+
+    <p><sup>2</sup> As of XRegExp 4.</p>
+
+    <p><sup>3</sup> As of XRegExp 4.1, when the <code>namespacing</code> option is on (it's on by default in XRegExp 5). Stored at <code><em>result</em>.<em>name</em></code> when <code>namespacing</code> is off.<br>
+    Note: Within <code><em>string</em>.replace</code> callbacks, stored at: <code>arguments[arguments.length - 1].<em>name</em></code> (with <code>namespacing</code> on) or <code>arguments[0].<em>name</em></code> (with <code>namespacing</code> off).</p>
+
+    <p><sup>4</sup> As of XRegExp 3.</p>
+
+    <p><sup>5</sup> As of PCRE 7.2.</p>
+
+    <p>TODO: Add a column comparing the use of capture names in regex conditionals (not supported by XRegExp).</p>
+
+
+
+
+
+  </div>
+</div>
+<div id="footer">
+  <p>&copy; <a href="http://stevenlevithan.com">Steven Levithan</a> :: <a href="https://github.com/slevithan/xregexp">GitHub</a> :: <a href="http://xregexp.com/">XRegExp.com</a></p>
+</div>
+</body>
+</html>

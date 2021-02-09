@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>New syntax :: XRegExp</title>
+  <link href="../assets/index.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="header">
+  <h1><a href="../index.html"><span id="logoX">X</span>RegExp</a></h1>
+  <h1 class="subtitle">The one of a kind JavaScript regular expression library</h1>
+</div>
+<div id="body">
+  <div id="navBar">
+    <div class="menu">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../api/index.html">API</a></li>
+        <li><a href="../syntax/index.html" class="selected">New syntax</a></li>
+        <li><a href="../flags/index.html">New flags</a></li>
+        <li><a href="../unicode/index.html">Unicode</a></li>
+      </ul>
+    </div>
+  </div>
+  <div id="main">
+
+
+
+
+
+    <div id="tocContainer">
+      <div id="toc">
+        <h2>Table of contents</h2>
+        <ul>
+          <li><a href="#namedCapture">Named capture</a></li>
+          <li><a href="#inlineComments">Inline comments</a></li>
+          <li><a href="#modeModifier">Leading mode modifier</a></li>
+          <li><a href="#strictErrors">Stricter error handling</a></li>
+          <li><a href="#unicode">Unicode</a></li>
+          <li><a href="#replacementText">Replacement text</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <h1>New syntax</h1>
+
+    <h2 id="namedCapture">Named capture</h2>
+
+    <p>XRegExp includes comprehensive support for named capture. Following are the details of XRegExp's named capture syntax:</p>
+
+    <ul>
+      <li>Capture: <code>(?&lt;<em>name</em>>&hellip;)</code></li>
+      <li>Backreference in regex: <code>\k&lt;<em>name</em>></code></li>
+      <li>Backreference in replacement text: <code>$&lt;<em>name</em>&gt;</code></li>
+      <li>Backreference stored at: <code><em>result</em>.groups.<em>name</em></code></li>
+      <li>Backreference numbering: Sequential (i.e., left to right for both named and unnamed capturing groups)</li>
+      <li>Multiple groups with same name: <code>SyntaxError</code></li>
+    </ul>
+
+    <h3>Notes</h3>
+    <ul>
+      <li>See additional details and compare to named capture in other regex flavors here: <a href="./named_capture_comparison/index.html"><strong>Named capture comparison</strong></a>.</li>
+      <li>JavaScript added native support for named capture in ES2018. XRegExp support predates this, and it extends this support into pre-ES2018 browsers.</li>
+      <li>Capture names can use a wide range of Unicode characters (see the definition of <a href="https://tc39.es/proposal-regexp-named-groups/#prod-RegExpIdentifierName"><code>RegExpIdentifierName</code></a>).</li>
+    </ul>
+
+    <h3>Example</h3>
+<pre class="sh_javascript">const repeatedWords = XRegExp.tag('gi')`\b(?&lt;word>[a-z]+)\s+\k&lt;word>\b`;
+// Alternatively: XRegExp('\\b(?&lt;word>[a-z]+)\\s+\\k&lt;word>\\b', 'gi');
+
+// Check for repeated words
+repeatedWords.test('The the test data');
+// -> true
+
+// Remove any repeated words
+const withoutRepeated = XRegExp.replace('The the test data', repeatedWords, '${word}');
+// -> 'The test data'
+
+const url = XRegExp(`^(?&lt;scheme> [^:/?]+ ) ://   # aka protocol
+                      (?&lt;host>   [^/?]+  )       # domain name/IP
+                      (?&lt;path>   [^?]*   ) \\??  # optional path
+                      (?&lt;query>  .*      )       # optional query`, 'x');
+
+// Get the URL parts
+const parts = XRegExp.exec('http://google.com/path/to/file?q=1', url);
+// parts -> ['http://google.com/path/to/file?q=1', 'http', 'google.com', '/path/to/file', 'q=1']
+// parts.groups.scheme -> 'http'
+// parts.groups.host   -> 'google.com'
+// parts.groups.path   -> '/path/to/file'
+// parts.groups.query  -> 'q=1'
+
+// Named backreferences are available in replacement functions as properties of the last argument
+XRegExp.replace('http://google.com/path/to/file?q=1', url, (match, ...args) => {
+  const groups = args.pop();
+  return match.replace(groups.host, 'xregexp.com');
+});
+// -> 'http://xregexp.com/path/to/file?q=1'
+</pre>
+
+    <p>Regexes that use named capture work with all native methods. However, you need to use <code><a href="../api/index.html#exec">XRegExp.exec</a></code> and <code><a href="../api/index.html#replace">XRegExp.replace</a></code> for access to named backreferences, otherwise only numbered backreferences are available.</p>
+
+    <h3>Annotations</h3>
+    <ul>
+      <li><strong>Rationale:</strong> Named capture can help make regular expressions and related code self-documenting, and thereby easier to read and use.</li>
+      <li><strong>Compatibility:</strong> The named capture syntax is illegal in pre-ES2018 native JavaScript regular expressions and hence does not cause problems. Backreferences to undefined named groups throw a <code>SyntaxError</code>.</li>
+      <li><strong>Compatibility with deprecated features:</strong> XRegExp's named capture functionality does not support the <code>lastMatch</code> property of the global <code>RegExp</code> object or the <code>RegExp.prototype.compile</code> method, since those features were <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Deprecated_and_obsolete_features">deprecated</a> in JavaScript 1.5.</li>
+      <li><strong>Prior art:</strong> Comes from Python (feature) and .NET (syntax).</li>
+    </ul>
+
+
+    <h2 id="inlineComments">Inline comments</h2>
+
+    <p>Inline comments use the syntax <code>(?#<em>comment</em>)</code>. They are an alternative to the line comments allowed in <a href="../flags/index.html#extended">free-spacing mode</a>.</p>
+
+    <p>Comments are a do-nothing (rather than ignore-me) metasequence. This distinction is important with something like <code>\1(?#comment)2</code>, which is taken as <code>\1</code> followed by <code>2</code>, and not <code>\12</code>. However, quantifiers following comments apply to the preceeding token, so <code>x(?#comment)+</code> is equivalent to <code>x+</code>.</p>
+
+    <h3 style="margin-top:20px;">Example</h3>
+<pre class="sh_javascript">const regex = XRegExp('^(?#month)\\d{1,2}/(?#day)\\d{1,2}/(?#year)(\\d{2}){1,2}', 'n');
+const isDate = regex.test('04/20/2008'); // -> true
+
+// Can still be useful when combined with free-spacing, because inline comments
+// don't need to end with \n
+const regex = XRegExp('^ \\d{1,2}      (?#month)' +
+                      '/ \\d{1,2}      (?#day  )' +
+                      '/ (\\d{2}){1,2} (?#year )', 'nx');
+</pre>
+
+    <h3>Annotations</h3>
+    <ul>
+      <li><strong>Rationale:</strong> Comments make regular expressions more readable.</li>
+      <li><strong>Compatibility:</strong> No known problems with this syntax; it is illegal in native JavaScript regular expressions.</li>
+      <li><strong>Prior art:</strong> The syntax comes from Perl. It is also available in .NET, PCRE, Python, Ruby, and Tcl, among other regular expression flavors.</li>
+    </ul>
+
+
+    <h2 id="modeModifier">Leading mode modifier</h2>
+
+    <p>A mode modifier uses the syntax <code>(?<em>imnsuxA</em>)</code>, where <code><em>imnsuxA</em></code> is any combination of XRegExp flags except <code>g</code> or <code>y</code>. Mode modifiers provide an alternate way to enable the specified flags. XRegExp allows the use of a single mode modifier at the very beginning of a pattern only.</p>
+
+    <h3 style="margin-top:20px;">Example</h3>
+<pre class="sh_javascript">const regex = XRegExp('(?im)^[a-z]+$');
+regex.ignoreCase; // -> true
+regex.multiline; // -> true
+</pre>
+
+    <p>When creating a regex, it's okay to include flags in a mode modifier that are also provided via the separate <code>flags</code> argument. For instance, <code>XRegExp('(?s).+', 's')</code> is valid.</p>
+
+    <p>Flags <code>g</code> and <code>y</code> cannot be included in a mode modifier, or an error is thrown. This is because <code>g</code> and <code>y</code>, unlike all other flags, have no impact on the meaning of a regex. Rather, they change how particular methods choose to apply the regex. In fact, XRegExp methods provide e.g. <code>scope</code>, <code>sticky</code>, and <code>pos</code> arguments that allow you to use and change such functionality on a per-run rather than per-regex basis. Also consider that it makes sense to apply all other flags to a particular subsection of a regex, whereas flags <code>g</code> and <code>y</code> only make sense when applied to the regex as a whole. Allowing <code>g</code> and <code>y</code> in a mode modifier might therefore create future compatibility problems.</p>
+
+    <p>The use of unknown flags in a mode modifier causes an error to be thrown. However, XRegExp addons can add new flags that are then automatically valid within mode modifiers.</p>
+
+    <h3>Annotations</h3>
+    <ul>
+      <li><strong>Rationale:</strong> Mode modifiers allow you to enable flags in situations where a regex pattern can be provided as a string only. They can also improve readability, since flags are read first rather than after the pattern.</li>
+      <li><strong>Compatibility:</strong> No known problems with this syntax; it is illegal in native JavaScript regular expressions.</li>
+      <li><strong>Compatibility with other regex flavors:</strong> Some regex flavors support the use of multiple mode modifiers anywhere in a pattern, and allow extended syntax for unsetting flags via <code>(?-i)</code>, simultaneously setting and unsetting flags via <code>(?i-m)</code>, and enabling flags for subpatterns only via <code>(?i:&hellip;)</code>. XRegExp does not support these extended options.</li>
+      <li><strong>Prior art:</strong> The syntax comes from Perl. It is also available in .NET, Java, PCRE, Python, Ruby, and Tcl, among other regular expression flavors.</li>
+    </ul>
+
+
+    <h2 id="strictErrors">Stricter error handling</h2>
+
+    <p>XRegExp makes any escaped letters or numbers a <code>SyntaxError</code> unless they form a valid and complete metasequence or backreference. This helps to catch errors early, and makes it safe for future versions of ES or XRegExp to introduce new escape sequences. It also means that octal escapes are always an error in XRegExp. ES3/5 do not allow octal escapes, but browsers support them anyway for backward compatibility, which often leads to unintended behavior.</p>
+
+    <p>XRegExp requires all backreferences, whether written as <code>\<em>n</em></code>, <code>\k&lt;<em>n</em>></code>, or <code>\k&lt;<em>name</em>></code>, to appear to the right of the opening parenthesis of the group they reference.</p>
+
+    <p>XRegExp never allows <code>\<em>n</em></code>-style backreferences to be followed by literal numbers. To match backreference 1 followed by a literal <code>2</code> character, you can use, e.g., <code>(a)\k&lt;1>2</code>, <code>(?x)(a)\1 2</code>, or <code>(a)\1(?#)2</code>.</p>
+
+
+    <h2 id="unicode">Unicode</h2>
+
+    <p>XRegExp supports matching Unicode categories, scripts, and other properties via addon scripts. Such tokens are matched using <code>\p{&hellip;}</code>, <code>\P{&hellip;}</code>, and <code>\p{^&hellip;}</code>. See <a href="../unicode/index.html">XRegExp Unicode addons</a> for more details.</p>
+
+    <p>XRegExp additionally supports the <code>\u{N&hellip;}</code> syntax for matching individual code points. In ES6 this is supported natively, but only when using the <code>u</code> flag. XRegExp supports this syntax for code points <code>0</code>&ndash;<code>FFFF</code> even when not using the <code>u</code> flag, and it supports the complete Unicode range <code>0</code>&ndash;<code>10FFFF</code> when using <code>u</code>.</p>
+
+
+    <h2 id="replacementText">Replacement text</h2>
+
+    <p>XRegExp's replacement text syntax is used by the <code><a href="../api/index.html#replace">XRegExp.replace</a></code> function. It adds <code>$0</code> as a synonym of <code>$&amp;</code> (to refer to the entire match), and adds <code>$&lt;<em>n</em>&gt;</code> and <code>${<em>n</em>}</code> for backreferences to named and numbered capturing groups (in addition to <code>$1</code>, etc.). When the braces syntax is used for numbered backreferences, it allows numbers with three or more digits (not possible natively) and allows separating a backreference from an immediately-following digit (not always possible natively). XRegExp uses stricter replacement text error handling than native JavaScript, to help you catch errors earlier (e.g., the use of a <code>$</code> character that isn't part of a valid metasequence causes an error to be thrown).</p>
+
+    <p>Following are the special tokens that can be used in XRegExp replacement strings:</p>
+
+    <ul>
+      <li><code>$$</code> - Inserts a literal <code>$</code> character.</li>
+      <li><code>$&amp;</code>, <code>$0</code> - Inserts the matched substring.</li>
+      <li><code>$`</code> - Inserts the string that precedes the matched substring (left context).</li>
+      <li><code>$'</code> - Inserts the string that follows the matched substring (right context).</li>
+      <li><code>$n</code>, <code>$nn</code> - Where n/nn are digits referencing an existing capturing group, inserts
+        backreference n/nn.</li>
+      <li><code>$&lt;n&gt;</code>, <code>${n}</code> - Where n is a name or any number of digits that reference an existent capturing
+        group, inserts backreference n.</li>
+    </ul>
+
+    <p>XRegExp behavior for <code>$&lt;n&gt;</code> and <code>${n}</code>:</p>
+
+    <ul>
+      <li>Backreference to numbered capture, if <code>n</code> is an integer. Use <code>0</code> for the entire match. Any number of leading zeros may be used.</li>
+      <li>Backreference to named capture <code>n</code>, if it exists. Does not overlap with numbered capture since XRegExp does not allow named capture to use a bare integer as the name.</li>
+      <li>If the name or number does not refer to an existing capturing group, it's an error.</li>
+    </ul>
+
+    <p>XRegExp behavior for <code>$n</code> and <code>$nn</code>:</p>
+
+    <ul>
+      <li>Backreferences without curly braces end after 1 or 2 digits. Use <code>${&hellip;}</code> for more digits.</li>
+      <li><code>$1</code> is an error if there are no capturing groups.</li>
+      <li><code>$10</code> is an error if there are less than 10 capturing groups. Use <code>${1}0</code> instead.</li>
+      <li><code>$01</code> is equivalent to <code>$1</code> if a capturing group exists, otherwise it's an error.</li>
+      <li><code>$0</code> (not followed by 1-9) and <code>$00</code> are the entire match.</li>
+    </ul>
+
+    <p>For comparison, following is JavaScript's native behavior for <code>$n</code> and <code>$nn</code>:</p>
+
+    <ul>
+      <li>Backreferences end after 1 or 2 digits. Cannot use backreference to capturing group 100+.</li>
+      <li><code>$1</code> is a literal <code>$1</code> if there are no capturing groups.</li>
+      <li><code>$10</code> is <code>$1</code> followed by a literal <code>0</code> if there are less than 10 capturing groups.</li>
+      <li><code>$01</code> is equivalent to <code>$1</code> if a capturing group exists, otherwise it's a literal <code>$01</code>.</li>
+      <li><code>$0</code> is a literal <code>$0</code>.</li>
+    </ul>
+
+
+
+
+
+  </div>
+</div>
+<div id="footer">
+  <p>&copy; <a href="http://stevenlevithan.com">Steven Levithan</a> :: <a href="https://github.com/slevithan/xregexp">GitHub</a> :: <a href="http://xregexp.com/">XRegExp.com</a></p>
+</div>
+</body>
+</html>
