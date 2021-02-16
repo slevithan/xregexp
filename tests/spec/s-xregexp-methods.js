@@ -230,7 +230,7 @@ describe('XRegExp.escape()', function() {
     });
 
     it('should handle escaping with ES6 flag u', function() {
-        expect(new RegExp('^' + XRegExp.escape(' - ') + '$', hasNativeU ? 'u' : '').test(' - ')).toBe(true);
+        expect(new RegExp('^' + XRegExp.escape(' \n-,#') + '$', hasNativeU ? 'u' : '').test(' \n-,#')).toBe(true);
     });
 
     it('should not escape nonmetacharacters', function() {
