@@ -789,13 +789,27 @@ XRegExp.cache.flush = (cacheName) => {
  * XRegExp.escape('Escaped? <.>');
  * // -> 'Escaped\?\u0020<\.>'
  */
-XRegExp.escape = (str) => String(nullThrows(str)).replace(/[-\[\]{}()*+?.,\\^$|#\s]/g, (match) => {
-    if (/\s/.test(match)) {
-        // Converting to \uNNNN since whitespace can't be escaped when used with ES6 flag `u`
-        return `\\u${pad4(hex(match.charCodeAt(0)))}`;
-    }
-    return `\\${match}`;
-});
+XRegExp.escape = (str) => {
+    // Following are the contexts where each metacharacter needs to be escaped because it would
+    // otherwise have a special meaning, change the meaning of surrounding characters, or cause an
+    // error. Context 'default' means outside character classes only.
+    // - `\` - context: all
+    // - `[()*+?.$|` - context: default
+    // - `]` - context: default with flag u or if forming the end of a character class
+    // - `{}` - context: default with flag u or if part of a valid/complete quantifier pattern
+    // - `,` - context: default if in a position that causes an unescaped `{` to turn into a
+    //   quantifier. E.g. /^a{1\,2}$/ matches 'a{1,2}', but /^a{1,2}$/ matches 'a' or 'aa'.
+    // - `#` and whitespace - context: default with flag x
+    // - `^` - context: default, and context: class if it's the first character in the class
+    // - `-` - context: class if part of a valid character class range
+    return String(nullThrows(str))
+        // Escape most special chars with a backslash
+        .replace(/[\\\[\]{}()*+?.,^$|#]/g, '\\$&')
+        // Convert whitespace to \uNNNN since it can't be escaped when used with ES6 flag `u`
+        .replace(/\s/g, (match) => `\\u${pad4(hex(match.charCodeAt(0)))}`
+        // Convert hyphen to \x2D since it can't be escaped when used with ES6 flag `u`
+        .replace(/-/g, '\\x2D');
+};
 
 /**
  * Executes a regex search in a specified string. Returns a match array or `null`. If the provided
