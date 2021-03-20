@@ -112,8 +112,8 @@ ea['namedMatch'] = 'b';
 const ea_str1: string | undefined = ea['namedMatch'] as string;
 
 // ChainArrayElement
-mca[1] = { regexp: /a/gi, backref: 1 };
-mca[2] = { regexp: /a/gi, backref: 'asdf' };
+mca[1] = { regex: /a/gi, backref: 1 };
+mca[2] = { regex: /a/gi, backref: 'asdf' };
 
 // MatchSubString
 class XRegExpMatchSubstringImpl extends String implements XRegExp.MatchSubString {
