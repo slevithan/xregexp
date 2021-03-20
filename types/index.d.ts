@@ -258,15 +258,15 @@ declare namespace XRegExp {
     }
 
     /**
-     * This is an element in the `XRegExpMatchChainArray` that also specifies a specific back reference.
+     * An element in a `MatchChainArray` that specifies a regex and a backreference to pass forward.
      */
     interface ChainArrayElement {
         /**
-         * The `RegExp` to use.
+         * The regex to use.
          */
-        regexp: RegExp;
+        regex: RegExp;
         /**
-         * The specific backreference.
+         * The named or numbered backreference to pass forward.
          */
         backref: number | string;
     }
