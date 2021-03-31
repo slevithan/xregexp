@@ -319,7 +319,7 @@ time.test('10:59'); // -> true
 XRegExp.exec('10:59', time).groups.minutes; // -> '59'
 </pre>
 
-    <p>See also: <em><a href="http://blog.stevenlevithan.com/archives/grammatical-patterns-xregexp-build">Creating Grammatical Regexes Using XRegExp.build</a></em>.</p>
+    <p>See also: <em><a href="https://blog.stevenlevithan.com/archives/grammatical-patterns-xregexp-build">Creating Grammatical Regexes Using XRegExp.build</a></em>.</p>
 
 
     <h2 id="cache"><code>XRegExp.cache(<span class="plain">pattern, [flags]</span>)</code></h2>
@@ -739,8 +739,8 @@ XRegExp.matchChain('1 &lt;b>2&lt;/b> 3 &lt;b>4 a 56&lt;/b>', [
 // -> ['2', '4', '56']
 
 // Passing forward and returning specific backreferences
-const html = `&lt;a href="http://xregexp.com/api/">XRegExp&lt;/a>
-              &lt;a href="http://www.google.com/">Google&lt;/a>`;
+const html = `&lt;a href="https://xregexp.com/api/">XRegExp&lt;/a>
+              &lt;a href="https://www.google.com/">Google&lt;/a>`;
 XRegExp.matchChain(html, [
   {regex: /&lt;a href="([^"]+)">/i, backref: 1},
   {regex: XRegExp('(?i)^https?://(?&lt;domain>[^/?#]+)'), backref: 'domain'}
@@ -1212,7 +1212,7 @@ XRegExp.union([/man/, /bear/, /pig/], 'i', {conjunction: 'none'});
   </div>
 </div>
 <div id="footer">
-  <p>&copy; <a href="http://stevenlevithan.com">Steven Levithan</a> :: <a href="https://github.com/slevithan/xregexp">GitHub</a> :: <a href="http://xregexp.com/">XRegExp.com</a></p>
+  <p>&copy; <a href="https://slev.life/">Steven Levithan</a> :: <a href="https://github.com/slevithan/xregexp">GitHub</a> :: <a href="https://xregexp.com/">XRegExp.com</a></p>
 </div>
 </body>
 </html>

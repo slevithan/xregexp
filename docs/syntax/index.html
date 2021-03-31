@@ -59,7 +59,7 @@
 
     <h3>Notes</h3>
     <ul>
-      <li>See additional details and compare to named capture in other regex flavors here: <a href="./named_capture_comparison/index.html"><strong>Named capture comparison</strong></a>.</li>
+      <li>See additional details and compare to named capture in other regex flavors here: <mark><a href="./named_capture_comparison/index.html">Named capture comparison</a></mark>.</li>
       <li>JavaScript added native support for named capture in ES2018. XRegExp support predates this, and it extends this support into pre-ES2018 browsers.</li>
       <li>Capture names can use a wide range of Unicode characters (see the definition of <a href="https://tc39.es/proposal-regexp-named-groups/#prod-RegExpIdentifierName"><code>RegExpIdentifierName</code></a>).</li>
     </ul>
@@ -82,19 +82,19 @@ const url = XRegExp(`^(?&lt;scheme> [^:/?]+ ) ://   # aka protocol
                       (?&lt;query>  .*      )       # optional query`, 'x');
 
 // Get the URL parts
-const parts = XRegExp.exec('http://google.com/path/to/file?q=1', url);
-// parts -> ['http://google.com/path/to/file?q=1', 'http', 'google.com', '/path/to/file', 'q=1']
-// parts.groups.scheme -> 'http'
+const parts = XRegExp.exec('https://google.com/path/to/file?q=1', url);
+// parts -> ['https://google.com/path/to/file?q=1', 'https', 'google.com', '/path/to/file', 'q=1']
+// parts.groups.scheme -> 'https'
 // parts.groups.host   -> 'google.com'
 // parts.groups.path   -> '/path/to/file'
 // parts.groups.query  -> 'q=1'
 
 // Named backreferences are available in replacement functions as properties of the last argument
-XRegExp.replace('http://google.com/path/to/file?q=1', url, (match, ...args) => {
+XRegExp.replace('https://google.com/path/to/file?q=1', url, (match, ...args) => {
   const groups = args.pop();
   return match.replace(groups.host, 'xregexp.com');
 });
-// -> 'http://xregexp.com/path/to/file?q=1'
+// -> 'https://xregexp.com/path/to/file?q=1'
 </pre>
 
     <p>Regexes that use named capture work with all native methods. However, you need to use <code><a href="../api/index.html#exec">XRegExp.exec</a></code> and <code><a href="../api/index.html#replace">XRegExp.replace</a></code> for access to named backreferences, otherwise only numbered backreferences are available.</p>
@@ -226,7 +226,7 @@ regex.multiline; // -> true
   </div>
 </div>
 <div id="footer">
-  <p>&copy; <a href="http://stevenlevithan.com">Steven Levithan</a> :: <a href="https://github.com/slevithan/xregexp">GitHub</a> :: <a href="http://xregexp.com/">XRegExp.com</a></p>
+  <p>&copy; <a href="https://slev.life/">Steven Levithan</a> :: <a href="https://github.com/slevithan/xregexp">GitHub</a> :: <a href="https://xregexp.com/">XRegExp.com</a></p>
 </div>
 </body>
 </html>

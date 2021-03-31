@@ -88,8 +88,8 @@ XRegExp.matchChain('1 <b>2</b> 3 <B>4 \n 56</B>', [
 
 // You can also pass forward and return specific backreferences
 const html =
-    `<a href="http://xregexp.com/">XRegExp</a>
-     <a href="http://www.google.com/">Google</a>`;
+    `<a href="https://xregexp.com/">XRegExp</a>
+     <a href="https://www.google.com/">Google</a>`;
 XRegExp.matchChain(html, [
     {regex: /<a href="([^"]+)">/i, backref: 1},
     {regex: XRegExp('(?i)^https?://(?<domain>[^/?#]+)'), backref: 'domain'}
@@ -101,7 +101,7 @@ XRegExp.union(['m+a*n', /(bear)\1/, /(pig)\1/], 'i', {conjunction: 'or'});
 // -> /m\+a\*n|(bear)\1|(pig)\2/i
 ```
 
-These examples give the flavor of what's possible, but XRegExp has more syntax, flags, methods, options, and browser fixes that aren't shown here. You can also augment XRegExp's regular expression syntax with addons (see below) or write your own. See [xregexp.com](http://xregexp.com/) for details.
+These examples give the flavor of what's possible, but XRegExp has more syntax, flags, methods, options, and browser fixes that aren't shown here. You can also augment XRegExp's regular expression syntax with addons (see below) or write your own. See [xregexp.com](https://xregexp.com/) for details.
 
 ## Addons
 
@@ -241,7 +241,7 @@ Using [npm](https://www.npmjs.com/):
 npm install xregexp
 ```
 
-In [Node.js](http://nodejs.org/):
+In [Node.js](https://nodejs.org/en/):
 
 ```js
 const XRegExp = require('xregexp');
@@ -251,10 +251,10 @@ const XRegExp = require('xregexp');
 
 XRegExp project collaborators are:
 
-- [Steven Levithan](http://stevenlevithan.com/)
+- [Steven Levithan](https://blog.stevenlevithan.com/)
 - [Joseph Frazier](https://github.com/josephfrazier)
 - [Mathias Bynens](https://mathiasbynens.be/)
 
 Thanks to all contributors and others who have submitted code, provided feedback, reported bugs, and inspired new features.
 
-XRegExp is released under the [MIT License](https://mit-license.org/). Learn more at [xregexp.com](http://xregexp.com/).
+XRegExp is released under the [MIT License](https://mit-license.org/). Learn more at [xregexp.com](https://xregexp.com/).

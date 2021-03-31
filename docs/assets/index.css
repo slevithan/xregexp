@@ -16,7 +16,6 @@ a:hover, a:active {color:#0a3716; text-decoration:underline;}
 .plain {font-weight:normal;}
 .alert {color:#900; font-weight:bold;}
 .todo {color:#c00; font-weight:bold;}
-.standout {background:#ffc;}
 .clear {clear:both;}
 h1 {margin-bottom:0; font-family:Cambria, Tahoma, Verdana, Arial, Helvetica, sans-serif;}
 h1 a:link, h1 a:visited, h1 a:active, h1 a:hover {color:#000; text-decoration:none;}
@@ -30,6 +29,7 @@ code {font-family:Monaco, Consolas, "Courier New", Courier, monospace; border:1p
 cite {font-style:normal;}
 q {font-style:italic;}
 q:before, q:after {content:"";}
+mark {background:#ffc;}
 li {margin-bottom:1px; line-height:130%;}
 table {border-collapse:collapse; border-color:#888;}
 table ul {padding-left:20px; margin:0;}

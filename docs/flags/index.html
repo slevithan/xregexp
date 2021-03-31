@@ -83,7 +83,7 @@
     <h2 id="singleline">Dot matches all <span class="plain">(<code>s</code>)</span></h2>
 
     <!--<div class="aside right">
-      <p>The now abandoned ES4 proposals called for recognizing the <a href="http://en.wikipedia.org/wiki/C0_and_C1_control_codes">C1</a>/Unicode NEL "next line" control code (<code>U+0085</code>) as an additional newline code point in that standard.</p>
+      <p>The now abandoned ES4 proposals called for recognizing the <a href="https://en.wikipedia.org/wiki/C0_and_C1_control_codes">C1</a>/Unicode NEL "next line" control code (<code>U+0085</code>) as an additional newline code point in that standard.</p>
     </div>-->
 
     <!--<div class="aside right">
@@ -172,7 +172,7 @@
 
       <p>Aside: Not all JavaScript regex syntax is Unicode-aware. According to JavaScript specs, <code>\s</code>, <code>\S</code>, <code>.</code>, <code>^</code>, and <code>$</code> use Unicode-based interpretations of <em>whitespace</em> and <em>newline</em>, while <code>\d</code>, <code>\D</code>, <code>\w</code>, <code>\W</code>, <code>\b</code>, and <code>\B</code> use ASCII-only interpretations of <em>digit</em>, <em>word character</em>, and <em>word boundary</em><!-- (e.g., <code>/a\b/.test("na&iuml;ve")</code> returns <code>true</code>)-->. Many browsers get some of these details wrong. <!--E.g., Firefox 2 and earlier considers <code>\d</code> and <code>\D</code> to be Unicode-aware. Firefox 3 fixes this bug, making <code>\d</code> equivalent to <code>[0-9]</code>.--></p>
 
-      <p>For more details, see <a href="http://blog.stevenlevithan.com/archives/javascript-regex-and-unicode"><em>JavaScript, Regex, and Unicode</em></a>.</p>
+      <p>For more details, see <a href="https://blog.stevenlevithan.com/archives/javascript-regex-and-unicode"><em>JavaScript, Regex, and Unicode</em></a>.</p>
     </div>
 
 
@@ -210,7 +210,7 @@ XRegExp('^\\pS$').test('💩'); // -> true
   </div>
 </div>
 <div id="footer">
-  <p>&copy; <a href="http://stevenlevithan.com">Steven Levithan</a> :: <a href="https://github.com/slevithan/xregexp">GitHub</a> :: <a href="http://xregexp.com/">XRegExp.com</a></p>
+  <p>&copy; <a href="https://slev.life/">Steven Levithan</a> :: <a href="https://github.com/slevithan/xregexp">GitHub</a> :: <a href="https://xregexp.com/">XRegExp.com</a></p>
 </div>
 </body>
 </html>

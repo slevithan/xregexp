@@ -44,7 +44,7 @@
 
     <p>XRegExp provides augmented (and extensible) JavaScript regular expressions. You get modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your grepping and parsing easier, while freeing you from regex cross-browser inconsistencies and other annoyances.</p>
 
-    <p>XRegExp supports all native ES6 regular expression syntax. It supports ES5+ browsers (including Internet Explorer 9+), and you can use it with Node.js or as a RequireJS module. Over the years, many of XRegExp's features have been adopted by new JavaScript standards (named capturing, Unicode properties/scripts/categories, flag <code>s</code>, sticky matching, etc.), so using XRegExp can be a way to extend these features into older browsers. It's released under the <a href="http://mit-license.org/">MIT License</a>.</p>
+    <p>XRegExp supports all native ES6 regular expression syntax. It supports <mark>ES5+ browsers</mark> (including Internet Explorer 9+), and you can use it with <mark>Node.js</mark> or as a <mark>RequireJS</mark> module. Over the years, many of XRegExp's features have been adopted by new JavaScript standards (named capturing, Unicode properties/scripts/categories, flag <code>s</code>, sticky matching, etc.), so using XRegExp can be a way to extend these features into older browsers. It's released under the <a href="https://mit-license.org/">MIT License</a>.</p>
 
     <p><strong>XRegExp lets you write regexes like this:</strong></p>
 
@@ -63,8 +63,8 @@ XRegExp.replace('2021-02-23', date, '$&lt;month&gt;/$&lt;day&gt;/$&lt;year&gt;')
 // -> '02/23/2021'
 
 // Finding matches within matches, while passing forward and returning specific backreferences
-const html = `&lt;a href="http://xregexp.com/api/">XRegExp&lt;/a>
-              &lt;a href="http://www.google.com/">Google&lt;/a>`;
+const html = `&lt;a href="https://xregexp.com/api/">XRegExp&lt;/a>
+              &lt;a href="https://www.google.com/">Google&lt;/a>`;
 XRegExp.matchChain(html, [
   {regex: /&lt;a href="([^"]+)">/i, backref: 1},
   {regex: XRegExp('(?i)^https?://(?&lt;domain>[^/?#]+)'), backref: 'domain'}
@@ -94,12 +94,12 @@ XRegExp.matchChain(html, [
 <pre class="sh_html">&lt;script src="https://unpkg.com/xregexp/xregexp-all.js">&lt;/script>
 </pre>
 
-    <p>Using <a href="http://npmjs.org/">npm</a>:</p>
+    <p>Using <a href="https://www.npmjs.com/">npm</a>:</p>
 
 <pre class="sh_html">npm install xregexp
 </pre>
 
-    <p>In <a href="http://nodejs.org/">Node.js</a>:</p>
+    <p>In <a href="https://nodejs.org/en/">Node.js</a>:</p>
 
 <pre class="sh_javascript">const XRegExp = require('xregexp');
 </pre>
@@ -131,7 +131,7 @@ const name = XRegExp.exec(str, regexWithNamedCapture).groups.name;
 	</div>
 </div>
 <div id="footer">
-	<p>&copy; <a href="http://stevenlevithan.com">Steven Levithan</a> :: <a href="https://github.com/slevithan/xregexp">GitHub</a> :: <a href="http://xregexp.com/">XRegExp.com</a></p>
+	<p>&copy; <a href="https://slev.life/">Steven Levithan</a> :: <a href="https://github.com/slevithan/xregexp">GitHub</a> :: <a href="https://xregexp.com/">XRegExp.com</a></p>
 </div>
 </body>
 </html>
