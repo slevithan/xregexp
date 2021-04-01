@@ -57,8 +57,5 @@
     "nyc": "^15.1.0",
     "unicode-property-value-aliases": "^3.5.0",
     "zuul": "^3.12.0"
-  },
-  "dependencies": {
-    "@babel/runtime-corejs3": "^7.12.1"
   }
 }
