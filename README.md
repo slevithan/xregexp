@@ -231,7 +231,11 @@ XRegExp.matchRecursive(str5, '<div\\s*>', '</div>', 'gi', {
     unbalancedDelimiters: 'text',
 });
 /* -> [
-
+{name: 'between', value: 'Here is <div> ',     start: 0,  end: 14},
+{name: 'left',    value: '<div>',              start: 14, end: 19},
+{name: 'match',   value: 'an',                 start: 19, end: 21},
+{name: 'right',   value: '</div>',             start: 21, end: 27},
+{name: 'between', value: ' unmatched example', start: 27, end: 45}
 ] */
 ```
 
