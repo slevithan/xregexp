@@ -223,6 +223,16 @@ XRegExp.matchRecursive(str3, '{', '}', 'g', {
 const str4 = '<1><<<2>>><3>4<5>';
 XRegExp.matchRecursive(str4, '<', '>', 'gy');
 // -> ['1', '<<2>>', '3']
+
+// Returning unmatched delimiters as raw text instead of erroring
+const str5 = 'Here is <div> <div>an</div> unmatched example';
+XRegExp.matchRecursive(str5, '<div\\s*>', '</div>', 'gi', {
+    valueNames: ['between', 'left', 'match', 'right'],
+    unbalancedDelimiters: 'text',
+});
+/* -> [
+
+] */
 ```
 
 `XRegExp.matchRecursive` throws an error if it scans past an unbalanced delimiter in the target string.
@@ -246,6 +256,15 @@ In [Node.js](https://nodejs.org/en/):
 ```js
 const XRegExp = require('xregexp');
 ```
+
+## Contribution Guide
+
+1. Fork the repository and clone the forked version locally.
+1. Ensure you have the `typescript` module installed globally.
+1. Run `npm install`.
+1. Ensure all tests pass with `npm t`.
+1. Add tests for new functionality or that fail from the bug not fixed.
+1. Implement functionality or bug fix to pass the test.
 
 ## Credits
 

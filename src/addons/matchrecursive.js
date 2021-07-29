@@ -30,7 +30,7 @@ export default (XRegExp) => {
      * @param {String} left Left delimiter as an XRegExp pattern.
      * @param {String} right Right delimiter as an XRegExp pattern.
      * @param {String} [flags] Any combination of XRegExp flags, used for the left and right delimiters.
-     * @param {Object} [options] Lets you specify `valueNames` and `escapeChar` options.
+     * @param {Object} [options] Lets you specify `valueNames`, `escapeChar`, and `unbalancedDelimiters` options.
      * @returns {!Array} Array of matches, or an empty array.
      * @example
      *
@@ -79,6 +79,7 @@ export default (XRegExp) => {
         const basicFlags = flags.replace(/y/g, '');
         let {escapeChar} = options;
         const vN = options.valueNames;
+        const unbalancedDelimiters = options.unbalancedDelimiters || 'error';
         const output = [];
         let openTokens = 0;
         let delimStart = 0;
@@ -179,10 +180,19 @@ export default (XRegExp) => {
                         break;
                     }
                 }
-            } else {
+            } else if (unbalancedDelimiters === 'error') {
                 const delimSide = rightMatch ? 'right' : 'left';
                 const errorPos = rightMatch ? delimStart : outerStart;
                 throw new Error(`Unbalanced ${delimSide} delimiter found in string at position ${errorPos}`);
+            } else if (unbalancedDelimiters === 'text') {
+                if (rightMatch) {
+                    rightMatch = null;
+                } else {
+                    delimEnd = XRegExp.exec(str, left, outerStart)[0].length + outerStart;
+                    openTokens = 0;
+                }
+            } else {
+                throw new Error(`Unsupported value for unbalancedDelimiters: ${unbalancedDelimiters}`);
             }
             // If the delimiter matched an empty string, avoid an infinite loop
             if (delimStart === delimEnd) {
