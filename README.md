@@ -10,7 +10,7 @@ XRegExp supports all native ES6 regular expression syntax. It supports ES5+ brow
 
 XRegExp compiles to native `RegExp` objects. Therefore regexes built with XRegExp perform just as fast as native regular expressions. There is a tiny extra cost when compiling a pattern for the first time.
 
-## Named Capture Breaking Change in XRegExp 5
+## Named capture breaking change in XRegExp 5
 
 XRegExp 5 introduced a breaking change where named backreference properties now appear on the result's `groups` object (following ES2018), rather than directly on the result. To restore the old handling so you don't need to update old code, run the following line after importing XRegExp:
 
@@ -59,7 +59,7 @@ XRegExp.replace('2021-02-22', date, '$<month>/$<day>/$<year>');
 // -> '02/22/2021'
 XRegExp.replace('2021-02-22', date, (...args) => {
     // Named backreferences are on the last argument
-    const groups = args.pop();
+    const groups = args[args.length - 1];
     return `${groups.month}/${groups.day}/${groups.year}`;
 });
 // -> '02/22/2021'
@@ -227,16 +227,9 @@ XRegExp.matchRecursive(str4, '<', '>', 'gy');
 // Skipping unbalanced delimiters instead of erroring
 const str5 = 'Here is <div> <div>an</div> unbalanced example';
 XRegExp.matchRecursive(str5, '<div\\s*>', '</div>', 'gi', {
-    valueNames: ['between', 'left', 'match', 'right'],
-    unbalancedDelimiters: 'skip',
+    unbalanced: 'skip'
 });
-/* -> [
-{name: 'between', value: 'Here is <div> ',      start: 0,  end: 14},
-{name: 'left',    value: '<div>',               start: 14, end: 19},
-{name: 'match',   value: 'an',                  start: 19, end: 21},
-{name: 'right',   value: '</div>',              start: 21, end: 27},
-{name: 'between', value: ' unbalanced example', start: 27, end: 44}
-] */
+// -> ['an']
 ```
 
 `XRegExp.matchRecursive` throws an error if it scans past an unbalanced delimiter in the target string.
@@ -261,7 +254,7 @@ In [Node.js](https://nodejs.org/en/):
 const XRegExp = require('xregexp');
 ```
 
-## Contribution Guide
+## Contribution guide
 
 1. Fork the repository and clone the forked version locally.
 1. Ensure you have the `typescript` module installed globally.

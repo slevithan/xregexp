@@ -340,14 +340,14 @@ declare namespace XRegExp {
         valueNames?: MatchRecursiveValueNames | null;
 
         /**
-         * The mode by which unbalanced delimiters should be handled.
-         * 
-         * By default, `matchRecursive` will throw an error. Valid values include:
-         * - "error" - throws an error (default)
-         * - "skip" - treats the unbalanced delimiter as raw text, skipping one delimiter at a time.
-         * - "skip-lazy" - treats the unbalanced delimiter as raw text, skipping one character at a time.
+         * How to handle unbalanced delimiters within the subject string. Valid values are:
+         * - 'error' - throw (default).
+         * - 'skip' - treat unbalanced delimiters as part of the text between delimiters, and
+         *   continue searching after the unbalanced delimiter.
+         * - 'skip-lazy' - treat unbalanced delimiters as part of the text between delimiters,
+         *   and continue searching one character after the start of the unbalanced delimiter.
          */
-        unbalancedDelimiters: 'error' | 'skip' | 'skip-lazy';
+        unbalanced?: 'error' | 'skip' | 'skip-lazy';
     }
 
     /**
@@ -762,18 +762,35 @@ declare namespace XRegExp {
      * @param left - Left delimiter as an XRegExp pattern.
      * @param right - Right delimiter as an XRegExp pattern.
      * @param flags - Any combination of XRegExp flags, used for the left and right delimiters.
-     * @param options - Lets you specify `valueNames` and `escapeChar` options.
+     * @param options - Options object with optional properties:
+     *   - `valueNames` {Array} Providing `valueNames` changes the overall return value from a
+     *     simple array of matched strings to an array of objects that provide greatly extended
+     *     information including value and position information about not only the matched strings
+     *     but also the matched delimiters and the strings outside of or between matches.
+     *     To use this extended information mode, provide 4 strings to name the parts that will be
+     *     returned: 1. values outside of (before, after, and between) matches, 2. the matched outer
+     *     left delimiter, 3. the matched text between outer left and right delimiters, and 4. the
+     *     matched outer right delimiter. Null values can be provided instead of strings for any of
+     *     these 4 parts to omit unneeded parts from the returned results.
+     *   - `escapeChar` {String} Single char used to escape delimiters within the subject string.
+     *   - `unbalanced` {String} How to handle unbalanced delimiters within the subject string.
+     *     Valid values are:
+     *     - 'error' - throw (default)
+     *     - 'skip' - treat unbalanced delimiters as part of the text between delimiters, and
+     *       continue searching after the unbalanced delimiter.
+     *     - 'skip-lazy' - treat unbalanced delimiters as part of the text between delimiters,
+     *       and continue searching one character after the start of the unbalanced delimiter.
      * @returns Array of matches, or an empty array.
      * @example
      *
      * // Basic usage
-     * let str = '(t((e))s)t()(ing)';
-     * XRegExp.matchRecursive(str, '\\(', '\\)', 'g');
+     * const str1 = '(t((e))s)t()(ing)';
+     * XRegExp.matchRecursive(str1, '\\(', '\\)', 'g');
      * // -> ['t((e))s', '', 'ing']
      *
      * // Extended information mode with valueNames
-     * str = 'Here is <div> <div>an</div></div> example';
-     * XRegExp.matchRecursive(str, '<div\\s*>', '</div>', 'gi', {
+     * const str2 = 'Here is <div> <div>an</div></div> example';
+     * XRegExp.matchRecursive(str2, '<div\\s*>', '</div>', 'gi', {
      *   valueNames: ['between', 'left', 'match', 'right']
      * });
      * // -> [
@@ -785,8 +802,8 @@ declare namespace XRegExp {
      * // ]
      *
      * // Omitting unneeded parts with null valueNames, and using escapeChar
-     * str = '...{1}.\\{{function(x,y){return {y:x}}}';
-     * XRegExp.matchRecursive(str, '{', '}', 'g', {
+     * const str3 = '...{1}.\\{{function(x,y){return {y:x}}}';
+     * XRegExp.matchRecursive(str3, '{', '}', 'g', {
      *   valueNames: ['literal', null, 'value', null],
      *   escapeChar: '\\'
      * });
@@ -798,9 +815,16 @@ declare namespace XRegExp {
      * // ]
      *
      * // Sticky mode via flag y
-     * str = '<1><<<2>>><3>4<5>';
-     * XRegExp.matchRecursive(str, '<', '>', 'gy');
+     * const str4 = '<1><<<2>>><3>4<5>';
+     * XRegExp.matchRecursive(str4, '<', '>', 'gy');
      * // -> ['1', '<<2>>', '3']
+     *
+     * // Skipping unbalanced delimiters instead of erroring
+     * const str5 = 'Here is <div> <div>an</div> unbalanced example';
+     * XRegExp.matchRecursive(str5, '<div\\s*>', '</div>', 'gi', {
+     *     unbalanced: 'skip'
+     * });
+     * // -> ['an']
      */
     function matchRecursive(str: string, left: string, right: string, flags?: string | null): string[];
     function matchRecursive<T extends (MatchRecursiveOptions | null | undefined)>(str: string, left: string, right: string, flags?: string | null, options?: T)
