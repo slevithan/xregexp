@@ -13,7 +13,7 @@ export default (XRegExp) => {
      * Adds support for all Unicode scripts. E.g., `\p{Latin}`. Token names are case insensitive,
      * and any spaces, hyphens, and underscores are ignored.
      *
-     * Uses Unicode 13.0.0.
+     * Uses Unicode 14.0.0.
      *
      * @requires XRegExp, Unicode Base
      */
