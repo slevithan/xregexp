@@ -340,12 +340,7 @@ declare namespace XRegExp {
         valueNames?: MatchRecursiveValueNames | null;
 
         /**
-         * How to handle unbalanced delimiters within the subject string. Valid values are:
-         * - 'error' - throw (default).
-         * - 'skip' - treat unbalanced delimiters as part of the text between delimiters, and
-         *   continue searching after the unbalanced delimiter.
-         * - 'skip-lazy' - treat unbalanced delimiters as part of the text between delimiters,
-         *   and continue searching one character after the start of the unbalanced delimiter.
+         * Handling mode for unbalanced delimiters.
          */
         unbalanced?: 'error' | 'skip' | 'skip-lazy';
     }
@@ -755,31 +750,32 @@ declare namespace XRegExp {
 
     /**
      * Returns an array of match strings between outermost left and right delimiters, or an array of
-     * objects with detailed match parts and position data. An error is thrown if delimiters are
-     * unbalanced within the data.
+     * objects with detailed match parts and position data. By default, an error is thrown if
+     * delimiters are unbalanced within the subject string.
      *
      * @param str - String to search.
      * @param left - Left delimiter as an XRegExp pattern.
      * @param right - Right delimiter as an XRegExp pattern.
      * @param flags - Any combination of XRegExp flags, used for the left and right delimiters.
      * @param options - Options object with optional properties:
-     *   - `valueNames` {Array} Providing `valueNames` changes the overall return value from a
-     *     simple array of matched strings to an array of objects that provide greatly extended
-     *     information including value and position information about not only the matched strings
-     *     but also the matched delimiters and the strings outside of or between matches.
-     *     To use this extended information mode, provide 4 strings to name the parts that will be
-     *     returned: 1. values outside of (before, after, and between) matches, 2. the matched outer
-     *     left delimiter, 3. the matched text between outer left and right delimiters, and 4. the
-     *     matched outer right delimiter. Null values can be provided instead of strings for any of
-     *     these 4 parts to omit unneeded parts from the returned results.
+     *   - `valueNames` {Array} Providing `valueNames` changes the return value from an array of
+     *     matched strings to an array of objects that provide the value and start/end positions
+     *     for the matched strings as well as the matched delimiters and unmatched string segments.
+     *     To use this extended information mode, provide an array of 4 strings that name the parts
+     *     to be returned:
+     *     1. String segments outside of (before, between, and after) matches.
+     *     2. Matched outermost left delimiters.
+     *     3. Matched text between the outermost left and right delimiters.
+     *     4. Matched outermost right delimiters.
+     *     Taken together, these parts include the entire subject string if used with flag g.
+     *     Use `null` for any of these values to omit unneeded parts from the returned results.
      *   - `escapeChar` {String} Single char used to escape delimiters within the subject string.
-     *   - `unbalanced` {String} How to handle unbalanced delimiters within the subject string.
-     *     Valid values are:
+     *   - `unbalanced` {String} Handling mode for unbalanced delimiters. Options are:
      *     - 'error' - throw (default)
-     *     - 'skip' - treat unbalanced delimiters as part of the text between delimiters, and
-     *       continue searching after the unbalanced delimiter.
-     *     - 'skip-lazy' - treat unbalanced delimiters as part of the text between delimiters,
-     *       and continue searching one character after the start of the unbalanced delimiter.
+     *     - 'skip' - unbalanced delimiters are treated as part of the text between delimiters, and
+     *       searches continue at the end of the unbalanced delimiter.
+     *     - 'skip-lazy' - unbalanced delimiters are treated as part of the text between delimiters,
+     *       and searches continue one character after the start of the unbalanced delimiter.
      * @returns Array of matches, or an empty array.
      * @example
      *

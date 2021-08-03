@@ -186,7 +186,7 @@ XRegExp.tag()`${backref1}${backref2}`.test('aabb'); // -> true
 
 ### XRegExp.matchRecursive
 
-Match recursive constructs using XRegExp pattern strings as left and right delimiters:
+A robust and flexible API for matching recursive constructs using XRegExp pattern strings as left and right delimiters:
 
 ```js
 const str1 = '(t((e))s)t()(ing)';
@@ -232,7 +232,7 @@ XRegExp.matchRecursive(str5, '<div\\s*>', '</div>', 'gi', {
 // -> ['an']
 ```
 
-`XRegExp.matchRecursive` throws an error if it scans past an unbalanced delimiter in the target string.
+By default, `XRegExp.matchRecursive` throws an error if it scans past an unbalanced delimiter in the target string. Multiple alternative options are available for handling unbalanced delimiters.
 
 ## Installation and usage
 
