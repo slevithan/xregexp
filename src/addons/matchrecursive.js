@@ -238,7 +238,7 @@ export default (XRegExp) => {
             }
         }
 
-        if (global && !sticky && vN && vN[0] && str.length > lastOuterEnd) {
+        if (global && output.length > 0 && !sticky && vN && vN[0] && str.length > lastOuterEnd) {
             output.push(row(vN[0], str.slice(lastOuterEnd), lastOuterEnd, str.length));
         }
 

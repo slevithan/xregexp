@@ -155,12 +155,11 @@ describe('XRegExp.matchRecursive addon:', function() {
                     valueNames: ['between', 'left', 'match', 'right']
                 })
             ).toEqual([]);
-            // TODO: Change behavior to match test (don't return `between` value with full string)
-            // expect(
-            //     XRegExp.matchRecursive('.', '<', '>', 'g', {
-            //         valueNames: ['between', 'left', 'match', 'right']
-            //     })
-            // ).toEqual([]);
+            expect(
+                XRegExp.matchRecursive('.', '<', '>', 'g', {
+                    valueNames: ['between', 'left', 'match', 'right']
+                })
+            ).toEqual([]);
         });
 
     });
