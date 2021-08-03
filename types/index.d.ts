@@ -338,6 +338,16 @@ declare namespace XRegExp {
          * return and array of `XRegExp.MatchRecursiveValueNameMatch`
          */
         valueNames?: MatchRecursiveValueNames | null;
+
+        /**
+         * The mode by which unbalanced delimiters should be handled.
+         * 
+         * By default, `matchRecursive` will throw an error. Valid values include:
+         * - "error" - throws an error (default)
+         * - "skip" - treats the unbalanced delimiter as raw text, skipping one delimiter at a time.
+         * - "skip-lazy" - treats the unbalanced delimiter as raw text, skipping one character at a time.
+         */
+        unbalancedDelimiters: 'error' | 'skip' | 'skip-lazy';
     }
 
     /**

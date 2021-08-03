@@ -223,6 +223,20 @@ XRegExp.matchRecursive(str3, '{', '}', 'g', {
 const str4 = '<1><<<2>>><3>4<5>';
 XRegExp.matchRecursive(str4, '<', '>', 'gy');
 // -> ['1', '<<2>>', '3']
+
+// Skipping unbalanced delimiters instead of erroring
+const str5 = 'Here is <div> <div>an</div> unbalanced example';
+XRegExp.matchRecursive(str5, '<div\\s*>', '</div>', 'gi', {
+    valueNames: ['between', 'left', 'match', 'right'],
+    unbalancedDelimiters: 'skip',
+});
+/* -> [
+{name: 'between', value: 'Here is <div> ',      start: 0,  end: 14},
+{name: 'left',    value: '<div>',               start: 14, end: 19},
+{name: 'match',   value: 'an',                  start: 19, end: 21},
+{name: 'right',   value: '</div>',              start: 21, end: 27},
+{name: 'between', value: ' unbalanced example', start: 27, end: 44}
+] */
 ```
 
 `XRegExp.matchRecursive` throws an error if it scans past an unbalanced delimiter in the target string.
@@ -246,6 +260,15 @@ In [Node.js](https://nodejs.org/en/):
 ```js
 const XRegExp = require('xregexp');
 ```
+
+## Contribution Guide
+
+1. Fork the repository and clone the forked version locally.
+1. Ensure you have the `typescript` module installed globally.
+1. Run `npm install`.
+1. Ensure all tests pass with `npm t`.
+1. Add tests for new functionality or that fail from the bug not fixed.
+1. Implement functionality or bug fix to pass the test.
 
 ## Credits
 

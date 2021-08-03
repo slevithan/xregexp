@@ -30,7 +30,7 @@ export default (XRegExp) => {
      * @param {String} left Left delimiter as an XRegExp pattern.
      * @param {String} right Right delimiter as an XRegExp pattern.
      * @param {String} [flags] Any combination of XRegExp flags, used for the left and right delimiters.
-     * @param {Object} [options] Lets you specify `valueNames` and `escapeChar` options.
+     * @param {Object} [options] Lets you specify `valueNames`, `escapeChar`, and `unbalancedDelimiters` options.
      * @returns {!Array} Array of matches, or an empty array.
      * @example
      *
@@ -69,6 +69,20 @@ export default (XRegExp) => {
      * str = '<1><<<2>>><3>4<5>';
      * XRegExp.matchRecursive(str, '<', '>', 'gy');
      * // -> ['1', '<<2>>', '3']
+     *
+     * // Skipping unbalanced delimiters instead of erroring
+     * const str5 = 'Here is <div> <div>an</div> unbalanced example';
+     * XRegExp.matchRecursive(str5, '<div\\s*>', '</div>', 'gi', {
+     *     valueNames: ['between', 'left', 'match', 'right'],
+     *     unbalancedDelimiters: 'skip',
+     * });
+     * // -> [
+     * // {name: 'between', value: 'Here is <div> ',     start: 0,  end: 14},
+     * // {name: 'left',    value: '<div>',              start: 14, end: 19},
+     * // {name: 'match',   value: 'an',                 start: 19, end: 21},
+     * // {name: 'right',   value: '</div>',             start: 21, end: 27},
+     * // {name: 'between', value: ' unbalanced example', start: 27, end: 45}
+     * // ]
      */
     XRegExp.matchRecursive = (str, left, right, flags, options) => {
         flags = flags || '';
@@ -79,6 +93,7 @@ export default (XRegExp) => {
         const basicFlags = flags.replace(/y/g, '');
         let {escapeChar} = options;
         const vN = options.valueNames;
+        const unbalancedDelimiters = options.unbalancedDelimiters || 'error';
         const output = [];
         let openTokens = 0;
         let delimStart = 0;
@@ -180,9 +195,23 @@ export default (XRegExp) => {
                     }
                 }
             } else {
-                const delimSide = rightMatch ? 'right' : 'left';
-                const errorPos = rightMatch ? delimStart : outerStart;
-                throw new Error(`Unbalanced ${delimSide} delimiter found in string at position ${errorPos}`);
+                // eslint-disable-next-line no-lonely-if
+                if (unbalancedDelimiters === 'error') {
+                    const delimSide = rightMatch ? 'right' : 'left';
+                    const errorPos = rightMatch ? delimStart : outerStart;
+                    throw new Error(`Unbalanced ${delimSide} delimiter found in string at position ${errorPos}`);
+                } else if (unbalancedDelimiters.startsWith('skip')) {
+                    if (rightMatch) {
+                        rightMatch = null;
+                    } else {
+                        delimEnd = unbalancedDelimiters === 'skip-lazy' ?
+                            1 :
+                            (XRegExp.exec(str, left, outerStart)[0].length + outerStart) || 1;
+                        openTokens = 0;
+                    }
+                } else {
+                    throw new Error(`Unsupported value for unbalancedDelimiters: ${unbalancedDelimiters}`);
+                }
             }
             // If the delimiter matched an empty string, avoid an infinite loop
             if (delimStart === delimEnd) {
