@@ -224,18 +224,18 @@ const str4 = '<1><<<2>>><3>4<5>';
 XRegExp.matchRecursive(str4, '<', '>', 'gy');
 // -> ['1', '<<2>>', '3']
 
-// Returning unmatched delimiters as raw text instead of erroring
-const str5 = 'Here is <div> <div>an</div> unmatched example';
+// Skipping unbalanced delimiters instead of erroring
+const str5 = 'Here is <div> <div>an</div> unbalanced example';
 XRegExp.matchRecursive(str5, '<div\\s*>', '</div>', 'gi', {
     valueNames: ['between', 'left', 'match', 'right'],
-    unbalancedDelimiters: 'text',
+    unbalancedDelimiters: 'skip',
 });
 /* -> [
-{name: 'between', value: 'Here is <div> ',     start: 0,  end: 14},
-{name: 'left',    value: '<div>',              start: 14, end: 19},
-{name: 'match',   value: 'an',                 start: 19, end: 21},
-{name: 'right',   value: '</div>',             start: 21, end: 27},
-{name: 'between', value: ' unmatched example', start: 27, end: 45}
+{name: 'between', value: 'Here is <div> ',      start: 0,  end: 14},
+{name: 'left',    value: '<div>',               start: 14, end: 19},
+{name: 'match',   value: 'an',                  start: 19, end: 21},
+{name: 'right',   value: '</div>',              start: 21, end: 27},
+{name: 'between', value: ' unbalanced example', start: 27, end: 44}
 ] */
 ```
 

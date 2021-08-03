@@ -344,9 +344,10 @@ declare namespace XRegExp {
          * 
          * By default, `matchRecursive` will throw an error. Valid values include:
          * - "error" - throws an error (default)
-         * - "text" - treats the unbalanced delimiter as raw text.
+         * - "skip" - treats the unbalanced delimiter as raw text, skipping one delimiter at a time.
+         * - "skip-lazy" - treats the unbalanced delimiter as raw text, skipping one character at a time.
          */
-        unbalancedDelimiters: 'error' | 'text';
+        unbalancedDelimiters: 'error' | 'skip' | 'skip-lazy';
     }
 
     /**
