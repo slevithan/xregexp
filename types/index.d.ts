@@ -347,7 +347,7 @@ declare namespace XRegExp {
          * - "skip" - treats the unbalanced delimiter as raw text, skipping one delimiter at a time.
          * - "skip-lazy" - treats the unbalanced delimiter as raw text, skipping one character at a time.
          */
-        unbalancedDelimiters: 'error' | 'skip' | 'skip-lazy';
+        unbalancedDelimiters?: 'error' | 'skip' | 'skip-lazy';
     }
 
     /**
