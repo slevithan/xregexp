@@ -257,11 +257,11 @@ const XRegExp = require('xregexp');
 ## Contribution guide
 
 1. Fork the repository and clone the forked version locally.
-1. Ensure you have the `typescript` module installed globally.
-1. Run `npm install`.
-1. Ensure all tests pass with `npm t`.
-1. Add tests for new functionality or that fail from the bug not fixed.
-1. Implement functionality or bug fix to pass the test.
+2. Ensure you have the `typescript` module installed globally.
+3. Run `npm install`.
+4. Ensure all tests pass with `npm test`.
+5. Add tests for new functionality or that fail from the bug not fixed.
+6. Implement functionality or bug fix to pass the test.
 
 ## Credits
 
