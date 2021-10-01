@@ -101,6 +101,12 @@ describe('XRegExp()', function() {
         expect(XRegExp('', 'i').ignoreCase).toBe(true);
         expect(XRegExp('', 'm').multiline).toBe(true);
 
+        if (hasNativeD) {
+            expect(XRegExp('', 'd').hasIndices).toBe(true);
+        } else {
+            expect(function() {XRegExp('', 'd');}).toThrowError(SyntaxError);
+        }
+
         if (hasNativeU) {
             expect(XRegExp('', 'u').unicode).toBe(true);
         } else {
@@ -134,7 +140,8 @@ describe('XRegExp()', function() {
         expect(XRegExp('').global).toBe(false);
         expect(XRegExp('').ignoreCase).toBe(false);
         expect(XRegExp('').multiline).toBe(false);
-        // Should be `false` or `undefined`, depending of whether flags `uy` are supported natively
+        // Should be `false` or `undefined`, depending of whether flags `duy` are supported natively
+        expect(XRegExp('').hasIndices).toBeFalsy();
         expect(XRegExp('').unicode).toBeFalsy();
         expect(XRegExp('').sticky).toBeFalsy();
     });
@@ -302,7 +309,8 @@ describe('XRegExp()', function() {
                 //expect(XRegExp('(?A)').astral).toBeFalsy();
             });
 
-            it('should throw an exception if flag g or y is included', function() {
+            it('should throw an exception if any of flags dgy are included', function() {
+                expect(function() {XRegExp('(?d)');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp('(?g)');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp('(?y)');}).toThrowError(SyntaxError);
                 expect(function() {XRegExp('(?gi)');}).toThrowError(SyntaxError);

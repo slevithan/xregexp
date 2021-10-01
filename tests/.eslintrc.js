@@ -6,6 +6,7 @@ module.exports = {
         "XRegExp": true,
         "resetFeatures": true,
         "REGEX_DATA": true,
+        "hasNativeD": true,
         "hasNativeS": true,
         "hasNativeU": true,
         "hasNativeY": true,

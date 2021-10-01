@@ -125,7 +125,7 @@ export default (XRegExp) => {
                     // `right` when they were passed through the XRegExp constructor above.
                     XRegExp.union([left, right], '', {conjunction: 'or'}).source
                 })[^${escapeChar}])+)+`,
-                // Flags `gy` not needed here
+                // Flags `dgy` not needed here
                 flags.replace(XRegExp._hasNativeFlag('s') ? /[^imsu]/g : /[^imu]/g, '')
             );
         }

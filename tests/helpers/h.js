@@ -13,6 +13,8 @@ global.resetFeatures = function() {
 // Property name used for extended regex instance data
 global.REGEX_DATA = 'xregexp';
 
+// Check for ES2021 `d` flag support
+global.hasNativeD = XRegExp._hasNativeFlag('d');
 // Check for ES2018 `s` flag support
 global.hasNativeS = XRegExp._hasNativeFlag('s');
 // Check for ES6 `u` flag support

@@ -16,6 +16,7 @@ export = XRegExp;
  * @param flags - Any combination of flags.
  *
  *   Native flags:
+ *     - `d` - indices for groups (ES2021)
  *     - `g` - global
  *     - `i` - ignore case
  *     - `m` - multiline anchors

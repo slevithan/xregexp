@@ -72,6 +72,8 @@ function hasNativeFlag(flag) {
     }
     return isSupported;
 }
+// Check for ES2021 `d` flag support
+const hasNativeD = hasNativeFlag('d');
 // Check for ES2018 `s` flag support
 const hasNativeS = hasNativeFlag('s');
 // Check for ES6 `u` flag support
@@ -80,6 +82,7 @@ const hasNativeU = hasNativeFlag('u');
 const hasNativeY = hasNativeFlag('y');
 // Tracker for known flags, including addon flags
 const registeredFlags = {
+    d: hasNativeD,
     g: true,
     i: true,
     m: true,
@@ -88,7 +91,7 @@ const registeredFlags = {
     y: hasNativeY
 };
 // Flags to remove when passing to native `RegExp` constructor
-const nonnativeFlags = hasNativeS ? /[^gimsuy]+/g : /[^gimuy]+/g;
+const nonnativeFlags = hasNativeS ? /[^dgimsuy]+/g : /[^dgimuy]+/g;
 
 /**
  * Attaches extended data and `XRegExp.prototype` properties to a regex object.
@@ -379,10 +382,10 @@ function prepareFlags(pattern, flags) {
         throw new SyntaxError(`Invalid duplicate regex flag ${flags}`);
     }
 
-    // Strip and apply a leading mode modifier with any combination of flags except g or y
+    // Strip and apply a leading mode modifier with any combination of flags except `dgy`
     pattern = pattern.replace(/^\(\?([\w$]+)\)/, ($0, $1) => {
-        if (/[gy]/.test($1)) {
-            throw new SyntaxError(`Cannot use flag g or y in mode modifier ${$0}`);
+        if (/[dgy]/.test($1)) {
+            throw new SyntaxError(`Cannot use flags dgy in mode modifier ${$0}`);
         }
         // Allow duplicate flags within the mode modifier
         flags = clipDuplicates(flags + $1);
@@ -519,6 +522,7 @@ function setNamespacing(on) {
  * @param {String|RegExp} pattern Regex pattern string, or an existing regex object to copy.
  * @param {String} [flags] Any combination of flags.
  *   Native flags:
+ *     - `d` - indices for groups (ES2021)
  *     - `g` - global
  *     - `i` - ignore case
  *     - `m` - multiline anchors
