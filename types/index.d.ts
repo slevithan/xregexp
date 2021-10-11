@@ -16,7 +16,7 @@ export = XRegExp;
  * @param flags - Any combination of flags.
  *
  *   Native flags:
- *     - `d` - indices for groups (ES2021)
+ *     - `d` - indices for capturing groups (ES2021)
  *     - `g` - global
  *     - `i` - ignore case
  *     - `m` - multiline anchors
@@ -24,10 +24,10 @@ export = XRegExp;
  *     - `y` - sticky (Firefox 3+, ES6)
  *
  *   Additional XRegExp flags:
- *     - `n` - explicit capture
+ *     - `n` - named capture only
  *     - `s` - dot matches all (aka singleline) - works even when not natively supported
  *     - `x` - free-spacing and line comments (aka extended)
- *     - `A` - astral (requires the Unicode Base addon)
+ *     - `A` - 21-bit Unicode properties (aka astral) - requires the Unicode Base addon
  *
  *   **Flags cannot be provided when constructing one `RegExp` from another.**
  * @returns Extended regular expression object.

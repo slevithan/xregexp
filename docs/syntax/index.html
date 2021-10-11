@@ -135,7 +135,7 @@ const regex = XRegExp('^ \\d{1,2}      (?#month)' +
 
     <h2 id="modeModifier">Leading mode modifier</h2>
 
-    <p>A mode modifier uses the syntax <code>(?<em>imnsuxA</em>)</code>, where <code><em>imnsuxA</em></code> is any combination of XRegExp flags except <code>g</code> or <code>y</code>. Mode modifiers provide an alternate way to enable the specified flags. XRegExp allows the use of a single mode modifier at the very beginning of a pattern only.</p>
+    <p>A mode modifier uses the syntax <code>(?<em>imnsuxA</em>)</code>, where <code><em>imnsuxA</em></code> is any combination of XRegExp flags except <code>g</code>, <code>y</code>, or <code>d</code>. Mode modifiers provide an alternate way to enable the specified flags. XRegExp allows the use of a single mode modifier at the very beginning of a pattern only.</p>
 
     <h3 style="margin-top:20px;">Example</h3>
 <pre class="sh_javascript">const regex = XRegExp('(?im)^[a-z]+$');
@@ -145,7 +145,7 @@ regex.multiline; // -> true
 
     <p>When creating a regex, it's okay to include flags in a mode modifier that are also provided via the separate <code>flags</code> argument. For instance, <code>XRegExp('(?s).+', 's')</code> is valid.</p>
 
-    <p>Flags <code>g</code> and <code>y</code> cannot be included in a mode modifier, or an error is thrown. This is because <code>g</code> and <code>y</code>, unlike all other flags, have no impact on the meaning of a regex. Rather, they change how particular methods choose to apply the regex. In fact, XRegExp methods provide e.g. <code>scope</code>, <code>sticky</code>, and <code>pos</code> arguments that allow you to use and change such functionality on a per-run rather than per-regex basis. Also consider that it makes sense to apply all other flags to a particular subsection of a regex, whereas flags <code>g</code> and <code>y</code> only make sense when applied to the regex as a whole. Allowing <code>g</code> and <code>y</code> in a mode modifier might therefore create future compatibility problems.</p>
+    <p>Flags <code>g</code>, <code>y</code>, and <code>d</code> cannot be included in a mode modifier, or an error is thrown. This is because <code>g</code>, <code>y</code>, and <code>d</code>, unlike all other flags, have no impact on the meaning of a regex. Rather, they change how particular methods choose to apply the regex. XRegExp methods provide e.g. <code>scope</code>, <code>sticky</code>, and <code>pos</code> arguments that allow you to use and change such functionality on a per-run rather than per-regex basis. Additionally, consider that it makes sense to apply all other flags to a particular subsection of a regex, whereas flags <code>g</code>, <code>y</code>, and <code>d</code> only make sense when applied to the regex as a whole. Allowing <code>g</code>, <code>y</code>, and <code>d</code> in a mode modifier might therefore create future compatibility problems.</p>
 
     <p>The use of unknown flags in a mode modifier causes an error to be thrown. However, XRegExp addons can add new flags that are then automatically valid within mode modifiers.</p>
 

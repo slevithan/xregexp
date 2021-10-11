@@ -33,10 +33,10 @@
         <h2>Table of contents</h2>
         <ul>
           <li><a href="#about">About flags</a></li>
-          <li><a href="#explicitCapture">Explicit capture (n)</a></li>
+          <li><a href="#explicitCapture">Named capture only (n)</a></li>
           <li><a href="#singleline">Dot matches all (s)</a></li>
           <li><a href="#extended">Free-spacing and line comments (x)</a></li>
-          <li><a href="#astral">Astral (A)</a></li>
+          <li><a href="#astral">21-bit Unicode properties (A)</a></li>
         </ul>
       </div>
     </div>
@@ -50,10 +50,10 @@
     <ul>
       <li><strong>New flags</strong>
         <ul>
-          <li><strong><code>n</code></strong> &mdash; Explicit capture</li>
-          <li><strong><code>s</code></strong> &mdash; Dot matches all (aka <em>singleline</em> mode) &mdash; <em>Added as a native flag in ES2018</em></li>
-          <li><strong><code>x</code></strong> &mdash; Free-spacing and line comments (aka <em>extended</em> mode)</li>
-          <li><strong><code>A</code></strong> &mdash; Astral (requires the Unicode Base addon)</li>
+          <li><strong><code>n</code></strong> &mdash; Named capture only</li>
+          <li><strong><code>s</code></strong> &mdash; Dot matches all (<em>singleline</em>) &mdash; <em>Added as a native flag in ES2018, but XRegExp always supports it</em></li>
+          <li><strong><code>x</code></strong> &mdash; Free-spacing and line comments (<em>extended</em>)</li>
+          <li><strong><code>A</code></strong> &mdash; 21-bit Unicode properties (<em>astral</em>) &mdash; <em>Requires the Unicode Base addon</em></li>
         </ul>
       </li>
       <li><strong>Native flags</strong>
@@ -61,22 +61,23 @@
           <li><strong><code>g</code></strong> &mdash; All matches, or advance <code>lastIndex</code> after matches (<code>global</code>)</li>
           <li><strong><code>i</code></strong> &mdash; Case insensitive (<code>ignoreCase</code>)</li>
           <li><strong><code>m</code></strong> &mdash; <code>^</code> and <code>$</code> match at newlines (<code>multiline</code>)</li>
-          <li><strong><code>u</code></strong> &mdash; Handle surrogate pairs as code points and enable <code>\u{&hellip;}</code> (<code>unicode</code>) &mdash; <em>Requires native ES6 support</em></li>
+          <li><strong><code>u</code></strong> &mdash; Handle surrogate pairs as code points and enable <code>\u{&hellip;}</code> and <code>\p{&hellip;}</code> (<code>unicode</code>) &mdash; <em>Requires native ES6 support</em></li>
           <li><strong><code>y</code></strong> &mdash; Matches must start at <code>lastIndex</code> (<code>sticky</code>) &mdash; <em>Requires Firefox 3+ or native ES6 support</em></li>
+          <li><strong><code>d</code></strong> &mdash; Include indices for capturing groups on match results (<code>hasIndices</code>) &mdash; <em>Requires native ES2021 support</em></li>
         </ul>
       </li>
     </ul>
 
 
-    <h2 id="explicitCapture">Explicit capture <span class="plain">(<code>n</code>)</span></h2>
+    <h2 id="explicitCapture">Named capture only <span class="plain">(<code>n</code>)</span></h2>
 
-    <p>Specifies that the only valid captures are explicitly named groups of the form <code>(?&lt;name>&hellip;)</code>. This allows unnamed <code>(&hellip;)</code> parentheses to act as noncapturing groups without the syntactic clumsiness of the expression <code>(?:&hellip;)</code>.</p>
+    <p>Specifies that the only captures are explicitly named groups of the form <code>(?&lt;name>&hellip;)</code>. This allows unnamed <code>(&hellip;)</code> parentheses to act as noncapturing groups without the syntactic clumsiness of the expression <code>(?:&hellip;)</code>.</p>
 
     <h3>Annotations</h3>
     <ul>
       <li><strong>Rationale:</strong> Backreference capturing adds performance overhead and is needed far less often than simple grouping. The <code>n</code> flag frees the <code>(&hellip;)</code> syntax from its often-undesired capturing side effect, while still allowing explicitly-named capturing groups.</li>
       <li><strong>Compatibility:</strong> No known problems; the <code>n</code> flag is illegal in native JavaScript regular expressions.</li>
-      <li><strong>Prior art:</strong> The <code>n</code> flag comes from .NET.</li>
+      <li><strong>Prior art:</strong> The <code>n</code> flag comes from .NET, where it's called "explicit capture."</li>
     </ul>
 
 
@@ -93,16 +94,16 @@
     <p>Usually, a dot does not match newlines. However, a mode in which dots match any code unit (including newlines) can be as useful as one where dots don't. The <code>s</code> flag allows the mode to be selected on a per-regex basis. Escaped dots (<code>\.</code>) and dots within character classes (<code>[.]</code>) are always equivalent to literal dots. The newline code points are as follows:</p>
 
     <ul>
-      <li><code>U+000a</code> &mdash; Line feed &mdash; <code>\n</code></li>
-      <li><code>U+000d</code> &mdash; Carriage return &mdash; <code>\r</code></li>
+      <li><code>U+000A</code> &mdash; Line feed &mdash; <code>\n</code></li>
+      <li><code>U+000D</code> &mdash; Carriage return &mdash; <code>\r</code></li>
       <li><code>U+2028</code> &mdash; Line separator</li>
       <li><code>U+2029</code> &mdash; Paragraph separator</li>
     </ul>
 
     <h3>Annotations</h3>
     <ul>
-      <li><strong>Rationale:</strong> All popular Perl-style regular expression flavors except JavaScript include a flag that allows dots to match newlines. Without this mode, matching any single code unit requires, e.g., <code>[\s\S]</code>, <code>[\0-\uFFFF]</code>, <code>[^]</code> (JavaScript only; doesn't work in some browsers without XRegExp), or god forbid <code>(.|\s)</code>.</li>
-      <li><strong>Compatibility:</strong> No known problems; the <code>s</code> flag is illegal in native JavaScript regular expressions.</li>
+      <li><strong>Rationale:</strong> All popular Perl-style regular expression flavors except JavaScript (prior to ES2018) include a flag that allows dots to match newlines. Without this mode, matching any single code unit requires, e.g., <code>[\s\S]</code>, <code>[\0-\uFFFF]</code>, <code>[^]</code> (JavaScript only; doesn't work in some browsers without XRegExp), or god forbid <code>(.|\s)</code> (which requires unnecessary backtracking).</li>
+      <li><strong>Compatibility:</strong> No known problems; the <code>s</code> flag is illegal in native JavaScript regular expressions prior to ES2018.</li>
       <li><strong>Prior art:</strong> The <code>s</code> flag comes from Perl.</li>
     </ul>
 
@@ -113,13 +114,13 @@
 
     <h2 id="extended">Free-spacing and line comments <span class="plain">(<code>x</code>)</span></h2>
 
-    <p>This flag has two complementary effects. First, it causes most whitespace to be ignored, so you can free-format the regex pattern for readability. Second, it allows comments with a leading <code>#</code>. Specifically, it turns most whitespace into an "ignore me" metacharacter, and <code>#</code> into an "ignore me, and everything else up to the next newline" metacharacter. They aren't taken as metacharacters within character classes (which means that classes are <em>not</em> free-format, even with <code>x</code>), and as with other metacharacters, you can escape whitespace and <code>#</code> that you want to be taken literally. Of course, you can always use <code>\s</code> to match whitespace.</p>
+    <p>This flag has two complementary effects. First, it causes all whitespace recognized natively by <code>\s</code> to be ignored, so you can free-format the regex pattern for readability. Second, it allows comments with a leading <code>#</code>. Specifically, it turns whitespace into an "ignore me" metacharacter, and <code>#</code> into an "ignore me and everything else up to the next newline" metacharacter. They aren't taken as metacharacters within character classes (which means that classes are <em>not</em> free-format even with <code>x</code>, following precedent from most other regex libraries that support <code>x</code>), and as with other metacharacters, you can escape whitespace and <code>#</code> that you want to be taken literally. Of course, you can always use <code>\s</code> to match whitespace.</p>
 
     <div class="aside">
       <p>It might be better to think of whitespace and comments as do-nothing (rather than ignore-me) metacharacters. This distinction is important with something like <code>\12&nbsp;3</code>, which with the <code>x</code> flag is taken as <code>\12</code> followed by <code>3</code>, and not <code>\123</code>. However, quantifiers following whitespace or comments apply to the preceeding token, so <code>x&nbsp;+</code> is equivalent to <code>x+</code>.</p>
     </div>
 
-    <p>The ignored whitespace characters are those matched natively by <code>\s</code>. ES3 whitespace is based on Unicode 2.1.0 or later. ES5 whitespace is based on Unicode 3.0.0 or later, plus <code>U+FEFF</code>. Following are the code points that should be matched by <code>\s</code> according to ES5 and Unicode 4.0.1&ndash;6.1.0 (not yet updated for later versions):</p>
+    <p>The ignored whitespace characters are those matched natively by <code>\s</code>. ES3 whitespace is based on Unicode 2.1.0 or later. ES5 whitespace is based on Unicode 3.0.0 or later, plus <code>U+FEFF</code>. Following are the code points that should be matched by <code>\s</code> according to ES5 and Unicode 4.0.1:</p>
 
     <ul style="-webkit-column-count:3; -moz-column-count:3; column-count:3;">
       <li><code>U+0009</code> &mdash; Tab &mdash; <code>\t</code></li>
@@ -168,33 +169,33 @@
     <div class="aside">
       <p>JavaScript's <code>\s</code> is similar but not equivalent to <code>\p{Z}</code> (the Separator category) from regex libraries that support Unicode categories, including XRegExp's own <a href="../unicode/index.html">Unicode Categories addon</a>. The difference is that <code>\s</code> includes code points <code>U+0009</code>&ndash;<code>U+000D</code> and <code>U+FEFF</code>, which are not assigned the Separator category in the Unicode character database.</p>
 
-      <p>JavaScript's <code>\s</code> is nearly equivalent to <code>\p{White_Space}</code> from the <a href="../unicode/index.html">Unicode Properties addon</a>. The differences are: 1. <code>\p{White_Space}</code> does not include <code>U+FEFF</code> (ZWNBSP). 2. <code>\p{White_Space}</code> includes <code>U+0085</code> (NEL), which is not assigned the Separator category in the Unicode character database.</p>
+      <p>JavaScript's <code>\s</code> is nearly equivalent to <code>\p{White_Space}</code> from the <a href="../unicode/index.html">Unicode Properties addon</a>. The differences are: 1. <code>\p{White_Space}</code> does not include <code>U+FEFF</code> (ZWNBSP), and 2. <code>\p{White_Space}</code> includes <code>U+0085</code> (NEL), which is not assigned the Separator category in the Unicode character database.</p>
 
-      <p>Aside: Not all JavaScript regex syntax is Unicode-aware. According to JavaScript specs, <code>\s</code>, <code>\S</code>, <code>.</code>, <code>^</code>, and <code>$</code> use Unicode-based interpretations of <em>whitespace</em> and <em>newline</em>, while <code>\d</code>, <code>\D</code>, <code>\w</code>, <code>\W</code>, <code>\b</code>, and <code>\B</code> use ASCII-only interpretations of <em>digit</em>, <em>word character</em>, and <em>word boundary</em><!-- (e.g., <code>/a\b/.test("na&iuml;ve")</code> returns <code>true</code>)-->. Many browsers get some of these details wrong. <!--E.g., Firefox 2 and earlier considers <code>\d</code> and <code>\D</code> to be Unicode-aware. Firefox 3 fixes this bug, making <code>\d</code> equivalent to <code>[0-9]</code>.--></p>
+      <p>Aside: Not all JavaScript regex syntax is Unicode-aware. According to JavaScript specs, <code>\s</code>, <code>\S</code>, <code>.</code>, <code>^</code>, and <code>$</code> use Unicode-based interpretations of <em>whitespace</em> and <em>newline</em>, while <code>\d</code>, <code>\D</code>, <code>\w</code>, <code>\W</code>, <code>\b</code>, and <code>\B</code> use ASCII-only interpretations of <em>digit</em>, <em>word character</em>, and <em>word boundary</em><!-- (e.g., <code>/a\b/.test("na&iuml;ve")</code> returns <code>true</code>)-->. Some browsers and browser versions get aspects of these details wrong.</p>
 
       <p>For more details, see <a href="https://blog.stevenlevithan.com/archives/javascript-regex-and-unicode"><em>JavaScript, Regex, and Unicode</em></a>.</p>
     </div>
 
 
-    <h2 id="astral">Astral <span class="plain">(<code>A</code>)</span></h2>
+    <h2 id="astral">21-bit Unicode properties <span class="plain">(<code>A</code>)</span></h2>
 
     <p><strong>Requires the <a href="../unicode/index.html">Unicode Base</a> addon.</strong></p>
 
     <p>By default, <code>\p{&hellip;}</code> and <code>\P{&hellip;}</code> support the Basic Multilingual Plane (i.e. code points up to <code>U+FFFF</code>). You can opt-in to full 21-bit Unicode support (with code points up to <code>U+10FFFF</code>) on a per-regex basis by using flag <code>A</code>. In XRegExp, this is called <em>astral mode</em>. You can automatically add flag <code>A</code> for all new regexes by running <code>XRegExp.install('astral')</code>. When in astral mode, <code>\p{&hellip;}</code> and <code>\P{&hellip;}</code> always match a full code point rather than a code unit, using surrogate pairs for code points above <code>U+FFFF</code>.</p>
 
 <pre class="sh_javascript">// Using flag A to match astral code points
-XRegExp('^\\pS$').test('💩'); // -> false
-XRegExp('^\\pS$', 'A').test('💩'); // -> true
-XRegExp('(?A)^\\pS$').test('💩'); // -> true
+XRegExp('^\\p{S}$').test('💩'); // -> false
+XRegExp('^\\p{S}$', 'A').test('💩'); // -> true
+XRegExp('(?A)^\\p{S}$').test('💩'); // -> true
 // Using surrogate pair U+D83D U+DCA9 to represent U+1F4A9 (pile of poo)
-XRegExp('(?A)^\\pS$').test('\uD83D\uDCA9'); // -> true
+XRegExp('(?A)^\\p{S}$').test('\uD83D\uDCA9'); // -> true
 
 // Implicit flag A
 XRegExp.install('astral');
-XRegExp('^\\pS$').test('💩'); // -> true
+XRegExp('^\\p{S}$').test('💩'); // -> true
 </pre>
 
-    <p>Opting in to astral mode disables the use of <code>\p{&hellip;}</code> and <code>\P{&hellip;}</code> within character classes. In astral mode, use e.g. <code>(\pL|[0-9_])+</code> instead of <code>[\pL0-9_]+</code>.</p>
+    <p><strong>Important:</strong> Opting in to astral mode disables the use of <code>\p{&hellip;}</code> and <code>\P{&hellip;}</code> within character classes. In astral mode, use e.g. <code>(\p{L}|[0-9_])+</code> instead of <code>[\p{L}0-9_]+</code>.</p>
 
     <h3>Annotations</h3>
     <ul>

@@ -522,17 +522,17 @@ function setNamespacing(on) {
  * @param {String|RegExp} pattern Regex pattern string, or an existing regex object to copy.
  * @param {String} [flags] Any combination of flags.
  *   Native flags:
- *     - `d` - indices for groups (ES2021)
+ *     - `d` - indices for capturing groups (ES2021)
  *     - `g` - global
  *     - `i` - ignore case
  *     - `m` - multiline anchors
  *     - `u` - unicode (ES6)
  *     - `y` - sticky (Firefox 3+, ES6)
  *   Additional XRegExp flags:
- *     - `n` - explicit capture
+ *     - `n` - named capture only
  *     - `s` - dot matches all (aka singleline) - works even when not natively supported
  *     - `x` - free-spacing and line comments (aka extended)
- *     - `A` - astral (requires the Unicode Base addon)
+ *     - `A` - 21-bit Unicode properties (aka astral) - requires the Unicode Base addon
  *   Flags cannot be provided when constructing one `RegExp` from another.
  * @returns {RegExp} Extended regular expression object.
  * @example
@@ -1885,7 +1885,7 @@ XRegExp.addToken(
 
 /*
  * Capturing group; match the opening parenthesis only. Required for support of named capturing
- * groups. Also adds explicit capture mode (flag n).
+ * groups. Also adds named capture only mode (flag n).
  */
 XRegExp.addToken(
     /\((?!\?)/,
