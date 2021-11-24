@@ -38,7 +38,7 @@
     "test-browser": "npm run test-saucelabs -- --local --open",
     "prepublish": "npm test"
   },
-  "types": "types",
+  "types": "types/index.d.ts",
   "devDependencies": {
     "@babel/cli": "^7.14.8",
     "@babel/core": "^7.14.8",
