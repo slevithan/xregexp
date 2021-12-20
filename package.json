@@ -34,8 +34,6 @@
     "build": "browserify lib/index.js --standalone XRegExp > xregexp-all.js",
     "pretest": "npm run build",
     "test": "nyc --reporter=lcov --reporter=text-summary jasmine JASMINE_CONFIG_PATH=tests/jasmine.json",
-    "test-saucelabs": "npm run pretest && zuul tests/spec/*.js",
-    "test-browser": "npm run test-saucelabs -- --local --open",
     "prepublish": "npm test"
   },
   "types": "types/index.d.ts",
@@ -55,8 +53,7 @@
     "jasmine": "^3.10.0",
     "jsesc": "^3.0.2",
     "nyc": "^15.1.0",
-    "unicode-property-value-aliases": "^3.6.0",
-    "zuul": "^3.12.0"
+    "unicode-property-value-aliases": "^3.6.0"
   },
   "dependencies": {
     "@babel/runtime-corejs3": "^7.16.5"
