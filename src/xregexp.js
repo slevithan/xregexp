@@ -834,7 +834,7 @@ XRegExp.escape = (str) => String(nullThrows(str)).
  * match.groups.hex; // -> '2620'
  *
  * // With pos and sticky, in a loop
- * let pos = 2, result = [], match;
+ * let pos = 3, result = [], match;
  * while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d)>/, pos, 'sticky')) {
  *   result.push(match[1]);
  *   pos = match.index + match[0].length;

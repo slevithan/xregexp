@@ -438,12 +438,12 @@ const regex2 = XRegExp.cache('.', 's');
 
     <h3>Example</h3>
 <pre class="sh_javascript">// Basic use, with named backreference
-let match = XRegExp.exec('U+2620', XRegExp('U\\+(?<hex>[0-9A-F]{4})'));
+let match = XRegExp.exec('U+2620', XRegExp('U\\+(?&lt;hex>[0-9A-F]{4})'));
 match.groups.hex; // -> '2620'
 
 // With pos and sticky, in a loop
-let pos = 2, result = [], match;
-while (match = XRegExp.exec('<1><2><3><4>5<6>', /<(\d)>/, pos, 'sticky')) {
+let pos = 3, result = [], match;
+while (match = XRegExp.exec('&lt;1>&lt;2>&lt;3>&lt;4>5&lt;6>', /&lt;(\d)>/, pos, 'sticky')) {
   result.push(match[1]);
   pos = match.index + match[0].length;
 }
