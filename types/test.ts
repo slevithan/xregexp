@@ -3,12 +3,25 @@ import XRegExp = require('xregexp');
 // ======================================================
 // constructor
 // ======================================================
-let regex1: RegExp = /a/gi;
+let regex1: XRegExp;
+let s: string;
+let n: null;
 regex1 = XRegExp('/a/');
+s = XRegExp('/a/').xregexp.source;
+n = XRegExp('/a/').xregexp.flags;
+
 regex1 = XRegExp('/a/', 'gi');
+s = XRegExp('/a/', 'gi').xregexp.source;
+s = XRegExp('/a/', 'gi').xregexp.flags;
+
 regex1 = XRegExp(/a/gi);
+n = XRegExp(/a/gi).xregexp.source;
+n = XRegExp(/a/gi).xregexp.flags;
+
 regex1 = XRegExp(regex1, undefined);
 
+regex1.xregexp.source;
+regex1.xregexp.flags;
 // ======================================================
 // XRegExp namespace
 // ======================================================
