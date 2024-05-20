@@ -2,6 +2,9 @@
 
 [![Build Status](https://github.com/slevithan/xregexp/workflows/Node.js%20CI/badge.svg)](https://github.com/slevithan/xregexp/actions)
 
+[<img align="left" src="https://github.com/slevithan/awesome-regex/raw/main/media/awesome-regex.svg" height="45">](https://github.com/slevithan/awesome-regex) <sub>Included in</sub><br>
+<sup>[Awesome Regex](https://github.com/slevithan/awesome-regex)</sup>
+
 XRegExp provides augmented (and extensible) JavaScript regular expressions. You get modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your grepping and parsing easier, while freeing you from regex cross-browser inconsistencies and other annoyances.
 
 XRegExp supports all native ES6 regular expression syntax. It supports ES5+ browsers, and you can use it with Node.js or as a RequireJS module. Over the years, many of XRegExp's features have been adopted by new JavaScript standards (named capturing, Unicode properties/scripts/categories, flag `s`, sticky matching, etc.), so using XRegExp can be a way to extend these features into older browsers.
@@ -59,8 +62,8 @@ XRegExp.replace('2021-02-22', date, '$<month>/$<day>/$<year>');
 // -> '02/22/2021'
 XRegExp.replace('2021-02-22', date, (...args) => {
     // Named backreferences are on the last argument
-    const groups = args[args.length - 1];
-    return `${groups.month}/${groups.day}/${groups.year}`;
+    const {day, month, year} = args.at(-1);
+    return `${month}/${day}/${year}`;
 });
 // -> '02/22/2021'
 

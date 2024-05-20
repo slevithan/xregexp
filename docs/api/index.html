@@ -932,8 +932,8 @@ XRegExp.replace('John Smith', name, '$&lt;last>, $&lt;first>');
 
 // Regex search, using named backreferences in replacement function
 XRegExp.replace('John Smith', name, (...args) => {
-  const groups = args[args.length - 1];
-  return `${groups.last}, ${groups.first}`;
+  const {first, last} = args.at(-1);
+  return `${last}, ${first}`;
 });
 // -> 'Smith, John'
 
