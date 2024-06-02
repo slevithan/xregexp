@@ -839,9 +839,9 @@ describe('XRegExp()', function() {
 
         });
 
-        xdescribe('A (astral), via the Unicode Base addon', function() {
-            // Covered by the specs for Unicode Base
-        });
+        // xdescribe('A (astral), via the Unicode Base addon', function() {
+        //     // Covered by the specs for Unicode Base
+        // });
 
     });
 

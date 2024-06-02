@@ -257,6 +257,7 @@ In [Node.js](https://nodejs.org/en/):
 const XRegExp = require('xregexp');
 ```
 
+<!--
 ## Contribution guide
 
 1. Fork the repository and clone the forked version locally.
@@ -265,6 +266,7 @@ const XRegExp = require('xregexp');
 4. Ensure all tests pass with `npm test`.
 5. Add tests for new functionality or that fail from the bug not fixed.
 6. Implement functionality or bug fix to pass the test.
+-->
 
 ## Credits
 
