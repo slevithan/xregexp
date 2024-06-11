@@ -1,13 +1,11 @@
-# XRegExp 5.1.1
+# XRegExp 5.1.1 [![Build Status](https://github.com/slevithan/xregexp/workflows/Node.js%20CI/badge.svg)](https://github.com/slevithan/xregexp/actions)
 
-[![Build Status](https://github.com/slevithan/xregexp/workflows/Node.js%20CI/badge.svg)](https://github.com/slevithan/xregexp/actions)
-
-[<img align="left" src="https://github.com/slevithan/awesome-regex/raw/main/media/awesome-regex.svg" height="45">](https://github.com/slevithan/awesome-regex) <sub>Included in</sub><br>
-<sup>[Awesome Regex](https://github.com/slevithan/awesome-regex)</sup>
+> [!TIP]
+> XRegExp was indispensable for heavy regex users in its time, but many of its best features have been adopted by modern JavaScript. Check out [`regex`](https://github.com/slevithan/regex), the modern spiritual successor to XRegExp that once again takes JavaScript regexes to the next level. And see [Awesome Regex](https://github.com/slevithan/awesome-regex) for all of the best regex resources.
 
 XRegExp provides augmented (and extensible) JavaScript regular expressions. You get modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your grepping and parsing easier, while freeing you from regex cross-browser inconsistencies and other annoyances.
 
-XRegExp supports all native ES6 regular expression syntax. It supports ES5+ browsers, and you can use it with Node.js or as a RequireJS module. Over the years, many of XRegExp's features have been adopted by new JavaScript standards (named capturing, Unicode properties/scripts/categories, flag `s`, sticky matching, etc.), so using XRegExp can be a way to extend these features into older browsers.
+XRegExp supports ES5+ browsers, and you can use it with Node.js or as a RequireJS module. Over the years, many of XRegExp's features have been adopted by new JavaScript standards (named capturing, Unicode properties/scripts/categories, flag `s`, sticky matching, etc.), so using XRegExp can be a way to extend these features into older browsers.
 
 ## Performance
 
