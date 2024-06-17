@@ -1,7 +1,7 @@
 # XRegExp 5.1.1 [![Build Status](https://github.com/slevithan/xregexp/workflows/Node.js%20CI/badge.svg)](https://github.com/slevithan/xregexp/actions)
 
 > [!TIP]
-> XRegExp was indispensable for heavy regex users in its time, but many of its best features have been adopted by modern JavaScript. Check out [`regex`](https://github.com/slevithan/regex), the modern spiritual successor to XRegExp that once again takes JavaScript regexes to the next level. And see [Awesome Regex](https://github.com/slevithan/awesome-regex) for all of the best regex resources.
+> XRegExp was indispensable for heavy regex users in its time, but many of its best features have been adopted by modern JavaScript. Check out [`regex`](https://github.com/slevithan/regex), the lightweight spiritual successor to XRegExp that once again takes JavaScript regexes to the next level.
 
 XRegExp provides augmented (and extensible) JavaScript regular expressions. You get modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your grepping and parsing easier, while freeing you from regex cross-browser inconsistencies and other annoyances.
 
