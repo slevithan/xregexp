@@ -1,7 +1,10 @@
-# XRegExp 5.1.1 [![Build Status](https://github.com/slevithan/xregexp/workflows/Node.js%20CI/badge.svg)](https://github.com/slevithan/xregexp/actions)
+# XRegExp
+
+[![npm version][npm-version-src]][npm-version-href]
+[![npm downloads][npm-downloads-src]][npm-downloads-href]
 
 > [!TIP]
-> XRegExp was indispensable for heavy regex users in its time, but many of its best features have been adopted by modern JavaScript. Check out [`regex`](https://github.com/slevithan/regex), the lightweight spiritual successor to XRegExp that once again takes JavaScript regexes to the next level.
+> XRegExp was indispensable for heavy regex users in its time, but many of its best features have been adopted into modern JavaScript. Check out [Regex+](https://github.com/slevithan/regex), the lightweight spiritual successor to XRegExp that once again takes JavaScript regexes to the next level.
 
 XRegExp provides augmented (and extensible) JavaScript regular expressions. You get modern syntax and flags beyond what browsers support natively. XRegExp is also a regex utility belt with tools to make your grepping and parsing easier, while freeing you from regex cross-browser inconsistencies and other annoyances.
 
@@ -277,3 +280,10 @@ XRegExp project collaborators are:
 Thanks to all contributors and others who have submitted code, provided feedback, reported bugs, and inspired new features.
 
 XRegExp is released under the [MIT License](https://mit-license.org/). Learn more at [xregexp.com](https://xregexp.com/).
+
+<!-- Badges -->
+
+[npm-version-src]: https://img.shields.io/npm/v/xregexp?color=78C372
+[npm-version-href]: https://npmjs.com/package/xregexp
+[npm-downloads-src]: https://img.shields.io/npm/dm/xregexp?color=78C372
+[npm-downloads-href]: https://npmjs.com/package/xregexp
