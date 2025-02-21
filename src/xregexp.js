@@ -25,9 +25,9 @@ const features = {
 // Storage for fixed/extended native methods
 const fixed = {};
 // Storage for regexes cached by `XRegExp.cache`
-let regexCache = {};
+let regexCache = Object.create(null);
 // Storage for pattern details cached by the `XRegExp` constructor
-let patternCache = {};
+let patternCache = Object.create(null);
 // Storage for regex syntax tokens added internally or by `XRegExp.addToken`
 const tokens = [];
 // Token scopes
@@ -774,10 +774,10 @@ XRegExp.cache = (pattern, flags) => {
 XRegExp.cache.flush = (cacheName) => {
     if (cacheName === 'patterns') {
         // Flush the pattern cache used by the `XRegExp` constructor
-        patternCache = {};
+        patternCache = Object.create(null);
     } else {
         // Flush the regex cache populated by `XRegExp.cache`
-        regexCache = {};
+        regexCache = Object.create(null);
     }
 };
 
