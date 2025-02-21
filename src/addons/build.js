@@ -1,5 +1,5 @@
 /*!
- * XRegExp.build 5.1.1
+ * XRegExp.build 5.1.2
  * <xregexp.com>
  * Steven Levithan (c) 2012-present MIT License
  */
