@@ -8,6 +8,9 @@ const scripts = require(`${unicodeVersion}`).Script;
 
 const result = [];
 for (const script of scripts) {
+    if (script === 'Unknown') {
+        continue;
+    }
     const codePoints = require(`${unicodeVersion}/Script/${script}/code-points.js`);
     result.push(assemble({
         name: script,
