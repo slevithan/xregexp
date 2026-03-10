@@ -9,11 +9,10 @@ global.addToEqualMatchMatcher = function() {
         toEqualMatch: function() {
             return {
                 compare: function(actual, expected) {
-                    var isA = jasmine.isA_;
                     var result = {};
 
-                    if (isA('Array', actual)) {
-                        if (!isA('Array', expected) || actual.length !== expected.length) {
+                    if (Array.isArray(actual)) {
+                        if (!Array.isArray(expected) || actual.length !== expected.length) {
                             result.pass = false;
                         } else {
                             for (var i = 0; i < actual.length; ++i) {

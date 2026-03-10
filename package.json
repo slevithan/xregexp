@@ -37,23 +37,23 @@
   },
   "types": "types/index.d.ts",
   "devDependencies": {
-    "@babel/cli": "^7.28.3",
-    "@babel/core": "^7.28.5",
-    "@babel/plugin-transform-unicode-property-regex": "^7.27.1",
-    "@babel/plugin-transform-runtime": "^7.28.5",
-    "@babel/preset-env": "^7.28.5",
+    "@babel/cli": "^7.28.6",
+    "@babel/core": "^7.29.0",
+    "@babel/plugin-transform-unicode-property-regex": "^7.28.6",
+    "@babel/plugin-transform-runtime": "^7.29.0",
+    "@babel/preset-env": "^7.29.0",
     "@unicode/unicode-14.0.0": "^1.6.16",
     "babel-plugin-add-module-exports": "^1.0.4",
     "babel-plugin-array-includes": "^2.0.3",
     "babel-plugin-transform-xregexp": "^1.0.0",
     "browserify": "^17.0.1",
     "eslint": "^8.57.1",
-    "jasmine": "^5.12.0",
+    "jasmine": "^6.1.0",
     "jsesc": "^3.1.0",
-    "nyc": "^17.1.0",
+    "nyc": "^18.0.0",
     "unicode-property-value-aliases": "^3.9.0"
   },
   "dependencies": {
-    "@babel/runtime-corejs3": "^7.28.4"
+    "@babel/runtime-corejs3": "^7.29.0"
   }
 }
