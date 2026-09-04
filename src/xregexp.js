@@ -23,7 +23,7 @@ const features = {
     namespacing: true
 };
 // Storage for fixed/extended native methods
-const fixed = {};
+const fixed = Object.create(null);
 // Storage for regexes cached by `XRegExp.cache`
 let regexCache = Object.create(null);
 // Storage for pattern details cached by the `XRegExp` constructor
@@ -81,15 +81,14 @@ const hasNativeU = hasNativeFlag('u');
 // Check for ES6 `y` flag support
 const hasNativeY = hasNativeFlag('y');
 // Tracker for known flags, including addon flags
-const registeredFlags = {
-    d: hasNativeD,
-    g: true,
-    i: true,
-    m: true,
-    s: hasNativeS,
-    u: hasNativeU,
-    y: hasNativeY
-};
+const registeredFlags = Object.create(null);
+registeredFlags.d = hasNativeD;
+registeredFlags.g = true;
+registeredFlags.i = true;
+registeredFlags.m = true;
+registeredFlags.s = hasNativeS;
+registeredFlags.u = hasNativeU;
+registeredFlags.y = hasNativeY;
 // Flags to remove when passing to native `RegExp` constructor
 const nonnativeFlags = hasNativeS ? /[^dgimsuy]+/g : /[^dgimuy]+/g;
 
@@ -565,7 +564,7 @@ function XRegExp(pattern, flags) {
     }
 
     if (!patternCache[pattern]) {
-        patternCache[pattern] = {};
+        patternCache[pattern] = Object.create(null);
     }
 
     if (!patternCache[pattern][flags]) {
@@ -763,7 +762,7 @@ XRegExp.addToken = (regex, handler, options) => {
  */
 XRegExp.cache = (pattern, flags) => {
     if (!regexCache[pattern]) {
-        regexCache[pattern] = {};
+        regexCache[pattern] = Object.create(null);
     }
     return regexCache[pattern][flags] || (
         regexCache[pattern][flags] = XRegExp(pattern, flags)

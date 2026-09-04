@@ -167,6 +167,31 @@ describe('XRegExp()', function() {
         expect(function() {XRegExp('', '?');}).toThrowError(SyntaxError);
     });
 
+    it('should throw an exception for `__proto__`-like flag names that would otherwise bypass flag validation via Object.prototype pollution (issue #365)', function() {
+        // The pattern and flag caches are keyed by user-controlled strings. When the cache is a
+        // plain object, names like `__proto__`, `constructor`, `hasOwnProperty`, `toString`, etc.
+        // resolve to inherited properties and skip the `Unknown regex flag` check, silently
+        // returning an always-matching regex. Follow-up to the prototype pollution fix in #362.
+        var poison = [
+            '__proto__',
+            'constructor',
+            'hasOwnProperty',
+            'isPrototypeOf',
+            'propertyIsEnumerable',
+            'toLocaleString',
+            'toString',
+            'valueOf'
+        ];
+        poison.forEach(function(name) {
+            // The most direct observable symptom of #365 before the fix: no throw at all.
+            expect(function() {XRegExp('', name);}).toThrow();
+            // The flag string is never accepted as a regex flag set, so the constructor
+            // must reject it with a SyntaxError (rather than returning an
+            // always-matching regex).
+            expect(function() {XRegExp('', name);}).toThrowError(SyntaxError);
+        });
+    });
+
     it('should allow (?:) followed by a quantifier as a pattern', function() {
         var quantifiers = [
             '?',
