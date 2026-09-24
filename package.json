@@ -33,7 +33,7 @@
     "build": "browserify lib/index.js --standalone XRegExp > xregexp-all.js",
     "pretest": "pnpm run build",
     "test": "jasmine JASMINE_CONFIG_PATH=tests/jasmine.json",
-    "prepublish": "pnpm test"
+    "prepack": "pnpm test"
   },
   "types": "types/index.d.ts",
   "devDependencies": {
