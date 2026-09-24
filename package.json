@@ -29,11 +29,11 @@
     "lint": "eslint .",
     "babel": "babel src -d lib",
     "build-unicode-data": "node tools/scripts/category-regex.js && node tools/scripts/property-regex.js && node tools/scripts/script-regex.js",
-    "prebuild": "npm run build-unicode-data && npm run lint && npm run babel",
+    "prebuild": "pnpm run build-unicode-data && pnpm run lint && pnpm run babel",
     "build": "browserify lib/index.js --standalone XRegExp > xregexp-all.js",
-    "pretest": "npm run build",
+    "pretest": "pnpm run build",
     "test": "nyc --reporter=lcov --reporter=text-summary jasmine JASMINE_CONFIG_PATH=tests/jasmine.json",
-    "prepublish": "npm test"
+    "prepublish": "pnpm test"
   },
   "types": "types/index.d.ts",
   "devDependencies": {
@@ -55,5 +55,6 @@
   },
   "dependencies": {
     "@babel/runtime-corejs3": "^7.29.0"
-  }
+  },
+  "packageManager": "pnpm@12.6.0"
 }

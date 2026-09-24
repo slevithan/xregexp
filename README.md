@@ -246,10 +246,10 @@ In browsers (bundle XRegExp with all of its addons):
 <script src="https://unpkg.com/xregexp/xregexp-all.js"></script>
 ```
 
-Using [npm](https://www.npmjs.com/):
+Using [pnpm](https://pnpm.io/):
 
 ```bash
-npm install xregexp
+pnpm add xregexp
 ```
 
 In [Node.js](https://nodejs.org/en/):
@@ -258,13 +258,25 @@ In [Node.js](https://nodejs.org/en/):
 const XRegExp = require('xregexp');
 ```
 
+## Development
+
+Install the pnpm version pinned in `package.json`, then run:
+
+```bash
+pnpm install
+pnpm test
+```
+
+`pnpm test` builds the Unicode data, lints and compiles the source, bundles XRegExp,
+and runs the test suite. Use `pnpm run build` to build without running the tests.
+
 <!--
 ## Contribution guide
 
 1. Fork the repository and clone the forked version locally.
 2. Ensure you have the `typescript` module installed globally.
-3. Run `npm install`.
-4. Ensure all tests pass with `npm test`.
+3. Run `pnpm install`.
+4. Ensure all tests pass with `pnpm test`.
 5. Add tests for new functionality or that fail from the bug not fixed.
 6. Implement functionality or bug fix to pass the test.
 -->

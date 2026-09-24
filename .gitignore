@@ -6,7 +6,7 @@ coverage
 # Compiled Python files
 *.pyc
 
-# Installed npm modules
+# Installed dependencies
 node_modules
 
 # Folder view configuration files
