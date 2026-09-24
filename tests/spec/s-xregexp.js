@@ -167,6 +167,29 @@ describe('XRegExp()', function() {
         expect(function() {XRegExp('', '?');}).toThrowError(SyntaxError);
     });
 
+    ['__proto__', 'constructor'].forEach(function(flags) {
+        it('should reject "' + flags + '" as flags', function() {
+            expect(function() {XRegExp('^admin$', flags);}).toThrowError(SyntaxError);
+        });
+    });
+
+    it('should not treat inherited properties as registered flags', function() {
+        var descriptor = Object.getOwnPropertyDescriptor(Object.prototype, 'q');
+        Object.defineProperty(Object.prototype, 'q', {configurable: true, value: true});
+
+        try {
+            expect(function() {XRegExp('^admin$', 'q');}).toThrowError(SyntaxError);
+            expect(function() {XRegExp('(?q)^admin$');}).toThrowError(SyntaxError);
+        } finally {
+            if (descriptor) {
+                Object.defineProperty(Object.prototype, 'q', descriptor);
+            } else {
+                delete Object.prototype.q;
+            }
+            XRegExp.cache.flush('patterns');
+        }
+    });
+
     it('should allow (?:) followed by a quantifier as a pattern', function() {
         var quantifiers = [
             '?',

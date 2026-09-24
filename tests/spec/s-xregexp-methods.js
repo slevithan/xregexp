@@ -204,6 +204,12 @@ describe('XRegExp.cache()', function() {
         expect(XRegExp.cache('. +()\\1 1', 'gimsx')).toEqual(XRegExp('. +()\\1 1', 'gimsx'));
     });
 
+    ['__proto__', 'constructor'].forEach(function(flags) {
+        it('should reject "' + flags + '" as flags', function() {
+            expect(function() {XRegExp.cache('^admin$', flags);}).toThrowError(SyntaxError);
+        });
+    });
+
     it('should allow flushing the regex object cache via XRegExp.cache.flush()', function() {
         var regex = XRegExp.cache('');
         XRegExp.cache.flush();
@@ -835,6 +841,10 @@ describe('XRegExp.isInstalled()', function() {
 
     it('should report unknown features as not installed', function() {
         expect(XRegExp.isInstalled('bogus')).toBe(false);
+    });
+
+    it('should report "toString" as not installed', function() {
+        expect(XRegExp.isInstalled('toString')).toBe(false);
     });
 
     it('should be case sensitive for feature names', function() {
