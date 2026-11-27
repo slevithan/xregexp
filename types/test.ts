@@ -9,6 +9,17 @@ regex1 = XRegExp('/a/', 'gi');
 regex1 = XRegExp(/a/gi);
 regex1 = XRegExp(regex1, undefined);
 
+const compiled = XRegExp('a b', 'x');
+const originalSource: string = compiled.xregexp.source;
+const originalFlags: string = compiled.xregexp.flags;
+const copiedSource: string = XRegExp(compiled).xregexp.source;
+const copiedFlags: string = XRegExp(compiled, undefined).xregexp.flags;
+const nativeSource: string | null = XRegExp(/ab/).xregexp.source;
+// @ts-expect-error A copy of a native regex has no original XRegExp source.
+const nativeSourceString: string = XRegExp(/ab/).xregexp.source;
+// @ts-expect-error Ordinary RegExp instances do not expose XRegExp metadata.
+/ab/.xregexp;
+
 // ======================================================
 // XRegExp namespace
 // ======================================================
@@ -79,6 +90,7 @@ const ng_str1: string = ng['name'] + ng['val'];
 
 // MatchArray
 class XRegExpMatchArrayImpl extends Array<string> implements XRegExp.MatchArray {
+    declare 0: string;
     constructor(...items: string[]) {
         super(...items);
         Object.setPrototypeOf(this, Object.create(XRegExpMatchArrayImpl.prototype));
@@ -96,6 +108,7 @@ const ma_str1: string | undefined = ma['namedMatch'] as string;
 
 // ExecArray
 class XRegExpExecArrayImpl extends Array<string> implements XRegExp.ExecArray {
+    declare 0: string;
     constructor(...items: string[]) {
         super(...items);
         Object.setPrototypeOf(this, Object.create(XRegExpExecArrayImpl.prototype));
@@ -181,9 +194,11 @@ XRegExp.addUnicodeData([ ucr ]);
 // build
 regex1 = XRegExp.build('(?x)^ {{v1}}:{{v2}} $', { v1: /a/gi, v2: regex1 });
 regex1 = XRegExp.build('(?x)^ {{v1}}:{{v2}} $', { v1: /a/gi, v2: '/a/' }, 'gi');
+const builtSource: string = XRegExp.build('{{v}}', { v: /a/ }).xregexp.source;
 
 // cache
 regex1 = XRegExp.cache('/a/', 'gi');
+const cachedFlags: string = XRegExp.cache('a', 'x').xregexp.flags;
 
 // escape
 const escape_str: string = XRegExp.escape('?<.abcde> asdf');
@@ -199,6 +214,10 @@ XRegExp.forEach('ab_ab_ab', /ab/gi, (m, i, s, r) => { /* do action */ });
 
 // globalize
 regex1 = XRegExp.globalize(/a/gi);
+const globalFlags: string = XRegExp.globalize(compiled).xregexp.flags;
+const nativeGlobalFlags: string | null = XRegExp.globalize(/a/).xregexp.flags;
+// @ts-expect-error Globalizing a native regex does not recover its original XRegExp flags.
+const nativeGlobalFlagsString: string = XRegExp.globalize(/a/).xregexp.flags;
 
 // install
 XRegExp.install('astral');
@@ -254,6 +273,7 @@ s_strarr = XRegExp.split('asdf', /a/gi, 2);
 // tag
 let tag_re: RegExp = /a/g;
 tag_re = XRegExp.tag('i')`(asdf|${tag_re}|qwerty)`;
+const taggedSource: string = XRegExp.tag('x')`a b`.xregexp.source;
 
 // test
 let t_bool: boolean = XRegExp.test('asdf', '/a/');
@@ -279,5 +299,6 @@ u_re = XRegExp.union([ '/a/', /b/gi, XRegExp(/a/gi) ], 'gi', { });
 u_re = XRegExp.union([ '/a/', /b/gi, XRegExp(/a/gi) ], 'gi', { conjunction: null });
 u_re = XRegExp.union([ '/a/', /b/gi, XRegExp(/a/gi) ], 'gi', { conjunction: 'or' });
 u_re = XRegExp.union([ '/a/', /b/gi, XRegExp(/a/gi) ], 'gi', { conjunction: 'none' });
+const unionSource: string = XRegExp.union([/a/, 'b']).xregexp.source;
 
 //#endregion
