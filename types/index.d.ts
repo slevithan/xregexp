@@ -8,6 +8,19 @@ export = XRegExp;
 //#region constructor
 
 /**
+ * A regular expression with the original XRegExp pattern and flags.
+ * Both values are null when copying a regex originally created by native RegExp.
+ */
+interface XRegExp<Original extends string | null = string | null> extends RegExp {
+    readonly xregexp: {
+        readonly source: Original;
+        readonly flags: Original;
+    };
+}
+
+type XRegExpFrom<Pattern> = Pattern extends string | XRegExp<string> ? XRegExp<string> : XRegExp;
+
+/**
  * Creates an extended regular expression object for matching text with a pattern. Differs from a
  * native regular expression in that additional syntax and flags are supported. The returned object
  * is in fact a native `RegExp` and works with all native methods.
@@ -43,9 +56,9 @@ export = XRegExp;
  * // have fresh `lastIndex` properties (set to zero).
  * XRegExp(/regex/);
  */
-declare function XRegExp(pattern: string, flags?: string): RegExp;
-declare function XRegExp(pattern: RegExp): RegExp;
-declare function XRegExp<T extends XRegExp.Pattern>(pattern: T, flags: (T extends RegExp ? undefined : string | undefined)): RegExp;
+declare function XRegExp(pattern: string, flags?: string): XRegExp<string>;
+declare function XRegExp<T extends RegExp>(pattern: T): XRegExpFrom<T>;
+declare function XRegExp<T extends XRegExp.Pattern>(pattern: T, flags: (T extends RegExp ? undefined : string | undefined)): XRegExpFrom<T>;
 
 //#endregion
 
@@ -542,7 +555,7 @@ declare namespace XRegExp {
      * time.test('10:59'); // -> true
      * XRegExp.exec('10:59', time).groups.minutes; // -> '59'
      */
-    function build(pattern: string, subs: Record<string, Pattern>, flags?: string): RegExp;
+    function build(pattern: string, subs: Record<string, Pattern>, flags?: string): XRegExp<string>;
 
     /**
      * Caches and returns the result of calling `XRegExp(pattern, flags)`. On any subsequent call with
@@ -558,7 +571,7 @@ declare namespace XRegExp {
      *   // The regex is compiled once only
      * }
      */
-    function cache(pattern: string, flags: string): RegExp;
+    function cache(pattern: string, flags: string): XRegExp<string>;
 
     /**
      * Escapes any regular expression metacharacters, for use when matching literal strings. The result
@@ -639,7 +652,7 @@ declare namespace XRegExp {
      * const globalCopy = XRegExp.globalize(/regex/);
      * globalCopy.global; // -> true
      */
-    function globalize(regex: RegExp): RegExp;
+    function globalize<T extends RegExp>(regex: T): XRegExpFrom<T>;
 
     /**
      * Installs optional features according to the specified options. Can be undone using
@@ -938,7 +951,7 @@ declare namespace XRegExp {
      * const backref2 = /(b)\1/;
      * XRegExp.tag()`${backref1}${backref2}`.test('aabb'); // -> true
      */
-    function tag(flags?: string | null): (literals: TemplateStringsArray, ...substitutions: any[]) => RegExp;
+    function tag(flags?: string | null): (literals: TemplateStringsArray, ...substitutions: any[]) => XRegExp<string>;
 
     /**
      * Executes a regex search in a specified string. Returns `true` or `false`. Optional `pos` and
@@ -1004,7 +1017,7 @@ declare namespace XRegExp {
      * XRegExp.union([/man/, /bear/, /pig/], 'i', {conjunction: 'none'});
      * // -> /manbearpig/i
      */
-    function union(patterns: Pattern[], flags?: string | null, options?: UnionOptions): RegExp;
+    function union(patterns: Pattern[], flags?: string | null, options?: UnionOptions): XRegExp<string>;
 
     //#endregion
 }
